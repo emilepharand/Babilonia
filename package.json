@@ -5,16 +5,22 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "start": "concurrently \"npm run serve\" \"npm run server\"",
+    "server": "cd api-server && tsnd app.ts",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "concurrently": "^6.5.1",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
@@ -32,6 +38,7 @@
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.0.0",
+    "ts-node-dev": "^1.1.8",
     "typescript": "~4.1.5",
     "vue-jest": "^5.0.0-0"
   }
