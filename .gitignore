@@ -26,3 +26,5 @@ pnpm-debug.log*
 *.sw?
 
 src/**/*.js
+*compiled.js
+*.js.map
