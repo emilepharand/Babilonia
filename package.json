@@ -6,13 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "start": "concurrently \"npm run serve\" \"npm run server\"",
-    "server": "cd api-server && tsnd app.ts",
+    "server": "cd server && tsnd index.ts",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "concurrently": "^6.5.1",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "express": "^4.17.2",
@@ -35,6 +34,7 @@
     "@vue/eslint-config-airbnb": "^5.0.2",
     "@vue/eslint-config-typescript": "^7.0.0",
     "@vue/test-utils": "^2.0.0-0",
+    "concurrently": "^6.5.1",
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.0.0",

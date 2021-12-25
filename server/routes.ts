@@ -1,8 +1,8 @@
 import { Express, Router } from 'express';
 
-import HomeController from './controller/home.controller';
+import Ideas from './controller/home.controller';
 
-export default class ExpressRouter {
+export default class Routes {
   public router: Router;
 
   private app: Express;
@@ -13,7 +13,7 @@ export default class ExpressRouter {
   }
 
   public init(): void {
-    this.router.get('/api/idea', HomeController.getDefault);
+    this.router.get('/api/ideas', Ideas.getDefault);
     this.app.use('/', this.router);
   }
 }
