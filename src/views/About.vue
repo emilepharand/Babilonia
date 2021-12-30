@@ -1,8 +1,8 @@
 <template>
   <div class="about">
     <h1>Idea</h1>
-    <div v-for="e in here.expressions" v-bind:key="e.expression">
-    <b>{{ e.language.name }}</b>: {{ e.expression }}
+    <div v-for="e in here.expressions" v-bind:key="e.id">
+    <b>{{ e.language }}</b>: {{ e.expression }}
     </div>
     <button @click="nextIdea()">Next</button>
     <h1>Debug</h1>
