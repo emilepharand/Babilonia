@@ -11,40 +11,13 @@ let db;
     filename: './model/db.db',
     driver: sqlite3.Database,
   });
+  console.log('Database was opened.');
 })();
 
 export default class DataManager {
   public static ideas: Idea[] = [];
 
   public static i = 1;
-
-  public static async createData(): Promise<void> {
-
-    const fr = new Language('français');
-    const en = new Language('english');
-    const es = new Language('español');
-    const de = new Language('deutsch');
-    const it = new Language('italian');
-
-    const e1 = new Expression('Bonjour', fr);
-    const e2 = new Expression('Hello', en);
-    const e3 = new Expression('Buenos días', es);
-    const e4 = new Expression('Guten tag', de);
-    const e5 = new Expression('Buongiorno', it);
-
-    const e6 = new Expression('Au revoir', fr);
-    const e7 = new Expression('Goodbye', en);
-    const e8 = new Expression('Adiós', es);
-    const e9 = new Expression('Auf wiedersehen', de);
-    const e0 = new Expression('Arrivederci', it);
-    DataManager.ideas.push(new Idea([e6, e7, e8, e9, e0]));
-
-    if (DataManager.i === 0) {
-      DataManager.i = 1;
-    } else {
-      DataManager.i = 0;
-    }
-  }
 
   static async getNextIdea(): Promise<Idea> {
     const expressions = await db.all('SELECT * FROM expressions WHERE idea_id = ?', DataManager.i);
@@ -64,8 +37,11 @@ export default class DataManager {
       expression.language = language[0].name;
       ideaExpressions.push(expression);
     }
-    console.log(ideaExpressions);
 
     return new Idea(ideaExpressions);
+  }
+
+  static async getLanguages(): Promise<Language[]> {
+    return db.all('select * from languages');
   }
 }

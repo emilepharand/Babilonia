@@ -1,22 +1,20 @@
 <template>
-  <div class="about">
+  <div class="browse">
     <h1>Idea</h1>
     <div v-for="e in here.expressions" v-bind:key="e.id">
     <b>{{ e.language }}</b>: {{ e.expression }}
     </div>
     <button @click="nextIdea()">Next</button>
-    <h1>Debug</h1>
-    <p>{{ here }}</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'About',
+  name: 'Browse',
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
-      here: null,
+      here: 'Loading...',
     };
   },
   methods: {
