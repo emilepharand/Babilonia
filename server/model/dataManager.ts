@@ -44,4 +44,16 @@ export default class DataManager {
   static async getLanguages(): Promise<Language[]> {
     return db.all('select * from languages');
   }
+
+  static async addIdea(expressions: Expression[]): Promise<void> {
+    await db.run('insert into ideas("id") VALUES (null)');
+    const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
+    // console.log(Object.keys(ideaId));
+    // eslint-disable-next-line no-restricted-syntax
+    for (const expression of expressions) {
+      // eslint-disable-next-line no-await-in-loop
+      await db.run('insert into expressions("expression", "idea_id", "language_id") values (?, ?, ?)',
+        expression.text, ideaId, expression.language.id);
+    }
+  }
 }

@@ -1,6 +1,5 @@
 import { Express, Router } from 'express';
-import IdeaBrowser from './controller/ideaBrowser';
-import LanguageController from './controller/languageController';
+import Controller from './controller';
 
 export default class Routes {
   public router: Router;
@@ -13,8 +12,9 @@ export default class Routes {
   }
 
   public init(): void {
-    this.router.get('/api/ideas', IdeaBrowser.getDefault);
-    this.router.get('/api/languages', LanguageController.getDefault);
+    this.router.get('/api/ideas', Controller.getNextIdea);
+    this.router.post('/api/ideas/add', Controller.addIdea);
+    this.router.get('/api/languages', Controller.getLanguages);
     this.app.use('/', this.router);
   }
 }

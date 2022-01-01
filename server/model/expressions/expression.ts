@@ -1,12 +1,12 @@
 import Language from '../languages/language';
 
 export default class Expression {
-  private expression: string;
+  public text: string;
 
-  private language: Language;
+  public language: Language;
 
-  constructor(expression: string, language: Language) {
-    this.expression = expression;
+  constructor(text: string, language: Language) {
+    this.text = text;
     this.language = language;
   }
 }

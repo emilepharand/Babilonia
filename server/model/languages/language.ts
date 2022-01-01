@@ -1,9 +1,12 @@
 export default class Language {
-  private name: string;
+  public id: number;
 
-  private order: number;
+  public name?: string;
 
-  constructor(name: string, order: number) {
+  public order?: number;
+
+  constructor(id: number, name: string, order: number) {
+    this.id = id;
     this.name = name;
     this.order = order;
   }
