@@ -17,28 +17,28 @@ let db;
 export default class DataManager {
   public static ideas: Idea[] = [];
 
-  public static i = 1;
+  public static offset = 0;
 
   static async getNextIdea(): Promise<Idea> {
-    const expressions = await db.all('SELECT * FROM expressions WHERE idea_id = ?', DataManager.i);
+    return this.makeIdeaFromId(await this.nextIdeaId());
+  }
 
-    if (DataManager.i === 1) {
-      DataManager.i = 2;
-    } else {
-      DataManager.i = 1;
+  private static async nextIdeaId(): Promise<number> {
+    let idea = await db.get('select id from ideas limit 1 offset ?', DataManager.offset);
+    if (idea === undefined) {
+      DataManager.offset = 0;
+      idea = await db.get('select id from ideas limit 1 offset ?', DataManager.offset);
     }
+    DataManager.offset += 1;
+    return idea.id;
+  }
 
-    const ideaExpressions: Expression[] = [];
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const expression of expressions) {
-      // eslint-disable-next-line no-await-in-loop
-      const language = await db.all('SELECT name FROM languages WHERE id = ?', expression.language_id);
-      expression.language = language[0].name;
-      ideaExpressions.push(expression);
-    }
-
-    return new Idea(ideaExpressions);
+  private static async makeIdeaFromId(ideaId: number): Promise<Idea> {
+    const expressions = await db.all('select id, text, languageId from expressions WHERE ideaId = ?', ideaId);
+    await Promise.all(expressions.map(async (e) => {
+      e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
+    }));
+    return { expressions };
   }
 
   static async getLanguages(): Promise<Language[]> {
@@ -48,12 +48,9 @@ export default class DataManager {
   static async addIdea(expressions: Expression[]): Promise<void> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    // console.log(Object.keys(ideaId));
-    // eslint-disable-next-line no-restricted-syntax
-    for (const expression of expressions) {
-      // eslint-disable-next-line no-await-in-loop
-      await db.run('insert into expressions("expression", "idea_id", "language_id") values (?, ?, ?)',
-        expression.text, ideaId, expression.language.id);
-    }
+    await Promise.all(expressions.map(async (e) => {
+      await db.run('insert into expressions("text", "ideaId", "languageId") values (?, ?, ?)',
+        e.text, ideaId, e.language.id);
+    }));
   }
 }

@@ -1,8 +1,8 @@
 <template>
   <div class="browse">
     <h1>Idea</h1>
-    <div v-for="e in here.expressions" v-bind:key="e.id">
-    <b>{{ e.language }}</b>: {{ e.expression }}
+    <div v-for="e in idea.expressions" v-bind:key="e.id">
+    <b>{{ e.language.name }}</b>: {{ e.text }}
     </div>
     <button @click="nextIdea()">Next</button>
   </div>
@@ -14,20 +14,20 @@ export default {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
-      here: 'Loading...',
+      idea: 'Loading...',
     };
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async nextIdea() {
       const res = await fetch('http://localhost:5000/api/ideas');
-      this.here = await res.json();
+      this.idea = await res.json();
     },
   },
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async created() {
     const res = await fetch('http://localhost:5000/api/ideas');
-    this.here = await res.json();
+    this.idea = await res.json();
   },
 };
 </script>

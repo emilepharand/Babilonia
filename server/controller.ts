@@ -1,7 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import Idea from './model/ideas/idea';
-import Expression from './model/expressions/expression';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -13,11 +11,8 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    console.log(JSON.stringify(req.body));
-    // {"expressions":[{"text":"MORNING","language":{"id":2}}]}
     const { expressions } = req.body;
     await DataManager.addIdea(expressions);
     res.send(req.body);
-    // res.json({ msg: 'Success or failure' });
   }
 }
