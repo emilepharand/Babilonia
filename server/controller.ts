@@ -25,6 +25,11 @@ export default class Controller {
   public static async editIdea(req: Request, res: Response): Promise<void> {
     const idea = req.body;
     await DataManager.editIdea(idea);
-    res.send(await DataManager.getIdeaById(idea.id));
+    res.send(await DataManager.getIdeaById(parseInt(req.params.id, 10)));
+  }
+
+  public static async deleteIdea(req: Request, res: Response): Promise<void> {
+    await DataManager.deleteIdea(parseInt(req.params.id, 10));
+    res.send({});
   }
 }

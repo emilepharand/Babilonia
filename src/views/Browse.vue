@@ -3,32 +3,36 @@
     <h1>Idea</h1>
     <button @click="nextIdea()">Next</button>
     <router-link :to="'/idea/edit/' + idea.id">Edit</router-link>
+    <button @click="deleteIdea()">Delete</button>
     <div v-for="e in idea.ee" v-bind:key="e.id">
-    <b>{{ e.language.name }}</b>: {{ e.text }}
+      <b>{{ e.language.name }}</b>: {{ e.text }}
     </div>
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+import Api from '@/js/api';
+import Idea from '../../server/model/idea';
+
+export default defineComponent({
   name: 'Browse',
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
-      idea: {},
+      idea: new Idea(1, []),
     };
   },
   methods: {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async nextIdea() {
-      const res = await fetch('http://localhost:5000/api/ideas');
-      this.idea = await res.json();
+      this.idea = await Api.getNextIdea();
+    },
+    async deleteIdea() {
+      const r = await Api.deleteIdea(this.idea.id);
+      alert(JSON.stringify(r));
     },
   },
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async created() {
-    const res = await fetch('http://localhost:5000/api/ideas');
-    this.idea = await res.json();
+    this.idea = await Api.getNextIdea();
   },
-};
+});
 </script>

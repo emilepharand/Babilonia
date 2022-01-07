@@ -38,7 +38,7 @@ export default class DataManager {
     await Promise.all(ee.map(async (e) => {
       e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
     }));
-    ee.sort((e1, e2) => e1.language.order - e2.language.order);
+    ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
     return new Idea(ideaId, ee);
   }
 
@@ -58,13 +58,20 @@ export default class DataManager {
     await this.insertExpressions(idea);
   }
 
+  static async deleteIdea(ideaId: number): Promise<void> {
+    await db.run('delete from expressions where ideaId = ?', ideaId);
+    await db.run('delete from ideas where id =  ?', ideaId);
+  }
+
   private static async insertExpressions(idea: Idea): Promise<void> {
     for (let i = 0; i < idea.ee.length; i += 1) {
       const e = idea.ee[i];
-      // await in loop to preserve order of expressions
-      // eslint-disable-next-line no-await-in-loop
-      await db.run('insert into expressions("text", "ideaId", "languageId") values (?, ?, ?)',
-        e.text, idea.id, e.language.id);
+      if (e.text) {
+        // await in loop to preserve order of expressions
+        // eslint-disable-next-line no-await-in-loop
+        await db.run('insert into expressions("text", "ideaId", "languageId") values (?, ?, ?)',
+          e.text, idea.id, e.language.id);
+      }
     }
   }
 }

@@ -2,51 +2,39 @@
   <div class="edit">
     <IdeaForm :idea="idea" title="Edit Idea"/>
     <button @click="edit()">Edit</button>
+    <button @click="deleteIdea()">Delete</button>
   </div>
 </template>
 
-<script>
-import IdeaForm from '@/components/IdeaForm/IdeaForm.vue';
+<script lang="ts">
+import { defineComponent } from 'vue';
+import IdeaForm from '@/components/IdeaForm.vue';
+import Api from '@/js/api';
+import Idea from '../../server/model/idea';
 
-export default {
+export default defineComponent({
   name: 'Edit',
   components: {
     IdeaForm,
   },
   data() {
     return {
-      idea: {},
+      idea: new Idea(1, []),
     };
   },
   async created() {
-    const url = `http://localhost:5000/api/idea/${this.$route.params.id}`;
-    const response = await fetch(url, {
-      method: 'GET',
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    this.idea = (await response.json());
+    const ideaId = Number.parseInt(Array.from(this.$route.params.id).join(''), 10);
+    this.idea = await Api.getIdea(ideaId);
   },
   methods: {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async edit() {
-      const idea = {};
-      idea.id = this.idea.id;
-      idea.ee = this.idea.ee.filter((e) => e.text !== '');
-      const url = `http://localhost:5000/api/idea/edit/${this.idea.id}`;
-      const response = await fetch(url, {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(idea),
-      });
-      const r = await response.json();
+      const r = await Api.editIdea(this.idea);
+      alert(JSON.stringify(r));
+    },
+    async deleteIdea() {
+      const r = await Api.deleteIdea(this.idea.id);
       alert(JSON.stringify(r));
     },
   },
-};
+});
 </script>
