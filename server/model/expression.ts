@@ -1,4 +1,4 @@
-import Language from '../languages/language';
+import Language from './language';
 
 export default class Expression {
   public id: number;

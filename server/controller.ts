@@ -15,4 +15,9 @@ export default class Controller {
     await DataManager.addIdea(expressions);
     res.send(req.body);
   }
+
+  public static async getIdeaById(req: Request, res: Response): Promise<void> {
+    const idea = await DataManager.makeIdeaFromId(parseInt(req.params.id, 10));
+    res.send(idea);
+  }
 }

@@ -1,8 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import Idea from './ideas/idea';
-import Language from './languages/language';
-import Expression from './expressions/expression';
+import Idea from './idea';
+import Language from './language';
+import Expression from './expression';
 
 let db;
 
@@ -33,12 +33,15 @@ export default class DataManager {
     return idea.id;
   }
 
-  private static async makeIdeaFromId(ideaId: number): Promise<Idea> {
+  public static async makeIdeaFromId(ideaId: number): Promise<Idea> {
     const expressions = await db.all('select id, text, languageId from expressions WHERE ideaId = ?', ideaId);
     await Promise.all(expressions.map(async (e) => {
       e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
     }));
-    return { expressions };
+    const idea: Idea = new Idea();
+    idea.id = ideaId;
+    idea.expressions = expressions;
+    return idea;
   }
 
   static async getLanguages(): Promise<Language[]> {

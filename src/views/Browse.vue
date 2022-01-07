@@ -5,6 +5,7 @@
     <b>{{ e.language.name }}</b>: {{ e.text }}
     </div>
     <button @click="nextIdea()">Next</button>
+    <router-link :to="'/idea/edit/' + idea.id">Edit</router-link>
   </div>
 </template>
 

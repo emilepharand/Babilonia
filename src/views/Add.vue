@@ -1,64 +1,55 @@
 <template>
   <div class="browse">
-    <h1>Add Idea</h1>
-    <form>
-      <div v-for="row in rows" :key="row.id">
-        <select id="language" name="language" v-model="row.language.name">
-          <option v-for="language in languages" :key="language.name" :value="language.name">
-            {{ language.name }}
-          </option>
-        </select>
-        <input type="text" v-model="row.text"/>
-      </div>
-    </form>
-    <button @click="add()">Add</button>
+    <IdeaForm :idea="idea" title="Add Idea"/>
   </div>
+  <button @click="add()">Add</button>
 </template>
 
 <script>
+import IdeaForm from '@/components/IdeaForm/IdeaForm.vue';
+
 export default {
   name: 'Add',
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  components: {
+    IdeaForm,
+  },
   data() {
     return {
-      rows: [],
-      languages: [],
+      idea: [],
     };
   },
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async created() {
-    const rows = [];
+    const idea = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const i of [...Array(5)
       .keys()]) {
-      rows.push({
+      idea.push({
         id: i,
-        language: { id: 2, name: 'Français' },
+        language: {
+          id: 1,
+          name: 'Français',
+          order: 0,
+        },
         text: '',
       });
     }
-    this.rows = rows;
-    const res = await fetch('http://localhost:5000/api/languages');
-    this.languages = await res.json();
+    this.idea = idea;
   },
   methods: {
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async add() {
       const ee = {};
-      ee.expressions = this.rows;
-      ee.expressions = ee.expressions.filter((e) => e.text !== '');
-      // alert(JSON.stringify(this.rows));
-      fetch('http://localhost:5000/api/ideas/add', {
-        method: 'post',
+      ee.expressions = this.idea.filter((e) => e.text !== '');
+      const url = 'http://localhost:5000/api/idea/add';
+      const response = await fetch(url, {
+        method: 'POST',
+        cache: 'no-cache',
         headers: {
-          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(ee),
-      })
-        .then((response) => {
-          // alert(response.then().json());
-        });
+      });
+      const r = await response.json();
+      alert(JSON.stringify(r));
     },
   },
 };

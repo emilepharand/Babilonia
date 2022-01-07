@@ -13,7 +13,8 @@ export default class Routes {
 
   public init(): void {
     this.router.get('/api/ideas', Controller.getNextIdea);
-    this.router.post('/api/ideas/add', Controller.addIdea);
+    this.router.get('/api/idea/:id', Controller.getIdeaById);
+    this.router.post('/api/idea/add', Controller.addIdea);
     this.router.get('/api/languages', Controller.getLanguages);
     this.app.use('/', this.router);
   }
