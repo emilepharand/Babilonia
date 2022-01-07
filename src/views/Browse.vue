@@ -1,11 +1,11 @@
 <template>
   <div class="browse">
     <h1>Idea</h1>
-    <div v-for="e in idea.expressions" v-bind:key="e.id">
-    <b>{{ e.language.name }}</b>: {{ e.text }}
-    </div>
     <button @click="nextIdea()">Next</button>
     <router-link :to="'/idea/edit/' + idea.id">Edit</router-link>
+    <div v-for="e in idea.ee" v-bind:key="e.id">
+    <b>{{ e.language.name }}</b>: {{ e.text }}
+    </div>
   </div>
 </template>
 
@@ -15,7 +15,7 @@ export default {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   data() {
     return {
-      idea: 'Loading...',
+      idea: {},
     };
   },
   methods: {

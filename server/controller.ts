@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
+import Expression from './model/expression';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -11,13 +12,19 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    const { expressions } = req.body;
-    await DataManager.addIdea(expressions);
+    const ee: Expression[] = req.body;
+    await DataManager.addIdea(ee);
     res.send(req.body);
   }
 
   public static async getIdeaById(req: Request, res: Response): Promise<void> {
-    const idea = await DataManager.makeIdeaFromId(parseInt(req.params.id, 10));
+    const idea = await DataManager.getIdeaById(parseInt(req.params.id, 10));
     res.send(idea);
+  }
+
+  public static async editIdea(req: Request, res: Response): Promise<void> {
+    const idea = req.body;
+    await DataManager.editIdea(idea);
+    res.send(await DataManager.getIdeaById(idea.id));
   }
 }

@@ -15,15 +15,16 @@ export default {
   },
   data() {
     return {
-      idea: [],
+      idea: {},
     };
   },
   async created() {
-    const idea = [];
+    const idea = {};
+    idea.ee = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const i of [...Array(5)
       .keys()]) {
-      idea.push({
+      idea.ee.push({
         id: i,
         language: {
           id: 1,
@@ -37,8 +38,8 @@ export default {
   },
   methods: {
     async add() {
-      const ee = {};
-      ee.expressions = this.idea.filter((e) => e.text !== '');
+      const ee = this.idea.ee.filter((e) => e.text !== '');
+      if (ee.length === 0) return;
       const url = 'http://localhost:5000/api/idea/add';
       const response = await fetch(url, {
         method: 'POST',

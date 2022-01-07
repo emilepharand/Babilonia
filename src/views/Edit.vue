@@ -15,7 +15,7 @@ export default {
   },
   data() {
     return {
-      idea: [],
+      idea: {},
     };
   },
   async created() {
@@ -27,26 +27,25 @@ export default {
         'Content-Type': 'application/json',
       },
     });
-    this.idea = (await response.json()).expressions;
+    this.idea = (await response.json());
   },
   methods: {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     async edit() {
-      const ee = {};
-      ee.expressions = this.rows;
-      ee.expressions = ee.expressions.filter((e) => e.text !== '');
-      // alert(JSON.stringify(this.rows));
-      fetch('http://localhost:5000/api/idea/add', {
-        method: 'post',
+      const idea = {};
+      idea.id = this.idea.id;
+      idea.ee = this.idea.ee.filter((e) => e.text !== '');
+      const url = `http://localhost:5000/api/idea/edit/${this.idea.id}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        cache: 'no-cache',
         headers: {
-          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(ee),
-      })
-        .then((response) => {
-          // alert(response.then().json());
-        });
+        body: JSON.stringify(idea),
+      });
+      const r = await response.json();
+      alert(JSON.stringify(r));
     },
   },
 };

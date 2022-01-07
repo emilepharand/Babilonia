@@ -1,13 +1,13 @@
 <template>
   <h1>{{ title }}</h1>
   <form>
-    <div v-for="expression in idea" :key="expression.id">
-      <select id="language" name="language" v-model="expression.language">
+    <div v-for="e in idea.ee" :key="e.id">
+      <select id="language" name="language" v-model="e.language">
         <option v-for="language in languages" :key="language.id" :value="language">
           {{ language.name }}
         </option>
       </select>
-      <input type="text" v-model="expression.text"/>
+      <input type="text" v-model="e.text"/>
     </div>
   </form>
 </template>
