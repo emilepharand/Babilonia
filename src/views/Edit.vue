@@ -1,6 +1,6 @@
 <template>
   <div class="edit">
-    <IdeaForm :idea="idea" title="Edit Idea"/>
+    <IdeaForm @addRows="addRows" :idea="idea" title="Edit Idea"/>
     <button @click="edit()">Edit</button>
     <button @click="deleteIdea()">Delete</button>
   </div>
@@ -23,7 +23,8 @@ export default defineComponent({
     };
   },
   async created() {
-    const ideaId = Number.parseInt(Array.from(this.$route.params.id).join(''), 10);
+    const ideaId = Number.parseInt(Array.from(this.$route.params.id)
+      .join(''), 10);
     this.idea = await Api.getIdea(ideaId);
   },
   methods: {
@@ -34,6 +35,20 @@ export default defineComponent({
     async deleteIdea() {
       const r = await Api.deleteIdea(this.idea.id);
       alert(JSON.stringify(r));
+    },
+    addRows(n: number) {
+      for (let i = 0; i < n; i += 1) {
+        this.idea.ee.push({
+          id: i,
+          ideaId: -1,
+          language: {
+            id: 1,
+            name: 'Français',
+            ordering: 0,
+          },
+          text: '',
+        });
+      }
     },
   },
 });
