@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Api from '@/js/api';
+import Api from '@/ts/api';
 import Idea from '../../server/model/idea';
 
 export default defineComponent({

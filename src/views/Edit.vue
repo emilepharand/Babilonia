@@ -9,8 +9,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
-import Api from '@/js/api';
+import Api from '@/ts/api';
 import Idea from '../../server/model/idea';
+import Utils from '@/ts/utils';
 
 export default defineComponent({
   name: 'Edit',
@@ -27,6 +28,7 @@ export default defineComponent({
       .join(''), 10);
     this.idea = await Api.getIdea(ideaId);
   },
+  expose: ['addRows'],
   methods: {
     async edit() {
       const r = await Api.editIdea(this.idea);
@@ -36,19 +38,8 @@ export default defineComponent({
       const r = await Api.deleteIdea(this.idea.id);
       alert(JSON.stringify(r));
     },
-    addRows(n: number) {
-      for (let i = 0; i < n; i += 1) {
-        this.idea.ee.push({
-          id: i,
-          ideaId: -1,
-          language: {
-            id: 1,
-            name: 'Français',
-            ordering: 0,
-          },
-          text: '',
-        });
-      }
+    addRows(howMany: number, currentSize: number) {
+      this.idea = Utils.addEmptyExpressions(this.idea, howMany, currentSize);
     },
   },
 });

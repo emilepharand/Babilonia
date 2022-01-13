@@ -10,7 +10,8 @@ export default class Api {
         'Content-Type': 'application/json',
       },
     });
-    return response.json();
+    const r = await response.json();
+    return new Idea(r.id, r.ee);
   }
 
   static async editIdea(idea: Idea): Promise<Idea> {
@@ -32,11 +33,6 @@ export default class Api {
       method: 'DELETE',
     });
     return response.json();
-  }
-
-  static async getEmptyIdea() {
-    const res = await fetch('http://localhost:5000/api/ideas/empty');
-    return res.json();
   }
 
   static async addIdea(idea: Idea): Promise<Idea> {

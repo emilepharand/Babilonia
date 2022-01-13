@@ -8,17 +8,18 @@
     </select>
     <input type="text" v-model="e.text"/>
   </div>
-  <input type="button" @click="addRows()" value="Add rows">
+  <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="Add rows">
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Idea from '../../server/model/idea';
 
 export default defineComponent({
   name: 'IdeaForm',
   props: {
     title: String,
-    idea: Object,
+    idea: Idea,
   },
   data() {
     return {
@@ -28,11 +29,6 @@ export default defineComponent({
   async created() {
     const res = await fetch('http://localhost:5000/api/languages');
     this.languages = await res.json();
-  },
-  methods: {
-    addRows() {
-      this.$emit('addRows', 5);
-    },
   },
   emits: ['addRows'],
 });
