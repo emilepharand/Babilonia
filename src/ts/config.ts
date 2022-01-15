@@ -15,6 +15,7 @@ export default class Config {
           id: 1,
           name: 'Français',
           ordering: 0,
+          isPractice: true,
         },
         text: '',
       });

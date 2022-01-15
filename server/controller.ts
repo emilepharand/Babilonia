@@ -32,4 +32,9 @@ export default class Controller {
     await DataManager.deleteIdea(parseInt(req.params.id, 10));
     res.send({});
   }
+
+  public static async addLanguage(req: Request, res: Response): Promise<void> {
+    await DataManager.addLanguage(req.body);
+    res.send(req.body);
+  }
 }

@@ -1,4 +1,5 @@
 import Idea from '../../server/model/idea';
+import Language from '../../server/model/language';
 
 export default class Api {
   public static async getIdea(ideaId: number): Promise<Idea> {
@@ -53,5 +54,17 @@ export default class Api {
   static async getNextIdea(): Promise<Idea> {
     const res = await fetch('http://localhost:5000/api/ideas');
     return res.json();
+  }
+
+  static async addLanguage(newLang: Language) {
+    const url = 'http://localhost:5000/api/language/add';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newLang),
+    });
+    return response.json();
   }
 }

@@ -14,6 +14,7 @@ export default class Utils {
           id: 1,
           name: 'Français',
           ordering: 0,
+          isPractice: true,
         },
         text: '',
       });

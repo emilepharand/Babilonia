@@ -74,4 +74,9 @@ export default class DataManager {
       }
     }
   }
+
+  public static async addLanguage(language: Language) {
+    await db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
+      language.name, language.ordering, language.isPractice);
+  }
 }
