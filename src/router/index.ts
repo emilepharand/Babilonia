@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "ideas" */ '../views/Ideas.vue'),
   },
   {
+    path: '/manage/languages',
+    name: 'Languages',
+    component: () => import(/* webpackChunkName: "languages" */ '../views/Languages.vue'),
+  },
+  {
     path: '/idea/edit/:id',
     name: 'Edit',
     component: () => import(/* webpackChunkName: "edit" */ '../views/Edit.vue'),

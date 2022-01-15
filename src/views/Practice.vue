@@ -3,17 +3,17 @@
     <h1>Practice</h1>
     <table>
       <tr v-for="(e, i) in idea.ee" :key="e.id">
-        <td>{{ e.language.name }}</td>
-        <td>
-          <input v-if="i === 0" type="text"
-                 v-model="e.text" disabled/>
-          <input v-else type="text"
-                 v-model="typed[i]"
-                 :class="{'partial-match': isPartialMatch(i, e.text),
+          <td v-if="e.language.isPractice">{{ e.language.name }}</td>
+          <td v-if="e.language.isPractice">
+            <input v-if="i === 0" type="text"
+                   v-model="e.text" disabled/>
+            <input v-else type="text"
+                   v-model="typed[i]"
+                   :class="{'partial-match': isPartialMatch(i, e.text),
                  'full-match': isFullMatch(i, e.text),
                  'no-match': isNoMatch(i, e.text),
                  }"/>
-        </td>
+          </td>
       </tr>
     </table>
     <div>
@@ -35,7 +35,7 @@ table {
 
 .full-match {
   background: darkgreen;
-  color:#fff;
+  color: #fff;
   font-weight: bold;
 }
 

@@ -4,4 +4,6 @@ export default class Language {
   public name: string;
 
   public ordering: number;
+
+  public isPractice: boolean;
 }
