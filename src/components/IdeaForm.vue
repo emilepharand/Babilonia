@@ -1,14 +1,15 @@
 <template>
-  <h1>{{ title }}</h1>
-  <div v-for="e in idea.ee" :key="e.id">
-    <select id="language" name="language" v-model="e.language">
-      <option v-for="language in languages" :key="language.id" :value="language">
-        {{ language.name }}
-      </option>
-    </select>
-    <input type="text" v-model="e.text"/>
+  <div>
+    <div v-for="e in idea.ee" :key="e.id">
+      <select id="language" name="language" v-model="e.language">
+        <option v-for="language in languages" :key="language.id" :value="language">
+          {{ language.name }}
+        </option>
+      </select>
+      <input type="text" v-model="e.text"/>
+    </div>
+    <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="More rows">
   </div>
-  <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="Add rows">
 </template>
 
 <script lang="ts">

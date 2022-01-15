@@ -1,5 +1,6 @@
 <template>
-  <div class="edit">
+  <div>
+    <h1>Edit Idea</h1>
     <IdeaForm @addRows="addRows" :idea="idea" title="Edit Idea"/>
     <button @click="edit()">Edit</button>
     <button @click="deleteIdea()">Delete</button>

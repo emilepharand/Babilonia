@@ -7,9 +7,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "browse" */ '../views/Browse.vue'),
   },
   {
-    path: '/ideas/add',
+    path: '/manage/ideas/add',
     name: 'Add',
     component: () => import(/* webpackChunkName: "add" */ '../views/Add.vue'),
+  },
+  {
+    path: '/manage/ideas',
+    name: 'Ideas',
+    component: () => import(/* webpackChunkName: "ideas" */ '../views/Ideas.vue'),
   },
   {
     path: '/idea/edit/:id',
@@ -25,6 +30,7 @@ const routes: Array<RouteRecordRaw> = [
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
+  linkActiveClass: 'active',
   routes,
 });
 

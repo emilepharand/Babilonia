@@ -1,8 +1,9 @@
 <template>
-  <div class="browse">
+  <div>
+    <h1>Add Idea</h1>
     <IdeaForm @addRows="addRows" :idea="idea" title="Add Idea"/>
+    <button @click="add()">Add</button>
   </div>
-  <button @click="add()">Add</button>
 </template>
 
 <script lang="ts">
