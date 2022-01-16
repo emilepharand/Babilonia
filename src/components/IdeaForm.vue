@@ -2,11 +2,12 @@
   <div>
     <div v-for="e in idea.ee" :key="e.id">
       <select id="language" name="language" v-model="e.language">
-        <option v-for="language in languages" :key="language.id" :value="language">
+        <option v-for="language in languages" :key="language.id" :value="language"
+                false-value="0" true-value="1">
           {{ language.name }}
         </option>
       </select>
-      <input type="text" v-model="e.text"/>
+      <input type="text" v-model="e.texts[0]"/>
     </div>
     <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="More rows">
   </div>

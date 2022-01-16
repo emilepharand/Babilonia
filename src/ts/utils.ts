@@ -16,7 +16,7 @@ export default class Utils {
           ordering: 0,
           isPractice: true,
         },
-        text: '',
+        texts: [''],
       });
       start += 1;
     }

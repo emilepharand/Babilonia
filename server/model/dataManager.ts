@@ -34,8 +34,12 @@ export default class DataManager {
   }
 
   public static async getIdeaById(ideaId: number): Promise<Idea> {
-    const ee = await db.all('select id, text, languageId from expressions WHERE ideaId = ?', ideaId);
+    const ee: Expression[] = await db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
+    ee.forEach((e) => {
+      e.texts = [];
+    });
     await Promise.all(ee.map(async (e) => {
+      e.texts.push((await db.get('SELECT text FROM texts WHERE expressionId = ?', e.id)).text);
       e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
     }));
     ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
@@ -65,18 +69,34 @@ export default class DataManager {
 
   private static async insertExpressions(idea: Idea): Promise<void> {
     for (let i = 0; i < idea.ee.length; i += 1) {
-      const e = idea.ee[i];
-      if (e.text) {
-        // await in loop to preserve order of expressions
+      // no empty text
+      if (!(idea.ee[i].texts.filter((txt) => txt.length > 0).length === 0)) {
         // eslint-disable-next-line no-await-in-loop
-        await db.run('insert into expressions("text", "ideaId", "languageId") values (?, ?, ?)',
-          e.text, idea.id, e.language.id);
+        await db.run('insert into expressions("ideaId", "languageId") values (?, ?)',
+          idea.id, idea.ee[i].language.id);
+        // eslint-disable-next-line no-await-in-loop
+        const exprId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
+        for (let j = 0; j < idea.ee[i].texts.length; j += 1) {
+          const txt = idea.ee[i].texts[j];
+          // don't insert empty text
+          if (txt) {
+            // await in loop to preserve order of expressions
+            // eslint-disable-next-line no-await-in-loop
+            await db.run('insert into texts("expressionId", "text") values (?, ?)',
+              exprId, txt);
+          }
+        }
       }
     }
   }
 
-  public static async addLanguage(language: Language) {
+  public static async addLanguage(language: Language): Promise<void> {
     await db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
       language.name, language.ordering, language.isPractice);
+  }
+
+  static async editLanguage(language: Language): Promise<void> {
+    await db.run('update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?',
+      language.name, language.ordering, language.isPractice, language.id);
   }
 }

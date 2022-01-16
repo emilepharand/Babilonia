@@ -5,7 +5,7 @@
     <router-link :to="'/idea/edit/' + idea.id">Edit</router-link>
     <button @click="deleteIdea()">Delete</button>
     <div v-for="e in idea.ee" v-bind:key="e.id">
-      <b>{{ e.language.name }}</b>: {{ e.text }}
+      <b>{{ e.language.name }}</b>: {{ e.texts[0] }}
     </div>
   </div>
 </template>

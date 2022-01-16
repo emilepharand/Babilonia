@@ -37,4 +37,9 @@ export default class Controller {
     await DataManager.addLanguage(req.body);
     res.send(req.body);
   }
+
+  public static async editLanguage(req: Request, res: Response): Promise<void> {
+    await DataManager.editLanguage(req.body);
+    res.send(req.body);
+  }
 }

@@ -1,11 +1,18 @@
 <template>
   <div>
     <h1>Languages</h1>
-    <div v-for="lang in languages" :key="lang.id">
-      <input type="text" v-model="lang.name"/>
-      <input type="number" v-model="lang.ordering">
-      <input type="checkbox" v-model="lang.isPractice" false-value="0" true-value="1">
-    </div>
+    <table>
+      <tr>
+      <th>Name</th>
+      <th>Order</th>
+      <th>Practice</th>
+      </tr>
+      <tr v-for="lang in languages" :key="lang.id">
+        <td><input type="text" v-model="lang.name"/></td>
+        <td><input type="number" v-model="lang.ordering"></td>
+        <td><input type="checkbox" v-model="lang.isPractice" false-value="0" true-value="1"></td>
+      </tr>
+    </table>
     <a href="#" @click="change()">Change</a>
     <h2>Add a new language</h2>
     <div>
@@ -40,6 +47,10 @@ export default defineComponent({
   },
   methods: {
     change() {
+      this.languages.forEach(
+        // eslint-disable-next-line no-return-await
+        async (lang) => await Api.editLanguage(lang),
+      );
       alert(JSON.stringify(this.languages));
     },
     async addNewLanguage() {

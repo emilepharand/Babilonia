@@ -13,6 +13,7 @@ import Api from '@/ts/api';
 import Idea from '../../server/model/idea';
 import Config from '@/ts/config';
 import Utils from '@/ts/utils';
+import Expression from '../../server/model/expression';
 
 export default defineComponent({
   name: 'Add',
@@ -28,8 +29,17 @@ export default defineComponent({
     this.idea = await Config.getAddIdeaTemplate();
   },
   methods: {
+    splitExpressionIntoTexts(e: Expression): string[] {
+      return e.texts[0].split('|').map((e2) => e2.trim());
+    },
     async add() {
-      const r = await Api.addIdea(this.idea);
+      const eeSplit: Expression[] = [];
+      this.idea.ee.forEach((e) => {
+        const e2 = { ...e };
+        e2.texts = this.splitExpressionIntoTexts(e);
+        eeSplit.push(e2);
+      });
+      const r = await Api.addIdea(eeSplit);
       alert(JSON.stringify(r));
     },
     addRows(howMany: number, currentSize: number) {

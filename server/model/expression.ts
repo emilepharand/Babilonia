@@ -3,7 +3,7 @@ import Language from './language';
 export default class Expression {
   public id: number;
 
-  public text: string;
+  public texts: string[];
 
   public ideaId: number;
 
