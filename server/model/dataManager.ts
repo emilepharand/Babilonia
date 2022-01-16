@@ -39,7 +39,8 @@ export default class DataManager {
       e.texts = [];
     });
     await Promise.all(ee.map(async (e) => {
-      e.texts.push((await db.get('SELECT text FROM texts WHERE expressionId = ?', e.id)).text);
+      const txts = await db.all('SELECT text FROM texts WHERE expressionId = ?', e.id);
+      txts.forEach((txt) => e.texts.push(txt.text));
       e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
     }));
     ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);

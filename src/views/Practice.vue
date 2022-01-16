@@ -10,9 +10,9 @@
                  v-model="e.texts[0]" disabled/>
           <input v-else type="text"
                  v-model="typed[i]"
-                 :class="{'partial-match': isPartialMatch(i, e.texts[0]),
-                 'full-match': isFullMatch(i, e.texts[0]),
-                 'no-match': isNoMatch(i, e.texts[0]),
+                 :class="{'partial-match': isPartialMatch(i, e.texts),
+                 'full-match': isFullMatch(i, e.texts),
+                 'no-match': isNoMatch(i, e.texts),
                  }"/>
         </td>
         <td><input type="button" value="Hint" @click="hint(i, e.texts[0])"></td>
@@ -38,28 +38,45 @@ export default defineComponent({
     return {
       idea: new Idea(1, []),
       typed: [''],
+      done: [false],
     };
   },
   async created() {
     this.idea = await Api.getNextIdea();
   },
   methods: {
-    isPartialMatch(i: number, txt: string) {
+    isPartialMatch(i: number, txt: string[]) {
+      if (this.done[i]) {
+        return false;
+      }
       return this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt) === TEXT_STATUS.PARTIAL_MATCH);
+        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.PARTIAL_MATCH);
     },
-    isNoMatch(i: number, txt: string) {
+    isNoMatch(i: number, txt: string[]) {
+      if (this.done[i]) {
+        return false;
+      }
       return this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt) === TEXT_STATUS.NO_MATCH);
+        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.NO_MATCH);
     },
-    isFullMatch(i: number, txt: string) {
-      return this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt) === TEXT_STATUS.FULL_MATCH);
+    isFullMatch(i: number, txt: string[]) {
+      if (this.done[i]) {
+        return true;
+      }
+      const ret = (this.typed[i] !== undefined
+        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.FULL_MATCH));
+      if (ret) {
+        this.done[i] = true;
+        // eslint-disable-next-line prefer-destructuring
+        this.typed[i] = txt.join(' | ');
+      }
+      return ret;
     },
     hint(rowNbr: number, txt: string) {
       if (this.typed[rowNbr] === undefined) {
         // eslint-disable-next-line prefer-destructuring
         this.typed[rowNbr] = txt[0];
+        this.done[rowNbr] = false;
       } else {
         let j = 0;
         while (j < this.typed[rowNbr].length && txt.charAt(j) === this.typed[rowNbr].charAt(j)) {
@@ -79,6 +96,7 @@ export default defineComponent({
     async next() {
       this.idea = await Api.getNextIdea();
       this.typed = [];
+      this.done = [];
     },
     submit() {
       alert(this.typed[0]);
