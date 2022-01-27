@@ -7,10 +7,20 @@ import Expression from './expression';
 let db;
 
 (async () => {
+  let filename = './model/db.db';
+  if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
+    filename = './model/db-test.db';
+  }
   db = await open({
-    filename: './model/db.db',
+    filename,
     driver: sqlite3.Database,
   });
+  if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
+    await db.run('DELETE FROM texts');
+    await db.run('DELETE FROM expressions');
+    await db.run('DELETE FROM ideas');
+    await db.run('DELETE FROM languages');
+  }
   console.log('Database was opened.');
 })();
 

@@ -7,8 +7,9 @@
     "build": "vue-cli-service build",
     "start": "concurrently \"npm run serve\" \"npm run server\"",
     "server": "cd server && tsnd index.ts",
+    "server:test": "cd server && tsnd index.ts --test-mode",
     "test:unit": "vue-cli-service test:unit",
-    "test:e2e": "vue-cli-service test:e2e",
+    "test:e2e": "concurrently \"npm run server:test\" \"vue-cli-service test:e2e\"",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
