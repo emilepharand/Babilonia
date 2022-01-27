@@ -30,14 +30,21 @@ export default class DataManager {
   public static offset = 0;
 
   static async getNextIdea(): Promise<Idea> {
-    return this.getIdeaById(await this.nextIdeaId());
+    return this.nextIdeaId()
+      .then((id) => this.getIdeaById(id))
+      .catch(() => Promise.reject());
   }
 
   private static async nextIdeaId(): Promise<number> {
     let idea = await db.get('select id from ideas limit 1 offset ?', DataManager.offset);
+    // no more ideas
     if (idea === undefined) {
       DataManager.offset = 0;
       idea = await db.get('select id from ideas limit 1 offset ?', DataManager.offset);
+      if (idea === undefined) {
+        // there are no ideas in database
+        return Promise.reject();
+      }
     }
     DataManager.offset += 1;
     return idea.id;

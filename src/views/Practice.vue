@@ -1,6 +1,7 @@
 <template>
   <div class="practice">
     <h1>Practice</h1>
+    <p v-if="noIdeas">No ideas have been found.</p>
     <table>
       <tr v-for="(e, i) in idea.ee" :key="e.id">
         <tbody v-if="e.language.isPractice">
@@ -39,10 +40,14 @@ export default defineComponent({
       idea: new Idea(1, []),
       typed: [''],
       done: [false],
+      noIdeas: false,
     };
   },
   async created() {
     this.idea = await Api.getNextIdea();
+    if (JSON.stringify(this.idea) === '{}') {
+      this.noIdeas = true;
+    }
   },
   methods: {
     isPartialMatch(i: number, txt: string[]) {

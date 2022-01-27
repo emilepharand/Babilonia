@@ -4,7 +4,12 @@ import Expression from './model/expression';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
-    res.send(JSON.stringify(await DataManager.getNextIdea()));
+    try {
+      res.send(JSON.stringify(await DataManager.getNextIdea()));
+    } catch {
+      // there is no idea in the database
+      res.send('{}');
+    }
   }
 
   public static async getLanguages(req: Request, res: Response): Promise<void> {
