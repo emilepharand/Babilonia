@@ -6,6 +6,10 @@ const app = express().use(cors()).use(express.json());
 const routes = new Routes(app);
 routes.init();
 
-app.listen(5000, () => {
-  console.log('Express server app started. Listening on port 5000.');
+let port = 5000;
+if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
+  port = 5555;
+}
+app.listen(port, () => {
+  console.log(`Express server app started. Listening on port ${port}.`);
 });

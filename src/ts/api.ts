@@ -4,7 +4,7 @@ import Expression from '../../server/model/expression';
 
 export default class Api {
   public static async getIdea(ideaId: number): Promise<Idea> {
-    const url = `http://localhost:5000/api/idea/${ideaId}`;
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/${ideaId}`;
     const response = await fetch(url, {
       method: 'GET',
       cache: 'no-cache',
@@ -17,7 +17,7 @@ export default class Api {
   }
 
   static async editIdea(idea: Idea): Promise<Idea> {
-    const url = `http://localhost:5000/api/idea/edit/${idea.id}`;
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/edit/${idea.id}`;
     const response = await fetch(url, {
       method: 'POST',
       cache: 'no-cache',
@@ -30,7 +30,7 @@ export default class Api {
   }
 
   static async deleteIdea(ideaId: number): Promise<unknown> {
-    const url = `http://localhost:5000/api/ideas/${ideaId}`;
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/ideas/${ideaId}`;
     const response = await fetch(url, {
       method: 'DELETE',
     });
@@ -40,7 +40,7 @@ export default class Api {
   static async addIdea(ee: Expression[]): Promise<Idea> {
     const ee2 = ee.filter((e) => e.texts[0] !== '');
     if (ee2.length === 0) return Promise.reject();
-    const url = 'http://localhost:5000/api/idea/add';
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/add`;
     const response = await fetch(url, {
       method: 'POST',
       cache: 'no-cache',
@@ -53,12 +53,14 @@ export default class Api {
   }
 
   static async getNextIdea(): Promise<Idea> {
-    const res = await fetch('http://localhost:5000/api/ideas');
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/ideas`;
+    alert(url);
+    const res = await fetch(url);
     return res.json();
   }
 
   public static async addLanguage(newLang: Language): Promise<Language> {
-    const url = 'http://localhost:5000/api/language/add';
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/language/add`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -70,7 +72,7 @@ export default class Api {
   }
 
   public static async editLanguage(lang: Language): Promise<Language> {
-    const url = 'http://localhost:5000/api/language/edit';
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/language/edit`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
