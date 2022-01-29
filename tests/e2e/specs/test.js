@@ -1,5 +1,3 @@
-// https://docs.cypress.io/api/introduction/api.html
-
 describe('Empty database', () => {
   it('Practice page', () => {
     cy.visit('/ideas/practice');

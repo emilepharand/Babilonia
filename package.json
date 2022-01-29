@@ -6,10 +6,9 @@
     "start": "concurrently \"npm run serve\" \"npm run server\"",
     "serve": "vue-cli-service serve --port 8000",
     "server": "cd server && tsnd index.ts",
-    "test": "concurrently \"npm run server:test\" \"npm run serve:test\" \"cypress run\"",
+    "test:init": "concurrently \"npm run serve:test\" \"npm run server:test\"",
     "serve:test": "vue-cli-service serve --mode test --port 8888",
     "server:test": "cd server && tsnd index.ts --test-mode",
-    "test:unit": "vue-cli-service test:unit",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -43,6 +42,7 @@
     "eslint": "^6.7.2",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^7.0.0",
+    "npm-run-all": "^4.1.5",
     "ts-node-dev": "^1.1.8",
     "typescript": "~4.1.5",
     "vue-jest": "^5.0.0-0"
