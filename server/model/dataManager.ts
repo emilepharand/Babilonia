@@ -1,15 +1,15 @@
 import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { Database, open } from 'sqlite';
 import Idea from './idea';
 import Language from './language';
 import Expression from './expression';
 
-let db;
+let db: Database;
 
 (async () => {
-  let filename = './model/db.db';
+  let filename = 'server/model/db.db';
   if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
-    filename = './model/db-test.db';
+    filename = 'server/model/db-test.db';
   }
   db = await open({
     filename,
@@ -58,7 +58,8 @@ export default class DataManager {
     await Promise.all(ee.map(async (e) => {
       const txts = await db.all('SELECT text FROM texts WHERE expressionId = ?', e.id);
       txts.forEach((txt) => e.texts.push(txt.text));
-      e.language = await db.get('SELECT * FROM languages WHERE id = ?', e.languageId);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      e.language = (await db.get('SELECT * FROM languages WHERE id = ?', e.languageId))!;
     }));
     ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
     return new Idea(ideaId, ee);

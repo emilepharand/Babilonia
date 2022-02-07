@@ -1,19 +1,20 @@
 {
   "compilerOptions": {
-    "target": "esnext",
     "module": "esnext",
+    "target": "es2021",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
       "webpack-env",
-      "jest"
+      "jest",
+      "cypress"
     ],
     "paths": {
       "@/*": [
@@ -32,9 +33,30 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "node_modules/highlight.js/types/index.d.ts"
   ],
   "exclude": [
     "node_modules"
   ]
 }
+
+//{
+//  "compilerOptions": {
+//    "lib": ["ES2021"],
+//    "module": "esnext",
+//    "target": "esnext",
+//    "strict": true,
+//    "esModuleInterop": true,
+//    "skipLibCheck": true,
+//    "forceConsistentCasingInFileNames": true,
+//    "moduleResolution": "node"
+//  },
+//  "paths": {
+//    "@/*": [
+//      "src/*"
+//    ]
+//  },
+//  "$schema": "https://json.schemastore.org/tsconfig",
+//  "display": "Recommended"
+//}

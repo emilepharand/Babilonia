@@ -30,7 +30,7 @@ export default class Api {
   }
 
   static async deleteIdea(ideaId: number): Promise<unknown> {
-    const url = `${process.env.VUE_APP_API_BASE_URL}/api/ideas/${ideaId}`;
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/${ideaId}`;
     const response = await fetch(url, {
       method: 'DELETE',
     });
@@ -53,8 +53,8 @@ export default class Api {
   }
 
   static async getNextIdea(): Promise<Idea> {
-    const url = `${process.env.VUE_APP_API_BASE_URL}/api/ideas`;
-    alert(url);
+    const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/next`;
+    // alert(url);
     const res = await fetch(url);
     return res.json();
   }

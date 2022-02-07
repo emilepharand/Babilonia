@@ -2,5 +2,6 @@
   "pluginsFile": "tests/e2e/plugins/index.js",
   "baseUrl": "http://localhost:8888",
   "screenshotOnRunFailure": false,
-  "video": false
+  "video": false,
+  "sourceType": "module"
 }
