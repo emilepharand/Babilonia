@@ -1,8 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import Idea from './idea';
-import Language from './language';
-import Expression from './expression';
+import { Idea } from './idea';
+import { Language } from './language';
+import { Expression } from './expression';
 
 let db: Database;
 
@@ -62,7 +62,7 @@ export default class DataManager {
       e.language = (await db.get('SELECT * FROM languages WHERE id = ?', e.languageId))!;
     }));
     ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
-    return new Idea(ideaId, ee);
+    return new Idea({ id: ideaId, ee });
   }
 
   static async getLanguages(): Promise<Language[]> {
@@ -72,7 +72,7 @@ export default class DataManager {
   static async addIdea(ee: Expression[]): Promise<void> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    const idea: Idea = new Idea(ideaId, ee);
+    const idea: Idea = new Idea({ id: ideaId, ee });
     await this.insertExpressions(idea);
   }
 

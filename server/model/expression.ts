@@ -1,20 +1,27 @@
-import Language from './language';
+import { Language, emptyLanguage } from './language';
 
-export default class Expression {
-  public id: number;
+export interface Expression {
+  id: number;
+  texts: string[];
+  ideaId: number;
+  language: Language;
+  languageId?: number;
+}
 
-  public texts: string[];
-
-  public ideaId: number;
-
-  public language: Language;
-
-  public languageId?: number;
-
-  public constructor() {
-    this.id = -1;
-    this.texts = [];
-    this.ideaId = -1;
-    this.language = new Language();
+export class Expression {
+  constructor(e: Expression) {
+    this.id = e.id;
+    this.texts = e.texts;
+    this.ideaId = e.ideaId;
+    this.language = e.language;
   }
+}
+
+export function emptyExpression(): Expression {
+  return {
+    id: 0,
+    texts: [],
+    ideaId: 0,
+    language: emptyLanguage(),
+  };
 }

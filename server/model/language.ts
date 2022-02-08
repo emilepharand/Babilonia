@@ -1,20 +1,28 @@
 import Ajv from 'ajv';
 
-export default class Language {
-  public id: number;
+export interface Language {
+  id: number;
+  name: string;
+  ordering: number;
+  isPractice: boolean;
+}
 
-  public name: string;
-
-  public ordering: number;
-
-  public isPractice: boolean;
-
-  public constructor() {
-    this.id = -1;
-    this.name = 'temp';
-    this.ordering = 0;
-    this.isPractice = true;
+export class Language {
+  constructor(l: Language) {
+    this.id = l.id;
+    this.name = l.name;
+    this.ordering = l.ordering;
+    this.isPractice = l.isPractice;
   }
+}
+
+export function emptyLanguage(): Language {
+  return {
+    id: 0,
+    name: '',
+    ordering: 0,
+    isPractice: false,
+  };
 }
 
 const ajv = new Ajv();

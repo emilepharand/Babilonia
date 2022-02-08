@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import Expression from './model/expression';
+import { Expression } from './model/expression';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {

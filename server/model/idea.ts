@@ -1,12 +1,20 @@
-import Expression from './expression';
+import { Expression } from './expression';
 
-export default class Idea {
-  public id: number;
+export interface Idea {
+  id: number;
+  ee: Expression[];
+}
 
-  public ee: Expression[];
-
-  public constructor(id: number, ee: Expression[]) {
-    this.id = id;
-    this.ee = ee;
+export class Idea {
+  constructor(idea: Idea) {
+    this.id = idea.id;
+    this.ee = idea.ee;
   }
+}
+
+export function emptyIdea(): Idea {
+  return {
+    id: 0,
+    ee: [],
+  };
 }
