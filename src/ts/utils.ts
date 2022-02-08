@@ -1,4 +1,4 @@
-import Idea from '../../server/model/idea';
+import { Idea } from '../../server/model/idea';
 
 // eslint-disable-next-line no-shadow
 export enum TEXT_STATUS { FULL_MATCH, PARTIAL_MATCH, NO_MATCH }

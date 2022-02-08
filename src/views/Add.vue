@@ -10,10 +10,10 @@
 import { defineComponent } from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
-import Idea from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/idea';
 import Config from '@/ts/config';
 import Utils from '@/ts/utils';
-import Expression from '../../server/model/expression';
+import { Expression } from '../../server/model/expression';
 
 export default defineComponent({
   name: 'Add',
@@ -22,7 +22,7 @@ export default defineComponent({
   },
   data() {
     return {
-      idea: new Idea(101, []),
+      idea: emptyIdea(),
     };
   },
   async created() {

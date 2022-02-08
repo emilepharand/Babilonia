@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import Idea from '../../server/model/idea';
+import { Idea } from '../../server/model/idea';
 
 export default defineComponent({
   name: 'IdeaForm',

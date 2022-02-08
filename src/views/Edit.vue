@@ -11,7 +11,7 @@
 import { defineComponent } from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
-import Idea from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/idea';
 import Utils from '@/ts/utils';
 
 export default defineComponent({
@@ -21,7 +21,7 @@ export default defineComponent({
   },
   data() {
     return {
-      idea: new Idea(1, []),
+      idea: emptyIdea(),
     };
   },
   async created() {

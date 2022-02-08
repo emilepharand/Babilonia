@@ -4,7 +4,7 @@ export interface Language {
   id: number;
   name: string;
   ordering: number;
-  isPractice: boolean;
+  isPractice: boolean | string;
 }
 
 export class Language {
@@ -23,6 +23,10 @@ export function emptyLanguage(): Language {
     ordering: 0,
     isPractice: false,
   };
+}
+
+export function emptyPartialLanguage(): Partial<Language> {
+  return {};
 }
 
 const ajv = new Ajv();

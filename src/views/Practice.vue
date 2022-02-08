@@ -30,14 +30,14 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Api from '@/ts/api';
-import Idea from '../../server/model/idea';
+import { emptyIdea, Idea } from '../../server/model/idea';
 import Utils, { TEXT_STATUS } from '@/ts/utils';
 
 export default defineComponent({
   name: 'Practice',
   data() {
     return {
-      idea: new Idea(1, []),
+      idea: emptyIdea(),
       typed: [''],
       done: [false],
       noIdeas: false,

@@ -13,13 +13,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Api from '@/ts/api';
-import Idea from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/idea';
 
 export default defineComponent({
   name: 'Browse',
   data() {
     return {
-      idea: new Idea(1, []),
+      idea: emptyIdea(),
     };
   },
   methods: {

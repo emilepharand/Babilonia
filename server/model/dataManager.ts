@@ -4,25 +4,20 @@ import { Idea } from './idea';
 import { Language } from './language';
 import { Expression } from './expression';
 
-let db: Database;
-
-(async () => {
+async function initDb(): Promise<Database> {
   let filename = 'server/model/db.db';
   if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
-    filename = 'server/model/db-test.db';
+    filename = ':memory:';
   }
-  db = await open({
+  const localDb = await open({
     filename,
     driver: sqlite3.Database,
   });
-  if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
-    await db.run('DELETE FROM texts');
-    await db.run('DELETE FROM expressions');
-    await db.run('DELETE FROM ideas');
-    await db.run('DELETE FROM languages');
-  }
   console.log('Database was opened.');
-})();
+  return localDb;
+}
+
+const db: Database = await initDb();
 
 export default class DataManager {
   public static ideas: Idea[] = [];
@@ -33,6 +28,35 @@ export default class DataManager {
     return this.nextIdeaId()
       .then((id) => this.getIdeaById(id))
       .catch(() => Promise.reject());
+  }
+
+  public static async deleteAllData(): Promise<void> {
+    await db.run('drop table if exists expressions');
+    await db.run('drop table if exists ideas');
+    await db.run('drop table if exists texts');
+    await db.run('drop table if exists languages');
+    await db.run(`CREATE TABLE "expressions" (
+\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+\t"ideaId"\tINTEGER NOT NULL,
+\t"languageId"\tINTEGER NOT NULL,
+\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id"),
+\tFOREIGN KEY("languageId") REFERENCES "languages"("id")
+)`);
+    await db.run(`CREATE TABLE "ideas" (
+\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE
+)`);
+    await db.run(`CREATE TABLE "languages" (
+\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+\t"name"\tTEXT NOT NULL,
+\t"ordering"\tINTEGER NOT NULL,
+\t"isPractice"\tTEXT NOT NULL
+)`);
+    await db.run(`CREATE TABLE "texts" (
+\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+\t"expressionId"\tINTEGER NOT NULL,
+\t"text"\tTEXT NOT NULL,
+\tFOREIGN KEY("expressionId") REFERENCES "expressions"("id")
+)`);
   }
 
   private static async nextIdeaId(): Promise<number> {
@@ -62,7 +86,10 @@ export default class DataManager {
       e.language = (await db.get('SELECT * FROM languages WHERE id = ?', e.languageId))!;
     }));
     ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
-    return new Idea({ id: ideaId, ee });
+    return new Idea({
+      id: ideaId,
+      ee,
+    });
   }
 
   static async getLanguages(): Promise<Language[]> {
@@ -72,7 +99,10 @@ export default class DataManager {
   static async addIdea(ee: Expression[]): Promise<void> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    const idea: Idea = new Idea({ id: ideaId, ee });
+    const idea: Idea = new Idea({
+      id: ideaId,
+      ee,
+    });
     await this.insertExpressions(idea);
   }
 
@@ -109,9 +139,19 @@ export default class DataManager {
     }
   }
 
-  public static async addLanguage(language: Language): Promise<void> {
+  public static async addLanguage(language: Language): Promise<Language> {
+    const nextOrdering: number = await this.nextOrdering();
     await db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
-      language.name, language.ordering, language.isPractice);
+      language.name, nextOrdering, language.isPractice);
+    const languageId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
+    const l: Language = (await db.get('select * from languages where id = ?', languageId)) as Language;
+    l.isPractice = l.isPractice === '1';
+    return l;
+  }
+
+  public static async nextOrdering(): Promise<number> {
+    const data: any = await db.get('select max(ordering) as nextOrdering from languages');
+    return data.nextOrdering as number === null ? 0 : data.nextOrdering + 1;
   }
 
   static async editLanguage(language: Language): Promise<void> {

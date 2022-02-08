@@ -29,7 +29,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Api from '@/ts/api';
-import Language from '../../server/model/language';
 
 export default defineComponent({
   name: 'Languages',

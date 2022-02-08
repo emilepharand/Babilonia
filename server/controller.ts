@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
 import { Expression } from './model/expression';
+import { Language } from './model/language';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -39,12 +40,17 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    await DataManager.addLanguage(req.body);
-    res.send(req.body);
+    const l: Language = await DataManager.addLanguage(req.body);
+    res.send(JSON.stringify(l));
   }
 
   public static async editLanguage(req: Request, res: Response): Promise<void> {
     await DataManager.editLanguage(req.body);
     res.send(req.body);
+  }
+
+  public static async deleteAllData(req: Request, res: Response): Promise<void> {
+    await DataManager.deleteAllData();
+    res.send({});
   }
 }

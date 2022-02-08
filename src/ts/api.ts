@@ -1,6 +1,6 @@
-import Idea from '../../server/model/idea';
-import Language from '../../server/model/language';
-import Expression from '../../server/model/expression';
+import { Idea } from '../../server/model/idea';
+import { Language } from '../../server/model/language';
+import { Expression } from '../../server/model/expression';
 
 export default class Api {
   public static async getIdea(ideaId: number): Promise<Idea> {
@@ -13,7 +13,7 @@ export default class Api {
       },
     });
     const r = await response.json();
-    return new Idea(r.id, r.ee);
+    return new Idea({ id: r.id, ee: r.ee });
   }
 
   static async editIdea(idea: Idea): Promise<Idea> {
