@@ -2,7 +2,7 @@
 module.exports = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  "testMatch": ["<rootDir>/tests/api/**/jt.ts"],
+  "testMatch": ["<rootDir>/tests/api/**/*.ts"],
   "extensionsToTreatAsEsm": [".ts"],
   globals: {
     'ts-jest': {

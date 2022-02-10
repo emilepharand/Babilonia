@@ -92,6 +92,12 @@ export default class DataManager {
     });
   }
 
+  public static async getLanguageById(id: number): Promise<Language> {
+    const l = (await db.get('SELECT * FROM languages WHERE id = ?', id)) as Language;
+    l.isPractice = l.isPractice === '1';
+    return l;
+  }
+
   static async getLanguages(): Promise<Language[]> {
     return db.all('select * from languages');
   }
@@ -142,7 +148,7 @@ export default class DataManager {
   public static async addLanguage(language: Language): Promise<Language> {
     const nextOrdering: number = await this.nextOrdering();
     await db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
-      language.name, nextOrdering, language.isPractice);
+      language.name, nextOrdering, false);
     const languageId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
     const l: Language = (await db.get('select * from languages where id = ?', languageId)) as Language;
     l.isPractice = l.isPractice === '1';
@@ -154,8 +160,9 @@ export default class DataManager {
     return data.nextOrdering as number === null ? 0 : data.nextOrdering + 1;
   }
 
-  static async editLanguage(language: Language): Promise<void> {
+  static async editLanguage(id: number, language: Language): Promise<Language> {
     await db.run('update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?',
       language.name, language.ordering, language.isPractice, language.id);
+    return this.getLanguageById(id);
   }
 }

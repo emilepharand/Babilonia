@@ -28,6 +28,11 @@ export default class Controller {
     res.send(idea);
   }
 
+  public static async getLanguageById(req: Request, res: Response): Promise<void> {
+    const language = await DataManager.getLanguageById(parseInt(req.params.id, 10));
+    res.send(language);
+  }
+
   public static async editIdea(req: Request, res: Response): Promise<void> {
     const idea = req.body;
     await DataManager.editIdea(idea);
@@ -45,8 +50,8 @@ export default class Controller {
   }
 
   public static async editLanguage(req: Request, res: Response): Promise<void> {
-    await DataManager.editLanguage(req.body);
-    res.send(req.body);
+    const l: Language = await DataManager.editLanguage(parseInt(req.params.id, 10), req.body);
+    res.send(JSON.stringify(l));
   }
 
   public static async deleteAllData(req: Request, res: Response): Promise<void> {
