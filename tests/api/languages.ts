@@ -2,9 +2,8 @@ import fetch from 'node-fetch';
 import {
   copy,
   emptyPartialLanguage,
-  equal,
   Language,
-  validate as validateLanguage,
+  validate,
 } from '../../server/model/language';
 
 async function addLanguage(name: string): Promise<Language> {
@@ -19,14 +18,14 @@ async function addLanguage(name: string): Promise<Language> {
   return await response.json() as Language;
 }
 
-async function editLanguage(id: number, newLanguage: Language): Promise<Language> {
-  const response = await fetch(`http://localhost:5555/api/language/edit/${id}`,
+async function editLanguages(newLanguages: Language[]): Promise<Language[]> {
+  const response = await fetch('http://localhost:5555/api/languages',
     {
-      method: 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newLanguage),
+      body: JSON.stringify(newLanguages),
     });
-  return await response.json() as Language;
+  return await response.json() as Language[];
 }
 
 async function getLanguage(id: number): Promise<Language> {
@@ -38,6 +37,7 @@ async function getLanguage(id: number): Promise<Language> {
   return await response.json() as Language;
 }
 
+// response code
 describe('adding languages', () => {
   beforeAll(async () => {
     await fetch('http://localhost:5555/api/reset', { method: 'GET' });
@@ -46,7 +46,8 @@ describe('adding languages', () => {
   test('adding first language', async () => {
     const languageName = 'a first language';
     const responseLanguage = await addLanguage(languageName);
-    expect(validateLanguage(responseLanguage))
+
+    expect(validate(responseLanguage))
       .toEqual(true);
     // id starts at 1
     expect(responseLanguage.id)
@@ -61,16 +62,17 @@ describe('adding languages', () => {
       .toEqual(0);
 
     const fetchedLanguage = await getLanguage(1);
-    expect(equal(responseLanguage, fetchedLanguage))
-      .toBe(true);
+    expect(responseLanguage)
+      .toEqual(fetchedLanguage);
   });
 
   test('adding second language', async () => {
     const languageName = 'a second language';
     const responseLanguage = await addLanguage(languageName);
 
-    expect(validateLanguage(responseLanguage))
+    expect(validate(responseLanguage))
       .toEqual(true);
+
     expect(responseLanguage.id)
       .toEqual(2);
     expect(responseLanguage.name)
@@ -81,8 +83,8 @@ describe('adding languages', () => {
       .toEqual(1);
 
     const fetchedLanguage = await getLanguage(2);
-    expect(equal(responseLanguage, fetchedLanguage))
-      .toBe(true);
+    expect(responseLanguage)
+      .toEqual(fetchedLanguage);
   });
 });
 
@@ -91,65 +93,95 @@ describe('editing languages', () => {
     await fetch('http://localhost:5555/api/reset', { method: 'GET' });
   });
 
-  test('editing the name of a language', async () => {
-    const languageName = 'original language';
+  test('editing languages with changes', async () => {
+    const oldLanguage1 = await addLanguage('old language 1');
+    const oldLanguage2 = await addLanguage('old language 2');
+    const newLanguage1 = copy(oldLanguage1);
+    const newLanguage2 = copy(oldLanguage2);
 
-    // adding a language is already tested
-    const oldLanguage = await addLanguage(languageName);
-
-    const newLanguage = copy(oldLanguage);
-    newLanguage.name = 'edited language';
-    expect(newLanguage.name)
+    // name
+    newLanguage1.name = 'edited language 1';
+    newLanguage2.name = 'edited language 2';
+    expect(newLanguage1.name)
       .not
-      .toEqual(oldLanguage.name);
+      .toEqual(oldLanguage1.name);
+    expect(newLanguage2.name)
+      .not
+      .toEqual(oldLanguage2.name);
 
-    const responseLanguage = await editLanguage(oldLanguage.id, newLanguage);
+    // isPractice
+    newLanguage1.isPractice = !oldLanguage1.isPractice;
+    newLanguage2.isPractice = !oldLanguage2.isPractice;
+    expect(newLanguage1.isPractice)
+      .not
+      .toEqual(oldLanguage1.isPractice);
+    expect(newLanguage2.isPractice)
+      .not
+      .toEqual(oldLanguage2.isPractice);
 
-    // should have changed
-    expect(responseLanguage.name)
-      .toEqual(newLanguage.name);
+    // ordering
+    newLanguage1.ordering = 1;
+    newLanguage2.ordering = 0;
+    expect(newLanguage1.ordering)
+      .not
+      .toEqual(oldLanguage1.ordering);
+    expect(newLanguage2.ordering)
+      .not
+      .toEqual(oldLanguage2.ordering);
 
-    // should be the same
-    expect(responseLanguage.id)
-      .toEqual(oldLanguage.id);
-    expect(responseLanguage.isPractice)
-      .toEqual(oldLanguage.isPractice);
-    expect(responseLanguage.ordering)
-      .toEqual(oldLanguage.ordering);
+    const ll: Language[] = [newLanguage1, newLanguage2];
+    const [responseLanguage1, responseLanguage2] = (await editLanguages(ll));
+    const fetchedLanguage1 = await getLanguage(oldLanguage1.id);
+    const fetchedLanguage2 = await getLanguage(oldLanguage2.id);
 
-    const fetchedLanguaged = await getLanguage(oldLanguage.id);
-    expect(equal(responseLanguage, fetchedLanguaged))
-      .toBe(true);
+    // sanity checks
+    expect(validate(responseLanguage1))
+      .toEqual(true);
+    expect(validate(responseLanguage2))
+      .toEqual(true);
+    expect(responseLanguage1)
+      .toEqual(fetchedLanguage1);
+    expect(responseLanguage2)
+      .toEqual(fetchedLanguage2);
+
+    // check values have changed
+    expect(fetchedLanguage1.name)
+      .toEqual(newLanguage1.name);
+    expect(fetchedLanguage2.name)
+      .toEqual(newLanguage2.name);
+    expect(fetchedLanguage1.isPractice)
+      .toEqual(newLanguage1.isPractice);
+    expect(fetchedLanguage2.isPractice)
+      .toEqual(newLanguage2.isPractice);
+    expect(fetchedLanguage1.ordering)
+      .toEqual(newLanguage1.ordering);
+    expect(fetchedLanguage2.ordering)
+      .toEqual(newLanguage2.ordering);
   });
 
-  test('editing the isPractice of a language', async () => {
-    const languageName = 'original language';
+  test('editing languages with no changes', async () => {
+    const oldLanguage1 = await addLanguage('old language 1');
+    const oldLanguage2 = await addLanguage('old language 2');
 
-    // response is already tested
-    const oldLanguage = await addLanguage(languageName);
+    const ll: Language[] = [oldLanguage1, oldLanguage2];
+    const [responseLanguage1, responseLanguage2] = (await editLanguages(ll));
+    const fetchedLanguage1 = await getLanguage(oldLanguage1.id);
+    const fetchedLanguage2 = await getLanguage(oldLanguage2.id);
 
-    const newLanguage = copy(oldLanguage);
-    newLanguage.isPractice = !oldLanguage.isPractice;
-    expect(oldLanguage.isPractice)
-      .not
-      .toEqual(newLanguage.isPractice);
+    // sanity checks
+    expect(validate(responseLanguage1))
+      .toEqual(true);
+    expect(validate(responseLanguage2))
+      .toEqual(true);
+    expect(responseLanguage1)
+      .toEqual(fetchedLanguage1);
+    expect(responseLanguage2)
+      .toEqual(fetchedLanguage2);
 
-    const responseLanguage = await editLanguage(oldLanguage.id, newLanguage);
-
-    // should have changed
-    expect(responseLanguage.isPractice)
-      .toEqual(newLanguage.isPractice);
-
-    // should be the same
-    expect(responseLanguage.name)
-      .toEqual(oldLanguage.name);
-    expect(responseLanguage.id)
-      .toEqual(oldLanguage.id);
-    expect(responseLanguage.ordering)
-      .toEqual(oldLanguage.ordering);
-
-    const fetchedLanguaged = await editLanguage(oldLanguage.id, newLanguage);
-    expect(equal(responseLanguage, fetchedLanguaged))
-      .toBe(true);
+    // check values have not changed
+    expect(fetchedLanguage1)
+      .toEqual(oldLanguage1);
+    expect(fetchedLanguage2)
+      .toEqual(oldLanguage2);
   });
 });

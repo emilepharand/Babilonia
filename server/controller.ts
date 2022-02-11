@@ -49,13 +49,14 @@ export default class Controller {
     res.send(JSON.stringify(l));
   }
 
-  public static async editLanguage(req: Request, res: Response): Promise<void> {
-    const l: Language = await DataManager.editLanguage(parseInt(req.params.id, 10), req.body);
-    res.send(JSON.stringify(l));
+  public static async editLanguages(req: Request, res: Response): Promise<void> {
+    const ll: Language[] = await DataManager.editLanguages(req.body);
+    res.send(JSON.stringify(ll));
   }
 
   public static async deleteAllData(req: Request, res: Response): Promise<void> {
     await DataManager.deleteAllData();
     res.send({});
   }
+
 }

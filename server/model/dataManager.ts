@@ -160,9 +160,21 @@ export default class DataManager {
     return data.nextOrdering as number === null ? 0 : data.nextOrdering + 1;
   }
 
-  static async editLanguage(id: number, language: Language): Promise<Language> {
+  private static async editLanguage(id: number, language: Language): Promise<Language> {
     await db.run('update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?',
       language.name, language.ordering, language.isPractice, language.id);
     return this.getLanguageById(id);
+  }
+
+  static async editLanguages(ll: Language[]): Promise<Language[]> {
+    const retLl: Language[] = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of ll) {
+      // eslint-disable-next-line no-await-in-loop
+      await this.editLanguage(l.id, l);
+      // eslint-disable-next-line no-await-in-loop
+      retLl.push(await this.getLanguageById(l.id));
+    }
+    return retLl;
   }
 }
