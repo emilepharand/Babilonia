@@ -1,4 +1,4 @@
-import { Express, Router } from 'express';
+import { Express, Router, ErrorRequestHandler } from 'express';
 import Controller from './controller';
 
 export default class Routes {

@@ -54,7 +54,13 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    const l: Language = await DataManager.addLanguage(req.body);
+    const keys = Object.keys(req.body);
+    if (keys.length !== 1 || keys[0] !== 'name' || typeof (req.body.name) !== 'string' || req.body.name === '') {
+      res.status(400);
+      res.end();
+      return;
+    }
+    const l: Language = await DataManager.addLanguage(req.body.name);
     res.status(201);
     res.send(JSON.stringify(l));
   }

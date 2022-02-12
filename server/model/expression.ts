@@ -25,3 +25,7 @@ export function emptyExpression(): Expression {
     language: emptyLanguage(),
   };
 }
+
+export function emptyPartialExpression(): Partial<Expression> {
+  return {};
+}

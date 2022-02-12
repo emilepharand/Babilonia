@@ -156,10 +156,10 @@ export default class DataManager {
     }
   }
 
-  public static async addLanguage(language: Language): Promise<Language> {
+  public static async addLanguage(name: string): Promise<Language> {
     const nextOrdering: number = await this.nextOrdering();
     await db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
-      language.name, nextOrdering, false);
+      name, nextOrdering, false);
     const languageId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
     const l: Language = (await db.get('select * from languages where id = ?', languageId)) as Language;
     l.isPractice = l.isPractice === '1';

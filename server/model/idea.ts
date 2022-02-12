@@ -18,3 +18,7 @@ export function emptyIdea(): Idea {
     ee: [],
   };
 }
+
+export function emptyPartialIdea(): Partial<Idea> {
+  return {};
+}

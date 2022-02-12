@@ -1,22 +1,19 @@
 import fetch, { Response } from 'node-fetch';
 import {
   copy,
-  emptyPartialLanguage,
   Language,
   validate,
 } from '../../server/model/language';
 
-function resetEverything(): Promise<Response> {
+function deleteEverything(): Promise<Response> {
   return fetch('http://localhost:5555/everything', { method: 'DELETE' });
 }
 
 async function addLanguage(name: string): Promise<Response> {
-  const l1: Partial<Language> = emptyPartialLanguage();
-  l1.name = name;
   return fetch('http://localhost:5555/languages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(l1),
+    body: JSON.stringify({ name }),
   });
 }
 
@@ -47,10 +44,9 @@ async function deleteLanguage(id: number): Promise<Response> {
   });
 }
 
-// response code
 describe('adding languages', () => {
   beforeAll(async () => {
-    await resetEverything();
+    await deleteEverything();
   });
 
   test('adding first language', async () => {
@@ -94,9 +90,98 @@ describe('adding languages', () => {
   });
 });
 
+describe('adding invalid languages', () => {
+  beforeEach(async () => {
+    await deleteEverything();
+  });
+
+  test('empty string name', async () => {
+    const languageName = '';
+    let r = await addLanguage(languageName);
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('empty object', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('object without name key with other keys', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: 1 }),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('object with name key and other keys', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: 1,
+        name: 'a language',
+      }),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('name is a number', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 1 }),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('invalid JSON', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '<',
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('wrong headers', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'a language' }),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+});
+
 describe('editing languages', () => {
   beforeEach(async () => {
-    await resetEverything();
+    await deleteEverything();
   });
 
   test('editing languages with changes', async () => {
@@ -182,7 +267,7 @@ describe('editing languages', () => {
 
 describe('deleting languages', () => {
   beforeEach(async () => {
-    await resetEverything();
+    await deleteEverything();
   });
 
   test('deleting a language', async () => {
@@ -199,7 +284,7 @@ describe('deleting languages', () => {
 
 describe('getting languages', () => {
   beforeEach(async () => {
-    await resetEverything();
+    await deleteEverything();
   });
 
   test('getting the list of languages', async () => {
