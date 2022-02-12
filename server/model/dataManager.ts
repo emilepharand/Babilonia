@@ -94,12 +94,19 @@ export default class DataManager {
 
   public static async getLanguageById(id: number): Promise<Language> {
     const l = (await db.get('SELECT * FROM languages WHERE id = ?', id)) as Language;
-    l.isPractice = l.isPractice === '1';
+    if (l !== undefined) {
+      l.isPractice = l.isPractice === '1';
+    }
     return l;
   }
 
   static async getLanguages(): Promise<Language[]> {
-    return db.all('select * from languages');
+    const ll = await db.all('select * from languages');
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of ll) {
+      l.isPractice = l.isPractice === '1';
+    }
+    return ll;
   }
 
   static async addIdea(ee: Expression[]): Promise<void> {
@@ -120,6 +127,10 @@ export default class DataManager {
   static async deleteIdea(ideaId: number): Promise<void> {
     await db.run('delete from expressions where ideaId = ?', ideaId);
     await db.run('delete from ideas where id =  ?', ideaId);
+  }
+
+  static async deleteLanguage(languageId: number): Promise<void> {
+    await db.run('delete from languages where id = ?', languageId);
   }
 
   private static async insertExpressions(idea: Idea): Promise<void> {
@@ -177,4 +188,5 @@ export default class DataManager {
     }
     return retLl;
   }
+
 }

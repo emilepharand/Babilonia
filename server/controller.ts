@@ -30,6 +30,10 @@ export default class Controller {
 
   public static async getLanguageById(req: Request, res: Response): Promise<void> {
     const language = await DataManager.getLanguageById(parseInt(req.params.id, 10));
+    if (language === undefined) {
+      res.status(404);
+      res.end();
+    }
     res.send(language);
   }
 
@@ -44,8 +48,14 @@ export default class Controller {
     res.send({});
   }
 
+  public static async deleteLanguage(req: Request, res: Response): Promise<void> {
+    await DataManager.deleteLanguage(parseInt(req.params.id, 10));
+    res.send({});
+  }
+
   public static async addLanguage(req: Request, res: Response): Promise<void> {
     const l: Language = await DataManager.addLanguage(req.body);
+    res.status(201);
     res.send(JSON.stringify(l));
   }
 
