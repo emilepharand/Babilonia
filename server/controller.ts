@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
 import { Expression } from './model/expression';
-import { Language } from './model/language';
+import { Language, validate } from './model/language';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -54,8 +54,7 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    const keys = Object.keys(req.body);
-    if (keys.length !== 1 || keys[0] !== 'name' || typeof (req.body.name) !== 'string' || req.body.name === '') {
+    if (!Controller.checkLanguage(req.body)) {
       res.status(400);
       res.end();
       return;
@@ -65,8 +64,39 @@ export default class Controller {
     res.send(JSON.stringify(l));
   }
 
+  private static checkLanguage(body: any): boolean {
+    const keys = Object.keys(body);
+    return !(keys.length !== 1 || keys[0] !== 'name' || typeof (body.name) !== 'string' || body.name === '');
+  }
+
   public static async editLanguages(req: Request, res: Response): Promise<void> {
-    const ll: Language[] = await DataManager.editLanguages(req.body);
+    if (!(req.body instanceof Array)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    if (req.body.length === 0) {
+      // empty body is invalid
+      res.status(400);
+      res.end();
+      return;
+    }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const a of req.body) {
+      if (!validate(a)) {
+        res.status(400);
+        res.end();
+        return;
+      }
+    }
+    let ll;
+    try {
+      ll = await DataManager.editLanguages(req.body);
+    } catch {
+      res.status(400);
+      res.end();
+      return;
+    }
     res.send(JSON.stringify(ll));
   }
 
@@ -74,5 +104,4 @@ export default class Controller {
     await DataManager.deleteAllData();
     res.send({});
   }
-
 }

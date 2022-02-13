@@ -1,11 +1,18 @@
-import express from 'express';
+import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import Routes from './routes';
 import DataManager from './model/dataManager';
 
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(400);
+  res.end();
+};
+
 const app = express()
   .use(cors())
   .use(express.json());
+app.use(errorHandler);
 const routes = new Routes(app);
 routes.init();
 

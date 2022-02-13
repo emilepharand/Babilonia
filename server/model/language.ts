@@ -36,15 +36,22 @@ export function emptyPartialLanguage(): Partial<Language> {
   return {};
 }
 
-const ajv = new Ajv();
+const ajv = new Ajv({ strictDefaults: true });
 const schema = {
   type: 'object',
   properties: {
     id: { type: 'integer' },
-    name: { type: 'string' },
+    name: {
+      type: 'string',
+      allOf: [
+        { not: { maxLength: 0 } },
+      ],
+    },
     ordering: { type: 'integer' },
     isPractice: { type: 'boolean' },
   },
+  required: ['id', 'name', 'ordering', 'isPractice'],
   additionalProperties: false,
+  strictRequired: true,
 };
 export const validate = ajv.compile(schema);

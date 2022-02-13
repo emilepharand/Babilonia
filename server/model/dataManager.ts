@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
 import { Idea } from './idea';
-import { Language } from './language';
+import { equal, Language } from './language';
 import { Expression } from './expression';
 
 async function initDb(): Promise<Database> {
@@ -178,6 +178,9 @@ export default class DataManager {
   }
 
   static async editLanguages(ll: Language[]): Promise<Language[]> {
+    if (!(await DataManager.includesAllLanguages(ll))) {
+      return Promise.reject();
+    }
     const retLl: Language[] = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const l of ll) {
@@ -189,4 +192,20 @@ export default class DataManager {
     return retLl;
   }
 
+  static async includesAllLanguages(ll: Language[]): Promise<boolean> {
+    const llInDb = await DataManager.getLanguages();
+    const ids = new Set<number>();
+    if (llInDb.length !== ll.length) return false;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of ll) {
+      // no duplicate ids
+      if (ids.has(l.id)) return false;
+      ids.add(l.id);
+      // eslint-disable-next-line no-await-in-loop
+      if ((await DataManager.getLanguageById(l.id) === undefined)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
