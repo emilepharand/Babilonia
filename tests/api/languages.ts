@@ -4,6 +4,7 @@ import {
   Language,
   validate,
 } from '../../server/model/language';
+import edit from '@/views/Edit.vue';
 
 function deleteEverything(): Promise<Response> {
   return fetch('http://localhost:5555/everything', { method: 'DELETE' });
@@ -114,13 +115,18 @@ describe('adding invalid languages', () => {
     expect((await getLanguage(2)).status).toEqual(404);
   });
 
-  test('empty string name', async () => {
-    const languageName = '';
-    let r = await addLanguage(languageName);
-    expect(r.status).toEqual(400);
+  test('empty or blank string name', async () => {
+    const cc = ['', ' ', '\t', '\n', '\f', '\r'];
+    // eslint-disable-next-line no-restricted-syntax,guard-for-in
+    for (const c1 of cc) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const c2 of cc) {
+        // eslint-disable-next-line no-await-in-loop
+        expect((await addLanguage(c1 + c2)).status).toEqual(400);
+      }
+    }
     // id starts at 1, make sure no language was created
-    r = await getLanguage(1);
-    expect(r.status).toEqual(404);
+    expect((await getLanguage(1)).status).toEqual(404);
   });
 
   test('empty object', async () => {
@@ -304,20 +310,21 @@ describe('editing invalid languages', () => {
     await deleteEverything();
   });
 
-  test('empty string name', async () => {
+  test('empty or blank name', async () => {
     const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
-    const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
     const newLanguage1 = copy(oldLanguage1);
-    const newLanguage2 = copy(oldLanguage2);
-    newLanguage1.name = '';
-    newLanguage2.name = 'new language 2';
-    const r = await editLanguages([newLanguage1, newLanguage2]);
-    expect(r.status).toEqual(400);
-    const responseLanguage1 = await (await getLanguage(1)).json() as Language;
-    const responseLanguage2 = await (await getLanguage(2)).json() as Language;
-    // edit operation is atomic: if one language is invalid, none are changed
-    expect(responseLanguage1).toEqual(oldLanguage1);
-    expect(responseLanguage2).toEqual(oldLanguage2);
+    const cc = ['', ' ', '\t', '\n', '\f', '\r'];
+    // eslint-disable-next-line no-restricted-syntax,guard-for-in
+    for (const c1 of cc) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const c2 of cc) {
+        newLanguage1.name = c1 + c2;
+        // eslint-disable-next-line no-await-in-loop
+        expect((await editLanguages([newLanguage1])).status).toEqual(400);
+      }
+    }
+    // id starts at 1, make sure no language was created
+    expect(await (await getLanguage(1)).json()).toEqual(oldLanguage1);
   });
 
   test('duplicate names', async () => {

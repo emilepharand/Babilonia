@@ -70,7 +70,7 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    if (!Controller.checkLanguage(req.body)) {
+    if (!Controller.checkLanguageForAdding(req.body)) {
       res.status(400);
       res.end();
       return;
@@ -85,9 +85,9 @@ export default class Controller {
     res.send(JSON.stringify(l));
   }
 
-  private static checkLanguage(body: any): boolean {
+  private static checkLanguageForAdding(body: any): boolean {
     const keys = Object.keys(body);
-    return !(keys.length !== 1 || keys[0] !== 'name' || typeof (body.name) !== 'string' || body.name === '');
+    return !(keys.length !== 1 || keys[0] !== 'name' || typeof (body.name) !== 'string' || body.name.trim() === '');
   }
 
   public static async editLanguages(req: Request, res: Response): Promise<void> {
