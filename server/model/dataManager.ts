@@ -177,8 +177,19 @@ export default class DataManager {
     return this.getLanguageById(id);
   }
 
+  public static async languageNameExists(name: string): Promise<boolean> {
+    const l = (await db.get('SELECT * FROM languages WHERE name = ?', name)) as Language;
+    return l !== undefined;
+  }
+
   static async editLanguages(ll: Language[]): Promise<Language[]> {
     if (!(await DataManager.includesAllLanguages(ll))) {
+      return Promise.reject();
+    }
+    if (!(DataManager.isValidOrdering(ll))) {
+      return Promise.reject();
+    }
+    if (!(DataManager.noDuplicateNames(ll))) {
       return Promise.reject();
     }
     const retLl: Language[] = [];
@@ -190,6 +201,21 @@ export default class DataManager {
       retLl.push(await this.getLanguageById(l.id));
     }
     return retLl;
+  }
+
+  static isValidOrdering(ll: Language[]): boolean {
+    const orderings = new Set<number>();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of ll) {
+      orderings.add(l.ordering);
+    }
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < ll.length; i++) {
+      if (!(orderings.has(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   static async includesAllLanguages(ll: Language[]): Promise<boolean> {
@@ -207,5 +233,21 @@ export default class DataManager {
       }
     }
     return true;
+  }
+
+  private static noDuplicateNames(ll: Language[]): boolean {
+    const names = new Set<string>();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of ll) {
+      if (names.has(l.name)) {
+        return false;
+      }
+      names.add(l.name);
+    }
+    return true;
+  }
+
+  static languageIdExists(id: string) {
+    return false;
   }
 }

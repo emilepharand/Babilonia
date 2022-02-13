@@ -29,6 +29,11 @@ export default class Controller {
   }
 
   public static async getLanguageById(req: Request, res: Response): Promise<void> {
+    if (Number.isNaN(+req.params.id)) {
+      res.status(400);
+      res.end();
+      return;
+    }
     const language = await DataManager.getLanguageById(parseInt(req.params.id, 10));
     if (language === undefined) {
       res.status(404);
@@ -49,12 +54,28 @@ export default class Controller {
   }
 
   public static async deleteLanguage(req: Request, res: Response): Promise<void> {
-    await DataManager.deleteLanguage(parseInt(req.params.id, 10));
+    if (Number.isNaN(+req.params.id)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    const id = parseInt(req.params.id, 10);
+    if (await DataManager.getLanguageById(id) === undefined) {
+      res.status(404);
+      res.end();
+      return;
+    }
+    await DataManager.deleteLanguage(id);
     res.send({});
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
     if (!Controller.checkLanguage(req.body)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    if (await DataManager.languageNameExists(req.body.name)) {
       res.status(400);
       res.end();
       return;

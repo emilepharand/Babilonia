@@ -95,7 +95,25 @@ describe('adding invalid languages', () => {
     await deleteEverything();
   });
 
-  // trying to add array
+  test('array', async () => {
+    let r = await fetch('http://localhost:5555/languages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ name: 'test' }]),
+    });
+    expect(r.status).toEqual(400);
+    // id starts at 1, make sure no language was created
+    r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
+
+  test('name already exists', async () => {
+    const name = 'a duplicate language';
+    expect((await addLanguage(name)).status).toEqual(201);
+    expect((await addLanguage(name)).status).toEqual(400);
+    expect((await getLanguage(2)).status).toEqual(404);
+  });
+
   test('empty string name', async () => {
     const languageName = '';
     let r = await addLanguage(languageName);
@@ -302,6 +320,20 @@ describe('editing invalid languages', () => {
     expect(responseLanguage2).toEqual(oldLanguage2);
   });
 
+  test('duplicate names', async () => {
+    const oldLanguage1 = await (await addLanguage('language 1')).json() as Language;
+    const oldLanguage2 = await (await addLanguage('language 2')).json() as Language;
+    const newLanguage1 = copy(oldLanguage1);
+    const newLanguage2 = copy(oldLanguage2);
+    newLanguage2.name = newLanguage1.name;
+    const r = await editLanguages([newLanguage1, newLanguage2]);
+    expect(r.status).toEqual(400);
+    const responseLanguage1 = await (await getLanguage(1)).json() as Language;
+    const responseLanguage2 = await (await getLanguage(2)).json() as Language;
+    expect(responseLanguage1).toEqual(oldLanguage1);
+    expect(responseLanguage2).toEqual(oldLanguage2);
+  });
+
   test('empty array', async () => {
     const r = await fetch('http://localhost:5555/languages', {
       method: 'PUT',
@@ -373,7 +405,6 @@ describe('editing invalid languages', () => {
     const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
     const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
     const newLanguage1 = copy(oldLanguage1);
-    const newLanguage2 = copy(oldLanguage2);
     newLanguage1.name = 'a new language';
     const r = await fetch('http://localhost:5555/languages', {
       method: 'PUT',
@@ -423,7 +454,62 @@ describe('editing invalid languages', () => {
     expect(fetchedLanguage2).toEqual(oldLanguage2);
   });
 
-  // ordering is invalid: [0,0] (duplicate), [1,2] (no start 0), [0,2] (gaps)
+  test('ordering has duplicates', async () => {
+    const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
+    const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
+    const newLanguage1 = copy(oldLanguage1);
+    const newLanguage2 = copy(oldLanguage2);
+    newLanguage2.ordering = 0;
+    const r = await fetch('http://localhost:5555/languages', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([newLanguage1, newLanguage2]),
+    });
+    expect(r.status).toEqual(400);
+    const fetchedLanguage1 = await (await getLanguage(oldLanguage1.id)).json();
+    const fetchedLanguage2 = await (await getLanguage(oldLanguage2.id)).json();
+    expect(fetchedLanguage1).toEqual(oldLanguage1);
+    expect(fetchedLanguage2).toEqual(oldLanguage2);
+  });
+
+  test('ordering doesn\'t start at 0', async () => {
+    const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
+    const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
+    const newLanguage1 = copy(oldLanguage1);
+    const newLanguage2 = copy(oldLanguage2);
+    newLanguage1.ordering = 1;
+    newLanguage2.ordering = 2;
+    const r = await fetch('http://localhost:5555/languages', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([newLanguage1, newLanguage2]),
+    });
+    expect(r.status).toEqual(400);
+    const fetchedLanguage1 = await (await getLanguage(oldLanguage1.id)).json();
+    const fetchedLanguage2 = await (await getLanguage(oldLanguage2.id)).json();
+    expect(fetchedLanguage1).toEqual(oldLanguage1);
+    expect(fetchedLanguage2).toEqual(oldLanguage2);
+  });
+
+  test('ordering has a gap', async () => {
+    const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
+    const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
+    const newLanguage1 = copy(oldLanguage1);
+    const newLanguage2 = copy(oldLanguage2);
+    newLanguage1.ordering = 0;
+    newLanguage2.ordering = 2;
+    const r = await fetch('http://localhost:5555/languages', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([newLanguage1, newLanguage2]),
+    });
+    expect(r.status).toEqual(400);
+    const fetchedLanguage1 = await (await getLanguage(oldLanguage1.id)).json();
+    const fetchedLanguage2 = await (await getLanguage(oldLanguage2.id)).json();
+    expect(fetchedLanguage1).toEqual(oldLanguage1);
+    expect(fetchedLanguage2).toEqual(oldLanguage2);
+  });
+
   test('name is a number', async () => {
     const l1 = await (await addLanguage('a language')).json() as Language;
     const l2 = copy(l1) as any;
@@ -493,6 +579,27 @@ describe('deleting languages', () => {
   });
 });
 
+describe('deleting invalid languages', () => {
+  beforeEach(async () => {
+    await deleteEverything();
+  });
+
+  test('deleting a nonexisting language', async () => {
+    expect((await addLanguage('a language')).status).toEqual(201);
+    expect((await deleteLanguage(2)).status).toEqual(404);
+    expect((await getLanguage(1)).status).toEqual(200);
+  });
+
+  test('id is not numeric', async () => {
+    expect((await addLanguage('a language')).status).toEqual(201);
+    const r = await fetch('http://localhost:5555/languages/123letters', {
+      method: 'DELETE',
+    });
+    expect(r.status).toEqual(400);
+    expect((await getLanguage(1)).status).toEqual(200);
+  });
+});
+
 describe('getting languages', () => {
   beforeEach(async () => {
     await deleteEverything();
@@ -509,5 +616,25 @@ describe('getting languages', () => {
     const responseLl = await r.json();
 
     expect(responseLl).toEqual(ll);
+  });
+
+  test('no languages = empty array', async () => {
+    const r = await getLanguages();
+    expect(r.status).toEqual(200);
+    expect(await r.json()).toEqual([]);
+  });
+});
+
+describe('getting invalid languages', () => {
+  beforeEach(async () => {
+    await deleteEverything();
+  });
+
+  test('id is not numeric', async () => {
+    const r = await fetch('http://localhost:5555/languages/123letters', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(r.status).toEqual(400);
   });
 });
