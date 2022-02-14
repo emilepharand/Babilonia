@@ -4,7 +4,9 @@ import Routes from './routes';
 import DataManager from './model/dataManager';
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  console.error(err.stack);
+  if (!(process.argv.length > 2 && process.argv[2] === '--test-mode')) {
+    console.error(err.stack);
+  }
   res.status(400);
   res.end();
 };

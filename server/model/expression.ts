@@ -1,9 +1,14 @@
 import { Language, emptyLanguage } from './language';
 
+export interface ExpressionForAdding {
+  texts: string[];
+  languageId: number;
+}
+
 export interface Expression {
   id: number;
-  texts: string[];
   ideaId: number;
+  texts: string[];
   language: Language;
   languageId?: number;
 }

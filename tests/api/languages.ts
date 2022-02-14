@@ -4,18 +4,25 @@ import {
   Language,
   validate,
 } from '../../server/model/language';
-import edit from '@/views/Edit.vue';
 
 function deleteEverything(): Promise<Response> {
   return fetch('http://localhost:5555/everything', { method: 'DELETE' });
 }
 
-async function addLanguage(name: string): Promise<Response> {
+export async function addLanguage(name: string): Promise<Response> {
   return fetch('http://localhost:5555/languages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name }),
   });
+}
+
+export async function simplyAddLanguage(name: string): Promise<Language> {
+  return await (await fetch('http://localhost:5555/languages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  })).json() as Language;
 }
 
 async function editLanguages(newLanguages: Language[]): Promise<Response> {

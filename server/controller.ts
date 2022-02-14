@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import { Expression } from './model/expression';
+import { Expression, ExpressionForAdding } from './model/expression';
 import { Language, validate } from './model/language';
+import { IdeaForAdding } from './model/idea';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -18,8 +19,9 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    const ee: Expression[] = req.body;
-    await DataManager.addIdea(ee);
+    const ideaForAdding: IdeaForAdding = req.body;
+    await DataManager.addIdea(ideaForAdding);
+    res.status(201);
     res.send(req.body);
   }
 
@@ -70,16 +72,13 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    if (!Controller.checkLanguageForAdding(req.body)) {
+    if (!Controller.checkLanguageForAdding(req.body)
+      || await DataManager.languageNameExists(req.body.name)) {
       res.status(400);
       res.end();
       return;
     }
-    if (await DataManager.languageNameExists(req.body.name)) {
-      res.status(400);
-      res.end();
-      return;
-    }
+
     const l: Language = await DataManager.addLanguage(req.body.name);
     res.status(201);
     res.send(JSON.stringify(l));

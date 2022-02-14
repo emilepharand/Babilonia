@@ -1,8 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import { Idea } from './idea';
+import { Idea, IdeaForAdding } from './idea';
 import { equal, Language } from './language';
-import { Expression } from './expression';
+import { Expression, ExpressionForAdding } from './expression';
 
 async function initDb(): Promise<Database> {
   let filename = 'server/model/db.db';
@@ -109,19 +109,15 @@ export default class DataManager {
     return ll;
   }
 
-  static async addIdea(ee: Expression[]): Promise<void> {
+  static async addIdea(ideaForAdding: IdeaForAdding): Promise<void> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    const idea: Idea = new Idea({
-      id: ideaId,
-      ee,
-    });
-    await this.insertExpressions(idea);
+    await this.insertExpressions(ideaForAdding, ideaId);
   }
 
   static async editIdea(idea: Idea): Promise<void> {
     await db.run('delete from expressions where ideaId = ?', idea.id);
-    await this.insertExpressions(idea);
+    // await this.insertExpressions(idea);
   }
 
   static async deleteIdea(ideaId: number): Promise<void> {
@@ -133,13 +129,13 @@ export default class DataManager {
     await db.run('delete from languages where id = ?', languageId);
   }
 
-  private static async insertExpressions(idea: Idea): Promise<void> {
+  private static async insertExpressions(idea: IdeaForAdding, ideaId: number): Promise<void> {
     for (let i = 0; i < idea.ee.length; i += 1) {
       // no empty text
       if (!(idea.ee[i].texts.filter((txt) => txt.length > 0).length === 0)) {
         // eslint-disable-next-line no-await-in-loop
         await db.run('insert into expressions("ideaId", "languageId") values (?, ?)',
-          idea.id, idea.ee[i].language.id);
+          ideaId, idea.ee[i].languageId);
         // eslint-disable-next-line no-await-in-loop
         const exprId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
         for (let j = 0; j < idea.ee[i].texts.length; j += 1) {
