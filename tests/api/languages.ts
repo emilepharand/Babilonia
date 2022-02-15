@@ -33,11 +33,15 @@ async function editLanguages(newLanguages: Language[]): Promise<Response> {
   });
 }
 
-async function getLanguage(id: number): Promise<Response> {
+export async function getLanguage(id: number): Promise<Response> {
   return fetch(`http://localhost:5555/languages/${id}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+export async function simplyGetLanguage(id: number): Promise<Language> {
+  return await (await getLanguage(id)).json() as Language;
 }
 
 async function getLanguages(): Promise<Response> {
@@ -591,6 +595,29 @@ describe('deleting languages', () => {
     // language doesn't exist
     expect((await getLanguage(1)).status).toEqual(404);
   });
+
+  test('deleting a language shouuld reorder languages correctly', async () => {
+    expect((await addLanguage('language 1')).status).toEqual(201);
+    expect((await addLanguage('language 2')).status).toEqual(201);
+    expect((await addLanguage('language 3')).status).toEqual(201);
+    expect((await addLanguage('language 4')).status).toEqual(201);
+    expect((await addLanguage('language 5')).status).toEqual(201);
+
+    expect((await simplyGetLanguage(1)).ordering).toEqual(0);
+    expect((await simplyGetLanguage(2)).ordering).toEqual(1);
+    expect((await simplyGetLanguage(3)).ordering).toEqual(2);
+    expect((await simplyGetLanguage(4)).ordering).toEqual(3);
+    expect((await simplyGetLanguage(5)).ordering).toEqual(4);
+
+    await deleteLanguage(3);
+
+    expect((await simplyGetLanguage(1)).ordering).toEqual(0);
+    expect((await simplyGetLanguage(2)).ordering).toEqual(1);
+    expect((await simplyGetLanguage(4)).ordering).toEqual(2);
+    expect((await simplyGetLanguage(5)).ordering).toEqual(3);
+  });
+
+  // deleting should delete all expressions of that language
 });
 
 describe('deleting invalid languages', () => {

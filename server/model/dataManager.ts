@@ -74,18 +74,34 @@ export default class DataManager {
     return idea.id;
   }
 
+  private static async getExpressions(ideaId: number): Promise<Expression[]> {
+    const res: [{ id: number, languageId: number }] = await
+    db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
+    const ee: Expression[] = [];
+    // beware of Promise.all() because expressions order need to be preserved
+    // eslint-disable-next-line no-restricted-syntax
+    for (const item of res) {
+      ee.push({
+        id: item.id,
+        // eslint-disable-next-line no-await-in-loop
+        texts: await DataManager.getTexts(item.id),
+        // eslint-disable-next-line no-await-in-loop
+        language: await DataManager.getLanguageById(item.languageId),
+      });
+    }
+    return ee;
+  }
+
+  private static async getTexts(expressionId: number): Promise<string[]> {
+    const texts: string[] = [];
+    const txts = await db.all('SELECT text FROM texts WHERE expressionId = ?', expressionId);
+    txts.forEach((txt) => texts.push(txt.text));
+    return texts;
+  }
+
   public static async getIdeaById(ideaId: number): Promise<Idea> {
-    const ee: Expression[] = await db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
-    ee.forEach((e) => {
-      e.texts = [];
-    });
-    await Promise.all(ee.map(async (e) => {
-      const txts = await db.all('SELECT text FROM texts WHERE expressionId = ?', e.id);
-      txts.forEach((txt) => e.texts.push(txt.text));
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      e.language = (await db.get('SELECT * FROM languages WHERE id = ?', e.languageId))!;
-    }));
-    ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering);
+    const ee: Expression[] = await DataManager.getExpressions(ideaId);
+    ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
     return new Idea({
       id: ideaId,
       ee,

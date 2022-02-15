@@ -39,30 +39,33 @@ ajv.addKeyword({
 const schema = {
   type: 'object',
   properties: {
-    id: {
-      type: 'integer',
-    },
+    id: { type: 'integer', },
     ee: {
       type: 'array',
       items: {
         type: 'object',
         properties: {
-          id: {
-            type: 'integer',
-          },
-          ideaId: {
-            type: 'integer',
-          },
+          id: { type: 'integer', },
           texts: {
             type: 'array',
             items: { type: 'string' },
           },
+          language: {
+            type: 'object',
+            properties: {
+              id: { type: 'integer' },
+              name: { type: 'string' },
+              ordering: { type: 'integer' },
+              isPractice: { type: 'boolean' },
+              additionalProperties: false,
+            },
+            additionalProperties: false,
+          },
           additionalProperties: false,
         },
-        additionalProperties: false,
       },
     },
+    additionalProperties: false,
   },
-  additionalProperties: false,
 };
 export const validate = ajv.compile(schema);
