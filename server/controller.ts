@@ -20,9 +20,9 @@ export default class Controller {
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
     const ideaForAdding: IdeaForAdding = req.body;
-    await DataManager.addIdea(ideaForAdding);
+    const returnIdea = await DataManager.addIdea(ideaForAdding);
     res.status(201);
-    res.send(req.body);
+    res.send(JSON.stringify(returnIdea));
   }
 
   public static async getIdeaById(req: Request, res: Response): Promise<void> {

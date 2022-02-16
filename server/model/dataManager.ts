@@ -76,7 +76,7 @@ export default class DataManager {
 
   private static async getExpressions(ideaId: number): Promise<Expression[]> {
     const res: [{ id: number, languageId: number }] = await
-    db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
+      db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
     const ee: Expression[] = [];
     // beware of Promise.all() because expressions order need to be preserved
     // eslint-disable-next-line no-restricted-syntax
@@ -125,10 +125,11 @@ export default class DataManager {
     return ll;
   }
 
-  static async addIdea(ideaForAdding: IdeaForAdding): Promise<void> {
+  static async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
     await this.insertExpressions(ideaForAdding, ideaId);
+    return DataManager.getIdeaById(ideaId);
   }
 
   static async editIdea(idea: Idea): Promise<void> {
@@ -142,7 +143,17 @@ export default class DataManager {
   }
 
   static async deleteLanguage(languageId: number): Promise<void> {
+    // TODO ordering when unique is enfored:
+    // BEGIN TRANSACTION;
+    // update languages set ordering = -ordering;
+    // update languages set ordering = 0 where id = 6;
+    // update languages set ordering = 2 where id = 7;
+    // update languages set ordering = 1 where id = 8;
+    // COMMIT;
+    const l = await DataManager.getLanguageById(languageId);
+    await db.run('update languages set ordering = case when ordering > ? then ordering - 1 else ordering END', l.ordering);
     await db.run('delete from languages where id = ?', languageId);
+    await db.run('delete from expressions where languageId = ?', languageId);
   }
 
   private static async insertExpressions(idea: IdeaForAdding, ideaId: number): Promise<void> {
@@ -257,9 +268,5 @@ export default class DataManager {
       names.add(l.name);
     }
     return true;
-  }
-
-  static languageIdExists(id: string) {
-    return false;
   }
 }

@@ -39,13 +39,13 @@ ajv.addKeyword({
 const schema = {
   type: 'object',
   properties: {
-    id: { type: 'integer', },
+    id: { type: 'integer' },
     ee: {
       type: 'array',
       items: {
         type: 'object',
         properties: {
-          id: { type: 'integer', },
+          id: { type: 'integer' },
           texts: {
             type: 'array',
             items: { type: 'string' },
@@ -57,15 +57,16 @@ const schema = {
               name: { type: 'string' },
               ordering: { type: 'integer' },
               isPractice: { type: 'boolean' },
-              additionalProperties: false,
             },
-            additionalProperties: false,
+            required: ['id', 'name', 'ordering', 'isPractice'],
           },
           additionalProperties: false,
         },
+        required: ['id', 'texts', 'language'],
       },
     },
     additionalProperties: false,
   },
+  required: ['id', 'ee'],
 };
 export const validate = ajv.compile(schema);

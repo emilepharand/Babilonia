@@ -1,38 +1,25 @@
 import fetch, { Response } from 'node-fetch';
 import { Expression, ExpressionForAdding } from '../../server/model/expression';
 import { Language } from '../../server/model/language';
-import {
-  simplyAddLanguage, simplyGetLanguage,
-} from './languages';
 import { Idea, IdeaForAdding, validate } from '../../server/model/idea';
-
-function deleteEverything(): Promise<Response> {
-  return fetch('http://localhost:5555/everything', { method: 'DELETE' });
-}
-
-async function addIdea(obj: unknown): Promise<Response> {
-  return fetch('http://localhost:5555/ideas', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(obj),
-  });
-}
-
-async function getIdea(id: number): Promise<Response> {
-  return fetch(`http://localhost:5555/ideas/${id}`, {
-    method: 'GET',
-  });
-}
+import {
+  addIdea,
+  deleteEverything,
+  getIdea,
+  simplyAddLanguage,
+  simplyGetLanguage,
+} from '../utils/utils';
 
 async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding,
-  expressionsInOrder?: ExpressionForAdding[]) {
+  expressionsInOrder?: ExpressionForAdding[]): Promise<void> {
   let r = await addIdea(ideaForAdding);
   expect(r.status).toEqual(201);
+  const responseIdea = await r.json() as Idea;
+  expect(validate(responseIdea)).toEqual(true);
 
   r = await getIdea(1);
+  const fetchedIdea = await r.json() as Idea;
   expect(r.status).toEqual(200);
-
-  const fetchedIdea: Idea = await r.json() as Idea;
   expect(validate(fetchedIdea)).toEqual(true);
 
   for (let i = 0; i < ideaForAdding.ee.length; i += 1) {
@@ -97,7 +84,7 @@ describe('adding ideas', () => {
     await addValidIdeaAndTest({ ee });
   });
 
-  test('test ordering of expressions', async () => {
+  test('ordering of expressions', async () => {
     const l1: Language = await simplyAddLanguage('language 1');
     const l2: Language = await simplyAddLanguage('language 2');
     const l3: Language = await simplyAddLanguage('language 3');
@@ -147,3 +134,4 @@ describe('adding ideas', () => {
 // is re-ordering working right? if the expressions don't follow language ordering
 // identical spellings
 // blank spelling
+// deleting a language should delete all ideas that would only be left with one language
