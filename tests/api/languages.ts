@@ -13,8 +13,6 @@ import {
   getLanguage, getLanguages, simplyAddLanguage, simplyGetIdea,
   simplyGetLanguage, simplyGetLanguages,
 } from '../utils/utils';
-import { Idea } from '../../server/model/idea';
-import { del } from 'superagent';
 
 beforeEach(async () => {
   await deleteEverything();

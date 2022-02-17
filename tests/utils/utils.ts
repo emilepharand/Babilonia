@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import { Idea } from '../../server/model/idea';
+import { Idea, IdeaForAdding } from '../../server/model/idea';
 import { Language } from '../../server/model/language';
 
 export const FIRST_LANGUAGE_ID = 1;
@@ -27,6 +27,14 @@ export async function editLanguagesObj(object: any): Promise<Response> {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: object,
+  });
+}
+
+export async function editIdea(idea: Idea): Promise<Response> {
+  return fetch(`http://localhost:5555/ideas/${idea.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(idea),
   });
 }
 
@@ -95,6 +103,15 @@ export async function addIdea(obj: unknown): Promise<Response> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(obj),
   });
+}
+
+export async function simplyAddIdea(idea: IdeaForAdding): Promise<Idea> {
+  const r = await fetch('http://localhost:5555/ideas', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(idea),
+  });
+  return await r.json() as Idea;
 }
 
 export async function simplyGetIdea(id: number): Promise<Idea> {

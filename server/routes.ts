@@ -24,7 +24,7 @@ export default class Routes {
     this.router.get('/idea/next', Controller.getNextIdea);
     this.router.get('/ideas/:id', Controller.getIdeaById);
     this.router.post('/ideas', Controller.addIdea);
-    this.router.post('/idea/edit/:id', Controller.editIdea);
+    this.router.put('/ideas/:id', Controller.editIdea);
     this.router.delete('/idea/:id', Controller.deleteIdea);
     // everything
     this.router.delete('/everything', Controller.deleteAllData);

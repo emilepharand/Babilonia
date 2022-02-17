@@ -143,7 +143,7 @@ export default class DataManager {
   }
 
   static async deleteLanguage(languageId: number): Promise<void> {
-    // TODO ordering when unique is enfored:
+    // TODO ordering when unique is enforced:
     // BEGIN TRANSACTION;
     // update languages set ordering = -ordering;
     // update languages set ordering = 0 where id = 6;
