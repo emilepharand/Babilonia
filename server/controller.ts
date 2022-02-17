@@ -3,6 +3,7 @@ import DataManager from './model/dataManager';
 import { Expression, ExpressionForAdding } from './model/expression';
 import { Language, validate } from './model/language';
 import { IdeaForAdding } from './model/idea';
+import { getLanguages } from '../tests/utils/utils';
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
@@ -95,8 +96,7 @@ export default class Controller {
       res.end();
       return;
     }
-    if (req.body.length === 0) {
-      // empty body is invalid
+    if (req.body.length !== (await DataManager.getLanguages()).length) {
       res.status(400);
       res.end();
       return;

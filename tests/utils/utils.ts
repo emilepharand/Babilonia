@@ -22,6 +22,14 @@ export async function addLanguageObj(object: any): Promise<Response> {
   });
 }
 
+export async function editLanguagesObj(object: any): Promise<Response> {
+  return fetch('http://localhost:5555/languages', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: object,
+  });
+}
+
 export async function simplyAddLanguage(name: string): Promise<Language> {
   return await (await fetch('http://localhost:5555/languages', {
     method: 'POST',
