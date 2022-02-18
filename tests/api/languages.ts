@@ -384,29 +384,29 @@ describe('deleting languages', () => {
     const l2: Language = await simplyAddLanguage('language 2');
     const l3: Language = await simplyAddLanguage('language 3');
 
-    const e1: ExpressionForAdding = { texts: ['e1'], languageId: l1.id };
-    const e2: ExpressionForAdding = { texts: ['e2'], languageId: l2.id };
-    const e3: ExpressionForAdding = { texts: ['e3'], languageId: l3.id };
-    const e4: ExpressionForAdding = { texts: ['e4'], languageId: l3.id };
+    const e1: ExpressionForAdding = { text: 'e1', languageId: l1.id };
+    const e2: ExpressionForAdding = { text: 'e2', languageId: l2.id };
+    const e3: ExpressionForAdding = { text: 'e3', languageId: l3.id };
+    const e4: ExpressionForAdding = { text: 'e4', languageId: l3.id };
     await addIdea({ ee: [e1, e2, e3, e4] });
 
-    const e5: ExpressionForAdding = { texts: ['e5'], languageId: l1.id };
-    const e6: ExpressionForAdding = { texts: ['e6'], languageId: l2.id };
-    const e7: ExpressionForAdding = { texts: ['e7'], languageId: l2.id };
-    const e8: ExpressionForAdding = { texts: ['e8'], languageId: l3.id };
+    const e5: ExpressionForAdding = { text: 'e5', languageId: l1.id };
+    const e6: ExpressionForAdding = { text: 'e6', languageId: l2.id };
+    const e7: ExpressionForAdding = { text: 'e7', languageId: l2.id };
+    const e8: ExpressionForAdding = { text: 'e8', languageId: l3.id };
     await addIdea({ ee: [e5, e6, e7, e8] });
 
     await deleteLanguage(l3.id);
 
     const idea1 = await simplyGetIdea(1);
     expect(idea1.ee.length).toEqual(2);
-    expect(idea1.ee[0].texts).toEqual(e1.texts);
-    expect(idea1.ee[1].texts).toEqual(e2.texts);
+    expect(idea1.ee[0].text).toEqual(e1.text);
+    expect(idea1.ee[1].text).toEqual(e2.text);
     const idea2 = await simplyGetIdea(2);
     expect(idea2.ee.length).toEqual(3);
-    expect(idea2.ee[0].texts).toEqual(e5.texts);
-    expect(idea2.ee[1].texts).toEqual(e6.texts);
-    expect(idea2.ee[2].texts).toEqual(e7.texts);
+    expect(idea2.ee[0].text).toEqual(e5.text);
+    expect(idea2.ee[1].text).toEqual(e6.text);
+    expect(idea2.ee[2].text).toEqual(e7.text);
   });
 });
 

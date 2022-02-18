@@ -46,10 +46,7 @@ const schema = {
         type: 'object',
         properties: {
           id: { type: 'integer' },
-          texts: {
-            type: 'array',
-            items: { type: 'string' },
-          },
+          text: { type: 'string' },
           language: {
             type: 'object',
             properties: {
@@ -62,7 +59,7 @@ const schema = {
           },
           additionalProperties: false,
         },
-        required: ['id', 'texts', 'language'],
+        required: ['id', 'text', 'language'],
       },
     },
     additionalProperties: false,

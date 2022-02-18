@@ -1,20 +1,20 @@
 import { Language, emptyLanguage } from './language';
 
 export interface ExpressionForAdding {
-  texts: string[];
+  text: string;
   languageId: number;
 }
 
 export interface Expression {
   id: number;
-  texts: string[];
+  text: string;
   language: Language;
 }
 
 export class Expression {
   constructor(e: Expression) {
     this.id = e.id;
-    this.texts = e.texts;
+    this.text = e.text;
     this.language = e.language;
   }
 }
@@ -22,7 +22,7 @@ export class Expression {
 export function emptyExpression(): Expression {
   return {
     id: 0,
-    texts: [],
+    text: '',
     language: emptyLanguage(),
   };
 }

@@ -33,30 +33,25 @@ export default class DataManager {
   public static async deleteAllData(): Promise<void> {
     await db.run('drop table if exists expressions');
     await db.run('drop table if exists ideas');
-    await db.run('drop table if exists texts');
     await db.run('drop table if exists languages');
-    await db.run(`CREATE TABLE "expressions" (
-\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-\t"ideaId"\tINTEGER NOT NULL,
-\t"languageId"\tINTEGER NOT NULL,
-\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id"),
-\tFOREIGN KEY("languageId") REFERENCES "languages"("id")
-)`);
-    await db.run(`CREATE TABLE "ideas" (
-\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE
-)`);
-    await db.run(`CREATE TABLE "languages" (
-\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-\t"name"\tTEXT NOT NULL,
-\t"ordering"\tINTEGER NOT NULL,
-\t"isPractice"\tTEXT NOT NULL
-)`);
-    await db.run(`CREATE TABLE "texts" (
-\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-\t"expressionId"\tINTEGER NOT NULL,
-\t"text"\tTEXT NOT NULL,
-\tFOREIGN KEY("expressionId") REFERENCES "expressions"("id")
-)`);
+    await db.run('CREATE TABLE "languages" (\n'
+      + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
+      + '\t"name"\tTEXT NOT NULL,\n'
+      + '\t"ordering"\tINTEGER NOT NULL,\n'
+      + '\t"isPractice"\tTEXT NOT NULL\n'
+      + ')');
+    await db.run('CREATE TABLE "ideas" (\n'
+      + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE\n'
+      + ')');
+    await db.run('CREATE TABLE "expressions" (\n'
+      + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
+      + '\t"ideaId"\tINTEGER NOT NULL,\n'
+      + '\t"languageId"\tINTEGER NOT NULL,\n'
+      + '\t"text"\tTEXT NOT NULL,\n'
+      + '\tFOREIGN KEY("languageId") REFERENCES "languages"("id"),\n'
+      + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
+      + ')');
+    const a = 'a';
   }
 
   private static async nextIdeaId(): Promise<number> {
@@ -75,8 +70,8 @@ export default class DataManager {
   }
 
   private static async getExpressions(ideaId: number): Promise<Expression[]> {
-    const res: [{ id: number, languageId: number }] = await
-      db.all('select id, languageId from expressions WHERE ideaId = ?', ideaId);
+    const res: [{ id: number, languageId: number, text: string }] = await
+    db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
     const ee: Expression[] = [];
     // beware of Promise.all() because expressions order need to be preserved
     // eslint-disable-next-line no-restricted-syntax
@@ -84,7 +79,7 @@ export default class DataManager {
       ee.push({
         id: item.id,
         // eslint-disable-next-line no-await-in-loop
-        texts: await DataManager.getTexts(item.id),
+        text: item.text,
         // eslint-disable-next-line no-await-in-loop
         language: await DataManager.getLanguageById(item.languageId),
       });
@@ -128,7 +123,12 @@ export default class DataManager {
   static async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
     await db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    await this.insertExpressions(ideaForAdding, ideaId);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const e of ideaForAdding.ee) {
+      // eslint-disable-next-line no-await-in-loop
+      await db.run('insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)',
+        ideaId, e.languageId, e.text);
+    }
     return DataManager.getIdeaById(ideaId);
   }
 
@@ -156,28 +156,28 @@ export default class DataManager {
     await db.run('delete from expressions where languageId = ?', languageId);
   }
 
-  private static async insertExpressions(idea: IdeaForAdding, ideaId: number): Promise<void> {
-    for (let i = 0; i < idea.ee.length; i += 1) {
-      // no empty text
-      if (!(idea.ee[i].texts.filter((txt) => txt.length > 0).length === 0)) {
-        // eslint-disable-next-line no-await-in-loop
-        await db.run('insert into expressions("ideaId", "languageId") values (?, ?)',
-          ideaId, idea.ee[i].languageId);
-        // eslint-disable-next-line no-await-in-loop
-        const exprId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-        for (let j = 0; j < idea.ee[i].texts.length; j += 1) {
-          const txt = idea.ee[i].texts[j];
-          // don't insert empty text
-          if (txt) {
-            // await in loop to preserve order of expressions
-            // eslint-disable-next-line no-await-in-loop
-            await db.run('insert into texts("expressionId", "text") values (?, ?)',
-              exprId, txt);
-          }
-        }
-      }
-    }
-  }
+  // private static async insertExpressions(idea: IdeaForAdding, ideaId: number): Promise<void> {
+  //   for (let i = 0; i < idea.ee.length; i += 1) {
+  //     // no empty text
+  //     if (!(idea.ee[i].texts.filter((txt) => txt.length > 0).length === 0)) {
+  //       // eslint-disable-next-line no-await-in-loop
+  //       await db.run('insert into expressions("ideaId", "languageId") values (?, ?)',
+  //         ideaId, idea.ee[i].languageId);
+  //       // eslint-disable-next-line no-await-in-loop
+  //       const exprId = (await db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
+  //       for (let j = 0; j < idea.ee[i].texts.length; j += 1) {
+  //         const txt = idea.ee[i].texts[j];
+  //         // don't insert empty text
+  //         if (txt) {
+  //           // await in loop to preserve order of expressions
+  //           // eslint-disable-next-line no-await-in-loop
+  //           await db.run('insert into texts("expressionId", "text") values (?, ?)',
+  //             exprId, txt);
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
   public static async addLanguage(name: string): Promise<Language> {
     const nextOrdering: number = await this.nextOrdering();
