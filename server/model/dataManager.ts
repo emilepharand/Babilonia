@@ -26,8 +26,8 @@ export default class DataManager {
 
   static async getNextIdea(): Promise<Idea> {
     return this.nextIdeaId()
-      .then((id) => this.getIdeaById(id))
-      .catch(() => Promise.reject());
+               .then((id) => this.getIdeaById(id))
+               .catch(() => Promise.reject());
   }
 
   public static async deleteAllData(): Promise<void> {
@@ -71,7 +71,7 @@ export default class DataManager {
 
   private static async getExpressions(ideaId: number): Promise<Expression[]> {
     const res: [{ id: number, languageId: number, text: string }] = await
-    db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
+      db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
     const ee: Expression[] = [];
     // beware of Promise.all() because expressions order need to be preserved
     // eslint-disable-next-line no-restricted-syntax
@@ -132,9 +132,14 @@ export default class DataManager {
     return DataManager.getIdeaById(ideaId);
   }
 
-  static async editIdea(idea: Idea): Promise<void> {
-    await db.run('delete from expressions where ideaId = ?', idea.id);
-    // await this.insertExpressions(idea);
+  static async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
+    await db.run('delete from expressions where ideaId = ?', id);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const e of idea.ee) {
+      // eslint-disable-next-line no-await-in-loop
+      await db.run('insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)',
+        id, e.languageId, e.text);
+    }
   }
 
   static async deleteIdea(ideaId: number): Promise<void> {

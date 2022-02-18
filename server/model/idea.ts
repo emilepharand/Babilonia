@@ -1,5 +1,9 @@
 import Ajv from 'ajv';
-import { Expression, ExpressionForAdding } from './expression';
+import {
+  Expression,
+  ExpressionForAdding,
+  getExpressionForAddingFromExpression
+} from './expression';
 import { Language } from './language';
 
 export interface IdeaForAdding {
@@ -22,6 +26,12 @@ export function emptyIdea(): Idea {
   return {
     id: 0,
     ee: [],
+  };
+}
+
+export function getIdeaForAddingFromIdea(idea: Idea):IdeaForAdding {
+  return {
+    ee: idea.ee.map((e) => getExpressionForAddingFromExpression(e)),
   };
 }
 

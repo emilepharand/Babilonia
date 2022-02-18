@@ -30,8 +30,8 @@ export async function editLanguagesObj(object: any): Promise<Response> {
   });
 }
 
-export async function editIdea(idea: Idea): Promise<Response> {
-  return fetch(`http://localhost:5555/ideas/${idea.id}`, {
+export async function editIdea(idea: IdeaForAdding, id: number): Promise<Response> {
+  return fetch(`http://localhost:5555/ideas/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(idea),

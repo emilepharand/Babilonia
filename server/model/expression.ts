@@ -19,6 +19,13 @@ export class Expression {
   }
 }
 
+export function getExpressionForAddingFromExpression(e: Expression): ExpressionForAdding {
+  return {
+    languageId: e.language.id,
+    text: e.text,
+  };
+}
+
 export function emptyExpression(): Expression {
   return {
     id: 0,
