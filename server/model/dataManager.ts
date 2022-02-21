@@ -95,6 +95,9 @@ export default class DataManager {
   }
 
   public static async getIdeaById(ideaId: number): Promise<Idea> {
+    if (!(await DataManager.ideaIdExists(ideaId))) {
+      return Promise.reject();
+    }
     const ee: Expression[] = await DataManager.getExpressions(ideaId);
     ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
     return new Idea({
@@ -210,6 +213,11 @@ export default class DataManager {
     return l !== undefined;
   }
 
+  public static async ideaIdExists(id: number): Promise<boolean> {
+    const i = (await db.get('SELECT * FROM ideas WHERE id = ?', id)) as Idea;
+    return i !== undefined;
+  }
+
   static async editLanguages(ll: Language[]): Promise<Language[]> {
     if (!(await DataManager.includesAllLanguages(ll))) {
       return Promise.reject();
@@ -244,6 +252,15 @@ export default class DataManager {
       }
     }
     return true;
+  }
+
+  static async languageExists(id: number): Promise<boolean> {
+    const llInDb = await DataManager.getLanguages();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const l of llInDb) {
+      if (l.id === id) return true;
+    }
+    return false;
   }
 
   static async includesAllLanguages(ll: Language[]): Promise<boolean> {

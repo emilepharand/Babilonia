@@ -71,6 +71,11 @@ describe('getting languages', () => {
     expect(r.status).toEqual(200);
     expect(await r.json()).toEqual([]);
   });
+
+  test('getting nonexistent language returns 404', async () => {
+    const r = await getLanguage(1);
+    expect(r.status).toEqual(404);
+  });
 });
 
 describe('getting invalid languages', () => {
@@ -130,7 +135,7 @@ describe('adding invalid languages', () => {
     await addInvalidLanguageAndTest(JSON.stringify({ name: 1 }));
   });
 
-  test('name is a number', async () => {
+  test('wrong JSON format', async () => {
     await addInvalidLanguageAndTest('<');
   });
 });

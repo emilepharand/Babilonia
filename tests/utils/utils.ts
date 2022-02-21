@@ -3,6 +3,7 @@ import { Idea, IdeaForAdding } from '../../server/model/idea';
 import { Language } from '../../server/model/language';
 
 export const FIRST_LANGUAGE_ID = 1;
+export const FIRST_IDEA_ID = 1;
 export const FIRST_ORDERING = 0;
 export const DEFAULT_IS_PRACTICE = false;
 
@@ -30,7 +31,7 @@ export async function editLanguagesObj(object: any): Promise<Response> {
   });
 }
 
-export async function editIdea(idea: IdeaForAdding, id: number): Promise<Response> {
+export async function editIdea(idea: unknown, id: number): Promise<Response> {
   return fetch(`http://localhost:5555/ideas/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

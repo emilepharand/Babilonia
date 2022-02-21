@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
 import { Expression, ExpressionForAdding } from './model/expression';
 import { Language, validate } from './model/language';
-import { IdeaForAdding } from './model/idea';
+import { IdeaForAdding, validateIdeaForAdding } from './model/idea';
 import { getLanguages } from '../tests/utils/utils';
 
 export default class Controller {
@@ -20,14 +20,65 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    const ideaForAdding: IdeaForAdding = req.body;
+    if (!validateIdeaForAdding(req.body)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    const ideaForAdding: IdeaForAdding = req.body as IdeaForAdding;
+    if (ideaForAdding.ee.length === 0) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    if (ideaForAdding.ee.filter((e) => e.text.trim() === '').length > 0) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    // eslint-disable-next-line no-return-await,no-restricted-syntax
+    for (const e of ideaForAdding.ee) {
+      // eslint-disable-next-line no-await-in-loop
+      if (!(await DataManager.languageExists(e.languageId))) {
+        res.status(400);
+        res.end();
+        return;
+      }
+    }
+    // below lines is to make sure no two expressions are identical (same language and same text)
+    const mapLanguageExpressions = new Map<number, string[]>();
+    ideaForAdding.ee.forEach((e) => mapLanguageExpressions.set(e.languageId, []));
+    // eslint-disable-next-line no-restricted-syntax
+    for (const e of ideaForAdding.ee) {
+      if (mapLanguageExpressions.get(e.languageId)?.includes(e.text)) {
+        res.status(400);
+        res.end();
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      mapLanguageExpressions.get(e.languageId).push(e.text);
+    }
     const returnIdea = await DataManager.addIdea(ideaForAdding);
     res.status(201);
     res.send(JSON.stringify(returnIdea));
   }
 
   public static async getIdeaById(req: Request, res: Response): Promise<void> {
-    const idea = await DataManager.getIdeaById(parseInt(req.params.id, 10));
+    let idea;
+    if (Number.isNaN(+req.params.id)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    try {
+      idea = await DataManager.getIdeaById(parseInt(req.params.id, 10));
+    } catch {
+      // idea doesnt exist
+      res.status(404);
+      res.end();
+      return;
+    }
     res.send(idea);
   }
 
@@ -46,7 +97,31 @@ export default class Controller {
   }
 
   public static async editIdea(req: Request, res: Response): Promise<void> {
-    const idea = req.body;
+    if (!validateIdeaForAdding(req.body)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    const idea = req.body as IdeaForAdding;
+    if (idea.ee.length === 0) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    if (idea.ee.filter((e) => e.text.trim() === '').length > 0) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    // eslint-disable-next-line no-return-await,no-restricted-syntax
+    for (const e of idea.ee) {
+      // eslint-disable-next-line no-await-in-loop
+      if (!(await DataManager.languageExists(e.languageId))) {
+        res.status(400);
+        res.end();
+        return;
+      }
+    }
     await DataManager.editIdea(idea, parseInt(req.params.id, 10));
     res.send(await DataManager.getIdeaById(parseInt(req.params.id, 10)));
   }

@@ -29,7 +29,7 @@ export function emptyIdea(): Idea {
   };
 }
 
-export function getIdeaForAddingFromIdea(idea: Idea):IdeaForAdding {
+export function getIdeaForAddingFromIdea(idea: Idea): IdeaForAdding {
   return {
     ee: idea.ee.map((e) => getExpressionForAddingFromExpression(e)),
   };
@@ -46,6 +46,27 @@ ajv.addKeyword({
   validate: (schema: any, data: any) => data.trim() !== '',
 });
 
+const ideaForAddingSchema = {
+  type: 'object',
+  properties: {
+    ee: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          text: { type: 'string' },
+          languageId: { type: 'number' },
+        },
+        required: ['text', 'languageId'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['ee'],
+  additionalProperties: false,
+};
+export const validateIdeaForAdding = ajv.compile(ideaForAddingSchema);
+
 const schema = {
   type: 'object',
   properties: {
@@ -61,19 +82,20 @@ const schema = {
             type: 'object',
             properties: {
               id: { type: 'integer' },
-              name: { type: 'string' },
+              name: { type: 'string', notEmpty: true },
               ordering: { type: 'integer' },
               isPractice: { type: 'boolean' },
             },
             required: ['id', 'name', 'ordering', 'isPractice'],
+            additionalProperties: false,
           },
-          additionalProperties: false,
         },
         required: ['id', 'text', 'language'],
+        additionalProperties: false,
       },
     },
-    additionalProperties: false,
   },
   required: ['id', 'ee'],
+  additionalProperties: false,
 };
 export const validate = ajv.compile(schema);
