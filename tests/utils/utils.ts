@@ -115,6 +115,12 @@ export async function simplyAddIdea(idea: IdeaForAdding): Promise<Idea> {
   return await r.json() as Idea;
 }
 
+export async function deleteIdea(id: number): Promise<Response> {
+  return fetch(`http://localhost:5555/ideas/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function simplyGetIdea(id: number): Promise<Idea> {
   const r = await fetch(`http://localhost:5555/ideas/${id}`, {
     method: 'GET',

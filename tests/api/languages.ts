@@ -418,8 +418,8 @@ describe('deleting languages', () => {
 describe('deleting invalid languages', () => {
   test('deleting a nonexisting language', async () => {
     expect((await addLanguage('a language')).status).toEqual(201);
-    expect((await deleteLanguage(2)).status).toEqual(404);
-    expect((await getLanguage(1)).status).toEqual(200);
+    expect((await deleteLanguage(FIRST_LANGUAGE_ID + 1)).status).toEqual(404);
+    expect((await getLanguage(FIRST_LANGUAGE_ID)).status).toEqual(200);
   });
 
   test('id is not numeric', async () => {
@@ -428,6 +428,6 @@ describe('deleting invalid languages', () => {
       method: 'DELETE',
     });
     expect(r.status).toEqual(400);
-    expect((await getLanguage(1)).status).toEqual(200);
+    expect((await getLanguage(FIRST_LANGUAGE_ID)).status).toEqual(200);
   });
 });

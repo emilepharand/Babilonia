@@ -122,12 +122,40 @@ export default class Controller {
         return;
       }
     }
+    // below lines is to make sure no two expressions are identical (same language and same text)
+    const mapLanguageExpressions = new Map<number, string[]>();
+    idea.ee.forEach((e) => mapLanguageExpressions.set(e.languageId, []));
+    // eslint-disable-next-line no-restricted-syntax
+    for (const e of idea.ee) {
+      if (mapLanguageExpressions.get(e.languageId)?.includes(e.text)) {
+        res.status(400);
+        res.end();
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      mapLanguageExpressions.get(e.languageId).push(e.text);
+    }
     await DataManager.editIdea(idea, parseInt(req.params.id, 10));
     res.send(await DataManager.getIdeaById(parseInt(req.params.id, 10)));
   }
 
   public static async deleteIdea(req: Request, res: Response): Promise<void> {
-    await DataManager.deleteIdea(parseInt(req.params.id, 10));
+    const ideaId = parseInt(req.params.id, 10);
+    if (Number.isNaN(+req.params.id)) {
+      res.status(400);
+      res.end();
+      return;
+    }
+    try {
+      await DataManager.getIdeaById(parseInt(req.params.id, 10));
+    } catch {
+      // idea doesnt exist
+      res.status(404);
+      res.end();
+      return;
+    }
+    await DataManager.deleteIdea(ideaId);
     res.send({});
   }
 

@@ -71,7 +71,7 @@ export default class DataManager {
 
   private static async getExpressions(ideaId: number): Promise<Expression[]> {
     const res: [{ id: number, languageId: number, text: string }] = await
-      db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
+    db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
     const ee: Expression[] = [];
     // beware of Promise.all() because expressions order need to be preserved
     // eslint-disable-next-line no-restricted-syntax
