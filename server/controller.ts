@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import { Expression, ExpressionForAdding } from './model/expression';
 import { Language, validate } from './model/language';
 import { IdeaForAdding, validateIdeaForAdding } from './model/idea';
-import { getLanguages } from '../tests/utils/utils';
+
+const lm = DataManager.getLanguageManager();
+const im = DataManager.getIdeaManager();
+const pm = DataManager.getPracticeManager();
 
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
     try {
-      res.send(JSON.stringify(await DataManager.getNextIdea()));
+      res.send(JSON.stringify(await pm.getNextIdea()));
     } catch {
       // there is no idea in the database
       res.send('{}');
@@ -16,7 +18,7 @@ export default class Controller {
   }
 
   public static async getLanguages(req: Request, res: Response): Promise<void> {
-    res.send(JSON.stringify(await DataManager.getLanguages()));
+    res.send(JSON.stringify(await lm.getLanguages()));
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
@@ -39,7 +41,7 @@ export default class Controller {
     // eslint-disable-next-line no-return-await,no-restricted-syntax
     for (const e of ideaForAdding.ee) {
       // eslint-disable-next-line no-await-in-loop
-      if (!(await DataManager.languageExists(e.languageId))) {
+      if (!(await lm.languageExists(e.languageId))) {
         res.status(400);
         res.end();
         return;
@@ -59,7 +61,7 @@ export default class Controller {
       // @ts-ignore
       mapLanguageExpressions.get(e.languageId).push(e.text);
     }
-    const returnIdea = await DataManager.addIdea(ideaForAdding);
+    const returnIdea = await im.addIdea(ideaForAdding);
     res.status(201);
     res.send(JSON.stringify(returnIdea));
   }
@@ -72,7 +74,7 @@ export default class Controller {
       return;
     }
     try {
-      idea = await DataManager.getIdeaById(parseInt(req.params.id, 10));
+      idea = await im.getIdeaById(parseInt(req.params.id, 10));
     } catch {
       // idea doesnt exist
       res.status(404);
@@ -88,7 +90,7 @@ export default class Controller {
       res.end();
       return;
     }
-    const language = await DataManager.getLanguageById(parseInt(req.params.id, 10));
+    const language = await lm.getLanguageById(parseInt(req.params.id, 10));
     if (language === undefined) {
       res.status(404);
       res.end();
@@ -116,7 +118,7 @@ export default class Controller {
     // eslint-disable-next-line no-return-await,no-restricted-syntax
     for (const e of idea.ee) {
       // eslint-disable-next-line no-await-in-loop
-      if (!(await DataManager.languageExists(e.languageId))) {
+      if (!(await lm.languageExists(e.languageId))) {
         res.status(400);
         res.end();
         return;
@@ -136,8 +138,8 @@ export default class Controller {
       // @ts-ignore
       mapLanguageExpressions.get(e.languageId).push(e.text);
     }
-    await DataManager.editIdea(idea, parseInt(req.params.id, 10));
-    res.send(await DataManager.getIdeaById(parseInt(req.params.id, 10)));
+    await im.editIdea(idea, parseInt(req.params.id, 10));
+    res.send(await im.getIdeaById(parseInt(req.params.id, 10)));
   }
 
   public static async deleteIdea(req: Request, res: Response): Promise<void> {
@@ -148,14 +150,14 @@ export default class Controller {
       return;
     }
     try {
-      await DataManager.getIdeaById(parseInt(req.params.id, 10));
+      await im.getIdeaById(parseInt(req.params.id, 10));
     } catch {
       // idea doesnt exist
       res.status(404);
       res.end();
       return;
     }
-    await DataManager.deleteIdea(ideaId);
+    await im.deleteIdea(ideaId);
     res.send({});
   }
 
@@ -166,24 +168,24 @@ export default class Controller {
       return;
     }
     const id = parseInt(req.params.id, 10);
-    if (await DataManager.getLanguageById(id) === undefined) {
+    if (await lm.getLanguageById(id) === undefined) {
       res.status(404);
       res.end();
       return;
     }
-    await DataManager.deleteLanguage(id);
+    await lm.deleteLanguage(id);
     res.send({});
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
     if (!Controller.checkLanguageForAdding(req.body)
-      || await DataManager.languageNameExists(req.body.name)) {
+      || await lm.languageNameExists(req.body.name)) {
       res.status(400);
       res.end();
       return;
     }
 
-    const l: Language = await DataManager.addLanguage(req.body.name);
+    const l: Language = await lm.addLanguage(req.body.name);
     res.status(201);
     res.send(JSON.stringify(l));
   }
@@ -199,7 +201,7 @@ export default class Controller {
       res.end();
       return;
     }
-    if (req.body.length !== (await DataManager.getLanguages()).length) {
+    if (req.body.length !== (await lm.getLanguages()).length) {
       res.status(400);
       res.end();
       return;
@@ -214,7 +216,7 @@ export default class Controller {
     }
     let ll;
     try {
-      ll = await DataManager.editLanguages(req.body);
+      ll = await lm.editLanguages(req.body);
     } catch {
       res.status(400);
       res.end();
