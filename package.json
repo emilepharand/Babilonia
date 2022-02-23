@@ -8,11 +8,13 @@
     "serve": "vue-cli-service serve --port 8000",
     "server:old": "cd server && tsnd index.ts",
     "server": "nodemon server/index.ts",
+    "test:init:nonodemon": "run-p serve:test server:test:nonodemon",
     "test:init": "run-p serve:test server:test",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "serve:test": "vue-cli-service serve --mode test --port 8888",
     "server:test:old": "cd server && tsnd index.ts --test-mode",
     "server:test": "nodemon server/index.ts --test-mode",
+    "server:test:nonodemon": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },

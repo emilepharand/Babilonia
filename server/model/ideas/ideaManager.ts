@@ -1,7 +1,8 @@
 import { Database } from 'sqlite';
 import { Expression } from './expression';
-import { Idea, IdeaForAdding } from './idea';
-import LanguageManager from './languageManager';
+import { Idea } from './idea';
+import LanguageManager from '../languages/languageManager';
+import { IdeaForAdding } from './ideaForAdding';
 
 export default class IdeaManager {
   private db: Database;
@@ -62,13 +63,6 @@ export default class IdeaManager {
     return ee;
   }
 
-  private async getTexts(expressionId: number): Promise<string[]> {
-    const texts: string[] = [];
-    const txts = await this.db.all('SELECT text FROM texts WHERE expressionId = ?', expressionId);
-    txts.forEach((txt) => texts.push(txt.text));
-    return texts;
-  }
-
   public async getIdeaById(ideaId: number): Promise<Idea> {
     if (!(await this.ideaIdExists(ideaId))) {
       return Promise.reject();
@@ -79,5 +73,9 @@ export default class IdeaManager {
       id: ideaId,
       ee,
     });
+  }
+
+  public async countIdeas(): Promise<number> {
+    return (await this.db.get('select count(*) as count from ideas'))?.count ?? 0;
   }
 }

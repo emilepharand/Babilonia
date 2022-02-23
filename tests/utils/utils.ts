@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch';
-import { Idea, IdeaForAdding } from '../../server/model/idea';
-import { Language } from '../../server/model/language';
+import { Idea } from '../../server/model/ideas/idea';
+import { Language } from '../../server/model/languages/language';
+import { IdeaForAdding } from '../../server/model/ideas/ideaForAdding';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;

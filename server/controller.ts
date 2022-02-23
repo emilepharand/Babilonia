@@ -1,20 +1,23 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import { Language, validate } from './model/language';
-import { IdeaForAdding, validateIdeaForAdding } from './model/idea';
+import { Language, validate } from './model/languages/language';
+import { IdeaForAdding, validateIdeaForAdding } from './model/ideas/ideaForAdding';
 
 const lm = DataManager.getLanguageManager();
 const im = DataManager.getIdeaManager();
 const pm = DataManager.getPracticeManager();
 
+// This is the contact point for the front-end and the back-end
+// Controller as in C in MVC
+// It makes basic validation before asking managers
+// It is static because it doesn't hold any state
 export default class Controller {
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
-    try {
-      res.send(JSON.stringify(await pm.getNextIdea()));
-    } catch {
-      // there is no idea in the database
-      res.send('{}');
+    if (await im.countIdeas() === 0) {
+      res.status(404);
+      res.end();
     }
+    res.send(JSON.stringify(await pm.getNextIdea()));
   }
 
   public static async getLanguages(req: Request, res: Response): Promise<void> {
@@ -22,46 +25,12 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    if (!validateIdeaForAdding(req.body)) {
+    if (!(await validateIdeaForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
     }
-    const ideaForAdding: IdeaForAdding = req.body as IdeaForAdding;
-    if (ideaForAdding.ee.length === 0) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    if (ideaForAdding.ee.filter((e) => e.text.trim() === '').length > 0) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    // eslint-disable-next-line no-return-await,no-restricted-syntax
-    for (const e of ideaForAdding.ee) {
-      // eslint-disable-next-line no-await-in-loop
-      if (!(await lm.languageExists(e.languageId))) {
-        res.status(400);
-        res.end();
-        return;
-      }
-    }
-    // below lines is to make sure no two expressions are identical (same language and same text)
-    const mapLanguageExpressions = new Map<number, string[]>();
-    ideaForAdding.ee.forEach((e) => mapLanguageExpressions.set(e.languageId, []));
-    // eslint-disable-next-line no-restricted-syntax
-    for (const e of ideaForAdding.ee) {
-      if (mapLanguageExpressions.get(e.languageId)?.includes(e.text)) {
-        res.status(400);
-        res.end();
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      mapLanguageExpressions.get(e.languageId).push(e.text);
-    }
-    const returnIdea = await im.addIdea(ideaForAdding);
+    const returnIdea = await im.addIdea(req.body as IdeaForAdding);
     res.status(201);
     res.send(JSON.stringify(returnIdea));
   }
@@ -99,7 +68,7 @@ export default class Controller {
   }
 
   public static async editIdea(req: Request, res: Response): Promise<void> {
-    if (!validateIdeaForAdding(req.body)) {
+    if (!await validateIdeaForAdding(req.body)) {
       res.status(400);
       res.end();
       return;

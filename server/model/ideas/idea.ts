@@ -1,14 +1,5 @@
 import Ajv from 'ajv';
-import {
-  Expression,
-  ExpressionForAdding,
-  getExpressionForAddingFromExpression
-} from './expression';
-import { Language } from './language';
-
-export interface IdeaForAdding {
-  ee: ExpressionForAdding[];
-}
+import { Expression } from './expression';
 
 export interface Idea {
   id: number;
@@ -29,43 +20,12 @@ export function emptyIdea(): Idea {
   };
 }
 
-export function getIdeaForAddingFromIdea(idea: Idea): IdeaForAdding {
-  return {
-    ee: idea.ee.map((e) => getExpressionForAddingFromExpression(e)),
-  };
-}
-
-export function emptyPartialIdea(): Partial<Idea> {
-  return {};
-}
-
 const ajv = new Ajv();
 
 ajv.addKeyword({
   keyword: 'notEmpty',
   validate: (schema: any, data: any) => data.trim() !== '',
 });
-
-const ideaForAddingSchema = {
-  type: 'object',
-  properties: {
-    ee: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          text: { type: 'string' },
-          languageId: { type: 'number' },
-        },
-        required: ['text', 'languageId'],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ['ee'],
-  additionalProperties: false,
-};
-export const validateIdeaForAdding = ajv.compile(ideaForAddingSchema);
 
 const schema = {
   type: 'object',

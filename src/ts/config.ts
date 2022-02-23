@@ -1,5 +1,5 @@
-import { emptyIdea, Idea } from '../../server/model/idea';
-import { Expression } from '../../server/model/expression';
+import { emptyIdea, Idea } from '../../server/model/ideas/idea';
+import { Expression } from '../../server/model/ideas/expression';
 
 export default class Config {
   public static async getAddIdeaTemplate(): Promise<Idea> {

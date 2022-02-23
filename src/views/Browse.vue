@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Api from '@/ts/api';
-import { emptyIdea } from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/ideas/idea';
 
 export default defineComponent({
   name: 'Browse',

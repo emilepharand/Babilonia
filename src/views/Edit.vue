@@ -11,7 +11,7 @@
 import { defineComponent } from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
-import { emptyIdea } from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/ideas/idea';
 import Utils from '@/ts/utils';
 
 export default defineComponent({
@@ -26,7 +26,7 @@ export default defineComponent({
   },
   async created() {
     const ideaId = Number.parseInt(Array.from(this.$route.params.id)
-      .join(''), 10);
+        .join(''), 10);
     this.idea = await Api.getIdea(ideaId);
   },
   expose: ['addRows'],

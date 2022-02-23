@@ -1,17 +1,23 @@
-import fetch, { Response } from 'node-fetch';
-import {
-  copy,
-  Language,
-  validate,
-} from '../../server/model/language';
-import { ExpressionForAdding } from '../../server/model/expression';
+import fetch from 'node-fetch';
+import { copy, Language, validate, } from '../../server/model/languages/language';
+import { ExpressionForAdding } from '../../server/model/ideas/expression';
 import {
   addIdea,
-  addLanguage, addLanguageObj, DEFAULT_IS_PRACTICE,
+  addLanguage,
+  addLanguageObj,
+  DEFAULT_IS_PRACTICE,
   deleteEverything,
-  deleteLanguage, editLanguages, editLanguagesObj, FIRST_LANGUAGE_ID, FIRST_ORDERING,
-  getLanguage, getLanguages, simplyAddLanguage, simplyGetIdea,
-  simplyGetLanguage, simplyGetLanguages,
+  deleteLanguage,
+  editLanguages,
+  editLanguagesObj,
+  FIRST_LANGUAGE_ID,
+  FIRST_ORDERING,
+  getLanguage,
+  getLanguages,
+  simplyAddLanguage,
+  simplyGetIdea,
+  simplyGetLanguage,
+  simplyGetLanguages,
 } from '../utils/utils';
 
 beforeEach(async () => {

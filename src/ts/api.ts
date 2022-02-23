@@ -1,6 +1,6 @@
-import { Idea } from '../../server/model/idea';
-import { Language } from '../../server/model/language';
-import { Expression } from '../../server/model/expression';
+import { Idea } from '../../server/model/ideas/idea';
+import { Language } from '../../server/model/languages/language';
+import { Expression } from '../../server/model/ideas/expression';
 
 export default class Api {
   public static async getIdea(ideaId: number): Promise<Idea> {

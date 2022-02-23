@@ -1,7 +1,10 @@
 import { Database } from 'sqlite';
-import { Idea } from '../model/idea';
-import IdeaManager from '../model/ideaManager';
+import { Idea } from '../model/ideas/idea';
+import IdeaManager from '../model/ideas/ideaManager';
 
+// Knows which ideas need to be provided to the user to practice
+// Handles the logic for providing ideas to practice
+// Provides ideas for the user to practice them
 export default class PracticeManager {
   private offset = 0;
 

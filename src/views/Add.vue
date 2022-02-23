@@ -10,10 +10,10 @@
 import { defineComponent } from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
-import { emptyIdea } from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/ideas/idea';
 import Config from '@/ts/config';
 import Utils from '@/ts/utils';
-import { Expression } from '../../server/model/expression';
+import { Expression } from '../../server/model/ideas/expression';
 
 export default defineComponent({
   name: 'Add',

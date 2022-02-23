@@ -1,8 +1,8 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import { Idea } from './idea';
-import IdeaManager from './ideaManager';
-import LanguageManager from './languageManager';
+import { Idea } from './ideas/idea';
+import IdeaManager from './ideas/ideaManager';
+import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
 
 async function initDb(): Promise<Database> {

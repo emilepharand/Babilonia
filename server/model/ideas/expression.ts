@@ -1,4 +1,4 @@
-import { Language, emptyLanguage } from './language';
+import { emptyLanguage, Language } from '../languages/language';
 
 export interface ExpressionForAdding {
   text: string;
@@ -32,8 +32,4 @@ export function emptyExpression(): Expression {
     text: '',
     language: emptyLanguage(),
   };
-}
-
-export function emptyPartialExpression(): Partial<Expression> {
-  return {};
 }

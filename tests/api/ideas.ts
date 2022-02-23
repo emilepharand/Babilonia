@@ -1,23 +1,24 @@
 import fetch from 'node-fetch';
 import {
-  Expression,
   ExpressionForAdding,
-  getExpressionForAddingFromExpression
-} from '../../server/model/expression';
-import { Language } from '../../server/model/language';
+  getExpressionForAddingFromExpression,
+} from '../../server/model/ideas/expression';
+import { Language } from '../../server/model/languages/language';
+import { Idea, validate } from '../../server/model/ideas/idea';
 import {
-  getIdeaForAddingFromIdea,
-  Idea,
-  IdeaForAdding,
-  validate,
-} from '../../server/model/idea';
-import {
-  addIdea, addLanguage, addLanguageObj,
-  deleteEverything, deleteLanguage, editIdea, editLanguagesObj, FIRST_IDEA_ID,
-  getIdea, getLanguage, simplyAddIdea,
-  simplyAddLanguage, deleteIdea, simplyGetIdea,
-  simplyGetLanguage, simplyGetLanguages,
+  addIdea,
+  deleteEverything,
+  deleteIdea,
+  editIdea,
+  FIRST_IDEA_ID,
+  getIdea,
+  getLanguage,
+  simplyAddIdea,
+  simplyAddLanguage,
+  simplyGetIdea,
+  simplyGetLanguage,
 } from '../utils/utils';
+import { getIdeaForAddingFromIdea, IdeaForAdding } from '../../server/model/ideas/ideaForAdding';
 
 beforeEach(async () => {
   await deleteEverything();
@@ -308,7 +309,11 @@ describe('editing invalid ideas', () => {
     const ideaForAdding: IdeaForAdding = { ee: [{ languageId: (l1.id), text: 'expression' }] };
     const idea = await simplyAddIdea(ideaForAdding);
     // additional property
-    await editInvalidIdeaAndTest({ ee: [{ id: 1, languageId: l1.id, text: 'expression' }] }, idea.id);
+    await editInvalidIdeaAndTest({
+      ee: [{
+        id: 1, languageId: l1.id, text: 'expression'
+      }]
+    }, idea.id);
     // missing required properties (languageId)
     await editInvalidIdeaAndTest({ ee: [{ text: 'a' }] }, idea.id);
     // missing required properties (text)

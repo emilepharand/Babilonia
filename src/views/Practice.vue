@@ -30,7 +30,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Api from '@/ts/api';
-import { emptyIdea, Idea } from '../../server/model/idea';
+import { emptyIdea } from '../../server/model/ideas/idea';
 import Utils, { TEXT_STATUS } from '@/ts/utils';
 
 export default defineComponent({
@@ -55,21 +55,21 @@ export default defineComponent({
         return false;
       }
       return this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.PARTIAL_MATCH);
+          && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.PARTIAL_MATCH);
     },
     isNoMatch(i: number, txt: string[]) {
       if (this.done[i]) {
         return false;
       }
       return this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.NO_MATCH);
+          && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.NO_MATCH);
     },
     isFullMatch(i: number, txt: string[]) {
       if (this.done[i]) {
         return true;
       }
       const ret = (this.typed[i] !== undefined
-        && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.FULL_MATCH));
+          && (Utils.checkText(this.typed[i], txt[0]) === TEXT_STATUS.FULL_MATCH));
       if (ret) {
         this.done[i] = true;
         // eslint-disable-next-line prefer-destructuring
