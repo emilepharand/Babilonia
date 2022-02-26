@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
 import { Language, validate } from './model/languages/language';
-import { IdeaForAdding, validateIdeaForAdding } from './model/ideas/ideaForAdding';
+import { IdeaForAdding } from './model/ideas/ideaForAdding';
 
 const lm = DataManager.getLanguageManager();
 const im = DataManager.getIdeaManager();
@@ -25,7 +25,7 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    if (!(await validateIdeaForAdding(req.body))) {
+    if (!(await im.validateIdeaForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -68,7 +68,7 @@ export default class Controller {
   }
 
   public static async editIdea(req: Request, res: Response): Promise<void> {
-    if (!await validateIdeaForAdding(req.body)) {
+    if (!await im.validateIdeaForAdding(req.body)) {
       res.status(400);
       res.end();
       return;
