@@ -56,11 +56,13 @@ export default class Controller {
       res.end();
       return;
     }
-    const language = await lm.getLanguageById(parseInt(req.params.id, 10));
-    if (language === undefined) {
+    const ideaId = parseInt(req.params.id, 10);
+    if (!(await lm.languageExists(ideaId))) {
       res.status(404);
       res.end();
+      return;
     }
+    const language = await lm.getLanguage(ideaId);
     res.send(language);
   }
 
@@ -131,7 +133,7 @@ export default class Controller {
       return;
     }
     const id = parseInt(req.params.id, 10);
-    if (await lm.getLanguageById(id) === undefined) {
+    if (!(await lm.languageExists(id))) {
       res.status(404);
       res.end();
       return;
@@ -164,7 +166,7 @@ export default class Controller {
       res.end();
       return;
     }
-    if (req.body.length !== (await lm.getLanguages()).length) {
+    if (!(await lm.validateLanguages(req.body))) {
       res.status(400);
       res.end();
       return;

@@ -4,7 +4,8 @@ export interface Language {
   id: number;
   name: string;
   ordering: number;
-  isPractice: boolean | string;
+  // SQLite doesn't have booleans
+  isPractice: boolean | '0' | '1';
 }
 
 export function equal(l1: Language, l2: Language): boolean {

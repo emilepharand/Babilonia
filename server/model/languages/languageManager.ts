@@ -1,6 +1,7 @@
 import { Database } from 'sqlite';
 import { Language } from './language';
 
+// Ensures consistency and validity of languages
 export default class LanguageManager {
   private db: Database;
 
@@ -8,21 +9,16 @@ export default class LanguageManager {
     this.db = db;
   }
 
-  public async getLanguageById(id: number): Promise<Language> {
-    const l = (await this.db.get('SELECT * FROM languages WHERE id = ?', id)) as Language;
-    if (l !== undefined) {
-      l.isPractice = l.isPractice === '1';
-    }
-    return l;
+  public async getLanguage(id: number): Promise<Language> {
+    const query = 'select * from languages where id = ?';
+    const row: Language = (await this.db.get(query, id)) as Language;
+    row.isPractice = row.isPractice === '1';
+    return row;
   }
 
   public async getLanguages(): Promise<Language[]> {
-    const ll = await this.db.all('select * from languages');
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of ll) {
-      l.isPractice = l.isPractice === '1';
-    }
-    return ll;
+    const languages: Language[] = await this.db.all('select * from languages');
+    return languages.map((l) => ({ ...l, isPractice: l.isPractice === '1' }));
   }
 
   async deleteLanguage(languageId: number): Promise<void> {
@@ -33,67 +29,70 @@ export default class LanguageManager {
     // update languages set ordering = 2 where id = 7;
     // update languages set ordering = 1 where id = 8;
     // COMMIT;
-    const l = await this.getLanguageById(languageId);
+    const l = await this.getLanguage(languageId);
     await this.db.run('update languages set ordering = case when ordering > ? then ordering - 1 else ordering END', l.ordering);
     await this.db.run('delete from languages where id = ?', languageId);
     await this.db.run('delete from expressions where languageId = ?', languageId);
   }
 
+  // Arguments are assumed to be valid.
   public async addLanguage(name: string): Promise<Language> {
-    const nextOrdering: number = await this.nextOrdering();
-    await this.db.run('insert into languages("name", "ordering", "isPractice") values (?, ?, ?)',
-      name, nextOrdering, false);
-    const languageId = (await this.db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    const l: Language = (await this.db.get('select * from languages where id = ?', languageId)) as Language;
+    const nextOrdering = await this.getNextOrdering();
+    const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
+    await this.db.run(query, name, nextOrdering, false);
+    const languageId = (await this.db.get('select last_insert_rowid() as id')).id;
+    const l = (await this.db.get('select * from languages where id = ?', languageId)) as Language;
     l.isPractice = l.isPractice === '1';
     return l;
   }
 
-  public async nextOrdering(): Promise<number> {
-    const data: any = await this.db.get('select max(ordering) as nextOrdering from languages');
-    return data.nextOrdering as number === null ? 0 : data.nextOrdering + 1;
+  public async getNextOrdering(): Promise<number> {
+    const res = await this.db.get('select max(ordering) as nextOrdering from languages');
+    return res.nextOrdering === null ? 0 : res.nextOrdering + 1;
   }
 
+  // Arguments are assumed to be valid.
   private async editLanguage(id: number, language: Language): Promise<Language> {
-    await this.db.run('update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?',
-      language.name, language.ordering, language.isPractice, language.id);
-    return this.getLanguageById(id);
+    const query = 'update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?';
+    await this.db.run(query, language.name, language.ordering, language.isPractice, language.id);
+    return this.getLanguage(id);
   }
 
   public async languageNameExists(name: string): Promise<boolean> {
-    const l = (await this.db.get('SELECT * FROM languages WHERE name = ?', name)) as Language;
-    return l !== undefined;
+    return (await this.db.get('select * from languages where name = ?', name)) !== undefined;
+  }
+
+  async languageExists(id: number): Promise<boolean> {
+    return (await this.db.get('select * from languages where id = ?', id)) !== undefined;
+  }
+
+  public async validateLanguages(ll: Language[]): Promise<boolean> {
+    const languageIds = new Set(Array.from(ll.values(), (l) => l.id));
+    if (await this.countLanguages() !== ll.length) {
+      return false;
+    }
+    if (!(await this.allLanguagesExist(languageIds))) {
+      return false;
+    }
+    if (!(LanguageManager.isValidOrdering(ll))) {
+      return false;
+    }
+    if (!(LanguageManager.noDuplicateNames(ll))) {
+      return false;
+    }
+    return true;
   }
 
   async editLanguages(ll: Language[]): Promise<Language[]> {
-    if (!(await this.includesAllLanguages(ll))) {
-      return Promise.reject();
-    }
-    if (!(LanguageManager.isValidOrdering(ll))) {
-      return Promise.reject();
-    }
-    if (!(LanguageManager.noDuplicateNames(ll))) {
-      return Promise.reject();
-    }
-    const retLl: Language[] = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of ll) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.editLanguage(l.id, l);
-      // eslint-disable-next-line no-await-in-loop
-      retLl.push(await this.getLanguageById(l.id));
-    }
-    return retLl;
+    const promises: Promise<Language>[] = [];
+    ll.forEach((l) => promises.push(this.editLanguage(l.id, l)));
+    return Promise.all(promises);
   }
 
   static isValidOrdering(ll: Language[]): boolean {
     const orderings = new Set<number>();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of ll) {
-      orderings.add(l.ordering);
-    }
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < ll.length; i++) {
+    ll.forEach((l) => orderings.add(l.ordering));
+    for (let i = 0; i < ll.length; i += 1) {
       if (!(orderings.has(i))) {
         return false;
       }
@@ -101,30 +100,10 @@ export default class LanguageManager {
     return true;
   }
 
-  async languageExists(id: number): Promise<boolean> {
-    const llInDb = await this.getLanguages();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of llInDb) {
-      if (l.id === id) return true;
-    }
-    return false;
-  }
-
-  async includesAllLanguages(ll: Language[]): Promise<boolean> {
-    const llInDb = await this.getLanguages();
-    const ids = new Set<number>();
-    if (llInDb.length !== ll.length) return false;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of ll) {
-      // no duplicate ids
-      if (ids.has(l.id)) return false;
-      ids.add(l.id);
-      // eslint-disable-next-line no-await-in-loop
-      if ((await this.getLanguageById(l.id) === undefined)) {
-        return false;
-      }
-    }
-    return true;
+  async allLanguagesExist(ids: Set<number>): Promise<boolean> {
+    const promises: Promise<boolean>[] = [];
+    ids.forEach((id) => promises.push(this.languageExists(id)));
+    return (await Promise.all(promises)).every((exist) => exist);
   }
 
   private static noDuplicateNames(ll: Language[]): boolean {
@@ -137,5 +116,9 @@ export default class LanguageManager {
       names.add(l.name);
     }
     return true;
+  }
+
+  public async countLanguages(): Promise<number> {
+    return (await this.db.get('select count(*) as count from languages'))?.count ?? 0;
   }
 }

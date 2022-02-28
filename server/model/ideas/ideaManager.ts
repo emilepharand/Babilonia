@@ -44,6 +44,7 @@ export default class IdeaManager {
     return true;
   }
 
+  // Arguments are assumed to be valid.
   async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
     await this.db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await this.db.get('select last_insert_rowid() as id')).id;
@@ -51,6 +52,7 @@ export default class IdeaManager {
     return this.getIdea(ideaId);
   }
 
+  // Arguments are assumed to be valid.
   async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
     // old expressions are deleted and new ones added
     // because ids of expressions don't need to be preserved
@@ -60,6 +62,7 @@ export default class IdeaManager {
     await this.insertExpressions(idea.ee, id);
   }
 
+  // Arguments are assumed to be valid.
   private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
     // eslint-disable-next-line no-restricted-syntax
     for (const e of ee) {
@@ -70,11 +73,12 @@ export default class IdeaManager {
     }
   }
 
+  // Arguments are assumed to be valid.
   async deleteIdea(ideaId: number): Promise<void> {
     await this.db.run('delete from expressions where ideaId = ?', ideaId);
     await this.db.run('delete from ideas where id =  ?', ideaId);
   }
-
+  
   public async getIdea(ideaId: number): Promise<Idea> {
     const ee: Expression[] = await this.getExpressions(ideaId);
     // sort ideas by language ordering
@@ -89,7 +93,7 @@ export default class IdeaManager {
       rows.map(async (row) => ({
         id: row.id,
         text: row.text,
-        language: await this.lm.getLanguageById(row.languageId),
+        language: await this.lm.getLanguage(row.languageId),
       })),
     );
   }

@@ -294,7 +294,10 @@ describe('editing invalid languages', () => {
 
   test('includes duplicate ids', async () => {
     const oldLanguage1 = await (await addLanguage('old language 1')).json() as Language;
-    await editInvalidLanguagesAndTest(JSON.stringify([oldLanguage1, oldLanguage1]), oldLanguage1);
+    const oldLanguage2 = copy(oldLanguage1);
+    oldLanguage2.name = 'old language 2';
+    oldLanguage2.ordering = FIRST_ORDERING + 1;
+    await editInvalidLanguagesAndTest(JSON.stringify([oldLanguage1, oldLanguage2]), oldLanguage1);
   });
 
   test('ordering has duplicates', async () => {
