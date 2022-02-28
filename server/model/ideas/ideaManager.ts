@@ -1,5 +1,5 @@
 import { Database } from 'sqlite';
-import { Expression } from './expression';
+import { Expression, ExpressionForAdding } from './expression';
 import { Idea } from './idea';
 import LanguageManager from '../languages/languageManager';
 import { IdeaForAdding, validateSchema as validateIdeaForAddingSchema } from './ideaForAdding';
@@ -16,6 +16,7 @@ export default class IdeaManager {
   }
 
   public async validateIdeaForAdding(ideaForAdding: unknown): Promise<boolean> {
+    // shape is valid (properties and their types)
     if (!validateIdeaForAddingSchema(ideaForAdding)) {
       return false;
     }
@@ -43,30 +44,29 @@ export default class IdeaManager {
     return true;
   }
 
-  public async ideaIdExists(id: number): Promise<boolean> {
-    const i = (await this.db.get('SELECT * FROM ideas WHERE id = ?', id)) as Idea;
-    return i !== undefined;
-  }
-
   async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
     await this.db.run('insert into ideas("id") VALUES (null)');
-    const ideaId = (await this.db.get('SELECT last_insert_rowid()'))['last_insert_rowid()'];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const e of ideaForAdding.ee) {
-      // eslint-disable-next-line no-await-in-loop
-      await this.db.run('insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)',
-        ideaId, e.languageId, e.text);
-    }
-    return this.getIdeaById(ideaId);
+    const ideaId = (await this.db.get('select last_insert_rowid() as id')).id;
+    await this.insertExpressions(ideaForAdding.ee, ideaId);
+    return this.getIdea(ideaId);
   }
 
   async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
+    // old expressions are deleted and new ones added
+    // because ids of expressions don't need to be preserved
+    // and it is easier to handle editing ideas this way
+    // (this might change in the future)
     await this.db.run('delete from expressions where ideaId = ?', id);
+    await this.insertExpressions(idea.ee, id);
+  }
+
+  private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
     // eslint-disable-next-line no-restricted-syntax
-    for (const e of idea.ee) {
+    for (const e of ee) {
+      const query = 'insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)';
+      // await is needed because order needs to be preserved
       // eslint-disable-next-line no-await-in-loop
-      await this.db.run('insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)',
-        id, e.languageId, e.text);
+      await this.db.run(query, ideaId, e.languageId, e.text);
     }
   }
 
@@ -75,33 +75,27 @@ export default class IdeaManager {
     await this.db.run('delete from ideas where id =  ?', ideaId);
   }
 
-  private async getExpressions(ideaId: number): Promise<Expression[]> {
-    const res: [{ id: number, languageId: number, text: string }] = await this.db.all('select id, languageId, text from expressions WHERE ideaId = ?', ideaId);
-    const ee: Expression[] = [];
-    // beware of Promise.all() because expressions order need to be preserved
-    // eslint-disable-next-line no-restricted-syntax
-    for (const item of res) {
-      ee.push({
-        id: item.id,
-        // eslint-disable-next-line no-await-in-loop
-        text: item.text,
-        // eslint-disable-next-line no-await-in-loop
-        language: await this.lm.getLanguageById(item.languageId),
-      });
-    }
-    return ee;
+  public async getIdea(ideaId: number): Promise<Idea> {
+    const ee: Expression[] = await this.getExpressions(ideaId);
+    // sort ideas by language ordering
+    ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
+    return new Idea({ id: ideaId, ee });
   }
 
-  public async getIdeaById(ideaId: number): Promise<Idea> {
-    if (!(await this.ideaIdExists(ideaId))) {
-      return Promise.reject();
-    }
-    const ee: Expression[] = await this.getExpressions(ideaId);
-    ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
-    return new Idea({
-      id: ideaId,
-      ee,
-    });
+  private async getExpressions(ideaId: number): Promise<Expression[]> {
+    const query = 'select id, languageId, text from expressions where ideaId = ?';
+    const rows: [{ id: number, languageId: number, text: string }] = await this.db.all(query, ideaId);
+    return Promise.all(
+      rows.map(async (row) => ({
+        id: row.id,
+        text: row.text,
+        language: await this.lm.getLanguageById(row.languageId),
+      })),
+    );
+  }
+
+  public async ideaExists(id: number): Promise<boolean> {
+    return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
   }
 
   public async countIdeas(): Promise<number> {

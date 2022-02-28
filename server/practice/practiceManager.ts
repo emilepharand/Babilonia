@@ -34,7 +34,7 @@ export default class PracticeManager {
 
   async getNextIdea(): Promise<Idea> {
     return this.nextIdeaId()
-      .then((id) => this.ideaManager.getIdeaById(id))
+      .then((id) => this.ideaManager.getIdea(id))
       .catch(() => Promise.reject());
   }
 }

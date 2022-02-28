@@ -53,8 +53,11 @@ async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding,
   }
 }
 
-async function editValidIdeaAndTest(idea: Idea, newIdea: IdeaForAdding,
-  expressionsInOrder?: ExpressionForAdding[]) {
+async function editValidIdeaAndTest(
+  idea: Idea,
+  newIdea: IdeaForAdding,
+  expressionsInOrder?: ExpressionForAdding[],
+) {
   let r = await editIdea(newIdea, idea.id);
 
   expect(r.status).toEqual(200);
@@ -65,6 +68,7 @@ async function editValidIdeaAndTest(idea: Idea, newIdea: IdeaForAdding,
   const fetchedIdea = await r.json() as Idea;
   expect(r.status).toEqual(200);
   expect(validate(fetchedIdea)).toEqual(true);
+  expect(responseIdea.ee.length).toEqual(idea.ee.length);
 
   for (let i = 0; i < responseIdea.ee.length; i += 1) {
     const e: ExpressionForAdding = expressionsInOrder ? expressionsInOrder[i]

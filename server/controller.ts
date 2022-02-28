@@ -36,20 +36,17 @@ export default class Controller {
   }
 
   public static async getIdeaById(req: Request, res: Response): Promise<void> {
-    let idea;
     if (Number.isNaN(+req.params.id)) {
       res.status(400);
       res.end();
       return;
     }
-    try {
-      idea = await im.getIdeaById(parseInt(req.params.id, 10));
-    } catch {
-      // idea doesnt exist
+    if (!(await im.ideaExists(parseInt(req.params.id, 10)))) {
       res.status(404);
       res.end();
       return;
     }
+    const idea = await im.getIdea(parseInt(req.params.id, 10));
     res.send(idea);
   }
 
@@ -108,7 +105,7 @@ export default class Controller {
       mapLanguageExpressions.get(e.languageId).push(e.text);
     }
     await im.editIdea(idea, parseInt(req.params.id, 10));
-    res.send(await im.getIdeaById(parseInt(req.params.id, 10)));
+    res.send(await im.getIdea(parseInt(req.params.id, 10)));
   }
 
   public static async deleteIdea(req: Request, res: Response): Promise<void> {
@@ -118,10 +115,7 @@ export default class Controller {
       res.end();
       return;
     }
-    try {
-      await im.getIdeaById(parseInt(req.params.id, 10));
-    } catch {
-      // idea doesnt exist
+    if (!(await im.ideaExists(parseInt(req.params.id, 10)))) {
       res.status(404);
       res.end();
       return;
