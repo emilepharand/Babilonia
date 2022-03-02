@@ -90,7 +90,7 @@ describe('getting invalid ideas', () => {
     expect((await getIdea(FIRST_IDEA_ID)).status).toEqual(404);
   });
 
-  test('idea is not numeric returns 400', async () => {
+  test('id is not numeric returns 400', async () => {
     const r = await fetch('http://localhost:5555/ideas/123letters', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -260,6 +260,20 @@ describe('editing invalid ideas', () => {
     const idea = await simplyAddIdea(ideaForAdding);
     ideaForAdding.ee = [];
     await editInvalidIdeaAndTest(ideaForAdding, idea.id);
+  });
+
+  test('id is not numeric', async () => {
+    const l1: Language = await simplyAddLanguage('language 1');
+    const e1 = { languageId: l1.id, text: 'language 1 expression 1' };
+    const ee = [e1];
+    const idea = await simplyAddIdea({ ee });
+    const ideaForAdding = getIdeaForAddingFromIdea(idea);
+    const r = await fetch('http://localhost:5555/ideas/123letters', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ideaForAdding),
+    });
+    expect(r.status).toEqual(400);
   });
 
   test('empty expression text', async () => {

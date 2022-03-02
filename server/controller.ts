@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import DataManager from './model/dataManager';
-import { Language, validate } from './model/languages/language';
+import { Language } from './model/languages/language';
 import { IdeaForAdding } from './model/ideas/ideaForAdding';
 
 const lm = DataManager.getLanguageManager();
@@ -36,162 +36,106 @@ export default class Controller {
   }
 
   public static async getIdeaById(req: Request, res: Response): Promise<void> {
-    if (Number.isNaN(+req.params.id)) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    if (!(await im.ideaExists(parseInt(req.params.id, 10)))) {
-      res.status(404);
-      res.end();
+    if (!(await Controller.validateIdeaIdInRequest(req, res))) {
       return;
     }
     const idea = await im.getIdea(parseInt(req.params.id, 10));
     res.send(idea);
   }
 
-  public static async getLanguageById(req: Request, res: Response): Promise<void> {
-    if (Number.isNaN(+req.params.id)) {
-      res.status(400);
-      res.end();
+  public static async deleteIdea(req: Request, res: Response): Promise<void> {
+    if (!(await Controller.validateIdeaIdInRequest(req, res))) {
       return;
     }
-    const ideaId = parseInt(req.params.id, 10);
-    if (!(await lm.languageExists(ideaId))) {
-      res.status(404);
-      res.end();
-      return;
-    }
-    const language = await lm.getLanguage(ideaId);
-    res.send(language);
+    await im.deleteIdea(parseInt(req.params.id, 10));
+    res.end();
   }
 
   public static async editIdea(req: Request, res: Response): Promise<void> {
+    if (!(await Controller.validateIdeaIdInRequest(req, res))) {
+      return;
+    }
     if (!await im.validateIdeaForAdding(req.body)) {
       res.status(400);
       res.end();
       return;
     }
     const idea = req.body as IdeaForAdding;
-    if (idea.ee.length === 0) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    if (idea.ee.filter((e) => e.text.trim() === '').length > 0) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    // eslint-disable-next-line no-return-await,no-restricted-syntax
-    for (const e of idea.ee) {
-      // eslint-disable-next-line no-await-in-loop
-      if (!(await lm.languageExists(e.languageId))) {
-        res.status(400);
-        res.end();
-        return;
-      }
-    }
-    // below lines is to make sure no two expressions are identical (same language and same text)
-    const mapLanguageExpressions = new Map<number, string[]>();
-    idea.ee.forEach((e) => mapLanguageExpressions.set(e.languageId, []));
-    // eslint-disable-next-line no-restricted-syntax
-    for (const e of idea.ee) {
-      if (mapLanguageExpressions.get(e.languageId)?.includes(e.text)) {
-        res.status(400);
-        res.end();
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      mapLanguageExpressions.get(e.languageId).push(e.text);
-    }
     await im.editIdea(idea, parseInt(req.params.id, 10));
     res.send(await im.getIdea(parseInt(req.params.id, 10)));
   }
 
-  public static async deleteIdea(req: Request, res: Response): Promise<void> {
-    const ideaId = parseInt(req.params.id, 10);
+  private static async validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
     if (Number.isNaN(+req.params.id)) {
       res.status(400);
       res.end();
-      return;
+      return false;
     }
-    if (!(await im.ideaExists(parseInt(req.params.id, 10)))) {
+    const ideaId = parseInt(req.params.id, 10);
+    if (!(await im.ideaExists(ideaId))) {
       res.status(404);
       res.end();
+      return false;
+    }
+    return true;
+  }
+
+  public static async getLanguageById(req: Request, res: Response): Promise<void> {
+    if (!(await Controller.validateLanguageIdInRequest(req, res))) {
       return;
     }
-    await im.deleteIdea(ideaId);
-    res.send({});
+    const languageId = parseInt(req.params.id, 10);
+    const language = await lm.getLanguage(languageId);
+    res.send(language);
   }
 
   public static async deleteLanguage(req: Request, res: Response): Promise<void> {
+    if (!(await Controller.validateLanguageIdInRequest(req, res))) {
+      return;
+    }
+    const languageId = parseInt(req.params.id, 10);
+    await lm.deleteLanguage(languageId);
+    res.end();
+  }
+
+  private static async validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
     if (Number.isNaN(+req.params.id)) {
       res.status(400);
       res.end();
-      return;
+      return false;
     }
-    const id = parseInt(req.params.id, 10);
-    if (!(await lm.languageExists(id))) {
+    const ideaId = parseInt(req.params.id, 10);
+    if (!(await lm.languageIdExists(ideaId))) {
       res.status(404);
       res.end();
-      return;
+      return false;
     }
-    await lm.deleteLanguage(id);
-    res.send({});
+    return true;
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    if (!Controller.checkLanguageForAdding(req.body)
-      || await lm.languageNameExists(req.body.name)) {
+    if (!await lm.validateLanguageForAdding(req.body)) {
       res.status(400);
       res.end();
       return;
     }
-
     const l: Language = await lm.addLanguage(req.body.name);
     res.status(201);
     res.send(JSON.stringify(l));
   }
 
-  private static checkLanguageForAdding(body: any): boolean {
-    const keys = Object.keys(body);
-    return !(keys.length !== 1 || keys[0] !== 'name' || typeof (body.name) !== 'string' || body.name.trim() === '');
-  }
-
   public static async editLanguages(req: Request, res: Response): Promise<void> {
-    if (!(req.body instanceof Array)) {
+    if (!(await lm.validateLanguagesForEditing(req.body))) {
       res.status(400);
       res.end();
       return;
     }
-    if (!(await lm.validateLanguages(req.body))) {
-      res.status(400);
-      res.end();
-      return;
-    }
-    // eslint-disable-next-line no-restricted-syntax
-    for (const a of req.body) {
-      if (!validate(a)) {
-        res.status(400);
-        res.end();
-        return;
-      }
-    }
-    let ll;
-    try {
-      ll = await lm.editLanguages(req.body);
-    } catch {
-      res.status(400);
-      res.end();
-      return;
-    }
+    const ll = await lm.editLanguages(req.body);
     res.send(JSON.stringify(ll));
   }
 
   public static async deleteAllData(req: Request, res: Response): Promise<void> {
     await DataManager.deleteAllData();
-    res.send({});
+    res.end();
   }
 }

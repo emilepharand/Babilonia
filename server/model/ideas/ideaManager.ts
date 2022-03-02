@@ -31,7 +31,7 @@ export default class IdeaManager {
     }
     // all languages exist
     const languagesExist: Promise<boolean>[] = [];
-    asIdeaForAdding.ee.forEach((e) => languagesExist.push(this.lm.languageExists(e.languageId)));
+    asIdeaForAdding.ee.forEach((e) => languagesExist.push(this.lm.languageIdExists(e.languageId)));
     if ((await Promise.all(languagesExist)).includes(false)) {
       return false;
     }
@@ -78,7 +78,7 @@ export default class IdeaManager {
     await this.db.run('delete from expressions where ideaId = ?', ideaId);
     await this.db.run('delete from ideas where id =  ?', ideaId);
   }
-  
+
   public async getIdea(ideaId: number): Promise<Idea> {
     const ee: Expression[] = await this.getExpressions(ideaId);
     // sort ideas by language ordering

@@ -1,5 +1,5 @@
 import { Database } from 'sqlite';
-import { Language } from './language';
+import { Language, validate } from './language';
 
 // Ensures consistency and validity of languages
 export default class LanguageManager {
@@ -62,22 +62,43 @@ export default class LanguageManager {
     return (await this.db.get('select * from languages where name = ?', name)) !== undefined;
   }
 
-  async languageExists(id: number): Promise<boolean> {
+  async languageIdExists(id: number): Promise<boolean> {
     return (await this.db.get('select * from languages where id = ?', id)) !== undefined;
   }
 
-  public async validateLanguages(ll: Language[]): Promise<boolean> {
+  public async validateLanguagesForEditing(toValidate: any): Promise<boolean> {
+    if (!(toValidate instanceof Array)) {
+      return false;
+    }
+    const ll = toValidate as Language[];
+    // there are no duplicate language ids
     const languageIds = new Set(Array.from(ll.values(), (l) => l.id));
     if (await this.countLanguages() !== ll.length) {
       return false;
     }
-    if (!(await this.allLanguagesExist(languageIds))) {
+    // there are no duplicate language names
+    const names = new Set(Array.from(ll.values(), (l) => l.name));
+    if (names.size !== ll.length) {
       return false;
     }
-    if (!(LanguageManager.isValidOrdering(ll))) {
+    // all languages exist
+    const promises: Promise<boolean>[] = [];
+    languageIds.forEach((id) => promises.push(this.languageIdExists(id)));
+    if (!(await Promise.all(promises)).every((exist) => exist)) {
       return false;
     }
-    if (!(LanguageManager.noDuplicateNames(ll))) {
+    // ordering is valid
+    const orderings = new Set<number>();
+    ll.forEach((l) => orderings.add(l.ordering));
+    for (let i = 0; i < ll.length; i += 1) {
+      if (!(orderings.has(i))) {
+        return false;
+      }
+    }
+    // each language is valid
+    const bools: boolean[] = [];
+    ll.forEach((l) => bools.push(validate(l)));
+    if (bools.some((valid) => !valid)) {
       return false;
     }
     return true;
@@ -89,36 +110,18 @@ export default class LanguageManager {
     return Promise.all(promises);
   }
 
-  static isValidOrdering(ll: Language[]): boolean {
-    const orderings = new Set<number>();
-    ll.forEach((l) => orderings.add(l.ordering));
-    for (let i = 0; i < ll.length; i += 1) {
-      if (!(orderings.has(i))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  async allLanguagesExist(ids: Set<number>): Promise<boolean> {
-    const promises: Promise<boolean>[] = [];
-    ids.forEach((id) => promises.push(this.languageExists(id)));
-    return (await Promise.all(promises)).every((exist) => exist);
-  }
-
-  private static noDuplicateNames(ll: Language[]): boolean {
-    const names = new Set<string>();
-    // eslint-disable-next-line no-restricted-syntax
-    for (const l of ll) {
-      if (names.has(l.name)) {
-        return false;
-      }
-      names.add(l.name);
-    }
-    return true;
-  }
-
   public async countLanguages(): Promise<number> {
     return (await this.db.get('select count(*) as count from languages'))?.count ?? 0;
+  }
+
+  public async validateLanguageForAdding(toValidate: any): Promise<boolean> {
+    const keys = Object.keys(toValidate);
+    if ((keys.length !== 1
+      || keys[0] !== 'name'
+      || typeof (toValidate.name) !== 'string'
+      || toValidate.name.trim() === '')) {
+      return false;
+    }
+    return !await this.languageNameExists(toValidate.name);
   }
 }
