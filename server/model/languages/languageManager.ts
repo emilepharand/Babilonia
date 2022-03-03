@@ -1,7 +1,10 @@
 import { Database } from 'sqlite';
-import { Language, validate } from './language';
+import { Language, validate, validateForAdding } from './language';
 
-// Ensures consistency and validity of languages
+// Manages languages: getting, adding, editing, deleting and the logic around those actions
+// Arguments are assumed to be valid
+// Methods to validate arguments are exposed
+// Validation is performed at a higher level in the `Controller` class
 export default class LanguageManager {
   private db: Database;
 
@@ -35,7 +38,6 @@ export default class LanguageManager {
     await this.db.run('delete from expressions where languageId = ?', languageId);
   }
 
-  // Arguments are assumed to be valid.
   public async addLanguage(name: string): Promise<Language> {
     const nextOrdering = await this.getNextOrdering();
     const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
@@ -51,7 +53,6 @@ export default class LanguageManager {
     return res.nextOrdering === null ? 0 : res.nextOrdering + 1;
   }
 
-  // Arguments are assumed to be valid.
   private async editLanguage(id: number, language: Language): Promise<Language> {
     const query = 'update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?';
     await this.db.run(query, language.name, language.ordering, language.isPractice, language.id);
@@ -66,11 +67,16 @@ export default class LanguageManager {
     return (await this.db.get('select * from languages where id = ?', id)) !== undefined;
   }
 
-  public async validateLanguagesForEditing(toValidate: any): Promise<boolean> {
+  public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
+    // object is not an array
     if (!(toValidate instanceof Array)) {
       return false;
     }
     const ll = toValidate as Language[];
+    // each language is valid
+    if (ll.some((l) => !validate(l))) {
+      return false;
+    }
     // there are no duplicate language ids
     const languageIds = new Set(Array.from(ll.values(), (l) => l.id));
     if (await this.countLanguages() !== ll.length) {
@@ -95,12 +101,6 @@ export default class LanguageManager {
         return false;
       }
     }
-    // each language is valid
-    const bools: boolean[] = [];
-    ll.forEach((l) => bools.push(validate(l)));
-    if (bools.some((valid) => !valid)) {
-      return false;
-    }
     return true;
   }
 
@@ -114,14 +114,14 @@ export default class LanguageManager {
     return (await this.db.get('select count(*) as count from languages'))?.count ?? 0;
   }
 
-  public async validateLanguageForAdding(toValidate: any): Promise<boolean> {
-    const keys = Object.keys(toValidate);
-    if ((keys.length !== 1
-      || keys[0] !== 'name'
-      || typeof (toValidate.name) !== 'string'
-      || toValidate.name.trim() === '')) {
+  public async validateLanguageForAdding(toValidate: unknown): Promise<boolean> {
+    if (!validateForAdding(toValidate)) {
       return false;
     }
-    return !await this.languageNameExists(toValidate.name);
+    const l = toValidate as { name: string };
+    if (l.name.trim() === '') {
+      return false;
+    }
+    return !(await this.languageNameExists(l.name));
   }
 }

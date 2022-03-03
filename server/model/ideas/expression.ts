@@ -1,4 +1,4 @@
-import { emptyLanguage, Language } from '../languages/language';
+import { Language } from '../languages/language';
 
 export interface ExpressionForAdding {
   text: string;
@@ -23,13 +23,5 @@ export function getExpressionForAddingFromExpression(e: Expression): ExpressionF
   return {
     languageId: e.language.id,
     text: e.text,
-  };
-}
-
-export function emptyExpression(): Expression {
-  return {
-    id: 0,
-    text: '',
-    language: emptyLanguage(),
   };
 }

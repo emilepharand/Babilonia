@@ -1,14 +1,15 @@
 import express, { ErrorRequestHandler } from 'express';
 import cors from 'cors';
 import Routes from './routes';
-import DataManager from './model/dataManager';
+import isTestMode from './context';
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  if (!(process.argv.length > 2 && process.argv[2] === '--test-mode')) {
+  if (!isTestMode) {
     console.error(err.stack);
   }
   res.status(400);
   res.end();
+  next();
 };
 
 const app = express()
@@ -18,11 +19,7 @@ app.use(errorHandler);
 const routes = new Routes(app);
 routes.init();
 
-let port = 5000;
-if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
-  port = 5555;
-  await DataManager.deleteAllData();
-}
+const port = isTestMode ? 5555 : 5000;
 app.listen(port, () => {
   console.log(`Express server app started. Listening on port ${port}.`);
 });

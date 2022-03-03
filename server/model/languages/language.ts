@@ -24,15 +24,6 @@ export function copy(l: Language): Language {
   };
 }
 
-export function emptyLanguage(): Language {
-  return {
-    id: 0,
-    name: '',
-    ordering: 0,
-    isPractice: false,
-  };
-}
-
 export function emptyPartialLanguage(): Partial<Language> {
   return {};
 }
@@ -59,3 +50,13 @@ const schema = {
   additionalProperties: false,
 };
 export const validate = ajv.compile(schema);
+
+const languageForAddingSchema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+  },
+  required: ['name'],
+  additionalProperties: false,
+};
+export const validateForAdding = ajv.compile(languageForAddingSchema);

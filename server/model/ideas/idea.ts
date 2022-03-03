@@ -22,11 +22,6 @@ export function emptyIdea(): Idea {
 
 const ajv = new Ajv();
 
-ajv.addKeyword({
-  keyword: 'notEmpty',
-  validate: (schema: any, data: any) => data.trim() !== '',
-});
-
 const schema = {
   type: 'object',
   properties: {
@@ -42,7 +37,7 @@ const schema = {
             type: 'object',
             properties: {
               id: { type: 'integer' },
-              name: { type: 'string', notEmpty: true },
+              name: { type: 'string' },
               ordering: { type: 'integer' },
               isPractice: { type: 'boolean' },
             },

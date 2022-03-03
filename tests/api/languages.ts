@@ -272,6 +272,11 @@ describe('editing invalid languages', () => {
     await editInvalidLanguagesAndTest(JSON.stringify([{ id: l1.id, name: 'a new language' }]), l1);
   });
 
+  test('missing id key', async () => {
+    const l1 = await (await addLanguage('a language')).json() as Language;
+    await editInvalidLanguagesAndTest(JSON.stringify([{ name: 'a new language' }]), l1);
+  });
+
   test('object with additional keys', async () => {
     const l1 = await (await addLanguage('a language')).json() as Language;
     await editInvalidLanguagesAndTest(JSON.stringify([{ ...l1, plus: 'something' }]), l1);

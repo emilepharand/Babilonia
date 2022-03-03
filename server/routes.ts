@@ -12,7 +12,6 @@ export default class Routes {
   }
 
   public init(): void {
-    const controller = new Controller();
     this.app.use('/', this.router);
     // languages
     this.router.get('/languages', Controller.getLanguages);

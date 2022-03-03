@@ -1,17 +1,13 @@
 import sqlite3 from 'sqlite3';
 import { Database, open } from 'sqlite';
-import { Idea } from './ideas/idea';
 import IdeaManager from './ideas/ideaManager';
 import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
+import isTestMode from '../context';
 
 async function initDb(): Promise<Database> {
-  let filename = 'server/model/db.db';
-  if (process.argv.length > 2 && process.argv[2] === '--test-mode') {
-    filename = ':memory:';
-  }
   const localDb = await open({
-    filename,
+    filename: isTestMode ? ':memory:' : 'server/model/db.db',
     driver: sqlite3.Database,
   });
   console.log('Database was opened.');
@@ -24,8 +20,6 @@ export const ideaManager = new IdeaManager(db, languageManager);
 export const practiceManager = new PracticeManager(db, ideaManager);
 
 export default class DataManager {
-  public static ideas: Idea[] = [];
-
   public static async deleteAllData(): Promise<void> {
     await db.run('drop table if exists expressions');
     await db.run('drop table if exists ideas');
@@ -60,4 +54,8 @@ export default class DataManager {
   static getPracticeManager(): PracticeManager {
     return practiceManager;
   }
+}
+
+if (isTestMode) {
+  await DataManager.deleteAllData();
 }

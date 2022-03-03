@@ -4,7 +4,10 @@ import { Idea } from './idea';
 import LanguageManager from '../languages/languageManager';
 import { IdeaForAdding, validateSchema as validateIdeaForAddingSchema } from './ideaForAdding';
 
-// Ensures consistency and validity of ideas and their expressions
+// Manages ideas: getting, adding, editing, deleting and the logic around those actions
+// Arguments are assumed to be valid
+// Methods to validate arguments are exposed
+// Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager {
   private db: Database;
 
@@ -44,7 +47,6 @@ export default class IdeaManager {
     return true;
   }
 
-  // Arguments are assumed to be valid.
   async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
     await this.db.run('insert into ideas("id") VALUES (null)');
     const ideaId = (await this.db.get('select last_insert_rowid() as id')).id;
@@ -52,7 +54,6 @@ export default class IdeaManager {
     return this.getIdea(ideaId);
   }
 
-  // Arguments are assumed to be valid.
   async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
     // old expressions are deleted and new ones added
     // because ids of expressions don't need to be preserved
@@ -62,7 +63,6 @@ export default class IdeaManager {
     await this.insertExpressions(idea.ee, id);
   }
 
-  // Arguments are assumed to be valid.
   private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
     // eslint-disable-next-line no-restricted-syntax
     for (const e of ee) {
@@ -73,7 +73,6 @@ export default class IdeaManager {
     }
   }
 
-  // Arguments are assumed to be valid.
   async deleteIdea(ideaId: number): Promise<void> {
     await this.db.run('delete from expressions where ideaId = ?', ideaId);
     await this.db.run('delete from ideas where id =  ?', ideaId);
