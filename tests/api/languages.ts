@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { copy, Language, validate, } from '../../server/model/languages/language';
+import { copy, Language, validate } from '../../server/model/languages/language';
 import { ExpressionForAdding } from '../../server/model/ideas/expression';
 import {
   addIdea,
@@ -310,8 +310,11 @@ describe('editing invalid languages', () => {
     const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
     const newLanguage2 = copy(oldLanguage2);
     newLanguage2.ordering = oldLanguage1.ordering;
-    await editInvalidLanguagesAndTest(JSON.stringify([oldLanguage1, newLanguage2]),
-      oldLanguage1, oldLanguage2);
+    await editInvalidLanguagesAndTest(
+      JSON.stringify([oldLanguage1, newLanguage2]),
+      oldLanguage1,
+      oldLanguage2,
+    );
   });
 
   test('ordering doesn\'t start at 0', async () => {
@@ -321,8 +324,11 @@ describe('editing invalid languages', () => {
     const newLanguage2 = copy(oldLanguage2);
     newLanguage1.ordering = FIRST_ORDERING + 1;
     newLanguage2.ordering = FIRST_ORDERING + 2;
-    await editInvalidLanguagesAndTest(JSON.stringify([newLanguage1, newLanguage2]),
-      oldLanguage1, oldLanguage2);
+    await editInvalidLanguagesAndTest(
+      JSON.stringify([newLanguage1, newLanguage2]),
+      oldLanguage1,
+      oldLanguage2,
+    );
   });
 
   test('ordering has a gap', async () => {
@@ -330,8 +336,11 @@ describe('editing invalid languages', () => {
     const oldLanguage2 = await (await addLanguage('old language 2')).json() as Language;
     const newLanguage2 = copy(oldLanguage2);
     newLanguage2.ordering = FIRST_ORDERING + 2;
-    await editInvalidLanguagesAndTest(JSON.stringify([oldLanguage1, newLanguage2]),
-      oldLanguage1, oldLanguage2);
+    await editInvalidLanguagesAndTest(
+      JSON.stringify([oldLanguage1, newLanguage2]),
+      oldLanguage1,
+      oldLanguage2,
+    );
   });
 
   test('name is a number', async () => {

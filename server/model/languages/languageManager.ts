@@ -68,13 +68,17 @@ export default class LanguageManager {
   }
 
   public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
-    // object is not an array
+    // object is an array
     if (!(toValidate instanceof Array)) {
       return false;
     }
     const ll = toValidate as Language[];
     // each language is valid
     if (ll.some((l) => !validate(l))) {
+      return false;
+    }
+    // no language name is blank
+    if (ll.some((l) => l.name.trim() === '')) {
       return false;
     }
     // there are no duplicate language ids
