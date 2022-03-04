@@ -33,7 +33,10 @@ export default class LanguageManager {
     // update languages set ordering = 1 where id = 8;
     // COMMIT;
     const l = await this.getLanguage(languageId);
-    await this.db.run('update languages set ordering = case when ordering > ? then ordering - 1 else ordering END', l.ordering);
+    await this.db.run(
+      'update languages set ordering = case when ordering > ? then ordering - 1 else ordering END',
+      l.ordering,
+    );
     await this.db.run('delete from languages where id = ?', languageId);
     await this.db.run('delete from expressions where languageId = ?', languageId);
   }
@@ -51,12 +54,6 @@ export default class LanguageManager {
   public async getNextOrdering(): Promise<number> {
     const res = await this.db.get('select max(ordering) as nextOrdering from languages');
     return res.nextOrdering === null ? 0 : res.nextOrdering + 1;
-  }
-
-  private async editLanguage(id: number, language: Language): Promise<Language> {
-    const query = 'update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?';
-    await this.db.run(query, language.name, language.ordering, language.isPractice, language.id);
-    return this.getLanguage(id);
   }
 
   public async languageNameExists(name: string): Promise<boolean> {
@@ -83,7 +80,7 @@ export default class LanguageManager {
     }
     // there are no duplicate language ids
     const languageIds = new Set(Array.from(ll.values(), (l) => l.id));
-    if (await this.countLanguages() !== ll.length) {
+    if ((await this.countLanguages()) !== ll.length) {
       return false;
     }
     // there are no duplicate language names
@@ -101,7 +98,7 @@ export default class LanguageManager {
     const orderings = new Set<number>();
     ll.forEach((l) => orderings.add(l.ordering));
     for (let i = 0; i < ll.length; i += 1) {
-      if (!(orderings.has(i))) {
+      if (!orderings.has(i)) {
         return false;
       }
     }
@@ -127,5 +124,11 @@ export default class LanguageManager {
       return false;
     }
     return !(await this.languageNameExists(l.name));
+  }
+
+  private async editLanguage(id: number, language: Language): Promise<Language> {
+    const query = 'update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?';
+    await this.db.run(query, language.name, language.ordering, language.isPractice, language.id);
+    return this.getLanguage(id);
   }
 }

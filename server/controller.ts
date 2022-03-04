@@ -30,23 +30,8 @@ export default class Controller {
     res.end();
   }
 
-  private static async validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
-    if (Number.isNaN(+req.params.id)) {
-      res.status(400);
-      res.end();
-      return false;
-    }
-    const ideaId = parseInt(req.params.id, 10);
-    if (!(await lm.languageIdExists(ideaId))) {
-      res.status(404);
-      res.end();
-      return false;
-    }
-    return true;
-  }
-
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    if (!await lm.validateLanguageForAdding(req.body)) {
+    if (!(await lm.validateLanguageForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -67,7 +52,7 @@ export default class Controller {
   }
 
   public static async getNextIdea(req: Request, res: Response): Promise<void> {
-    if (await im.countIdeas() === 0) {
+    if ((await im.countIdeas()) === 0) {
       res.status(404);
       res.end();
     }
@@ -109,7 +94,7 @@ export default class Controller {
     if (!(await Controller.validateIdeaIdInRequest(req, res))) {
       return;
     }
-    if (!await im.validateIdeaForAdding(req.body)) {
+    if (!(await im.validateIdeaForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -117,6 +102,26 @@ export default class Controller {
     const idea = req.body as IdeaForAdding;
     await im.editIdea(idea, parseInt(req.params.id, 10));
     res.send(await im.getIdea(parseInt(req.params.id, 10)));
+  }
+
+  public static async deleteAllData(req: Request, res: Response): Promise<void> {
+    await DataManager.deleteAllData();
+    res.end();
+  }
+
+  private static async validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
+    if (Number.isNaN(+req.params.id)) {
+      res.status(400);
+      res.end();
+      return false;
+    }
+    const ideaId = parseInt(req.params.id, 10);
+    if (!(await lm.languageIdExists(ideaId))) {
+      res.status(404);
+      res.end();
+      return false;
+    }
+    return true;
   }
 
   private static async validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
@@ -132,10 +137,5 @@ export default class Controller {
       return false;
     }
     return true;
-  }
-
-  public static async deleteAllData(req: Request, res: Response): Promise<void> {
-    await DataManager.deleteAllData();
-    res.end();
   }
 }

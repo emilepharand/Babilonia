@@ -14,11 +14,6 @@ export function getIdeaForAddingFromIdea(idea: Idea): IdeaForAdding {
 
 const ajv = new Ajv();
 
-ajv.addKeyword({
-  keyword: 'notEmpty',
-  validate: (schema: any, data: any) => data.trim() !== '',
-});
-
 const ideaForAddingSchema = {
   type: 'object',
   properties: {

@@ -41,10 +41,7 @@ export default class IdeaManager {
     // no expressions are identical (same language and text)
     const distinctExpressions = new Set<string>();
     asIdeaForAdding.ee.forEach((e) => distinctExpressions.add(JSON.stringify(e)));
-    if (distinctExpressions.size !== asIdeaForAdding.ee.length) {
-      return false;
-    }
-    return true;
+    return distinctExpressions.size === asIdeaForAdding.ee.length;
   }
 
   async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
@@ -63,16 +60,6 @@ export default class IdeaManager {
     await this.insertExpressions(idea.ee, id);
   }
 
-  private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const e of ee) {
-      const query = 'insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)';
-      // await is needed because order needs to be preserved
-      // eslint-disable-next-line no-await-in-loop
-      await this.db.run(query, ideaId, e.languageId, e.text);
-    }
-  }
-
   async deleteIdea(ideaId: number): Promise<void> {
     await this.db.run('delete from expressions where ideaId = ?', ideaId);
     await this.db.run('delete from ideas where id =  ?', ideaId);
@@ -85,9 +72,30 @@ export default class IdeaManager {
     return new Idea({ id: ideaId, ee });
   }
 
+  public async ideaExists(id: number): Promise<boolean> {
+    return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
+  }
+
+  public async countIdeas(): Promise<number> {
+    return (await this.db.get('select count(*) as count from ideas'))?.count ?? 0;
+  }
+
+  private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const e of ee) {
+      const query = 'insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)';
+      // await is needed because order needs to be preserved
+      // eslint-disable-next-line no-await-in-loop
+      await this.db.run(query, ideaId, e.languageId, e.text);
+    }
+  }
+
   private async getExpressions(ideaId: number): Promise<Expression[]> {
     const query = 'select id, languageId, text from expressions where ideaId = ?';
-    const rows: [{ id: number, languageId: number, text: string }] = await this.db.all(query, ideaId);
+    const rows: [{ id: number; languageId: number; text: string }] = await this.db.all(
+      query,
+      ideaId,
+    );
     return Promise.all(
       rows.map(async (row) => ({
         id: row.id,
@@ -95,13 +103,5 @@ export default class IdeaManager {
         language: await this.lm.getLanguage(row.languageId),
       })),
     );
-  }
-
-  public async ideaExists(id: number): Promise<boolean> {
-    return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
-  }
-
-  public async countIdeas(): Promise<number> {
-    return (await this.db.get('select count(*) as count from ideas'))?.count ?? 0;
   }
 }

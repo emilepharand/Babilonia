@@ -17,6 +17,10 @@ export default class PracticeManager {
     this.db = db;
   }
 
+  async getNextIdea(): Promise<Idea> {
+    return this.nextIdeaId().then((id) => this.ideaManager.getIdea(id));
+  }
+
   private async nextIdeaId(): Promise<number> {
     let idea = await this.db.get('select id from ideas limit 1 offset ?', this.offset);
     // no more ideas
@@ -30,9 +34,5 @@ export default class PracticeManager {
     }
     this.offset += 1;
     return idea.id;
-  }
-
-  async getNextIdea(): Promise<Idea> {
-    return this.nextIdeaId().then((id) => this.ideaManager.getIdea(id));
   }
 }

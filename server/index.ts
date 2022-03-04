@@ -12,9 +12,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   next();
 };
 
-const app = express()
-  .use(cors())
-  .use(express.json());
+const app = express().use(cors()).use(express.json());
 app.use(errorHandler);
 const routes = new Routes(app);
 routes.init();
