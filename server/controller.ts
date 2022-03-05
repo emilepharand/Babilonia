@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import DataManager from './model/dataManager';
+import DataServiceProvider from './model/dataServiceProvider';
 import { Language } from './model/languages/language';
 import { IdeaForAdding } from './model/ideas/ideaForAdding';
 
-const lm = DataManager.getLanguageManager();
-const im = DataManager.getIdeaManager();
-const pm = DataManager.getPracticeManager();
+const lm = DataServiceProvider.getLanguageManager();
+const im = DataServiceProvider.getIdeaManager();
+const pm = DataServiceProvider.getPracticeManager();
+const dv = DataServiceProvider.getInputValidator();
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -31,7 +32,7 @@ export default class Controller {
   }
 
   public static async addLanguage(req: Request, res: Response): Promise<void> {
-    if (!(await lm.validateLanguageForAdding(req.body))) {
+    if (!(await dv.validateLanguageForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -42,7 +43,7 @@ export default class Controller {
   }
 
   public static async editLanguages(req: Request, res: Response): Promise<void> {
-    if (!(await lm.validateLanguagesForEditing(req.body))) {
+    if (!(await dv.validateLanguagesForEditing(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -64,7 +65,7 @@ export default class Controller {
   }
 
   public static async addIdea(req: Request, res: Response): Promise<void> {
-    if (!(await im.validateIdeaForAdding(req.body))) {
+    if (!(await dv.validateIdeaForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -94,7 +95,7 @@ export default class Controller {
     if (!(await Controller.validateIdeaIdInRequest(req, res))) {
       return;
     }
-    if (!(await im.validateIdeaForAdding(req.body))) {
+    if (!(await dv.validateIdeaForAdding(req.body))) {
       res.status(400);
       res.end();
       return;
@@ -105,7 +106,7 @@ export default class Controller {
   }
 
   public static async deleteAllData(req: Request, res: Response): Promise<void> {
-    await DataManager.deleteAllData();
+    await DataServiceProvider.deleteAllData();
     res.end();
   }
 

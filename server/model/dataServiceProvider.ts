@@ -3,6 +3,7 @@ import { Database, open } from 'sqlite';
 import IdeaManager from './ideas/ideaManager';
 import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
+import InputValidator from './inputValidator';
 import isTestMode from '../context';
 
 async function initDb(): Promise<Database> {
@@ -18,8 +19,9 @@ export const db: Database = await initDb();
 export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
 export const practiceManager = new PracticeManager(db, ideaManager);
+export const inputValidator = new InputValidator(ideaManager, languageManager);
 
-export default class DataManager {
+export default class DataServiceProvider {
   public static async deleteAllData(): Promise<void> {
     await db.run('drop table if exists expressions');
     await db.run('drop table if exists ideas');
@@ -60,8 +62,12 @@ export default class DataManager {
   static getPracticeManager(): PracticeManager {
     return practiceManager;
   }
+
+  static getInputValidator(): InputValidator {
+    return inputValidator;
+  }
 }
 
 if (isTestMode) {
-  await DataManager.deleteAllData();
+  await DataServiceProvider.deleteAllData();
 }

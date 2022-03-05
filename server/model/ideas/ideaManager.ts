@@ -2,11 +2,10 @@ import { Database } from 'sqlite';
 import { Expression, ExpressionForAdding } from './expression';
 import { Idea } from './idea';
 import LanguageManager from '../languages/languageManager';
-import { IdeaForAdding, validateSchema as validateIdeaForAddingSchema } from './ideaForAdding';
+import { IdeaForAdding } from './ideaForAdding';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
-// Methods to validate arguments are exposed
 // Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager {
   private db: Database;
@@ -16,32 +15,6 @@ export default class IdeaManager {
   constructor(db: Database, lm: LanguageManager) {
     this.db = db;
     this.lm = lm;
-  }
-
-  public async validateIdeaForAdding(ideaForAdding: unknown): Promise<boolean> {
-    // shape is valid (properties and their types)
-    if (!validateIdeaForAddingSchema(ideaForAdding)) {
-      return false;
-    }
-    const asIdeaForAdding = ideaForAdding as IdeaForAdding;
-    // contains at least one expression
-    if (asIdeaForAdding.ee.length === 0) {
-      return false;
-    }
-    // no expressions are blank
-    if (asIdeaForAdding.ee.some((e) => e.text.trim() === '')) {
-      return false;
-    }
-    // all languages exist
-    const languagesExist: Promise<boolean>[] = [];
-    asIdeaForAdding.ee.forEach((e) => languagesExist.push(this.lm.languageIdExists(e.languageId)));
-    if ((await Promise.all(languagesExist)).includes(false)) {
-      return false;
-    }
-    // no expressions are identical (same language and text)
-    const distinctExpressions = new Set<string>();
-    asIdeaForAdding.ee.forEach((e) => distinctExpressions.add(JSON.stringify(e)));
-    return distinctExpressions.size === asIdeaForAdding.ee.length;
   }
 
   async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
