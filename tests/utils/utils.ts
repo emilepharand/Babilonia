@@ -119,17 +119,30 @@ export async function fetchIdea(id: number): Promise<Idea> {
 }
 
 export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
-  let params = `pattern=${sc.pattern}`;
-  params += `&language=${sc.languages.join('|')}`;
-  let separator = sc.ideaHasOperator === 'and' ? ',' : '|';
-  params += `&ideaHas=${sc.ideaHas.join(separator)}`;
-  separator = sc.ideaDoesNotHaveOperator === 'and' ? ',' : '|';
-  params += `&ideaDoesNotHave=${sc.ideaDoesNotHave.join(separator)}`;
+  let params;
+  if (sc.pattern) {
+    params = `pattern=${sc.pattern}`;
+  }
+  if (sc.language) {
+    params += `&language=${sc.language}`;
+  }
+  let separator;
+  if (sc.ideaHasOperator && sc.ideaHas) {
+    separator = sc.ideaHasOperator === 'and' ? ',' : '|';
+    params += `&ideaHas=${sc.ideaHas.join(separator)}`;
+  }
+  if (sc.ideaDoesNotHaveOperator && sc.ideaDoesNotHave) {
+    separator = sc.ideaDoesNotHaveOperator === 'and' ? ',' : '|';
+    params += `&ideaDoesNotHave=${sc.ideaDoesNotHave.join(separator)}`;
+  }
   const url = `http://localhost:5555/ideas?${params}`;
-  console.log(url);
   return fetch(url, {
     method: 'GET',
   });
+}
+
+export async function search(sc: SearchContext): Promise<Idea[]> {
+  return (await (await searchAndGetResponse(sc)).json()) as Idea[];
 }
 
 export async function deleteEverything(): Promise<Response> {
