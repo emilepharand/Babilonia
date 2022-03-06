@@ -1,7 +1,7 @@
 <template>
   <div style="display:flex;flex-direction: column">
     <router-link to="/manage/ideas/add">Add Ideas</router-link>
-    <router-link to="/manage/ideas/search">Search Ideas</router-link>
+    <router-link to="/manage/ideas/search">SearchHandler Ideas</router-link>
   </div>
 </template>
 

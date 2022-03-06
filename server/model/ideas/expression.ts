@@ -9,6 +9,8 @@ export interface Expression {
   id: number;
   text: string;
   language: Language;
+  // this is used for search results
+  matched?: boolean;
 }
 
 export class Expression {

@@ -2,11 +2,13 @@ import { Request, Response } from 'express';
 import DataServiceProvider from './model/dataServiceProvider';
 import { Language } from './model/languages/language';
 import { IdeaForAdding } from './model/ideas/ideaForAdding';
+import { SearchContext } from './model/search/searchContext';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
 const dv = DataServiceProvider.getInputValidator();
+const search = DataServiceProvider.getSearchHandler();
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -81,6 +83,19 @@ export default class Controller {
     }
     const idea = await im.getIdea(parseInt(req.params.id, 10));
     res.send(idea);
+  }
+
+  public static async search(req: Request, res: Response): Promise<void> {
+    const sc: SearchContext = {
+      pattern: req.query.pattern as string,
+      languages: [],
+      ideaHas: [],
+      ideaHasOperator: 'and',
+      ideaDoesNotHave: [],
+      ideaDoesNotHaveOperator: 'and',
+    };
+    const ideas = await search.executeSearch(sc);
+    res.send(ideas);
   }
 
   public static async deleteIdea(req: Request, res: Response): Promise<void> {

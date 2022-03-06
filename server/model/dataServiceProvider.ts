@@ -5,6 +5,7 @@ import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
 import InputValidator from './inputValidator';
 import isTestMode from '../context';
+import SearchHandler from './search/searchHandler';
 
 async function initDb(): Promise<Database> {
   const localDb = await open({
@@ -20,6 +21,7 @@ export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
 export const practiceManager = new PracticeManager(db, ideaManager);
 export const inputValidator = new InputValidator(ideaManager, languageManager);
+export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
 
 export default class DataServiceProvider {
   public static async deleteAllData(): Promise<void> {
@@ -66,8 +68,8 @@ export default class DataServiceProvider {
   static getInputValidator(): InputValidator {
     return inputValidator;
   }
-}
 
-if (isTestMode) {
-  await DataServiceProvider.deleteAllData();
+  static getSearchHandler(): SearchHandler {
+    return searchHandler;
+  }
 }

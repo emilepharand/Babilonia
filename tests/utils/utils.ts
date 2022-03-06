@@ -117,7 +117,7 @@ export async function fetchIdea(id: number): Promise<Idea> {
   return (await (await fetchIdeaAndGetResponse(id)).json()) as Idea;
 }
 
-export async function search(
+export async function searchAndGetResponse(
   pattern: string,
   languages: number[],
   ideaHas: number[],
@@ -125,7 +125,7 @@ export async function search(
   ideaDoesNotHave: number[],
   ideaDoesNotHaveOperator: string,
 ): Promise<Response> {
-  let params = `expression=${pattern}`;
+  let params = `pattern=${pattern}`;
   params += `&language=${languages.join('|')}`;
   let separator = ideaHasOperator === 'and' ? ',' : '|';
   params += `&ideaHas=${ideaHas.join(separator)}`;
