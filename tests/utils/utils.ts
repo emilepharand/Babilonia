@@ -2,6 +2,7 @@ import fetch, { Response } from 'node-fetch';
 import { Idea } from '../../server/model/ideas/idea';
 import { Language } from '../../server/model/languages/language';
 import { IdeaForAdding } from '../../server/model/ideas/ideaForAdding';
+import { SearchContext } from '../../server/model/search/searchContext';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -117,20 +118,13 @@ export async function fetchIdea(id: number): Promise<Idea> {
   return (await (await fetchIdeaAndGetResponse(id)).json()) as Idea;
 }
 
-export async function searchAndGetResponse(
-  pattern: string,
-  languages: number[],
-  ideaHas: number[],
-  ideaHasOperator: string,
-  ideaDoesNotHave: number[],
-  ideaDoesNotHaveOperator: string,
-): Promise<Response> {
-  let params = `pattern=${pattern}`;
-  params += `&language=${languages.join('|')}`;
-  let separator = ideaHasOperator === 'and' ? ',' : '|';
-  params += `&ideaHas=${ideaHas.join(separator)}`;
-  separator = ideaDoesNotHaveOperator === 'and' ? ',' : '|';
-  params += `&ideaDoesNotHave=${ideaDoesNotHave.join(separator)}`;
+export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
+  let params = `pattern=${sc.pattern}`;
+  params += `&language=${sc.languages.join('|')}`;
+  let separator = sc.ideaHasOperator === 'and' ? ',' : '|';
+  params += `&ideaHas=${sc.ideaHas.join(separator)}`;
+  separator = sc.ideaDoesNotHaveOperator === 'and' ? ',' : '|';
+  params += `&ideaDoesNotHave=${sc.ideaDoesNotHave.join(separator)}`;
   const url = `http://localhost:5555/ideas?${params}`;
   console.log(url);
   return fetch(url, {
