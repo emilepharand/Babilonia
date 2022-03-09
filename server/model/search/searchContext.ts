@@ -1,8 +1,9 @@
 export interface SearchContext {
   pattern?: string;
+  strict?: true;
   language?: number;
   ideaHas?: number[];
   ideaDoesNotHave?: number[];
-  ideaHasOperator?: string;
-  ideaDoesNotHaveOperator?: string;
+  ideaHasOperator?: 'and' | 'or';
+  ideaDoesNotHaveOperator?: 'and' | 'or';
 }

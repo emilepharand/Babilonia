@@ -88,7 +88,8 @@ export default class Controller {
   public static async search(req: Request, res: Response): Promise<void> {
     const sc: SearchContext = {
       pattern: req.query.pattern as string,
-      language: undefined,
+      language: parseInt(req.query.language as string, 10),
+      strict: req.query.strict as true | undefined,
       ideaHas: undefined,
       ideaHasOperator: undefined,
       ideaDoesNotHave: undefined,

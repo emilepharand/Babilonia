@@ -22,8 +22,10 @@ export default class SearchHandler {
       select e.id as expressionId, ideaId from expressions as e
       join languages as l
       on l.id=e.languageId
-      where e.text LIKE ?`;
-    const rows = (await this.db.all(query, sc.pattern)) as {
+      where e.text LIKE ?
+      and l.id=?`;
+    const pattern = sc.strict ? sc.pattern : `%${sc.pattern}%`;
+    const rows = (await this.db.all(query, pattern, sc.language)) as {
       ideaId: number;
       expressionId: number;
     }[];
