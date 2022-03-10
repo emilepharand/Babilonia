@@ -25,8 +25,10 @@ async function testSearch(
     matchedExpressions.forEach((matchedExpression, j) => {
       const expressionThatShouldMatch = expressionsThatShouldMatch[j];
       expect(matchedExpression.text).toEqual(expressionThatShouldMatch);
-      expect(matchedExpression.language.id).toEqual(languageId);
       expect(matchedExpression.matched).toEqual(true);
+      if (languageId) {
+        expect(matchedExpression.language.id).toEqual(languageId);
+      }
     });
   });
 }
@@ -69,31 +71,35 @@ describe('searching expressions', () => {
     await testSearch(sc, [i2], [['fr ipsum sed']], fr.id);
   });
 
-  // test('ideaHas and ideaDoesNotHave', async () => {
-  //   const fr = await addLanguage('français');
-  //   const en = await addLanguage('anglais');
-  //   const es = await addLanguage('español');
-  //   const it = await addLanguage('italiano');
-  //   const de = await addLanguage('deutsch');
-  //   const fr1: ExpressionForAdding = { text: 'bonjour', languageId: fr.id };
-  //   const en1: ExpressionForAdding = { text: 'hello', languageId: en.id };
-  //   const es1: ExpressionForAdding = { text: 'buenos días', languageId: es.id };
-  //   const it1: ExpressionForAdding = { text: 'buongiorno', languageId: it.id };
-  //   const fr2: ExpressionForAdding = { text: 'bonne nuit', languageId: fr.id };
-  //   const en2: ExpressionForAdding = { text: 'good night', languageId: en.id };
-  //   const es2: ExpressionForAdding = { text: 'buenas noches', languageId: es.id };
-  //   const de2: ExpressionForAdding = { text: 'gute Natch', languageId: de.id };
-  //   const i1 = await addIdea({ ee: [fr1, en1, es1, it1] });
-  //   const i2 = await addIdea({ ee: [fr2, en2, es2, de2] });
-  //   const sc: SearchContext = {
-  //     ideaHas: [fr.id, en.id, es.id, it.id, de.id],
-  //     ideaHasOperator: 'and',
-  //     ideaDoesNotHave: [],
-  //     ideaDoesNotHaveOperator: 'or',
-  //   };
-  //   const r = await searchAndGetResponse(sc);
-  //   const ideas = (await r.json()) as Idea[];
-  //   expect(ideas.length).toEqual(1);
-  //   expect(ideas[0]).toMatchObject(i1);
-  // });
+  test('searching for ideas that contain specific languages', async () => {
+    const fr = await addLanguage('français');
+    const en = await addLanguage('anglais');
+    const es = await addLanguage('español');
+    const it = await addLanguage('italiano');
+    const de = await addLanguage('deutsch');
+    const fr1: ExpressionForAdding = { text: 'bonjour', languageId: fr.id };
+    const en1: ExpressionForAdding = { text: 'hello', languageId: en.id };
+    const es1: ExpressionForAdding = { text: 'buenos días', languageId: es.id };
+    const it1: ExpressionForAdding = { text: 'buongiorno', languageId: it.id };
+    const fr2: ExpressionForAdding = { text: 'bonne nuit', languageId: fr.id };
+    const en2: ExpressionForAdding = { text: 'good night', languageId: en.id };
+    const es2: ExpressionForAdding = { text: 'buenas noches', languageId: es.id };
+    const de2: ExpressionForAdding = { text: 'gute Natch', languageId: de.id };
+    const es3: ExpressionForAdding = { text: 'buenas tardes', languageId: es.id };
+    const i1 = await addIdea({ ee: [fr1, en1, es1, it1] });
+    const i2 = await addIdea({ ee: [fr2, en2, es2, de2] });
+    const i3 = await addIdea({ ee: [es3] });
+
+    // All ideas containing Spanish or French
+    const sc: SearchContext = {
+      pattern: '',
+      ideaHas: [es.id, fr.id],
+      ideaHasOperator: 'or',
+    };
+    await testSearch(
+      sc,
+      [i1, i2, i3],
+      [i1.ee.map((e) => e.text), i2.ee.map((e) => e.text), ['buenas tardes']],
+    );
+  });
 });

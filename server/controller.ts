@@ -86,11 +86,18 @@ export default class Controller {
   }
 
   public static async search(req: Request, res: Response): Promise<void> {
+    const pattern = (req.query.pattern as string) ?? undefined;
+    const language = req.query.language ? parseInt(req.query.language as string, 10) : undefined;
+    const strict = req.query.strict as true | undefined;
+    let ideaHas;
+    if (req.query.ideaHas) {
+      ideaHas = (req.query.ideaHas as string).split(',').map((i) => parseInt(i, 10));
+    }
     const sc: SearchContext = {
-      pattern: req.query.pattern as string,
-      language: parseInt(req.query.language as string, 10),
-      strict: req.query.strict as true | undefined,
-      ideaHas: undefined,
+      pattern,
+      language,
+      strict,
+      ideaHas,
       ideaHasOperator: undefined,
       ideaDoesNotHave: undefined,
       ideaDoesNotHaveOperator: undefined,
