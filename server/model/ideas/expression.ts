@@ -1,4 +1,4 @@
-import { Language } from '../languages/language';
+import {Language} from '../languages/language';
 
 export interface ExpressionForAdding {
   text: string;
@@ -9,21 +9,21 @@ export interface Expression {
   id: number;
   text: string;
   language: Language;
-  // this is used for search results
+  // This is used for search results
   matched?: boolean;
 }
 
 export class Expression {
-  constructor(e: Expression) {
-    this.id = e.id;
-    this.text = e.text;
-    this.language = e.language;
-  }
+	constructor(e: Expression) {
+		this.id = e.id;
+		this.text = e.text;
+		this.language = e.language;
+	}
 }
 
 export function getExpressionForAddingFromExpression(e: Expression): ExpressionForAdding {
-  return {
-    languageId: e.language.id,
-    text: e.text,
-  };
+	return {
+		languageId: e.language.id,
+		text: e.text,
+	};
 }
