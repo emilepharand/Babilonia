@@ -11,9 +11,7 @@ type SearchResultRow = {
 
 export default class SearchHandler {
 	private db: Database;
-
 	private lm: LanguageManager;
-
 	private im: IdeaManager;
 
 	constructor(db: Database, lm: LanguageManager, im: IdeaManager) {
@@ -32,24 +30,20 @@ export default class SearchHandler {
 			whereCondition.push('e.text LIKE ?');
 			params.push(pattern);
 		}
-
 		if (sc.language) {
 			whereCondition.push('l.id=?');
 			params.push(sc.language);
 		}
-
-		if (sc.ideaHas && sc.ideaHasOperator === 'or') {
-			whereCondition.push(
-				`ideaId in (select * from ideas where id in (select distinct ideaId from expressions where languageId
-            in (${sc.ideaHas.join(',')})))`,
-			);
+		if (sc.ideaHas) {
+			whereCondition.push(`ideaId in
+			                      (select ideaId from expressions
+                            where languageId in (${sc.ideaHas.join(',')})
+                            group by ideaId
+                            having (count(ideaId) = ${sc.ideaHas.length}))`);
 		}
-
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;
 		}
-
-		console.log(query);
 		return this.db.all(query, ...params);
 	}
 

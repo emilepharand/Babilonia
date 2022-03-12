@@ -3,7 +3,5 @@ export interface SearchContext {
   strict?: true;
   language?: number;
   ideaHas?: number[];
-  ideaDoesNotHave?: number[];
-  ideaHasOperator?: 'and' | 'or';
-  ideaDoesNotHaveOperator?: 'and' | 'or';
+  ideaDoesNotHave?: number;
 }

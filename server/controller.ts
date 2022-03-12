@@ -77,7 +77,6 @@ export default class Controller {
 			res.end();
 			return;
 		}
-
 		const returnIdea = await im.addIdea(req.body as IdeaForAdding);
 		res.status(201);
 		res.send(JSON.stringify(returnIdea));
@@ -87,7 +86,6 @@ export default class Controller {
 		if (!(await Controller.validateIdeaIdInRequest(req, res))) {
 			return;
 		}
-
 		const idea = await im.getIdea(parseInt(req.params.id, 10));
 		res.send(idea);
 	}
@@ -100,15 +98,15 @@ export default class Controller {
 		if (req.query.ideaHas) {
 			ideaHas = (req.query.ideaHas as string).split(',').map(i => parseInt(i, 10));
 		}
-
+		const ideaDoesNotHave = req.query.ideaDoesNotHave
+			? parseInt(req.query.ideaDoesNotHave as string, 10)
+			: undefined;
 		const sc: SearchContext = {
 			pattern,
 			language,
 			strict,
 			ideaHas,
-			ideaHasOperator: undefined,
-			ideaDoesNotHave: undefined,
-			ideaDoesNotHaveOperator: undefined,
+			ideaDoesNotHave,
 		};
 		const ideas = await search.executeSearch(sc);
 		res.send(ideas);
@@ -150,14 +148,12 @@ export default class Controller {
 			res.end();
 			return false;
 		}
-
 		const ideaId = parseInt(req.params.id, 10);
 		if (!(await lm.languageIdExists(ideaId))) {
 			res.status(404);
 			res.end();
 			return false;
 		}
-
 		return true;
 	}
 
@@ -167,14 +163,12 @@ export default class Controller {
 			res.end();
 			return false;
 		}
-
 		const ideaId = parseInt(req.params.id, 10);
 		if (!(await im.ideaExists(ideaId))) {
 			res.status(404);
 			res.end();
 			return false;
 		}
-
 		return true;
 	}
 }

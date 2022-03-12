@@ -46,14 +46,7 @@ describe('searching expressions', () => {
 		const i2 = await addIdea({ee: [fr2, en2]});
 		const i3 = await addIdea({ee: [fr3]});
 
-		for (const a of i1.ee) {
-			console.log(a);
-		}
-
-		const sc: SearchContext = {
-			pattern: 'lorem ipsum',
-			language: fr.id,
-		};
+		const sc: SearchContext = {pattern: 'lorem ipsum', language: fr.id};
 		await testSearch(sc, [i1], [['fr lorem ipsum']], fr.id);
 
 		sc.pattern = 'fr';
@@ -92,16 +85,15 @@ describe('searching expressions', () => {
 		const i2 = await addIdea({ee: [fr2, en2, es2, de2]});
 		const i3 = await addIdea({ee: [es3]});
 
-		// All ideas containing Spanish or French
+		// All ideas containing Spanish and French
 		const sc: SearchContext = {
 			pattern: '',
 			ideaHas: [es.id, fr.id],
-			ideaHasOperator: 'or',
 		};
 		await testSearch(
 			sc,
-			[i1, i2, i3],
-			[i1.ee.map(e => e.text), i2.ee.map(e => e.text), ['buenas tardes']],
+			[i1, i2],
+			[i1.ee.map(e => e.text), i2.ee.map(e => e.text)],
 		);
 	});
 });

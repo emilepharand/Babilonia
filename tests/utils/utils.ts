@@ -123,26 +123,18 @@ export async function searchAndGetResponse(sc: SearchContext): Promise<Response>
 	if (sc.pattern) {
 		params = `pattern=${sc.pattern}`;
 	}
-
 	if (sc.strict) {
 		params += '&strict=true';
 	}
-
 	if (sc.language) {
 		params += `&language=${sc.language}`;
 	}
-
-	let separator;
-	if (sc.ideaHasOperator && sc.ideaHas) {
-		separator = sc.ideaHasOperator === 'and' ? ',' : '|';
-		params += `&ideaHas=${sc.ideaHas.join(separator)}`;
+	if (sc.ideaHas) {
+		params += `&ideaHas=${sc.ideaHas.join(',')}`;
 	}
-
-	if (sc.ideaDoesNotHaveOperator && sc.ideaDoesNotHave) {
-		separator = sc.ideaDoesNotHaveOperator === 'and' ? ',' : '|';
-		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave.join(separator)}`;
+	if (sc.ideaDoesNotHave) {
+		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
 	}
-
 	const url = encodeURI(`http://localhost:5555/ideas?${params}`);
 	return fetch(url, {
 		method: 'GET',
