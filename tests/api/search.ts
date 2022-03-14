@@ -66,34 +66,86 @@ describe('searching expressions', () => {
 		await testSearch(sc, [i2], [['fr ipsum sed']], fr.id);
 	});
 
-	test('searching for ideas that contain specific languages', async () => {
+	test('searching for ideas that contain specific languages but miss another', async () => {
 		const fr = await addLanguage('français');
 		const en = await addLanguage('anglais');
 		const es = await addLanguage('español');
 		const it = await addLanguage('italiano');
 		const de = await addLanguage('deutsch');
+
+		// Idea 1: fr, en, es, de, it
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id};
 		const en1: ExpressionForAdding = {text: 'hello', languageId: en.id};
 		const es1: ExpressionForAdding = {text: 'buenos días', languageId: es.id};
+		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: es.id};
 		const it1: ExpressionForAdding = {text: 'buongiorno', languageId: it.id};
+		const i1 = await addIdea({ee: [fr1, en1, es1, de1, it1]});
+
+		// Idea 2: fr, en, es, de
 		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id};
 		const en2: ExpressionForAdding = {text: 'good night', languageId: en.id};
 		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
 		const de2: ExpressionForAdding = {text: 'gute Natch', languageId: de.id};
-		const es3: ExpressionForAdding = {text: 'buenas tardes', languageId: es.id};
-		const i1 = await addIdea({ee: [fr1, en1, es1, it1]});
 		const i2 = await addIdea({ee: [fr2, en2, es2, de2]});
-		const i3 = await addIdea({ee: [es3]});
+
+		// Idea 3: fr, en, es
+		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
+		const en3: ExpressionForAdding = {text: 'good evening', languageId: en.id};
+		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
+		const i3 = await addIdea({ee: [fr3, en3, es3]});
 
 		// All ideas containing Spanish and French
 		const sc: SearchContext = {
 			pattern: '',
 			ideaHas: [es.id, fr.id],
 		};
-		await testSearch(
-			sc,
+		await testSearch(sc,
+			[i1, i2, i3],
+			[i1.ee.map(e => e.text),
+				i2.ee.map(e => e.text),
+				i3.ee.map(e => e.text)],
+		);
+
+		// All ideas containing Spanish and French but not Italian
+		sc.ideaHas = [es.id, fr.id];
+		sc.ideaDoesNotHave = it.id;
+		await testSearch(sc,
+			[i2, i3],
+			[i2.ee.map(e => e.text),
+				i3.ee.map(e => e.text)],
+		);
+
+		// All ideas containing Spanish and German
+		sc.ideaHas = [es.id, de.id];
+		sc.ideaDoesNotHave = undefined;
+		await testSearch(sc,
 			[i1, i2],
-			[i1.ee.map(e => e.text), i2.ee.map(e => e.text)],
+			[i1.ee.map(e => e.text),
+				i2.ee.map(e => e.text)],
+		);
+
+		// All ideas containing Spanish and English but not German
+		sc.ideaHas = [es.id, en.id];
+		sc.ideaDoesNotHave = de.id;
+		await testSearch(sc,
+			[i3],
+			[i3.ee.map(e => e.text)],
+		);
+
+		// All ideas containing Italian
+		sc.ideaHas = [it.id];
+		sc.ideaDoesNotHave = undefined;
+		await testSearch(sc,
+			[i1],
+			[i1.ee.map(e => e.text)],
+		);
+
+		// All ideas containing French but not English
+		sc.ideaHas = [fr.id];
+		sc.ideaDoesNotHave = en.id;
+		await testSearch(sc,
+			[],
+			[],
 		);
 	});
 });
