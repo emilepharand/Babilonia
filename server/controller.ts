@@ -91,23 +91,36 @@ export default class Controller {
 	}
 
 	public static async search(req: Request, res: Response): Promise<void> {
-		const pattern = (req.query.pattern as string) ?? undefined;
-		const language = req.query.language ? parseInt(req.query.language as string, 10) : undefined;
-		const strict = req.query.strict as true | undefined;
-		let ideaHas;
-		if (req.query.ideaHas) {
-			ideaHas = (req.query.ideaHas as string).split(',').map(i => parseInt(i, 10));
+		const sc: SearchContext = {};
+		sc.pattern = (req.query.pattern as string) ?? undefined;
+		sc.strict = req.query.strict as true | undefined;
+		if (req.query.language) {
+			if (!await Controller.validateNumberInRequest(req.query.language as string, res)) {
+				return;
+			}
+			sc.language = parseInt(req.query.language as string, 10);
 		}
-		const ideaDoesNotHave = req.query.ideaDoesNotHave
-			? parseInt(req.query.ideaDoesNotHave as string, 10)
-			: undefined;
-		const sc: SearchContext = {
-			pattern,
-			language,
-			strict,
-			ideaHas,
-			ideaDoesNotHave,
-		};
+		if (req.query.ideaHas) {
+			const ideaHasArray = (req.query.ideaHas as string).split(',');
+			const promises: Promise<boolean>[] = [];
+			ideaHasArray.forEach(ideaHas => promises.push(Controller.validateNumberInRequest(ideaHas, res)));
+			if (!(await Promise.all(promises)).every(validNumber => validNumber)) {
+				return;
+			}
+			sc.ideaHas = (req.query.ideaHas as string).split(',').map(i => parseInt(i, 10));
+		}
+		if (req.query.ideaDoesNotHave) {
+			if (!await Controller.validateNumberInRequest(req.query.ideaDoesNotHave as string, res)) {
+				return;
+			}
+			sc.ideaDoesNotHave = parseInt(req.query.ideaDoesNotHave as string, 10);
+		}
+		// Nothing to search
+		if (Object.values(sc).every(el => el === undefined)) {
+			res.status(400);
+			res.end();
+			return;
+		}
 		const ideas = await search.executeSearch(sc);
 		res.send(ideas);
 	}
@@ -143,9 +156,7 @@ export default class Controller {
 	}
 
 	private static async validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
-		if (Number.isNaN(Number(req.params.id))) {
-			res.status(400);
-			res.end();
+		if (!await this.validateNumberInRequest(req.params.id, res)) {
 			return false;
 		}
 		const ideaId = parseInt(req.params.id, 10);
@@ -158,14 +169,21 @@ export default class Controller {
 	}
 
 	private static async validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
-		if (Number.isNaN(Number(req.params.id))) {
-			res.status(400);
-			res.end();
+		if (!await this.validateNumberInRequest(req.params.id, res)) {
 			return false;
 		}
 		const ideaId = parseInt(req.params.id, 10);
 		if (!(await im.ideaExists(ideaId))) {
 			res.status(404);
+			res.end();
+			return false;
+		}
+		return true;
+	}
+
+	private static async validateNumberInRequest(expectedNumber: string, res: Response): Promise<boolean> {
+		if (Number.isNaN(Number(expectedNumber))) {
+			res.status(400);
 			res.end();
 			return false;
 		}

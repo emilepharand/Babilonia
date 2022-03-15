@@ -1,4 +1,11 @@
-import {addIdea, addLanguage, deleteEverything, search} from '../utils/utils';
+import {
+	addIdea,
+	addLanguage,
+	deleteEverything,
+	search,
+	searchAndGetResponse,
+	searchRawParamsAndGetResponse,
+} from '../utils/utils';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {Idea} from '../../server/model/ideas/idea';
 import {SearchContext} from '../../server/model/search/searchContext';
@@ -72,21 +79,24 @@ describe('searching expressions', () => {
 		const es = await addLanguage('español');
 		const it = await addLanguage('italiano');
 		const de = await addLanguage('deutsch');
+		const pt = await addLanguage('português');
 
-		// Idea 1: fr, en, es, de, it
+		// Idea 1: fr, en, es, de, it, pt
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id};
 		const en1: ExpressionForAdding = {text: 'hello', languageId: en.id};
 		const es1: ExpressionForAdding = {text: 'buenos días', languageId: es.id};
 		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id};
+		const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: pt.id};
 		const it1: ExpressionForAdding = {text: 'buongiorno', languageId: it.id};
-		const i1 = await addIdea({ee: [fr1, en1, es1, de1, it1]});
+		const i1 = await addIdea({ee: [fr1, en1, es1, de1, pt1, it1]});
 
-		// Idea 2: fr, en, es, de
+		// Idea 2: fr, en, es, de, pt
 		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id};
 		const en2: ExpressionForAdding = {text: 'good night', languageId: en.id};
 		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
+		const pt2: ExpressionForAdding = {text: 'boa noite', languageId: pt.id};
 		const de2: ExpressionForAdding = {text: 'gute Natch', languageId: de.id};
-		const i2 = await addIdea({ee: [fr2, en2, es2, de2]});
+		const i2 = await addIdea({ee: [fr2, en2, es2, pt2, de2]});
 
 		// Idea 3: fr, en, es
 		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
@@ -99,7 +109,6 @@ describe('searching expressions', () => {
 
 		// All ideas containing Spanish and French
 		const sc: SearchContext = {
-			pattern: '',
 			ideaHas: [es.id, fr.id],
 		};
 		await testSearch(sc,
@@ -150,5 +159,55 @@ describe('searching expressions', () => {
 			[],
 			[],
 		);
+
+		// Expressions in French matching "b" in languages containing Portuguese
+		sc.pattern = 'b';
+		sc.strict = undefined;
+		sc.language = fr.id;
+		sc.ideaHas = [pt.id];
+		sc.ideaDoesNotHave = undefined;
+		await testSearch(sc,
+			[i1, i2],
+			[i1.ee.map(e => e.text), i2.ee.map(e => e.text)],
+		);
+
+		// Expressions in French matching "b" in languages containing Portuguese but not Italian
+		sc.pattern = 'b';
+		sc.strict = undefined;
+		sc.language = fr.id;
+		sc.ideaHas = [pt.id];
+		sc.ideaDoesNotHave = it.id;
+		await testSearch(sc,
+			[i2],
+			[i2.ee.map(e => e.text)],
+		);
+	});
+
+	// Pattern?: string;
+	// strict?: true;
+	// language?: number;
+	// ideaHas?: number[];
+	// ideaDoesNotHave?: number;
+
+	describe('searching for expressions erroneously', () => {
+		test('no value set', async () => {
+			const r = await searchAndGetResponse({});
+			expect(r.status).toEqual(400);
+		});
+
+		test('language is not numeric', async () => {
+			const r = await searchRawParamsAndGetResponse('language=a');
+			expect(r.status).toEqual(400);
+		});
+
+		test('ideaHas is not numeric', async () => {
+			const r = await searchRawParamsAndGetResponse('ideaHas=a');
+			expect(r.status).toEqual(400);
+		});
+
+		test('ideaDoesNotHave is not numeric', async () => {
+			const r = await searchRawParamsAndGetResponse('ideaDoesNotHave=a');
+			expect(r.status).toEqual(400);
+		});
 	});
 });

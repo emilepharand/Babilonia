@@ -118,6 +118,13 @@ export async function fetchIdea(id: number): Promise<Idea> {
 	return (await (await fetchIdeaAndGetResponse(id)).json()) as Idea;
 }
 
+export async function searchRawParamsAndGetResponse(params: string): Promise<Response> {
+	const url = encodeURI(`http://localhost:5555/ideas?${params}`);
+	return fetch(url, {
+		method: 'GET',
+	});
+}
+
 export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
 	let params;
 	if (sc.pattern) {
