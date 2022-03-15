@@ -36,10 +36,11 @@ export default class SearchHandler {
 		}
 		if (sc.ideaHas) {
 			whereCondition.push(`ideaId in
-			                      (select distinct ideaId from expressions
-                            where languageId in (${sc.ideaHas.join(',')})
-                            group by ideaId
-                            having (count(ideaId) >= ${sc.ideaHas.length}))`);
+			                      (select ideaId from
+(select distinct ideaId, languageId from expressions
+where languageId in (${sc.ideaHas.join(',')}))
+group by ideaId
+having count(ideaId) >= ${sc.ideaHas.length})`);
 		}
 		if (sc.ideaDoesNotHave) {
 			whereCondition.push(`ideaId not in (select distinct ideaId from expressions where languageId=${sc.ideaDoesNotHave})`);

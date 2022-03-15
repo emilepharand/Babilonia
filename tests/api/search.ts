@@ -77,7 +77,7 @@ describe('searching expressions', () => {
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id};
 		const en1: ExpressionForAdding = {text: 'hello', languageId: en.id};
 		const es1: ExpressionForAdding = {text: 'buenos días', languageId: es.id};
-		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: es.id};
+		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id};
 		const it1: ExpressionForAdding = {text: 'buongiorno', languageId: it.id};
 		const i1 = await addIdea({ee: [fr1, en1, es1, de1, it1]});
 
@@ -90,9 +90,12 @@ describe('searching expressions', () => {
 
 		// Idea 3: fr, en, es
 		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
+		const fr4: ExpressionForAdding = {text: 'bonsoir 2', languageId: fr.id};
 		const en3: ExpressionForAdding = {text: 'good evening', languageId: en.id};
+		const en4: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
 		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
-		const i3 = await addIdea({ee: [fr3, en3, es3]});
+		const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
+		const i3 = await addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
 
 		// All ideas containing Spanish and French
 		const sc: SearchContext = {
