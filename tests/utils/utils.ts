@@ -152,6 +152,16 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 	return (await (await searchAndGetResponse(sc)).json()) as Idea[];
 }
 
+export async function rawNextPracticeIdea(): Promise<Response> {
+	return fetch('http://localhost:5555/practice-ideas/next', {
+		method: 'GET',
+	});
+}
+
+export async function nextPracticeIdea(): Promise<Idea> {
+	return (await (await rawNextPracticeIdea()).json()) as Idea;
+}
+
 export async function deleteEverything(): Promise<Response> {
 	return fetch('http://localhost:5555/everything', {method: 'DELETE'});
 }

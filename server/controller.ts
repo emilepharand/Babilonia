@@ -15,6 +15,14 @@ const search = DataServiceProvider.getSearchHandler();
 // It must validate arguments before calling methods of the managers
 // It is static because it doesn't hold any state
 export default class Controller {
+	public static async getNextPracticeIdea(req: Request, res: Response): Promise<void> {
+		if ((await im.countIdeas()) === 0) {
+			res.status(404);
+			res.end();
+		}
+		res.send(JSON.stringify(await pm.getNextIdea()));
+	}
+
 	public static async getLanguageById(req: Request, res: Response): Promise<void> {
 		if (!(await Controller.validateLanguageIdInRequest(req, res))) {
 			return;
@@ -56,15 +64,6 @@ export default class Controller {
 
 		const ll = await lm.editLanguages(req.body);
 		res.send(JSON.stringify(ll));
-	}
-
-	public static async getNextIdea(req: Request, res: Response): Promise<void> {
-		if ((await im.countIdeas()) === 0) {
-			res.status(404);
-			res.end();
-		}
-
-		res.send(JSON.stringify(await pm.getNextIdea()));
 	}
 
 	public static async getLanguages(req: Request, res: Response): Promise<void> {

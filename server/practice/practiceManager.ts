@@ -1,6 +1,7 @@
 import {Database} from 'sqlite';
-import {Idea} from '../model/ideas/idea';
 import IdeaManager from '../model/ideas/ideaManager';
+import {Idea} from '../model/ideas/idea';
+import {ideaManager} from '../model/dataServiceProvider';
 
 // Knows which ideas need to be provided to the user to practice
 // Handles the logic for providing ideas to practice
@@ -17,23 +18,12 @@ export default class PracticeManager {
 		this.db = db;
 	}
 
-	async getNextIdea(): Promise<Idea> {
-		return this.nextIdeaId().then(id => this.ideaManager.getIdea(id));
-	}
-
-	private async nextIdeaId(): Promise<number> {
-		let idea = await this.db.get('select id from ideas limit 1 offset ?', this.offset);
-		// No more ideas
+	public async getNextIdea(): Promise<Idea> {
+		const idea = await this.db.get('select * from ideas order by random() limit 1');
+		// There are no ideas
 		if (idea === undefined) {
-			this.offset = 0;
-			idea = await this.db.get('select id from ideas limit 1 offset ?', this.offset);
-			if (idea === undefined) {
-				// There are no ideas in database
-				return Promise.reject();
-			}
+			return Promise.reject();
 		}
-
-		this.offset += 1;
-		return idea.id;
+		return ideaManager.getIdea(idea.id);
 	}
 }
