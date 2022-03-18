@@ -51,6 +51,7 @@ export default class DataServiceProvider {
         + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
         + ')',
 		);
+		practiceManager.clear();
 	}
 
 	public static getIdeaManager(): IdeaManager {

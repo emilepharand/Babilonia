@@ -7,7 +7,7 @@ import {ideaManager} from '../model/dataServiceProvider';
 // Handles the logic for providing ideas to practice
 // Provides ideas for the user to practice them
 export default class PracticeManager {
-	private offset = 0;
+	private ideasAlreadyGiven = new Set<number>();
 
 	private db: Database;
 
@@ -19,11 +19,16 @@ export default class PracticeManager {
 	}
 
 	public async getNextIdea(): Promise<Idea> {
-		const idea = await this.db.get('select * from ideas order by random() limit 1');
-		// There are no ideas
+		let idea = await this.db.get(`select * from ideas where id not in (${Array.from(this.ideasAlreadyGiven).join(',')}) order by random() limit 1`);
 		if (idea === undefined) {
-			return Promise.reject();
+			this.ideasAlreadyGiven.clear();
+			idea = await this.db.get(`select * from ideas where id not in (${Array.from(this.ideasAlreadyGiven).join(',')}) order by random() limit 1`);
 		}
+		this.ideasAlreadyGiven.add(idea.id);
 		return ideaManager.getIdea(idea.id);
+	}
+
+	public clear(): void {
+		this.ideasAlreadyGiven.clear();
 	}
 }
