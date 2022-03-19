@@ -2,28 +2,30 @@
   <div class="practice">
     <h1>Practice</h1>
     <p v-if="noIdeas">No ideas have been found.</p>
-    <table>
-      <tr v-for="(e, i) in idea.ee" :key="e.id">
-        <tbody v-if="e.language.isPractice">
-        <td>{{ e.language.name }}</td>
-        <td>
-          <input v-if="i === 0" type="text"
-                 v-model="e.texts[0]" disabled/>
-          <input v-else type="text"
-                 v-model="typed[i]"
-                 :class="{'partial-match': isPartialMatch(i, e.texts),
-                 'full-match': isFullMatch(i, e.texts),
-                 'no-match': isNoMatch(i, e.texts),
-                 }"/>
-        </td>
-        <td><input type="button" value="Hint" @click="hint(i, e.texts[0])"></td>
-        </tbody>
-      </tr>
-    </table>
-    <div>
-      <button @click="next()">Next</button>
-      <button @click="submit()">Submit</button>
-    </div>
+    <div v-else>
+        <table>
+          <tr v-for="(e, i) in idea.ee" :key="e.id">
+            <tbody v-if="e.language.isPractice">
+            <td>{{ e.language.name }}</td>
+            <td>
+              <input v-if="i === 0" type="text"
+                     v-model="e.texts[0]" disabled/>
+              <input v-else type="text"
+                     v-model="typed[i]"
+                     :class="{'partial-match': isPartialMatch(i, e.texts),
+                     'full-match': isFullMatch(i, e.texts),
+                     'no-match': isNoMatch(i, e.texts),
+                     }"/>
+            </td>
+            <td><input type="button" value="Hint" @click="hint(i, e.texts[0])"></td>
+            </tbody>
+          </tr>
+        </table>
+        <div>
+          <button @click="next()">Next</button>
+          <button @click="submit()">Submit</button>
+        </div>
+      </div>
   </div>
 </template>
 
@@ -43,8 +45,9 @@ export default defineComponent({
 		};
 	},
 	async created() {
-		this.idea = await Api.getNextIdea();
-		if (JSON.stringify(this.idea) === '{}') {
+		try {
+			this.idea = await Api.getNextIdea();
+		} catch {
 			this.noIdeas = true;
 		}
 	},
@@ -130,3 +133,4 @@ table {
   color: darkred;
 }
 </style>
+

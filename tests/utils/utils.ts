@@ -163,10 +163,10 @@ export async function nextPracticeIdea(): Promise<Idea> {
 	return (await (await rawNextPracticeIdea()).json()) as Idea;
 }
 
-export async function getStats(): Promise<Promise<NumberIdeasInLanguage[]>> {
+export async function getStats(): Promise<NumberIdeasInLanguage[]> {
 	return await (await fetch('http://localhost:5555/stats', {
 		method: 'GET',
-	})).json() as Promise<NumberIdeasInLanguage[]>;
+	})).json() as NumberIdeasInLanguage[];
 }
 
 export async function deleteEverything(): Promise<Response> {

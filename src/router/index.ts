@@ -7,35 +7,25 @@ const routes: Array<RouteRecordRaw> = [
 		component: () => import(/* webpackChunkName: "AppDashboard" */ '../views/AppDashboard.vue'),
 	},
 	{
-		path: '/ideas/browse',
-		name: 'Browse',
-		component: () => import(/* webpackChunkName: "BrowseIdeas" */ '../views/BrowseIdeas.vue'),
+		path: '/practice',
+		name: 'Practice',
+		component: () => import(/* webpackChunkName: "PracticeIdeas" */ '../views/PracticeIdeas.vue'),
 	},
 	{
-		path: '/manage/ideas/add',
+		path: '/ideas/add',
 		name: 'AddIdea',
 		component: () => import(/* webpackChunkName: "AddIdea" */ '../views/AddIdea.vue'),
 	},
 	{
-		path: '/manage/ideas',
-		name: 'Ideas',
-		component: () => import(/* webpackChunkName: "IdeasDunno" */ '../views/IdeasDunno.vue'),
+		path: '/ideas/search',
+		name: 'SearchIdeas',
+		component: () => import(/* webpackChunkName: "SearchIdeas" */ '../views/SearchIdeas.vue'),
 	},
 	{
-		path: '/manage/languages',
+		path: '/languages',
 		name: 'Languages',
 		component: () =>
 			import(/* webpackChunkName: "ManageLanguages" */ '../views/ManageLanguages.vue'),
-	},
-	{
-		path: '/idea/edit/:id',
-		name: 'Edit',
-		component: () => import(/* webpackChunkName: "EditIdeas" */ '../views/EditIdeas.vue'),
-	},
-	{
-		path: '/ideas/practice',
-		name: 'Practice',
-		component: () => import(/* webpackChunkName: "PracticeIdeas" */ '../views/PracticeIdeas.vue'),
 	},
 ];
 
@@ -46,3 +36,4 @@ const router = createRouter({
 });
 
 export default router;
+

@@ -1,10 +1,17 @@
 import {Database} from 'sqlite';
-import {Language} from '../model/languages/language';
+import {getEmptyLanguage, Language} from '../model/languages/language';
 import LanguageManager from '../model/languages/languageManager';
 
 export interface NumberIdeasInLanguage {
   language: Language;
   count: number;
+}
+
+export function getEmptyNumberIdeasInLanguage(): NumberIdeasInLanguage[] {
+	return [{
+		language: getEmptyLanguage(),
+		count: 0,
+	}];
 }
 
 export class Stats {

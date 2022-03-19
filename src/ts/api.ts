@@ -1,7 +1,7 @@
 import {Idea} from '../../server/model/ideas/idea';
 import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
-import {Stats} from '../../server/stats/stats';
+import {NumberIdeasInLanguage} from '../../server/stats/stats';
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
@@ -52,9 +52,11 @@ export default class Api {
 	}
 
 	static async getNextIdea(): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/next`;
-		// Alert(url);
+		const url = `${process.env.VUE_APP_API_BASE_URL}/practice-ideas/next`;
 		const res = await fetch(url);
+		if (res.status === 404) {
+			return Promise.reject();
+		}
 		return res.json();
 	}
 
@@ -90,7 +92,7 @@ export default class Api {
 		return response.json();
 	}
 
-	public static async getStats(): Promise<Stats> {
+	public static async getStats(): Promise<NumberIdeasInLanguage[]> {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/stats`;
 		const response = await fetch(url, {
 			method: 'GET',

@@ -1,5 +1,14 @@
 import Ajv from 'ajv';
 
+export function getEmptyLanguage(): Language {
+	return {
+		id: -1,
+		name: '',
+		ordering: 0,
+		isPractice: false,
+	};
+}
+
 export interface Language {
   id: number;
   name: string;
