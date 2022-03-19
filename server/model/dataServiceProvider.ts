@@ -80,3 +80,7 @@ export default class DataServiceProvider {
 		return stats;
 	}
 }
+
+if (isTestMode) {
+	await DataServiceProvider.deleteAllData();
+}

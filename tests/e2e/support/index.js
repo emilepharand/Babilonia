@@ -15,6 +15,17 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands';
-
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+import failOnConsoleError, {consoleType} from 'cypress-fail-on-console-error';
+
+const config = {
+	excludeMessages: ['foo', '^some bar-regex.*'],
+	includeConsoleTypes: [
+		consoleType.ERROR,
+		consoleType.WARN,
+		consoleType.INFO,
+	],
+};
+
+failOnConsoleError(config);

@@ -23,9 +23,19 @@ const routes: Array<RouteRecordRaw> = [
 	},
 	{
 		path: '/languages',
-		name: 'Languages',
+		name: 'ManageLanguages',
 		component: () =>
 			import(/* webpackChunkName: "ManageLanguages" */ '../views/ManageLanguages.vue'),
+	},
+	{
+		path: '/help',
+		name: 'Help',
+		component: () => import(/* webpackChunkName: "AppHelp" */ '../views/AppHelp.vue'),
+	},
+	{
+		path: '/settings',
+		name: 'AppSettings',
+		component: () => import(/* webpackChunkName: "AppSettings" */ '../views/AppSettings.vue'),
 	},
 ];
 
@@ -36,4 +46,3 @@ const router = createRouter({
 });
 
 export default router;
-
