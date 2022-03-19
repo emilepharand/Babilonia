@@ -29,6 +29,8 @@ export default class Routes {
 		this.router.delete('/ideas/:id', Controller.deleteIdea);
 		// Practice
 		this.router.get('/practice-ideas/next', Controller.getNextPracticeIdea);
+		// Stats
+		this.router.get('/stats', Controller.getStats);
 		// Everything
 		this.router.delete('/everything', Controller.deleteAllData);
 	}

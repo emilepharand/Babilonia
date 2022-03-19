@@ -9,7 +9,6 @@ import {IdeaForAdding} from './ideaForAdding';
 // Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager {
 	private db: Database;
-
 	private lm: LanguageManager;
 
 	constructor(db: Database, lm: LanguageManager) {

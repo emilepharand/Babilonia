@@ -8,6 +8,7 @@ const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
 const dv = DataServiceProvider.getInputValidator();
+const stats = DataServiceProvider.getStats();
 const search = DataServiceProvider.getSearchHandler();
 
 // This is the contact point for the front-end and the back-end
@@ -15,6 +16,11 @@ const search = DataServiceProvider.getSearchHandler();
 // It must validate arguments before calling methods of the managers
 // It is static because it doesn't hold any state
 export default class Controller {
+	public static async getStats(req: Request, res: Response): Promise<void> {
+		const ideasPerLanguage = await stats.getIdeasPerLanguage();
+		res.send(JSON.stringify(ideasPerLanguage));
+	}
+
 	public static async getNextPracticeIdea(req: Request, res: Response): Promise<void> {
 		if ((await im.countIdeas()) === 0) {
 			res.status(404);
@@ -23,6 +29,7 @@ export default class Controller {
 		try {
 			res.send(JSON.stringify(await pm.getNextIdea()));
 		} catch {
+			// There are no practiceable ideas
 			res.status(404);
 			res.end();
 		}
@@ -32,7 +39,6 @@ export default class Controller {
 		if (!(await Controller.validateLanguageIdInRequest(req, res))) {
 			return;
 		}
-
 		const languageId = parseInt(req.params.id, 10);
 		const language = await lm.getLanguage(languageId);
 		res.send(language);
@@ -42,7 +48,6 @@ export default class Controller {
 		if (!(await Controller.validateLanguageIdInRequest(req, res))) {
 			return;
 		}
-
 		const languageId = parseInt(req.params.id, 10);
 		await lm.deleteLanguage(languageId);
 		res.end();
@@ -54,7 +59,6 @@ export default class Controller {
 			res.end();
 			return;
 		}
-
 		const l: Language = await lm.addLanguage(req.body.name);
 		res.status(201);
 		res.send(JSON.stringify(l));
@@ -67,7 +71,7 @@ export default class Controller {
 			return;
 		}
 		const ll = await lm.editLanguages(req.body);
-		// Reset practice manager because practiceable ideas may change
+		// Reset practice manager because practiceable ideas may change after editing languages
 		pm.clear();
 		res.send(JSON.stringify(ll));
 	}

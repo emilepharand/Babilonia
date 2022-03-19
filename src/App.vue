@@ -1,5 +1,5 @@
 <template>
-  <main class="container">
+  <div>
     <div class="container">
       <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
@@ -8,7 +8,7 @@
           </router-link>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <router-link to="/ideas/dashboard" class="nav-link">Dashboard
+              <router-link to="/" class="nav-link">Dashboard
               </router-link>
             </li>
             <li class="nav-item">
@@ -40,8 +40,10 @@
         </div>
       </nav>
     </div>
-    <router-view/>
-  </main>
+    <main class="container">
+      <router-view/>
+    </main>
+  </div>
 </template>
 
 <style scoped>

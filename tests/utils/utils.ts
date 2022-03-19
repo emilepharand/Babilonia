@@ -3,6 +3,7 @@ import {Idea} from '../../server/model/ideas/idea';
 import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
+import {NumberIdeasInLanguage} from '../../server/stats/stats';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -160,6 +161,12 @@ export async function rawNextPracticeIdea(): Promise<Response> {
 
 export async function nextPracticeIdea(): Promise<Idea> {
 	return (await (await rawNextPracticeIdea()).json()) as Idea;
+}
+
+export async function getStats(): Promise<Promise<NumberIdeasInLanguage[]>> {
+	return await (await fetch('http://localhost:5555/stats', {
+		method: 'GET',
+	})).json() as Promise<NumberIdeasInLanguage[]>;
 }
 
 export async function deleteEverything(): Promise<Response> {

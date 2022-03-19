@@ -183,12 +183,6 @@ describe('searching expressions', () => {
 		);
 	});
 
-	// Pattern?: string;
-	// strict?: true;
-	// language?: number;
-	// ideaHas?: number[];
-	// ideaDoesNotHave?: number;
-
 	describe('searching for expressions erroneously', () => {
 		test('no value set', async () => {
 			const r = await searchAndGetResponse({});
