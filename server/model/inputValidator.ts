@@ -22,37 +22,31 @@ export default class InputValidator {
 		if (!(toValidate instanceof Array)) {
 			return false;
 		}
-
 		const ll = toValidate as Language[];
 		// Each language is valid
 		if (ll.some(l => !validate(l))) {
 			return false;
 		}
-
 		// No language name is blank
 		if (ll.some(l => l.name.trim() === '')) {
 			return false;
 		}
-
 		// There are no duplicate language ids
 		const languageIds = new Set(Array.from(ll.values(), l => l.id));
 		if ((await this.lm.countLanguages()) !== ll.length) {
 			return false;
 		}
-
 		// There are no duplicate language names
 		const names = new Set(Array.from(ll.values(), l => l.name));
 		if (names.size !== ll.length) {
 			return false;
 		}
-
 		// All languages exist
 		const promises: Promise<boolean>[] = [];
 		languageIds.forEach(id => promises.push(this.lm.languageIdExists(id)));
 		if (!(await Promise.all(promises)).every(exist => exist)) {
 			return false;
 		}
-
 		// Ordering is valid
 		const orderings = new Set<number>();
 		ll.forEach(l => orderings.add(l.ordering));
@@ -61,7 +55,6 @@ export default class InputValidator {
 				return false;
 			}
 		}
-
 		return true;
 	}
 

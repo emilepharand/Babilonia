@@ -19,7 +19,7 @@ async function initDb(): Promise<Database> {
 export const db: Database = await initDb();
 export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
-export const practiceManager = new PracticeManager(db, ideaManager);
+export const practiceManager = new PracticeManager(db, ideaManager, languageManager);
 export const inputValidator = new InputValidator(ideaManager, languageManager);
 export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
 

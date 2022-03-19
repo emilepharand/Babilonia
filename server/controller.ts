@@ -20,7 +20,12 @@ export default class Controller {
 			res.status(404);
 			res.end();
 		}
-		res.send(JSON.stringify(await pm.getNextIdea()));
+		try {
+			res.send(JSON.stringify(await pm.getNextIdea()));
+		} catch {
+			res.status(404);
+			res.end();
+		}
 	}
 
 	public static async getLanguageById(req: Request, res: Response): Promise<void> {
@@ -61,8 +66,9 @@ export default class Controller {
 			res.end();
 			return;
 		}
-
 		const ll = await lm.editLanguages(req.body);
+		// Reset practice manager because practiceable ideas may change
+		pm.clear();
 		res.send(JSON.stringify(ll));
 	}
 

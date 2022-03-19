@@ -9,6 +9,7 @@ module.exports = {
       useESM: true,
     },
   },
+  testTimeout: 9999999,
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
