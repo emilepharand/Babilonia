@@ -27,39 +27,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent} from 'vue';
 import Api from '@/ts/api';
 
 export default defineComponent({
-  name: 'Languages',
-  components: {},
-  data() {
-    return {
-      languages: [],
-      newLanguage: {
-        id: -1,
-        name: '',
-        ordering: 5,
-        isPractice: true,
-      },
-    };
-  },
-  methods: {
-    change() {
-      this.languages.forEach(
-        // eslint-disable-next-line no-return-await
-        async (lang) => await Api.editLanguage(lang),
-      );
-      alert(JSON.stringify(this.languages));
-    },
-    async addNewLanguage() {
-      const r = await Api.addLanguage(this.newLanguage);
-      alert(JSON.stringify(r));
-    },
-  },
-  async created() {
-    const res = await fetch('http://localhost:5000/api/languages');
-    this.languages = await res.json();
-  },
+	name: 'ManageLanguages',
+	components: {},
+	data() {
+		return {
+			languages: [],
+			newLanguage: {
+				id: -1,
+				name: '',
+				ordering: 5,
+				isPractice: true,
+			},
+		};
+	},
+	methods: {
+		change() {
+			this.languages.forEach(
+				// eslint-disable-next-line no-return-await
+				async lang => await Api.editLanguage(lang),
+			);
+		},
+		async addNewLanguage() {
+			await Api.addLanguage(this.newLanguage);
+		},
+	},
+	async created() {
+		const res = await fetch('http://localhost:5000/api/languages');
+		this.languages = await res.json();
+	},
 });
 </script>

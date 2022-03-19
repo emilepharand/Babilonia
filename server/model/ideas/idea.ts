@@ -13,9 +13,9 @@ export class Idea {
 	}
 }
 
-export function emptyIdea(): Idea {
+export function getEmptyIdea(): Idea {
 	return {
-		id: 0,
+		id: -1,
 		ee: [],
 	};
 }

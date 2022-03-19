@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {defineComponent} from 'vue';
 
 export default defineComponent({
-  name: 'Ideas',
-  components: {},
-  data() {
-    return {};
-  },
-  methods: {},
+	name: 'IdeasDunno',
+	components: {},
+	data() {
+		return {};
+	},
+	methods: {},
 });
 </script>

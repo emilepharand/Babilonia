@@ -14,24 +14,24 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { Idea } from '../../server/model/ideas/idea';
+import {defineComponent} from 'vue';
+import {Idea} from '../../server/model/ideas/idea';
 
 export default defineComponent({
-  name: 'IdeaForm',
-  props: {
-    title: String,
-    idea: Idea,
-  },
-  data() {
-    return {
-      languages: [],
-    };
-  },
-  async created() {
-    const res = await fetch('http://localhost:5000/api/languages');
-    this.languages = await res.json();
-  },
-  emits: ['addRows'],
+	name: 'IdeaForm',
+	props: {
+		title: String,
+		idea: Idea,
+	},
+	data() {
+		return {
+			languages: [],
+		};
+	},
+	async created() {
+		const res = await fetch('http://localhost:5000/api/languages');
+		this.languages = await res.json();
+	},
+	emits: ['addRows'],
 });
 </script>
