@@ -8,26 +8,23 @@ export default class Api {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/${ideaId}`;
 		const response = await fetch(url, {
 			method: 'GET',
-			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
-		const r = await response.json();
-		return new Idea({id: r.id, ee: r.ee});
+		return (await response.json()) as Idea;
 	}
 
 	static async editIdea(idea: Idea): Promise<Idea> {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/edit/${idea.id}`;
 		const response = await fetch(url, {
 			method: 'POST',
-			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(idea),
 		});
-		return response.json();
+		return (await response.json()) as Idea;
 	}
 
 	static async deleteIdea(ideaId: number): Promise<unknown> {
@@ -42,13 +39,12 @@ export default class Api {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/add`;
 		const response = await fetch(url, {
 			method: 'POST',
-			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify(ifa),
 		});
-		return response.json();
+		return (await response.json()) as Idea;
 	}
 
 	static async getNextIdea(): Promise<Idea> {
@@ -57,7 +53,7 @@ export default class Api {
 		if (res.status === 404) {
 			return Promise.reject();
 		}
-		return res.json();
+		return (await res.json()) as Idea;
 	}
 
 	public static async addLanguage(newLang: Language): Promise<Language> {
@@ -69,7 +65,7 @@ export default class Api {
 			},
 			body: JSON.stringify(newLang),
 		});
-		return response.json();
+		return (await response.json()) as Language;
 	}
 
 	public static async editLanguage(lang: Language): Promise<Language> {
@@ -81,7 +77,7 @@ export default class Api {
 			},
 			body: JSON.stringify(lang),
 		});
-		return response.json();
+		return (await response.json()) as Language;
 	}
 
 	public static async getLanguage(id: number): Promise<Language> {
@@ -89,7 +85,7 @@ export default class Api {
 		const response = await fetch(url, {
 			method: 'GET',
 		});
-		return response.json();
+		return (await response.json()) as Language;
 	}
 
 	public static async getStats(): Promise<NumberIdeasInLanguage[]> {
@@ -97,6 +93,18 @@ export default class Api {
 		const response = await fetch(url, {
 			method: 'GET',
 		});
-		return response.json();
+		return (await response.json()) as NumberIdeasInLanguage[];
+	}
+
+	static async getLanguages(): Promise<Language[]> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
+		const response = await fetch(url, {
+			method: 'GET',
+		});
+		return (await response.json()) as Language[];
+	}
+
+	static async deleteEverything(): Promise<void> {
+		await fetch('http://localhost:5555/everything', {method: 'DELETE'});
 	}
 }

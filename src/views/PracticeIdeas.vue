@@ -1,7 +1,9 @@
 <template>
-  <div class="practice">
+  <div class="view practice">
     <h1>Practice</h1>
-    <p v-if="noIdeas">No ideas have been found.</p>
+    <div v-if="noIdeas">
+      <NotEnoughData noIdea />
+    </div>
     <div v-else>
         <table>
           <tr v-for="(e, i) in idea.ee" :key="e.id">
@@ -32,13 +34,15 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import Api from '@/ts/api';
-import {getEmptyIdea} from '../../server/model/ideas/idea';
+import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
+import NotEnoughData from '@/components/NotEnoughData.vue';
 
 export default defineComponent({
 	name: 'PracticeIdeas',
+	components: {NotEnoughData},
 	data() {
 		return {
-			idea: getEmptyIdea(),
+			idea: getEmptyIdeaNoAsync(),
 			typed: [''],
 			done: [false],
 			noIdeas: false,

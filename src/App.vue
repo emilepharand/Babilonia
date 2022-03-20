@@ -34,12 +34,41 @@
       </nav>
     </div>
     <main class="container">
-      <router-view/>
+      <router-view v-slot="{ Component }">
+        <transition name="bounce">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </main>
   </div>
 </template>
 
+<style>
+.view {
+  position: absolute;
+}
+</style>
+
 <style scoped>
+.bounce-leave-active {
+  animation: bounce-in 0.1s cubic-bezier(0.22, 1, 0.36, 1) reverse;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 main {
   margin-top:1rem;
   display:flex;

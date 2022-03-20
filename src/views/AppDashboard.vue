@@ -1,8 +1,8 @@
 <template>
-  <div class="browse">
+  <div class="view">
     <h1>Dashboard</h1>
     <div v-if="noIdeas">
-      <p>No ideas have been found.</p>
+      <NotEnoughData noIdea />
     </div>
     <div v-else>
       <div v-for="(ideaPerLanguage) in ideasPerLanguage" :key="ideaPerLanguage.language.id">
@@ -21,9 +21,11 @@
 import {defineComponent} from 'vue';
 import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
 import Api from '@/ts/api';
+import NotEnoughData from '@/components/NotEnoughData.vue';
 
 export default defineComponent({
 	name: 'AppDashboard',
+	components: {NotEnoughData},
 	data() {
 		return {
 			ideasPerLanguage: getEmptyNumberIdeasInLanguage(),

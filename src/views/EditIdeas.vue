@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="view">
     <h1>Edit Idea</h1>
     <IdeaForm @addRows="addRows" :idea="idea" title="Edit Idea"/>
     <button @click="edit()">Edit</button>
@@ -12,7 +12,7 @@ import {defineComponent} from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
 import Utils from '@/ts/utils';
-import {getEmptyIdea} from '../../server/model/ideas/idea';
+import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 
 export default defineComponent({
 	name: 'EditIdeas',
@@ -21,7 +21,7 @@ export default defineComponent({
 	},
 	data() {
 		return {
-			idea: getEmptyIdea(),
+			idea: getEmptyIdeaNoAsync(),
 		};
 	},
 	async created() {

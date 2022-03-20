@@ -41,7 +41,7 @@ export default class IdeaManager {
 		const ee: Expression[] = await this.getExpressions(ideaId);
 		// Sort ideas by language ordering
 		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
-		return new Idea({id: ideaId, ee});
+		return {id: ideaId, ee};
 	}
 
 	public async ideaExists(id: number): Promise<boolean> {

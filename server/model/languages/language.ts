@@ -35,8 +35,13 @@ export function copy(l: Language): Language {
 	};
 }
 
-export function emptyPartialLanguage(): Partial<Language> {
-	return {};
+export function getEmptyLanguagesNoAsync(): Language[] {
+	return [{
+		id: -1,
+		name: '',
+		ordering: 0,
+		isPractice: false,
+	}];
 }
 
 const ajv = new Ajv();

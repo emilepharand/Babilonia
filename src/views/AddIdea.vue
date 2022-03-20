@@ -1,8 +1,13 @@
 <template>
-  <div>
+  <div class="view">
     <h1>Add Idea</h1>
-    <IdeaForm @addRows="addRows" :idea="idea" title="Add Idea"/>
-    <button @click="add()">Add</button>
+    <div v-if="noLanguages">
+      <NotEnoughData noLanguage />
+    </div>
+    <div v-else>
+      <IdeaForm @addRows="addRows" :idea="idea" title="Add Idea"/>
+      <button @click="add()">Add</button>
+    </div>
   </div>
 </template>
 
@@ -10,25 +15,38 @@
 import {defineComponent} from 'vue';
 import IdeaForm from '@/components/IdeaForm.vue';
 import Api from '@/ts/api';
-import {getEmptyIdea} from '../../server/model/ideas/idea';
+import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {getExpressionForAddingFromExpression} from '../../server/model/ideas/expression';
 import Utils from '@/ts/utils';
+import {getEmptyLanguage} from '../../server/model/languages/language';
+import NotEnoughData from '@/components/NotEnoughData.vue';
 
 export default defineComponent({
 	name: 'AddIdea',
 	components: {
+		NotEnoughData,
 		IdeaForm,
 	},
 	data() {
 		return {
-			idea: getEmptyIdea(),
+			idea: getEmptyIdeaNoAsync(),
+			noLanguages: false,
+			loaded: false,
 		};
 	},
 	async created() {
-		this.idea = await getEmptyIdea();
+		await this.checkIfLanguages();
+		this.idea = getEmptyIdea(5, await getEmptyLanguage());
+		this.loaded = true;
 	},
 	methods: {
+		async checkIfLanguages() {
+			const languages = await Api.getLanguages();
+			if (languages.length === 0) {
+				this.noLanguages = true;
+			}
+		},
 		async add() {
 			const ee = this.idea.ee.filter(e => e.text.trim() !== '');
 			const ee2 = ee.map(e => getExpressionForAddingFromExpression(e));

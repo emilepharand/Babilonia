@@ -1,5 +1,6 @@
 import Ajv from 'ajv';
-import {Expression} from './expression';
+import {Expression, getEmptyNExpressions} from './expression';
+import {getEmptyLanguage, Language} from '../languages/language';
 
 export interface Idea {
   id: number;
@@ -7,16 +8,23 @@ export interface Idea {
 }
 
 export class Idea {
-	constructor(idea: Idea) {
-		this.id = idea.id;
-		this.ee = idea.ee;
+	constructor(id: number, ee: Expression[]) {
+		this.id = id;
+		this.ee = ee;
 	}
 }
 
-export function getEmptyIdea(): Idea {
+export function getEmptyIdeaNoAsync(): Idea {
 	return {
 		id: -1,
-		ee: [],
+		ee: getEmptyNExpressions(1, 0, getEmptyLanguage()),
+	};
+}
+
+export function getEmptyIdea(howManyExpressions: number, l: Language): Idea {
+	return {
+		id: -1,
+		ee: getEmptyNExpressions(howManyExpressions, 0, l),
 	};
 }
 
