@@ -4,7 +4,7 @@ import {
 } from './ideas/ideaForAdding';
 import LanguageManager from './languages/languageManager';
 import IdeaManager from './ideas/ideaManager';
-import {Language, validate, validateForAdding} from './languages/language';
+import {debugLFA, Language, validate, validateForAdding} from './languages/language';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -60,14 +60,17 @@ export default class InputValidator {
 
 	public async validateLanguageForAdding(toValidate: unknown): Promise<boolean> {
 		if (!validateForAdding(toValidate)) {
+			debugLFA(toValidate);
 			return false;
 		}
-
 		const l = toValidate as { name: string };
 		if (l.name.trim() === '') {
+			console.log('trim');
 			return false;
 		}
-
+		if ((await this.lm.languageNameExists(l.name))) {
+			console.log('exists');
+		}
 		return !(await this.lm.languageNameExists(l.name));
 	}
 
@@ -76,25 +79,21 @@ export default class InputValidator {
 		if (!validateIdeaForAddingSchema(ideaForAdding)) {
 			return false;
 		}
-
 		const asIdeaForAdding = ideaForAdding as IdeaForAdding;
 		// Contains at least one expression
 		if (asIdeaForAdding.ee.length === 0) {
 			return false;
 		}
-
 		// No expressions are blank
 		if (asIdeaForAdding.ee.some(e => e.text.trim() === '')) {
 			return false;
 		}
-
 		// All languages exist
 		const languagesExist: Promise<boolean>[] = [];
 		asIdeaForAdding.ee.forEach(e => languagesExist.push(this.lm.languageIdExists(e.languageId)));
 		if ((await Promise.all(languagesExist)).includes(false)) {
 			return false;
 		}
-
 		// No expressions are identical (same language and text)
 		const distinctExpressions = new Set<string>();
 		asIdeaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));

@@ -55,6 +55,7 @@ export default class Controller {
 
 	public static async addLanguage(req: Request, res: Response): Promise<void> {
 		if (!(await dv.validateLanguageForAdding(req.body))) {
+			console.log(req.body);
 			res.status(400);
 			res.end();
 			return;

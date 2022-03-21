@@ -7,7 +7,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	if (!isTestMode) {
 		console.error(err.stack);
 	}
-
 	res.status(400);
 	res.end();
 	next();

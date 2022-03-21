@@ -1,28 +1,29 @@
 <template>
   <div class="view">
     <h1>Languages</h1>
-    <div v-if="languages.length !== 0">
-      <table>
+    <div class="edit-languages-block" v-if="loaded && languages.length !== 0">
+      <h2>Edit</h2>
+      <table class="languages-table">
         <tr>
         <th>Name</th>
         <th>Order</th>
         <th>Practice</th>
         </tr>
-        <tr v-for="lang in languages" :key="lang.id">
-          <td><input type="text" v-model="lang.name"/></td>
-          <td><input type="number" v-model="lang.ordering"></td>
-          <td><input type="checkbox" v-model="lang.isPractice" false-value="0" true-value="1"></td>
+        <tr class="language-row" v-for="lang in languages" :key="lang.id">
+          <td><input class="language-name" type="text" v-model="lang.name"/></td>
+          <td><input class="language-ordering" type="number" v-model="lang.ordering"></td>
+          <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice" false-value="0" true-value="1"></td>
         </tr>
       </table>
-      <a href="#" @click="edit()">Edit</a>
+      <button href="#" @click="save()">Save</button>
     </div>
-    <h2>Add</h2>
-    <div>
-      <input type="text" v-model="newLanguage.name"/>
-      <input type="number" v-model="newLanguage.ordering">
-      <input type="checkbox" v-model="newLanguage.isPractice">
+    <div class="add-language-block">
+      <h2>Add</h2>
       <div>
-        <button @click="addNewLanguage()">Add</button>
+        <input @keyup.enter="add()" id="new-language-name" type="text" v-model="newLanguageName"/>
+        <div>
+          <button id="add-language-button" @click="add()">Add</button>
+        </div>
       </div>
     </div>
   </div>
@@ -38,23 +39,22 @@ export default defineComponent({
 	data() {
 		return {
 			languages: getEmptyLanguagesNoAsync(),
-			newLanguage: {
-				id: -1,
-				name: '',
-				ordering: 5,
-				isPractice: true,
-			},
+			newLanguageName: '',
+			loaded: false,
 		};
 	},
 	methods: {
-		change() {
+		async save() {
 		},
-		async addNewLanguage() {
-			await Api.addLanguage(this.newLanguage);
+		async add() {
+			await Api.addLanguage(this.newLanguageName);
+			this.newLanguageName = '';
+			this.languages = await Api.getLanguages();
 		},
 	},
 	async created() {
 		this.languages = await Api.getLanguages();
+		this.loaded = true;
 	},
 });
 </script>

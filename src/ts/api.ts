@@ -56,14 +56,14 @@ export default class Api {
 		return (await res.json()) as Idea;
 	}
 
-	public static async addLanguage(newLang: Language): Promise<Language> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/language/add`;
+	public static async addLanguage(name: string): Promise<Language> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(newLang),
+			body: JSON.stringify({name}),
 		});
 		return (await response.json()) as Language;
 	}

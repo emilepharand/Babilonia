@@ -1,14 +1,14 @@
 before(() => {
 	cy.request('DELETE', 'http://localhost:5555/everything');
 	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('http://localhost:8888/');
+	cy.visit('/');
 });
 
 describe('When database is empty', () => {
 	it('Displays dashboard correctly', () => {
 		cy.get('#dashboard-link').click();
-		cy.contains('No ideas')
-			.should('not.contain.text', 'can express');
+		cy.contains('No ideas');
+		cy.should('not.have.text', 'can express');
 	});
 	it('Displays practice page correctly', () => {
 		cy.get('#practice-link').click();
@@ -23,8 +23,13 @@ describe('When database is empty', () => {
 	it('Displays search ideas page correctly', () => {
 		cy.get('#search-ideas-link').click();
 	});
-	it('Displays search languages page correctly', () => {
+	it('Displays languages page correctly', () => {
 		cy.get('#languages-link').click();
+		// There are no languages to edit
+		cy.get('.edit-languages-block').should('not.exist');
+		cy.get('.view')
+			.should('not.contain', 'Edit')
+			.should('not.contain', 'Save');
 	});
 	it('Displays settings page correctly', () => {
 		cy.get('#settings-link').click();
@@ -33,3 +38,10 @@ describe('When database is empty', () => {
 		cy.get('#help-link').click();
 	});
 });
+
+// Cy.get('.add-language-block')
+//   .get('input')
+//   .type('Language 1');
+// cy.get('.add-language-block')
+//   .get('button')
+//   .click();
