@@ -15,7 +15,7 @@
           <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice" false-value="0" true-value="1"></td>
         </tr>
       </table>
-      <button href="#" @click="save()">Save</button>
+      <button id="save-languages-button" href="#" @click="save()">Save</button>
     </div>
     <div class="add-language-block">
       <h2>Add</h2>
