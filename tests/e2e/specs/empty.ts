@@ -38,10 +38,3 @@ describe('When database is empty', () => {
 		cy.get('#help-link').click();
 	});
 });
-
-// Cy.get('.add-language-block')
-//   .get('input')
-//   .type('Language 1');
-// cy.get('.add-language-block')
-//   .get('button')
-//   .click();

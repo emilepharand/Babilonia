@@ -22,13 +22,13 @@ context('The language page', () => {
 				.eq(i)
 				.find('.language-name')
 				.should('have.value', languageName);
-			// Ordering
+			// Ordering (default is last available)
 			cy.get('.languages-table')
 				.find('.language-row')
 				.eq(i)
 				.find('.language-ordering')
 				.should('have.value', i);
-			// Practice
+			// Practice (default is false)
 			cy.get('.languages-table')
 				.find('.language-row')
 				.eq(i)

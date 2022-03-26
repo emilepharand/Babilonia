@@ -68,16 +68,16 @@ export default class Api {
 		return (await response.json()) as Language;
 	}
 
-	public static async editLanguage(lang: Language): Promise<Language> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/language/edit`;
+	public static async editLanguages(languages: Language[]): Promise<Language[]> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
 		const response = await fetch(url, {
-			method: 'POST',
+			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(lang),
+			body: JSON.stringify(languages),
 		});
-		return (await response.json()) as Language;
+		return (await response.json()) as Language[];
 	}
 
 	public static async getLanguage(id: number): Promise<Language> {
