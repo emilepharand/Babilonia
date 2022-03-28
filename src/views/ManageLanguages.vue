@@ -15,11 +15,13 @@
           <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice"></td>
         </tr>
       </table>
-      <div class="d-flex">
-        <button id="save-languages-button" class="btn btn-primary" @click="save()">Save</button>
-        <div>
-        <p id="language-saved-text" class="text-success d-none animate__animated">Language saved.</p>
-        </div>
+      <div class="d-flex align-items-center">
+        <button id="save-languages-button" class="btn btn-primary btn-sm" @click="save()">
+          Save
+        </button>
+        <span id="language-saved-text" class="pl-2 text-success animate__animated animate__faster d-none">
+          Languages saved.
+        </span>
       </div>
     </div>
     <div class="add-language-block">
@@ -27,7 +29,7 @@
       <div>
         <input @keyup.enter="add()" id="new-language-name" type="text" v-model="newLanguageName"/>
         <div>
-          <button id="add-language-button" @click="add()">Add</button>
+          <button id="add-language-button" class="btn btn-primary btn-sm" @click="add()">Add</button>
         </div>
       </div>
     </div>
@@ -46,19 +48,35 @@ export default defineComponent({
 			languages: getEmptyLanguagesNoAsync(),
 			newLanguageName: '',
 			loaded: false,
+			lastSaved: Date.now(),
 		};
 	},
 	methods: {
 		async save() {
+			this.lastSaved = Date.now();
+			const {lastSaved} = this;
 			await Api.editLanguages(this.languages);
+			this.animateLanguageSavedText(lastSaved);
+		},
+		animateLanguageSavedText(lastSaved: number) {
 			const languageSavedText = this.$el.querySelector('#language-saved-text');
+			languageSavedText.classList.remove('animate__fadeOut');
 			languageSavedText.classList.remove('d-none');
-			languageSavedText.classList.add('animate__fadeIn');
-			setTimeout(() => languageSavedText.classList.add('animate__fadeOut'), 3000);
+			setTimeout(() => {
+				if (lastSaved === this.lastSaved) {
+					languageSavedText.classList.add('animate__fadeOut');
+					setTimeout(() => {
+						if (lastSaved === this.lastSaved) {
+							languageSavedText.classList.add('d-none');
+						}
+					}, 500);
+				}
+			}, 2000);
 		},
 		async add() {
 			await Api.addLanguage(this.newLanguageName);
 			this.newLanguageName = '';
+			this.languages = await Api.getLanguages();
 		},
 	},
 	async created() {
