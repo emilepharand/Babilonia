@@ -19,7 +19,6 @@ import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {getExpressionForAddingFromExpression} from '../../server/model/ideas/expression';
 import Utils from '@/ts/utils';
-import {getEmptyLanguage} from '../../server/model/languages/language';
 import NotEnoughData from '@/components/NotEnoughData.vue';
 
 export default defineComponent({
@@ -37,7 +36,7 @@ export default defineComponent({
 	},
 	async created() {
 		await this.checkIfLanguages();
-		this.idea = getEmptyIdea(5, await getEmptyLanguage());
+		this.idea = getEmptyIdea(5, (await Api.getLanguages())[0]);
 		this.loaded = true;
 	},
 	methods: {
@@ -48,6 +47,7 @@ export default defineComponent({
 			}
 		},
 		async add() {
+			console.log(JSON.stringify(this.idea));
 			const ee = this.idea.ee.filter(e => e.text.trim() !== '');
 			const ee2 = ee.map(e => getExpressionForAddingFromExpression(e));
 			const ideaForAdding: IdeaForAdding = {ee: ee2};

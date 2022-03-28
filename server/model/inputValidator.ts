@@ -4,7 +4,7 @@ import {
 } from './ideas/ideaForAdding';
 import LanguageManager from './languages/languageManager';
 import IdeaManager from './ideas/ideaManager';
-import {debugLFA, Language, validate, validateForAdding} from './languages/language';
+import {Language, validate, validateForAdding} from './languages/language';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -60,7 +60,6 @@ export default class InputValidator {
 
 	public async validateLanguageForAdding(toValidate: unknown): Promise<boolean> {
 		if (!validateForAdding(toValidate)) {
-			debugLFA(toValidate);
 			return false;
 		}
 		const l = toValidate as { name: string };

@@ -19,8 +19,10 @@ export default class LanguageManager {
 	}
 
 	public async getLanguages(): Promise<Language[]> {
-		const languages: Language[] = await this.db.all('select * from languages');
-		return languages.map(l => ({...l, isPractice: l.isPractice === '1'}));
+		let languages: Language[] = await this.db.all('select * from languages');
+		languages = languages.map(l => ({...l, isPractice: l.isPractice === '1'}));
+		languages.sort((l1, l2) => l1.ordering - l2.ordering);
+		return languages;
 	}
 
 	async deleteLanguage(languageId: number): Promise<void> {

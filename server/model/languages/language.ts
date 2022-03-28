@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 
 export function getEmptyLanguage(): Language {
 	return {
-		id: -1,
+		id: 0,
 		name: '',
 		ordering: 0,
 		isPractice: false,
@@ -70,11 +70,3 @@ const languageForAddingSchema = {
 	additionalProperties: false,
 };
 export const validateForAdding = ajv.compile(languageForAddingSchema);
-
-export function debugLFA(data: any): void {
-	const validate = ajv.compile(languageForAddingSchema);
-	if (!validate(data)) {
-		console.log(data);
-		console.log(validate.errors);
-	}
-}

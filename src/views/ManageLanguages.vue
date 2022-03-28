@@ -57,6 +57,7 @@ export default defineComponent({
 			const {lastSaved} = this;
 			await Api.editLanguages(this.languages);
 			this.animateLanguageSavedText(lastSaved);
+			this.languages = await Api.getLanguages();
 		},
 		animateLanguageSavedText(lastSaved: number) {
 			const languageSavedText = this.$el.querySelector('#language-saved-text');

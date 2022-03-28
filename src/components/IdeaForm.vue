@@ -1,9 +1,8 @@
 <template>
   <div v-if="loaded">
-    <div v-for="e in idea.ee" :key="e.id">
+    <div v-for="e in idea.ee" :key="e.id" order>
       <select id="language" name="language" v-model="e.language">
-        <option v-for="language in languages" :key="language.id" :value="language"
-                false-value="0" true-value="1">
+        <option v-for="language in languages" :key="language.id" :value="language">
           {{ language.name }}
         </option>
       </select>
