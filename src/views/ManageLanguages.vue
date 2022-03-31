@@ -19,7 +19,7 @@
         <button id="save-languages-button" class="btn btn-primary btn-sm" @click="save()">
           Save
         </button>
-        <span id="language-saved-text" class="pl-2 text-success animate__animated animate__faster d-none">
+        <span id="languages-saved-text" class="pl-2 text-success animate__animated animate__faster d-none">
           Languages saved.
         </span>
       </div>
@@ -28,8 +28,9 @@
       <h2>Add</h2>
       <div>
         <input @keyup.enter="add()" id="new-language-name" type="text" v-model="newLanguageName"/>
-        <div>
+        <div class="d-flex align-items-center">
           <button id="add-language-button" class="btn btn-primary btn-sm" @click="add()">Add</button>
+          <span id="error-add-language-text" class="pl-2 text-danger d-none"></span>
         </div>
       </div>
     </div>
@@ -60,7 +61,7 @@ export default defineComponent({
 			this.languages = await Api.getLanguages();
 		},
 		animateLanguageSavedText(lastSaved: number) {
-			const languageSavedText = this.$el.querySelector('#language-saved-text');
+			const languageSavedText = this.$el.querySelector('#languages-saved-text');
 			languageSavedText.classList.remove('animate__fadeOut');
 			languageSavedText.classList.remove('d-none');
 			setTimeout(() => {
@@ -75,9 +76,16 @@ export default defineComponent({
 			}, 2000);
 		},
 		async add() {
-			await Api.addLanguage(this.newLanguageName);
-			this.newLanguageName = '';
-			this.languages = await Api.getLanguages();
+			const errorAddLanguageText = this.$el.querySelector('#error-add-language-text');
+			if (this.newLanguageName.trim() === '') {
+				errorAddLanguageText.classList.remove('d-none');
+				errorAddLanguageText.innerText = 'Please enter a valid language name.';
+			} else {
+				errorAddLanguageText.classList.add('d-none');
+				await Api.addLanguage(this.newLanguageName);
+				this.newLanguageName = '';
+				this.languages = await Api.getLanguages();
+			}
 		},
 	},
 	async created() {

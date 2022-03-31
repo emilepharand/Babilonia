@@ -4,24 +4,13 @@ before(() => {
 	cy.visit('/');
 });
 
-function checkLanguageRowHasValues(rowNbr: number, name: string, ordering: number, isPractice: boolean) {
-	cy.get('.languages-table').find('.language-row').eq(rowNbr).find('.language-name')
-		.should('have.value', name);
-	cy.get('.languages-table').find('.language-row').eq(rowNbr).find('.language-ordering')
-		.should('have.value', ordering);
-	cy.get('.languages-table').find('.language-row').eq(rowNbr).find('.language-is-practice')
-		.should(isPractice ? 'be.checked' : 'not.be.checked');
-}
-
-context('The language page', () => {
+context('Valid inputs in the language page', () => {
 	specify('Adding languages works and the page updates', () => {
 		cy.get('#languages-link').click();
 		// Add three languages
 		for (let i = 0; i < 3; i++) {
 			const languageName = `Language ${i}`;
-			// Add language
-			cy.get('#new-language-name').type(languageName);
-			cy.get('#add-language-button').click();
+			addLanguage(languageName);
 			// Check that language table has updated
 			cy.get('.languages-table')
 				.find('.language-row').should('have.length', i + 1);
@@ -34,21 +23,53 @@ context('The language page', () => {
 		// Edit languages configuration
 		for (let i = 0; i < 3; i++) {
 			const languageName = `Modified language ${i}`;
-			// New name
-			cy.get('.languages-table').find('.language-row').eq(i).find('.language-name')
-				.clear().type(languageName);
-			// New ordering
-			cy.get('.languages-table').find('.language-ordering').eq(i)
-				.clear().type(`${2 - i}`);
-			// New practice
-			cy.get('.languages-table').find('.language-is-practice').eq(i)
-				.check();
+			inputLanguageChange(i, languageName, 2 - i, true);
 		}
 		cy.get('#save-languages-button').click();
-		cy.get('#language-saved-text').should('be.visible');
+		cy.get('#languages-saved-text').should('be.visible');
 		cy.reload();
-		checkLanguageRowHasValues(0, 'Modified language 0', 2, true);
+		checkLanguageRowHasValues(0, 'Modified language 2', 0, true);
 		checkLanguageRowHasValues(1, 'Modified language 1', 1, true);
-		checkLanguageRowHasValues(2, 'Modified language 2', 0, true);
+		checkLanguageRowHasValues(2, 'Modified language 0', 2, true);
 	});
 });
+
+context('Error handling in the language page', () => {
+	specify('Invalid inputs', () => {
+		addLanguage('');
+	});
+});
+
+function addLanguage(name: string) {
+	cy.get('#new-language-name').clear();
+	if (name !== '') {
+		cy.get('#new-language-name').type(name);
+	}
+	cy.get('#add-language-button').click();
+}
+
+function inputLanguageChange(rowNbr: number, name: string, ordering: number, isPractice: boolean) {
+	cy.get('.languages-table').find('.language-row').eq(rowNbr).find('.language-name')
+		.clear().type(name);
+	cy.get('.languages-table').find('.language-ordering').eq(rowNbr)
+		.clear().type(ordering.toString());
+	if (isPractice) {
+		cy.get('.languages-table').find('.language-is-practice').eq(rowNbr)
+			.check();
+	} else {
+		cy.get('.languages-table').find('.language-is-practice').eq(rowNbr)
+			.uncheck();
+	}
+}
+
+function checkLanguageRowHasValues(rowNbr: number, name: string, ordering: number, isPractice: boolean) {
+	cy.get('.languages-table').find('.language-row')
+		.eq(rowNbr).find('.language-name')
+		.should('have.value', name);
+	cy.get('.languages-table').find('.language-row')
+		.eq(rowNbr).find('.language-ordering')
+		.should('have.value', ordering);
+	cy.get('.languages-table').find('.language-row')
+		.eq(rowNbr).find('.language-is-practice')
+		.should(isPractice ? 'be.checked' : 'not.be.checked');
+}
