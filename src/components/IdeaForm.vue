@@ -8,7 +8,7 @@
       </select>
       <input class="expression-text" type="text" v-model="e.text"/>
     </div>
-    <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="More rows">
+    <input id="add-rows" type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="Add rows">
   </div>
 </template>
 

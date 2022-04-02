@@ -14,19 +14,58 @@ before(() => {
 });
 
 context('The idea page', () => {
-	specify('Adding idea works and the page updates', () => {
+	specify('Adding ideas', () => {
+		// Idea 1 doesn't exist
 		assertFetchIdeaReturnsStatus(1, 404);
+
+		// Navigate
 		cy.get('#add-ideas-link').click();
-		inputExpression(0, 'français', 'bonjour');
-		inputExpression(1, 'english', 'hello');
-		inputExpression(2, 'español', 'buenos días');
-		inputExpression(3, 'italiano', 'buongiorno');
-		inputExpression(4, 'deutsch', 'guten Tag');
+
+		// Enter expressions
+		const ee = [['français', 'bonjour'],
+			['english', 'hello'],
+			['español', 'buenos días'],
+			['italiano', 'buongiorno'],
+			['deutsch', 'guten Tag']];
+		ee.forEach((e, i) => {
+			inputExpression(i, e[0], e[1]);
+		});
+
+		// Click save
 		cy.get('#save-idea').click();
+
+		// Idea 1 was created
 		assertFetchIdeaReturnsStatus(1, 200, 'guten Tag');
+
+		// All inputs are emptied
 		assertAllInputsEmpty();
+
+		// Idea 2 doesn't exist
+		assertFetchIdeaReturnsStatus(2, 404);
+
+		// Enter expressions
+		ee.forEach((e, i) => {
+			inputExpression(i, e[0], e[1]);
+		});
+
+		// Add more rows
+		cy.get('#add-rows').click();
+
+		// Adding rows did not remove previous expressions
+		ee.forEach((e, i) => {
+			assertExpressionHasValues(i, e[0], e[1]);
+		});
+
+		// Leaving gaps
 	});
 });
+
+function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
+	cy.get('#ideas .expression').eq(rowNbr).within(() => {
+		cy.get('.expression-language :selected').should('have.text', languageName);
+		cy.get('.expression-text').should('have.value', text);
+	});
+}
 
 function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string) {
 	cy.request({

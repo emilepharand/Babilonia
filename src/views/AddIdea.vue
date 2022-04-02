@@ -54,7 +54,7 @@ export default defineComponent({
 			this.idea = getEmptyIdea(5, (await Api.getLanguages())[0]);
 		},
 		async addRows(howMany: number, currentSize: number) {
-			const l = await Api.getLanguage(0);
+			const l = await Api.getLanguage(1);
 			this.idea = Utils.addEmptyExpressions(this.idea, howMany, currentSize, l);
 		},
 	},
