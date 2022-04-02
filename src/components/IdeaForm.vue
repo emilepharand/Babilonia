@@ -1,12 +1,12 @@
 <template>
-  <div v-if="loaded">
-    <div v-for="e in idea.ee" :key="e.id" order>
-      <select id="language" name="language" v-model="e.language">
+  <div id="ideas" v-if="loaded">
+    <div class="expression" v-for="e in idea.ee" :key="e.id">
+      <select class="expression-language" name="language" v-model="e.language">
         <option v-for="language in languages" :key="language.id" :value="language">
           {{ language.name }}
         </option>
       </select>
-      <input type="text" v-model="e.text"/>
+      <input class="expression-text" type="text" v-model="e.text"/>
     </div>
     <input type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="More rows">
   </div>

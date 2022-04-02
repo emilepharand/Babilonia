@@ -5,8 +5,8 @@
       <NotEnoughData noLanguage />
     </div>
     <div v-else>
-      <IdeaForm @addRows="addRows" :idea="idea" title="Add Idea"/>
-      <button @click="add()">Add</button>
+      <IdeaForm @addRows="this.addRows" :idea="idea" title="Add Idea"/>
+      <button id="save-idea" @click="this.save()">Save</button>
     </div>
   </div>
 </template>
@@ -46,12 +46,12 @@ export default defineComponent({
 				this.noLanguages = true;
 			}
 		},
-		async add() {
-			console.log(JSON.stringify(this.idea));
+		async save() {
 			const ee = this.idea.ee.filter(e => e.text.trim() !== '');
 			const ee2 = ee.map(e => getExpressionForAddingFromExpression(e));
 			const ideaForAdding: IdeaForAdding = {ee: ee2};
 			await Api.addIdea(ideaForAdding);
+			this.idea = getEmptyIdea(5, (await Api.getLanguages())[0]);
 		},
 		async addRows(howMany: number, currentSize: number) {
 			const l = await Api.getLanguage(0);

@@ -19,11 +19,6 @@ export default class PracticeManager {
 		this.db = db;
 	}
 
-	private async nextIdeaId(): Promise<number> {
-		const idea = await this.db.get(`select * from ideas where id not in (${Array.from(this.ideasAlreadyGiven).join(',')}) order by random() limit 1`);
-		return idea.id;
-	}
-
 	private buildNextIdeaIdQuery(): string {
 		return `select id from ideas where id in
     (select ideaId from expressions

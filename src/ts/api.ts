@@ -36,7 +36,7 @@ export default class Api {
 	}
 
 	static async addIdea(ifa: IdeaForAdding): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/add`;
+		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
