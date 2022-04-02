@@ -65,6 +65,9 @@ export default class Api {
 			},
 			body: JSON.stringify({name}),
 		});
+		if (response.status !== 201) {
+			return Promise.reject();
+		}
 		return (await response.json()) as Language;
 	}
 

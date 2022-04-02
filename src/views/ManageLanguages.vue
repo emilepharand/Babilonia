@@ -80,11 +80,19 @@ export default defineComponent({
 			if (this.newLanguageName.trim() === '') {
 				errorAddLanguageText.classList.remove('d-none');
 				errorAddLanguageText.innerText = 'Please enter a valid language name.';
+			} else if (this.languages.some(l => l.name === this.newLanguageName)) {
+				errorAddLanguageText.classList.remove('d-none');
+				errorAddLanguageText.innerText = 'This language already exists.';
 			} else {
-				errorAddLanguageText.classList.add('d-none');
-				await Api.addLanguage(this.newLanguageName);
-				this.newLanguageName = '';
-				this.languages = await Api.getLanguages();
+				try {
+					errorAddLanguageText.classList.add('d-none');
+					await Api.addLanguage(this.newLanguageName);
+					this.newLanguageName = '';
+					this.languages = await Api.getLanguages();
+				} catch {
+					errorAddLanguageText.classList.remove('d-none');
+					errorAddLanguageText.innerText = 'An unexpected error has occurred.';
+				}
 			}
 		},
 	},

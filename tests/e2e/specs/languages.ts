@@ -36,7 +36,21 @@ context('Valid inputs in the language page', () => {
 
 context('Error handling in the language page', () => {
 	specify('Invalid inputs', () => {
+		// Empty name
 		addLanguage('');
+		assertAddLanguageErrorMsgVisible('valid language');
+		// Valid language
+		addLanguage('Valid language');
+		assertAddLanguageErrorMsgNotVisible();
+		// Blank name
+		addLanguage(' ');
+		assertAddLanguageErrorMsgVisible('valid language');
+		// Valid language
+		addLanguage('Valid language 2');
+		assertAddLanguageErrorMsgNotVisible();
+		// Duplicate name
+		addLanguage('Modified language 2');
+		assertAddLanguageErrorMsgVisible('already exists');
 	});
 });
 
@@ -46,6 +60,17 @@ function addLanguage(name: string) {
 		cy.get('#new-language-name').type(name);
 	}
 	cy.get('#add-language-button').click();
+}
+
+function assertAddLanguageErrorMsgNotVisible() {
+	cy.get('#error-add-language-text')
+		.should('not.be.visible');
+}
+
+function assertAddLanguageErrorMsgVisible(containsText: string) {
+	cy.get('#error-add-language-text')
+		.should('be.visible')
+		.should('contain.text', containsText);
 }
 
 function inputLanguageChange(rowNbr: number, name: string, ordering: number, isPractice: boolean) {
