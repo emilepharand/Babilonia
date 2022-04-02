@@ -14,7 +14,7 @@ before(() => {
 });
 
 context('The idea page', () => {
-	specify('Adding idea works and the page updates', async () => {
+	specify('Adding idea works and the page updates', () => {
 		assertFetchIdeaReturnsStatus(1, 404);
 		cy.get('#add-ideas-link').click();
 		inputExpression(0, 'français', 'bonjour');
@@ -23,18 +23,21 @@ context('The idea page', () => {
 		inputExpression(3, 'italiano', 'buongiorno');
 		inputExpression(4, 'deutsch', 'guten Tag');
 		cy.get('#save-idea').click();
-		assertFetchIdeaReturnsStatus(1, 200);
+		assertFetchIdeaReturnsStatus(1, 200, 'guten Tag');
 		assertAllInputsEmpty();
 	});
 });
 
-function assertFetchIdeaReturnsStatus(id: number, status: number) {
+function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string) {
 	cy.request({
-		method: 'GET',
 		url: `http://localhost:5555/ideas/${id}`,
 		failOnStatusCode: false,
-	}).its('status')
-		.should('equal', status);
+	}).then(r => {
+		cy.wrap(r).its('status').should('equal', status);
+		if (contains) {
+			cy.wrap(JSON.stringify(r.body)).should('contain', contains);
+		}
+	});
 }
 
 function assertAllInputsEmpty() {

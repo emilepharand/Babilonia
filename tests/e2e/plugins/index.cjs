@@ -15,6 +15,14 @@ module.exports = (on, config) => {
   //  watchOptions: {}
   // }))
 
+  on('task', {
+    log(message) {
+      console.log(message)
+
+      return null
+    },
+  })
+
   return {
     ...config,
     fixturesFolder: 'tests/e2e/fixtures',
