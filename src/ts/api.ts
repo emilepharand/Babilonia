@@ -28,11 +28,16 @@ export default class Api {
 	}
 
 	static async deleteIdea(ideaId: number): Promise<unknown> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/${ideaId}`;
+		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${ideaId}`;
 		const response = await fetch(url, {
 			method: 'DELETE',
 		});
 		return response.json();
+	}
+
+	static async deleteLanguage(languageId: number): Promise<void> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/languages/${languageId}`;
+		await fetch(url, {method: 'DELETE'});
 	}
 
 	static async addIdea(ifa: IdeaForAdding): Promise<Idea> {

@@ -3,17 +3,23 @@
     <h1>Languages</h1>
     <div class="edit-languages-block" v-if="loaded && languages.length !== 0">
       <h2>Edit</h2>
-      <table class="languages-table">
-        <tr>
-        <th>Name</th>
-        <th>Order</th>
-        <th>Practice</th>
-        </tr>
-        <tr class="language-row" v-for="lang in languages" :key="lang.id">
-          <td><input class="language-name" type="text" v-model="lang.name"/></td>
-          <td><input class="language-ordering" type="number" v-model="lang.ordering"></td>
-          <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice"></td>
-        </tr>
+      <table class="languages-table table table-sm table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Order</th>
+            <th scope="col">Practice</th>
+            <th scope="col">Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="language-row" v-for="lang in languages" :key="lang.id">
+            <td><input class="language-name" type="text" v-model="lang.name"/></td>
+            <td><input class="language-ordering" type="number" v-model="lang.ordering"></td>
+            <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice"></td>
+            <td><button @click="this.delete(lang.id)" class="btn btn-danger btn-sm delete-language-button">X</button></td>
+          </tr>
+        </tbody>
       </table>
       <div class="d-flex align-items-center">
         <button id="save-languages-button" class="btn btn-primary btn-sm" @click="save()">
@@ -36,6 +42,12 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+/*td, th {*/
+/*  padding-right: 10px;*/
+/*}*/
+</style>
 
 <script lang="ts">
 import {defineComponent} from 'vue';
@@ -94,6 +106,10 @@ export default defineComponent({
 					errorAddLanguageText.innerText = 'An unexpected error has occurred.';
 				}
 			}
+		},
+		async delete(id: number) {
+			await Api.deleteLanguage(id);
+			this.languages = await Api.getLanguages();
 		},
 	},
 	async created() {
