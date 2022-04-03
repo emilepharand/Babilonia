@@ -51,7 +51,9 @@ export default defineComponent({
 			const ee2 = ee.map(e => getExpressionForAddingFromExpression(e));
 			const ideaForAdding: IdeaForAdding = {ee: ee2};
 			await Api.addIdea(ideaForAdding);
-			this.idea = getEmptyIdea(5, (await Api.getLanguages())[0]);
+			this.idea.ee.forEach(e => {
+				e.text = '';
+			});
 		},
 		async addRows(howMany: number, currentSize: number) {
 			const l = await Api.getLanguage(1);
