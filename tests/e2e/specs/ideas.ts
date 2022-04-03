@@ -27,9 +27,7 @@ context('The idea page', () => {
 			['español', 'buenos días'],
 			['italiano', 'buongiorno'],
 			['deutsch', 'guten Tag']];
-		ee.forEach((e, i) => {
-			inputExpression(i, e[0], e[1]);
-		});
+		ee.forEach((e, i) => inputExpression(i, e[0], e[1]));
 
 		// Click save
 		cy.get('#save-idea').click();
@@ -44,9 +42,7 @@ context('The idea page', () => {
 		assertFetchIdeaReturnsStatus(2, 404);
 
 		// Enter expressions
-		ee.forEach((e, i) => {
-			inputExpression(i, e[0], e[1]);
-		});
+		ee.forEach((e, i) => inputExpression(i, e[0], e[1]));
 
 		// Add more rows
 		cy.get('#add-rows').click();
@@ -75,7 +71,7 @@ context('The idea page', () => {
 		cy.get('#save-idea').click();
 
 		// Idea 2 was created (testing a sample of expressions)
-		assertFetchIdeaReturnsStatus(2, 200, ['toto', 'bom dia', 'hi', 'salut', 'bonjour', 'guten tag']);
+		assertFetchIdeaReturnsStatus(2, 200, ['toto', 'bom dia', 'hi', 'salut', 'bonjour', 'guten Tag']);
 
 		// All inputs are emptied
 		assertAllInputsEmpty();
@@ -83,7 +79,13 @@ context('The idea page', () => {
 		// There are still 15 rows
 		cy.get('#ideas').find('.expression').should('have.length', 15);
 
+		const expectedLanguages = ee.map(e => e[0]);
+		expectedLanguages.push('français', 'français', 'français', 'français', 'english', 'français', 'português', 'français');
+
 		// Check languages stayed the same
+		expectedLanguages.forEach((e, i) => {
+			assertExpressionHasValues(i, expectedLanguages[i], '');
+		});
 	});
 });
 
