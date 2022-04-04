@@ -45,7 +45,7 @@ export default class LanguageManager {
 	public async addLanguage(name: string): Promise<Language> {
 		const nextOrdering = await this.getNextOrdering();
 		const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
-		await this.db.run(query, name, nextOrdering, false);
+		await this.db.run(query, name.trim(), nextOrdering, false);
 		const languageId = (await this.db.get('select last_insert_rowid() as id')).id;
 		const l = (await this.db.get('select * from languages where id = ?', languageId)) as Language;
 		l.isPractice = l.isPractice === '1';
@@ -78,7 +78,7 @@ export default class LanguageManager {
 	private async editLanguage(id: number, language: Language): Promise<Language> {
 		const query
       = 'update languages set "name" = ?, "ordering" = ?, "isPractice" = ? WHERE "id" = ?';
-		await this.db.run(query, language.name, language.ordering, language.isPractice, language.id);
+		await this.db.run(query, language.name.trim(), language.ordering, language.isPractice, language.id);
 		return this.getLanguage(id);
 	}
 }

@@ -23,3 +23,11 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+// Allow type empty string (#6157 and #3587)
+Cypress.Commands.overwrite('type', (originalFn, subject, str, options) => {
+	if (str !== '') {
+		return originalFn(subject, str, options);
+	}
+	return subject;
+});

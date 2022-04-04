@@ -9,6 +9,7 @@ import {
 	DEFAULT_IS_PRACTICE,
 	deleteEverything,
 	deleteLanguage,
+	editLanguages,
 	editLanguagesAndGetResponse,
 	editLanguagesRawObjectAndGetResponse,
 	fetchIdea,
@@ -101,6 +102,12 @@ describe('adding languages', () => {
 	test('adding two languages', async () => {
 		await addValidLanguageAndTest('first language', FIRST_LANGUAGE_ID, FIRST_ORDERING);
 		await addValidLanguageAndTest('second language', FIRST_LANGUAGE_ID + 1, FIRST_ORDERING + 1);
+	});
+
+	test('language name is trimmed', async () => {
+		await addLanguage('     a name with trailing spaces    ');
+		const l = await fetchLanguage(1);
+		expect(l.name).toEqual('a name with trailing spaces');
 	});
 });
 
@@ -200,6 +207,14 @@ describe('editing languages', () => {
 		const oldLanguage2 = await addLanguage('old language 2');
 
 		await editAndTest(oldLanguage1, oldLanguage2, false);
+	});
+
+	test('language name is trimmed', async () => {
+		const oldLanguage1 = await addLanguage('old language 1');
+		oldLanguage1.name = '             a name with trailing spaces     ';
+		await editLanguages([oldLanguage1]);
+		const l = await fetchLanguage(oldLanguage1.id);
+		expect(l.name).toEqual('a name with trailing spaces');
 	});
 
 	test('editing languages with changes', async () => {

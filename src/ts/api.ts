@@ -85,6 +85,9 @@ export default class Api {
 			},
 			body: JSON.stringify(languages),
 		});
+		if (response.status === 400) {
+			return Promise.reject();
+		}
 		return (await response.json()) as Language[];
 	}
 

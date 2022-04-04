@@ -48,10 +48,14 @@ export default class InputValidator {
 			return false;
 		}
 		// Ordering is valid
-		const orderings = new Set<number>();
-		ll.forEach(l => orderings.add(l.ordering));
-		for (let i = 0; i < ll.length; i += 1) {
-			if (!orderings.has(i)) {
+		return InputValidator.isValidOrdering(ll.map(l => l.ordering));
+	}
+
+	public static isValidOrdering(orderings: number[]): boolean {
+		const orderingsSet = new Set<number>();
+		orderings.forEach(o => orderingsSet.add(o));
+		for (let i = 0; i < orderings.length; i += 1) {
+			if (!orderingsSet.has(i)) {
 				return false;
 			}
 		}
