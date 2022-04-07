@@ -1,8 +1,8 @@
-import {Request, Response} from 'express';
-import DataServiceProvider from './model/dataServiceProvider';
-import {Language} from './model/languages/language';
-import {IdeaForAdding} from './model/ideas/ideaForAdding';
-import {SearchContext} from './model/search/searchContext';
+import { Request, Response } from "express";
+import DataServiceProvider from "./model/dataServiceProvider";
+import { Language } from "./model/languages/language";
+import { IdeaForAdding } from "./model/ideas/ideaForAdding";
+import { SearchContext } from "./model/search/searchContext";
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
@@ -55,7 +55,6 @@ export default class Controller {
 
 	public static async addLanguage(req: Request, res: Response): Promise<void> {
 		if (!(await dv.validateLanguageForAdding(req.body))) {
-			console.log(req.body);
 			res.status(400);
 			res.end();
 			return;

@@ -68,11 +68,7 @@ export default class InputValidator {
 		}
 		const l = toValidate as { name: string };
 		if (l.name.trim() === '') {
-			console.log('trim');
 			return false;
-		}
-		if ((await this.lm.languageNameExists(l.name))) {
-			console.log('exists');
 		}
 		return !(await this.lm.languageNameExists(l.name));
 	}
