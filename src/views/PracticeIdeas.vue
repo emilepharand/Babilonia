@@ -14,8 +14,9 @@
                      v-model="e.text" disabled/>
               <input v-else type="text"
                      v-model="typed[i]"
+                     :disabled="done[i]"
                      :class="{'partial-match': isPartialMatch(i, e.text),
-                     'full-match': isFullMatch(i, e.text),
+                     'full-match': done[i],
                      'no-match': isNoMatch(i, e.text),
                      }"/>
             </td>
@@ -37,7 +38,6 @@ import Api from '@/ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import NotEnoughData from '@/components/NotEnoughData.vue';
 import {Expression} from '../../server/model/ideas/expression';
-import {MatchStatus} from '../ts/utils';
 
 export default defineComponent({
 	name: 'PracticeIdeas',
@@ -47,7 +47,6 @@ export default defineComponent({
 			idea: getEmptyIdeaNoAsync(),
 			typed: [''],
 			done: [false],
-			statuses: [MatchStatus.NO_MATCH],
 			noIdeas: false,
 		};
 	},
@@ -78,17 +77,19 @@ export default defineComponent({
 			const textToMatch = txt;
 			const firstLettersMatch = this.checkFirstLettersMatch(textToMatch, typedWord);
 			if (firstLettersMatch) {
-				if (typedWord.length === textToMatch.length) {
-					this.statuses[i] = MatchStatus.FULL_MATCH;
-					return true;
+				if (typedWord.length > 0 && typedWord.length === textToMatch.length) {
+					this.done[i] = true;
+					return false;
 				}
-				this.statuses[i] = MatchStatus.PARTIAL_MATCH;
 				return true;
 			}
-			this.statuses[i] = MatchStatus.NO_MATCH;
 			return false;
 		},
+		isNoMatch(i: number, txt: string) {
+			return !this.checkFirstLettersMatch(txt, this.typed[i]);
+		},
 		checkFirstLettersMatch(textToMatch:string, typedWord: string) {
+			console.log(textToMatch);
 			let i = 0;
 			while (i < typedWord.length) {
 				if (textToMatch.charAt(i) === typedWord.charAt(i)) {
@@ -98,12 +99,6 @@ export default defineComponent({
 				}
 			}
 			return true;
-		},
-		isNoMatch(i: number, txt: string) {
-			return i === 1 && txt === 'a';
-		},
-		isFullMatch(i: number, txt: string) {
-			return i === 2 && txt === 'a';
 		},
 		hint(rowNbr: number, txt: string) {
 			if (this.typed[rowNbr] === undefined) {
