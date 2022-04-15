@@ -89,7 +89,9 @@ export default defineComponent({
 			return !this.checkFirstLettersMatch(txt, this.typed[i]);
 		},
 		checkFirstLettersMatch(textToMatch:string, typedWord: string) {
-			console.log(textToMatch);
+			if (typedWord as unknown === undefined) {
+				return false;
+			}
 			let i = 0;
 			while (i < typedWord.length) {
 				if (textToMatch.charAt(i) === typedWord.charAt(i)) {
@@ -101,7 +103,7 @@ export default defineComponent({
 			return true;
 		},
 		hint(rowNbr: number, txt: string) {
-			if (this.typed[rowNbr] === undefined) {
+			if (this.typed[rowNbr] as unknown === undefined) {
 				this.typed[rowNbr] = txt[0];
 				this.done[rowNbr] = false;
 			} else {
