@@ -7,19 +7,19 @@
     <div v-else>
         <table>
           <tr v-for="(e, i) in idea.ee" :key="e.id">
-            <tbody v-if="e.language.isPractice">
+            <tbody>
             <td>{{ e.language.name }}</td>
             <td>
-              <input v-if="i === 0" type="text"
-                     v-model="e.texts[0]" disabled/>
+              <input v-if="e.language.isPractice" type="text"
+                     v-model="e.text" disabled/>
               <input v-else type="text"
                      v-model="typed[i]"
-                     :class="{'partial-match': isPartialMatch(i, e.texts),
-                     'full-match': isFullMatch(i, e.texts),
-                     'no-match': isNoMatch(i, e.texts),
+                     :class="{'partial-match': isPartialMatch(i, e.text),
+                     'full-match': isFullMatch(i, e.text),
+                     'no-match': isNoMatch(i, e.text),
                      }"/>
             </td>
-            <td><input type="button" value="Hint" @click="hint(i, e.texts[0])"></td>
+            <td><input type="button" value="Hint" @click="hint(i, e.text)"></td>
             </tbody>
           </tr>
         </table>
@@ -36,6 +36,8 @@ import {defineComponent} from 'vue';
 import Api from '@/ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import NotEnoughData from '@/components/NotEnoughData.vue';
+import {Expression} from '../../server/model/ideas/expression';
+import {MatchStatus} from '../ts/utils';
 
 export default defineComponent({
 	name: 'PracticeIdeas',
@@ -45,42 +47,63 @@ export default defineComponent({
 			idea: getEmptyIdeaNoAsync(),
 			typed: [''],
 			done: [false],
+			statuses: [MatchStatus.NO_MATCH],
 			noIdeas: false,
 		};
 	},
 	async created() {
 		try {
-			this.idea = await Api.getNextIdea();
+			const idea = await Api.getNextIdea();
+			idea.ee = this.reorderExpressions(idea.ee);
+			this.idea = idea;
 		} catch {
 			this.noIdeas = true;
 		}
 	},
 	methods: {
-		isPartialMatch(i: number, txt: string[]) {
-			if (this.done[i]) {
-				txt[0].trim();
-				return false;
-			}
-			return this.typed[i];
+		// Reorders expressions to put expressions to practice first
+		reorderExpressions(ee: Expression[]): Expression[] {
+			return ee.sort((e1, e2) => {
+				if (e1.language.isPractice && !e2.language.isPractice) {
+					return 1;
+				}
+				if (e1.language.isPractice && e2.language.isPractice) {
+					return 0;
+				}
+				return -1;
+			});
 		},
-		isNoMatch(i: number, txt: string[]) {
-			if (this.done[i]) {
-				txt[0].trim();
-				return false;
-			}
-			return this.typed[i];
-		},
-		isFullMatch(i: number, txt: string[]) {
-			if (this.done[i]) {
+		isPartialMatch(i: number, txt: string) {
+			const typedWord = this.typed[i];
+			const textToMatch = txt;
+			const firstLettersMatch = this.checkFirstLettersMatch(textToMatch, typedWord);
+			if (firstLettersMatch) {
+				if (typedWord.length === textToMatch.length) {
+					this.statuses[i] = MatchStatus.FULL_MATCH;
+					return true;
+				}
+				this.statuses[i] = MatchStatus.PARTIAL_MATCH;
 				return true;
 			}
-			const ret = this.typed[i];
-			if (ret) {
-				this.done[i] = true;
-
-				this.typed[i] = txt.join(' | ');
+			this.statuses[i] = MatchStatus.NO_MATCH;
+			return false;
+		},
+		checkFirstLettersMatch(textToMatch:string, typedWord: string) {
+			let i = 0;
+			while (i < typedWord.length) {
+				if (textToMatch.charAt(i) === typedWord.charAt(i)) {
+					i += 1;
+				} else {
+					return false;
+				}
 			}
-			return ret;
+			return true;
+		},
+		isNoMatch(i: number, txt: string) {
+			return i === 1 && txt === 'a';
+		},
+		isFullMatch(i: number, txt: string) {
+			return i === 2 && txt === 'a';
 		},
 		hint(rowNbr: number, txt: string) {
 			if (this.typed[rowNbr] === undefined) {
