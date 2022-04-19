@@ -32,7 +32,6 @@ export default defineComponent({
 		return {
 			idea: getEmptyIdeaNoAsync(),
 			noIdeas: false,
-			typed: '',
 		};
 	},
 	async created() {
