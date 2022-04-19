@@ -38,6 +38,18 @@ export default defineComponent({
 			isFullMatch: false,
 		};
 	},
+	watch: {
+		expression: {
+			handler() {
+				if (this.expression.language.isPractice) {
+					this.typed = '';
+					this.isFullMatch = false;
+				}
+			},
+			deep: true,
+			immediate: true,
+		},
+	},
 	methods: {
 		isPartialMatch() {
 			const typedWord = this.typed;
