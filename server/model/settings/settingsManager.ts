@@ -18,4 +18,8 @@ export default class SettingsManager {
 	async setBooleanSetting(name: string, value: string): Promise<void> {
 		await this.db.run('update setttings set ?=?', name, value);
 	}
+
+	async isRandomPractice() {
+		return this.getBooleanSetting('PRACTICE_RANDOM');
+	}
 }

@@ -19,19 +19,20 @@ async function initDb(): Promise<Database> {
 }
 
 export const db: Database = await initDb();
+export const settingsManager = new SettingsManager(db);
 export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
-export const practiceManager = new PracticeManager(db, ideaManager, languageManager);
+export const practiceManager = new PracticeManager(db, ideaManager, languageManager, settingsManager);
 export const inputValidator = new InputValidator(ideaManager, languageManager);
 export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
 export const stats = new Stats(db, languageManager);
-export const settingsManager = new SettingsManager(db);
 
 export default class DataServiceProvider {
 	public static async deleteAllData(): Promise<void> {
 		await db.run('drop table if exists expressions');
 		await db.run('drop table if exists ideas');
 		await db.run('drop table if exists languages');
+		await db.run('drop table if exists settings');
 		await db.run(
 			'CREATE TABLE "languages" (\n'
         + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
