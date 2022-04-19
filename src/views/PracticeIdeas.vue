@@ -5,14 +5,13 @@
       <NotEnoughData noIdea />
     </div>
     <div v-else>
-        <table>
-          <tr v-for="e in idea.ee" :key="e.id">
-            <PracticeRow :expression="e"/>
-          </tr>
-        </table>
         <div>
-          <button @click="next()">Next</button>
-          <button @click="submit()">Submit</button>
+          <div v-for="e in idea.ee" :key="e.id">
+            <PracticeRow :expression="e"/>
+          </div>
+        </div>
+        <div class="d-flex">
+          <button class="btn btn-sm btn-primary flex-grow-1" @click="next()">Next</button>
         </div>
       </div>
   </div>
@@ -32,8 +31,6 @@ export default defineComponent({
 	data() {
 		return {
 			idea: getEmptyIdeaNoAsync(),
-			typed: [''],
-			done: [false],
 			noIdeas: false,
 		};
 	},
@@ -51,18 +48,18 @@ export default defineComponent({
 		reorderExpressions(ee: Expression[]): Expression[] {
 			return ee.sort((e1, e2) => {
 				if (e1.language.isPractice && !e2.language.isPractice) {
-					return 1;
+					return -1;
 				}
 				if (e1.language.isPractice && e2.language.isPractice) {
 					return 0;
 				}
-				return -1;
+				return 1;
 			});
 		},
 		async next() {
-			this.idea = await Api.getNextIdea();
-			this.typed = [];
-			this.done = [];
+			const idea = await Api.getNextIdea();
+			idea.ee = this.reorderExpressions(idea.ee);
+			this.idea = idea;
 		},
 		keyPressed(txt: string, s: string) {
 			txt.trim();

@@ -1,11 +1,14 @@
 <template>
-  <tbody>
-  <td>{{ expression.language.name }}</td>
-    <td>
-      <input v-if="expression.language.isPractice"
+  <div class="d-flex justify-content-end align-items-center pb-1">
+    <div class="text-left me-2">{{ expression.language.name }}</div>
+    <div>
+      <input class="me-2"
+             style="max-width: 200px"
+             v-if="!expression.language.isPractice"
              type="text"
              :value="expression.text" disabled/>
-      <input v-else
+      <input class="me-2" v-else
+             style="max-width: 200px"
              type="text"
              v-model="typed"
              :disabled="isFullMatch"
@@ -13,11 +16,11 @@
                        'full-match': isFullMatch,
                        'no-match': isNoMatch(),
                        }"/>
-    </td>
-    <td>
-      <input type="button" value="Hint" @click="hint()">
-    </td>
-  </tbody>
+      <input class="btn btn-sm btn-primary" type="button"
+             :disabled="!expression.language.isPractice"
+             value="Hint" @click="hint()">
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
