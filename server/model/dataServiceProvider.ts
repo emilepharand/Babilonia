@@ -7,6 +7,7 @@ import InputValidator from './inputValidator';
 import isTestMode from '../context';
 import SearchHandler from './search/searchHandler';
 import {Stats} from '../stats/stats';
+import SettingsManager from './settings/settingsManager';
 
 async function initDb(): Promise<Database> {
 	const localDb = await open({
@@ -24,6 +25,7 @@ export const practiceManager = new PracticeManager(db, ideaManager, languageMana
 export const inputValidator = new InputValidator(ideaManager, languageManager);
 export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
 export const stats = new Stats(db, languageManager);
+export const settingsManager = new SettingsManager(db);
 
 export default class DataServiceProvider {
 	public static async deleteAllData(): Promise<void> {
@@ -53,6 +55,12 @@ export default class DataServiceProvider {
         + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
         + ')',
 		);
+		await db.run(
+			'CREATE TABLE "settings" (\n'
+      + '"name"\tTEXT NOT NULL UNIQUE,\n'
+      + '"value"\tTEXT\n'
+      + ')',
+		);
 		practiceManager.clear();
 	}
 
@@ -78,6 +86,10 @@ export default class DataServiceProvider {
 
 	static getStats(): Stats {
 		return stats;
+	}
+
+	static getSettingsManager(): SettingsManager {
+		return settingsManager;
 	}
 }
 
