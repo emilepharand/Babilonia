@@ -1,13 +1,15 @@
-import { Request, Response } from "express";
-import DataServiceProvider from "./model/dataServiceProvider";
-import { Language } from "./model/languages/language";
-import { IdeaForAdding } from "./model/ideas/ideaForAdding";
-import { SearchContext } from "./model/search/searchContext";
+import {Request, Response} from 'express';
+import DataServiceProvider from './model/dataServiceProvider';
+import {Language} from './model/languages/language';
+import {IdeaForAdding} from './model/ideas/ideaForAdding';
+import {SearchContext} from './model/search/searchContext';
+import {Settings} from './model/settings/settings';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
 const dv = DataServiceProvider.getInputValidator();
+const sm = DataServiceProvider.getSettingsManager();
 const stats = DataServiceProvider.getStats();
 const search = DataServiceProvider.getSearchHandler();
 
@@ -138,7 +140,6 @@ export default class Controller {
 		if (!(await Controller.validateIdeaIdInRequest(req, res))) {
 			return;
 		}
-
 		await im.deleteIdea(parseInt(req.params.id, 10));
 		res.end();
 	}
@@ -147,16 +148,20 @@ export default class Controller {
 		if (!(await Controller.validateIdeaIdInRequest(req, res))) {
 			return;
 		}
-
 		if (!(await dv.validateIdeaForAdding(req.body))) {
 			res.status(400);
 			res.end();
 			return;
 		}
-
 		const idea = req.body as IdeaForAdding;
 		await im.editIdea(idea, parseInt(req.params.id, 10));
 		res.send(await im.getIdea(parseInt(req.params.id, 10)));
+	}
+
+	public static async setSettings(req: Request, res: Response): Promise<void> {
+		const settings = req.body as Settings;
+		await sm.setSettings(settings);
+		res.end();
 	}
 
 	public static async deleteAllData(req: Request, res: Response): Promise<void> {

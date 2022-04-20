@@ -4,11 +4,28 @@ import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
+import {Settings} from '../../server/model/settings/settings';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
 export const FIRST_ORDERING = 0;
 export const DEFAULT_IS_PRACTICE = false;
+
+export async function setSettingsRawObjectAndGetResponse(object: any) {
+	return fetch('http://localhost:5555/settings', {
+		method: 'PUT',
+		headers: {'Content-Type': 'application/json'},
+		body: object,
+	});
+}
+
+export async function setSettingsAndGetResponse(settings: Settings) {
+	return setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
+}
+
+export async function setSettings(settings: Settings) {
+	await setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
+}
 
 export async function addLanguageRawObjectAndGetResponse(object: any): Promise<Response> {
 	return fetch('http://localhost:5555/languages', {

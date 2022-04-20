@@ -5,10 +5,12 @@ import {
 	editLanguages,
 	nextPracticeIdea,
 	rawNextPracticeIdea,
+	setSettings,
 } from '../utils/utils';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {Idea, validate} from '../../server/model/ideas/idea';
+import {Settings} from '../../server/model/settings/settings';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -75,6 +77,77 @@ describe('getting practice ideas', () => {
 			ideaIds.add((await nextPracticeIdea()).id);
 		}
 		expect(ideaIds.size).toEqual(10);
+	});
+
+	test('test random practice setting', async () => {
+		const l1: Language = await addLanguage('language 1');
+		const l2: Language = await addLanguage('language 2');
+		l1.isPractice = true;
+
+		let settings: Settings = {
+			randomPractice: true,
+		};
+		await setSettings(settings);
+
+		// Make sure there are practiceable ideas
+		await editLanguages([l1, l2]);
+
+		// Add ideas
+		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'},
+			{languageId: l2.id, text: 'expression2'}]};
+		for (let i = 0; i < 10; i++) {
+			// Allow await because this API call should not be made many times at once
+			// eslint-disable-next-line no-await-in-loop
+			await addIdea(ideaForAdding);
+		}
+
+		let firstIdeaIds = [];
+		for (let i = 0; i < 10; i++) {
+			// Allow await because this API call should not be made many times at once
+			// eslint-disable-next-line no-await-in-loop
+			firstIdeaIds.push((await nextPracticeIdea()).id);
+		}
+		let secondIdeaIds = [];
+		for (let i = 0; i < 10; i++) {
+			// Allow await because this API call should not be made many times at once
+			// eslint-disable-next-line no-await-in-loop
+			secondIdeaIds.push((await nextPracticeIdea()).id);
+		}
+		let i = 0;
+		let idsInSameOrder = true;
+		while (i < 10 && idsInSameOrder) {
+			if (!(firstIdeaIds[i] === secondIdeaIds[i])) {
+				idsInSameOrder = false;
+			}
+			i++;
+		}
+		// This test might pass when it should fail but the chance is statistically small
+		expect(idsInSameOrder).toEqual(false);
+
+		settings = {randomPractice: false};
+		await setSettings(settings);
+
+		firstIdeaIds = [];
+		for (let i = 0; i < 10; i++) {
+			// Allow await because this API call should not be made many times at once
+			// eslint-disable-next-line no-await-in-loop
+			firstIdeaIds.push((await nextPracticeIdea()).id);
+		}
+		secondIdeaIds = [];
+		for (let i = 0; i < 10; i++) {
+			// Allow await because this API call should not be made many times at once
+			// eslint-disable-next-line no-await-in-loop
+			secondIdeaIds.push((await nextPracticeIdea()).id);
+		}
+		i = 0;
+		idsInSameOrder = true;
+		while (i < 10 && idsInSameOrder) {
+			if (!(firstIdeaIds[i] === secondIdeaIds[i])) {
+				idsInSameOrder = false;
+			}
+			i++;
+		}
+		expect(idsInSameOrder).toEqual(true);
 	});
 
 	test('many expressions and languages', async () => {

@@ -31,6 +31,8 @@ export default class Routes {
 		this.router.get('/practice-ideas/next', Controller.getNextPracticeIdea);
 		// Stats
 		this.router.get('/stats', Controller.getStats);
+		// Settings
+		this.router.put('/settings', Controller.setSettings);
 		// Everything
 		this.router.delete('/everything', Controller.deleteAllData);
 	}
