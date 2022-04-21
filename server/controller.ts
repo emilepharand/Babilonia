@@ -8,7 +8,7 @@ import {Settings} from './model/settings/settings';
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
-const dv = DataServiceProvider.getInputValidator();
+const iv = DataServiceProvider.getInputValidator();
 const sm = DataServiceProvider.getSettingsManager();
 const stats = DataServiceProvider.getStats();
 const search = DataServiceProvider.getSearchHandler();
@@ -56,7 +56,7 @@ export default class Controller {
 	}
 
 	public static async addLanguage(req: Request, res: Response): Promise<void> {
-		if (!(await dv.validateLanguageForAdding(req.body))) {
+		if (!(await iv.validateLanguageForAdding(req.body))) {
 			res.status(400);
 			res.end();
 			return;
@@ -67,7 +67,7 @@ export default class Controller {
 	}
 
 	public static async editLanguages(req: Request, res: Response): Promise<void> {
-		if (!(await dv.validateLanguagesForEditing(req.body))) {
+		if (!(await iv.validateLanguagesForEditing(req.body))) {
 			res.status(400);
 			res.end();
 			return;
@@ -83,7 +83,7 @@ export default class Controller {
 	}
 
 	public static async addIdea(req: Request, res: Response): Promise<void> {
-		if (!(await dv.validateIdeaForAdding(req.body))) {
+		if (!(await iv.validateIdeaForAdding(req.body))) {
 			res.status(400);
 			res.end();
 			return;
@@ -148,7 +148,7 @@ export default class Controller {
 		if (!(await Controller.validateIdeaIdInRequest(req, res))) {
 			return;
 		}
-		if (!(await dv.validateIdeaForAdding(req.body))) {
+		if (!(await iv.validateIdeaForAdding(req.body))) {
 			res.status(400);
 			res.end();
 			return;
@@ -159,8 +159,14 @@ export default class Controller {
 	}
 
 	public static async setSettings(req: Request, res: Response): Promise<void> {
+		if (!iv.validateSettings(req.body as Settings)) {
+			res.status(400);
+			res.end();
+			return;
+		}
 		const settings = req.body as Settings;
 		await sm.setSettings(settings);
+		res.status(200);
 		res.end();
 	}
 

@@ -4,7 +4,8 @@ import {
 } from './ideas/ideaForAdding';
 import LanguageManager from './languages/languageManager';
 import IdeaManager from './ideas/ideaManager';
-import {Language, validate, validateForAdding} from './languages/language';
+import {Language, validate as validateIdea, validateForAdding} from './languages/language';
+import {validateSchema as validateSettingsSchema} from './settings/settings';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -24,7 +25,7 @@ export default class InputValidator {
 		}
 		const ll = toValidate as Language[];
 		// Each language is valid
-		if (ll.some(l => !validate(l))) {
+		if (ll.some(l => !validateIdea(l))) {
 			return false;
 		}
 		// No language name is blank
@@ -97,5 +98,9 @@ export default class InputValidator {
 		const distinctExpressions = new Set<string>();
 		asIdeaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));
 		return distinctExpressions.size === asIdeaForAdding.ee.length;
+	}
+
+	public validateSettings(settings: unknown): boolean {
+		return validateSettingsSchema(settings);
 	}
 }
