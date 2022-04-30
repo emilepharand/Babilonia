@@ -7,7 +7,9 @@
     <div v-else>
         <div>
           <div v-for="(e, i) in idea.ee" :key="e.id">
-            <PracticeRow :isFocused="isFocused(i)" :rowOrder="i" @fullMatched="fullMatchedRow" :expression="e"/>
+            <PracticeRow :startInteractive="startInteractive"
+                         :isFocused="isFocused(i)" :rowOrder="i" @fullMatched="fullMatchedRow"
+                         :expression="e"/>
           </div>
         </div>
         <div class="d-flex">
@@ -36,48 +38,48 @@ export default defineComponent({
 			currentlyFocusedRow: 0,
 			fullMatchedRows: 0,
 			nbrRowsToMatch: 0,
+			startInteractive: false,
 		};
 	},
-	async created() {
+	async mounted() {
 		try {
 			const idea = await Api.getNextIdea();
 			idea.ee = this.reorderExpressions(idea.ee);
 			this.idea = idea;
-			this.focusFirstPracticeRow();
-			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 			this.fullMatchedRows = 0;
+			this.currentlyFocusedRow = 0;
+			this.startInteractive = true;
+			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 		} catch {
 			this.noIdeas = true;
 		}
 	},
 	computed: {
 		nextButtonClass() {
-			if (this.nbrRowsToMatch === this.fullMatchedRows) {
+			if (this.fullMatchedRows === this.nbrRowsToMatch) {
 				return 'btn btn-sm btn-success flex-grow-1';
 			}
-			return 'btn btn-sm btn-dark flex-grow-1';
+			return 'btn btn-sm btn-secondary flex-grow-1';
 		},
 	},
 	methods: {
 		isFocused(rowNumber: number) {
-			console.log('isfocused');
 			return rowNumber === this.currentlyFocusedRow;
 		},
-		fullMatchedRow(rowOrder: number) {
-			this.fullMatchedRows++;
+		fullMatchedRow(rowOrder: number, newMatch: boolean) {
+			if (newMatch) {
+				this.fullMatchedRows++;
+			}
 			if (this.idea.ee.length === rowOrder + 1) {
-				this.currentlyFocusedRow = -1;
-				(this.$refs.nextButton as any).focus();
+				if (this.fullMatchedRows === this.nbrRowsToMatch) {
+					this.currentlyFocusedRow = -1;
+					(this.$refs.nextButton as any).focus();
+				} else {
+					this.currentlyFocusedRow = 0;
+				}
 			} else {
 				this.currentlyFocusedRow = rowOrder + 1;
 			}
-		},
-		focusFirstPracticeRow() {
-			let i = 0;
-			while (!this.idea.ee[i].language.isPractice) {
-				i++;
-			}
-			this.currentlyFocusedRow = i;
 		},
 		// Reorders expressions to put visible expressions first
 		reorderExpressions(ee: Expression[]): Expression[] {
@@ -95,9 +97,9 @@ export default defineComponent({
 			const idea = await Api.getNextIdea();
 			idea.ee = this.reorderExpressions(idea.ee);
 			this.idea = idea;
-			this.focusFirstPracticeRow();
-			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 			this.fullMatchedRows = 0;
+			this.currentlyFocusedRow = 0;
+			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 		},
 		keyPressed(txt: string, s: string) {
 			txt.trim();

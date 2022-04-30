@@ -37,6 +37,7 @@ export default defineComponent({
 		expression: {} as any,
 		rowOrder: Number,
 		isFocused: Boolean,
+		startInteractive: Boolean,
 	},
 	emits: ['fullMatched'],
 	data() {
@@ -66,9 +67,13 @@ export default defineComponent({
 		},
 		isFocused: {
 			handler() {
-				if (this.isFocused) {
-					if (this.$refs.textInput) {
-						(this.$refs.textInput as any).focus();
+				if (this.startInteractive) {
+					if (this.isFocused) {
+						if (this.isFullMatch || !this.expression.language.isPractice) {
+							this.$emit('fullMatched', this.rowOrder);
+						} else if (this.$refs.textInput) {
+							(this.$refs.textInput as any).focus();
+						}
 					}
 				}
 			},
@@ -76,7 +81,13 @@ export default defineComponent({
 		},
 		typed: {
 			handler() {
-				this.checkMatch();
+				if (this.startInteractive) {
+					if (this.isFullMatch) {
+						this.$emit('fullMatched', this.rowOrder, false);
+					} else {
+						this.checkMatch();
+					}
+				}
 			},
 		},
 	},
@@ -89,7 +100,7 @@ export default defineComponent({
 					this.isNoMatch = false;
 					this.isPartialMatch = false;
 					this.isFullMatch = true;
-					this.$emit('fullMatched', this.rowOrder);
+					this.$emit('fullMatched', this.rowOrder, true);
 				} else {
 					this.isNoMatch = false;
 					this.isPartialMatch = true;
