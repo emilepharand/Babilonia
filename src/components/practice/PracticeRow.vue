@@ -12,9 +12,9 @@
              type="text"
              v-model="typed"
              @keydown.up.prevent="this.$emit('focusPrevious', rowOrder)"
-             @keyup.down="this.$emit('focusNext', rowOrder)"
-             @keyup.delete="currentMaxLength"
+             @keydown.down="this.$emit('focusNext', rowOrder)"
              @focus="this.$emit('focusedRow', rowOrder)"
+             @keydown.right="this.$refs.hintButton.focus()"
              :maxlength="this.currentMaxLength"
              :disabled="isFullMatch"
              :class="{'partial-match': isPartialMatch,
@@ -24,8 +24,13 @@
                        }"/>
         <button class="btn btn-outline-dark"
                :disabled="buttonsDisabled()"
+                @keydown.right="this.$refs.showButtom.focus()"
+                @keydown.left="this.$refs.textInput.focus()"
+                ref="hintButton"
                value="Hint" @click="hint()">Hint</button>
         <button class="btn btn-outline-dark"
+                ref="showButtom"
+                @keydown.left="this.$refs.hintButton.focus()"
                :disabled="buttonsDisabled()"
                @click="show()">Show</button>
     </div>
