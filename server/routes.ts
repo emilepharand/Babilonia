@@ -33,6 +33,7 @@ export default class Routes {
 		this.router.get('/stats', Controller.getStats);
 		// Settings
 		this.router.put('/settings', Controller.setSettings);
+		this.router.get('/settings', Controller.getSettings);
 		// Everything
 		this.router.delete('/everything', Controller.deleteAllData);
 	}

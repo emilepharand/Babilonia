@@ -39,6 +39,7 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
+import Api from '@/ts/api';
 
 export default defineComponent({
 	name: 'PracticeRow',
@@ -59,6 +60,8 @@ export default defineComponent({
 			nothingTyped: true,
 			moreLettersAllowed: true,
 			currentMaxLength: 1,
+			// TODO: This should be Settings
+			settings: {} as any,
 		};
 	},
 	mounted() {
@@ -67,6 +70,9 @@ export default defineComponent({
 				this.focusInput();
 			}
 		}
+	},
+	async created() {
+		this.settings = await Api.getSettings();
 	},
 	watch: {
 		expression: {
@@ -112,6 +118,9 @@ export default defineComponent({
 		buttonsDisabled() {
 			return !this.expression.language.isPractice || this.isFullMatch;
 		},
+		normalizeChar(c: string) {
+			return c.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+		},
 		checkMatch() {
 			const typedWord = this.typed;
 			if (typedWord.length === 0) {
@@ -125,6 +134,8 @@ export default defineComponent({
 			this.nothingTyped = false;
 			const firstLettersMatch = this.checkFirstLettersMatch(this.expression.text, typedWord);
 			if (firstLettersMatch) {
+				// Show real non-normalized spelling
+				this.typed = this.expression.text.substring(0, this.typed.length);
 				if (typedWord.length > 0 && typedWord.length === this.expression.text.length) {
 					this.isNoMatch = false;
 					this.isPartialMatch = false;
@@ -149,7 +160,7 @@ export default defineComponent({
 			}
 			let i = 0;
 			while (i < typedWord.length) {
-				if (textToMatch.charAt(i) === typedWord.charAt(i)) {
+				if (this.normalizeChar(textToMatch.charAt(i)) === this.normalizeChar(typedWord.charAt(i))) {
 					i += 1;
 				} else {
 					return false;

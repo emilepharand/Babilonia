@@ -27,6 +27,12 @@ export async function setSettings(settings: Settings) {
 	await setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
 }
 
+export async function fetchSettings(): Promise<Settings> {
+	return await (await fetch('http://localhost:5555/settings', {
+		method: 'GET',
+	})).json() as Settings;
+}
+
 export async function addLanguageRawObjectAndGetResponse(object: any): Promise<Response> {
 	return fetch('http://localhost:5555/languages', {
 		method: 'POST',

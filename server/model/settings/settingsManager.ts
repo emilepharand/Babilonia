@@ -18,6 +18,7 @@ export default class SettingsManager {
 
 	async setSettings(settings: Settings) {
 		await this.setBooleanSetting('PRACTICE_RANDOM', settings.randomPractice);
+		await this.setBooleanSetting('MAP_CHARACTERS', settings.strictCharacters);
 	}
 
 	async setBooleanSetting(name: string, value: boolean): Promise<void> {
@@ -31,5 +32,16 @@ export default class SettingsManager {
 
 	async isRandomPractice() {
 		return this.getBooleanSetting('PRACTICE_RANDOM');
+	}
+
+	private async isstrictCharacters() {
+		return this.getBooleanSetting('MAP_CHARACTERS');
+	}
+
+	async getSettings(): Promise<Settings> {
+		return {
+			randomPractice: await this.isRandomPractice(),
+			strictCharacters: await this.isstrictCharacters(),
+		};
 	}
 }

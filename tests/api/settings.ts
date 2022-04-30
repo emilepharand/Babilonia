@@ -1,5 +1,7 @@
 import {
 	deleteEverything,
+	fetchSettings,
+	setSettings,
 	setSettingsAndGetResponse,
 	setSettingsRawObjectAndGetResponse,
 } from '../utils/utils';
@@ -11,13 +13,30 @@ beforeEach(async () => {
 // Valid settings are tested in tests for each feature that uses them
 describe('settings API', () => {
 	test('right settings returns 200', async () => {
-		const settings = {randomPractice: false};
+		const settings = {randomPractice: true, strictCharacters: true};
 		const r = await setSettingsAndGetResponse(settings);
 		expect(r.status).toEqual(200);
+		const fetchedSettings = await fetchSettings();
+		expect(fetchedSettings.strictCharacters).toEqual(true);
+		expect(fetchedSettings.randomPractice).toEqual(true);
+	});
+
+	test('settings are correctly set', async () => {
+		const settings = {randomPractice: true, strictCharacters: true};
+		await setSettings(settings);
+		let fetchedSettings = await fetchSettings();
+		expect(fetchedSettings.strictCharacters).toEqual(true);
+		expect(fetchedSettings.randomPractice).toEqual(true);
+		settings.randomPractice = false;
+		settings.strictCharacters = false;
+		await setSettings(settings);
+		fetchedSettings = await fetchSettings();
+		expect(fetchedSettings.strictCharacters).toEqual(false);
+		expect(fetchedSettings.randomPractice).toEqual(false);
 	});
 
 	test('settings that don\'t exist', async () => {
-		const settings = {randomPractice: false, invalidSetting: 'invalid'};
+		const settings = {randomPractice: false, strictCharacters: false, invalidSetting: 'invalid'};
 		const r = await setSettingsAndGetResponse(settings);
 		expect(r.status).toEqual(400);
 	});

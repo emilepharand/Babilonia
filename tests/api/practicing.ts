@@ -86,6 +86,7 @@ describe('getting practice ideas', () => {
 
 		let settings: Settings = {
 			randomPractice: true,
+			strictCharacters: false,
 		};
 		await setSettings(settings);
 
@@ -124,7 +125,7 @@ describe('getting practice ideas', () => {
 		// This test might pass when it should fail but the chance is statistically small
 		expect(idsInSameOrder).toEqual(false);
 
-		settings = {randomPractice: false};
+		settings = {randomPractice: false, strictCharacters: false};
 		await setSettings(settings);
 
 		firstIdeaIds = [];

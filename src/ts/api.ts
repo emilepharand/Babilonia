@@ -2,6 +2,7 @@ import {Idea} from '../../server/model/ideas/idea';
 import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
+import {Settings} from '../../server/model/settings/settings';
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
@@ -117,5 +118,13 @@ export default class Api {
 
 	static async deleteEverything(): Promise<void> {
 		await fetch('http://localhost:5555/everything', {method: 'DELETE'});
+	}
+
+	static async getSettings(): Promise<Settings> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/settings`;
+		const response = await fetch(url, {
+			method: 'GET',
+		});
+		return (await response.json()) as Settings;
 	}
 }

@@ -170,6 +170,10 @@ export default class Controller {
 		res.end();
 	}
 
+	public static async getSettings(req: Request, res: Response): Promise<void> {
+		res.send(JSON.stringify(await sm.getSettings()));
+	}
+
 	public static async deleteAllData(req: Request, res: Response): Promise<void> {
 		await DataServiceProvider.deleteAllData();
 		res.end();
