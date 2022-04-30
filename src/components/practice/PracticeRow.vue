@@ -1,28 +1,28 @@
 <template>
-  <div class="d-flex justify-content-end align-items-center pb-1">
+  <div class="d-flex justify-content-end align-items-center">
     <div class="text-left me-2">{{ expression.language.name }}</div>
-    <div>
-      <input class="me-2"
-             style="max-width: 200px"
-             v-if="!expression.language.isPractice"
+    <div class="input-group input-group-md" style="width: 500px">
+      <input v-if="!expression.language.isPractice"
+             class="form-control"
              type="text"
              :value="expression.text" disabled/>
-      <input ref="textInput"
-             class="me-2" v-else
-             style="max-width: 200px"
+      <input v-else
+             ref="textInput"
+             class="form-control"
              type="text"
              v-model="typed"
              :disabled="isFullMatch"
              :class="{'partial-match': isPartialMatch,
                        'full-match': isFullMatch,
                        'no-match': isNoMatch,
+                       'neutral': nothingTyped,
                        }"/>
-      <input class="btn btn-sm btn-primary me-2" type="button"
-             :disabled="!expression.language.isPractice"
-             value="Hint" @click="hint()">
-      <input class="btn btn-sm btn-primary" type="button"
-             :disabled="!expression.language.isPractice"
-             value="Show" @click="show()">
+        <button class="btn btn-outline-dark"
+               :disabled="buttonsDisabled()"
+               value="Hint" @click="hint()">Hint</button>
+        <button class="btn btn-outline-dark"
+               :disabled="buttonsDisabled()"
+               @click="show()">Show</button>
     </div>
   </div>
 </template>
@@ -45,7 +45,8 @@ export default defineComponent({
 			typed: '',
 			isFullMatch: false,
 			isPartialMatch: false,
-			isNoMatch: true,
+			isNoMatch: false,
+			nothingTyped: true,
 		};
 	},
 	mounted() {
@@ -92,8 +93,22 @@ export default defineComponent({
 		},
 	},
 	methods: {
+		focused() {
+			console.log(`focused ${this.rowOrder}`);
+		},
+		buttonsDisabled() {
+			return !this.expression.language.isPractice || this.isFullMatch;
+		},
 		checkMatch() {
 			const typedWord = this.typed;
+			if (typedWord.length === 0) {
+				this.nothingTyped = true;
+				this.isNoMatch = false;
+				this.isPartialMatch = false;
+				this.isFullMatch = false;
+				return;
+			}
+			this.nothingTyped = false;
 			const firstLettersMatch = this.checkFirstLettersMatch(this.expression.text, typedWord);
 			if (firstLettersMatch) {
 				if (typedWord.length > 0 && typedWord.length === this.expression.text.length) {
@@ -140,6 +155,7 @@ export default defineComponent({
 			} else {
 				this.typed = this.expression.text.substring(0, 1);
 			}
+			(this.$refs.textInput as any).focus();
 		},
 		show() {
 			this.typed = this.expression.text;
@@ -152,16 +168,30 @@ export default defineComponent({
 <style scoped>
 
 .partial-match {
-  color: darkgreen;
+  color: #198754;
+}
+
+.partial-match:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.2rem rgba(0,200,81,.25);
 }
 
 .full-match {
-  background: darkgreen;
+  background: #198754;
   color: #fff;
   font-weight: bold;
 }
 
 .no-match {
-  color: darkred;
+  color: #dc3545;
+}
+
+.no-match:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(255,68,68,.25);
+}
+
+input {
+  font-size: 1.1rem;
 }
 </style>

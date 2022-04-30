@@ -6,12 +6,13 @@
     </div>
     <div v-else>
         <div>
-          <div v-for="(e, i) in idea.ee" :key="e.id">
+          <div v-for="(e, i) in idea.ee" :key="e.id" class="pb-2">
             <PracticeRow :startInteractive="startInteractive"
                          :isFocused="isFocused(i)" :rowOrder="i" @fullMatched="fullMatchedRow"
                          :expression="e"/>
           </div>
         </div>
+        <hr>
         <div class="d-flex">
           <button ref="nextButton" :class="nextButtonClass" @click="next()">Next</button>
         </div>
@@ -56,10 +57,10 @@ export default defineComponent({
 	},
 	computed: {
 		nextButtonClass() {
-			if (this.fullMatchedRows === this.nbrRowsToMatch) {
-				return 'btn btn-sm btn-success flex-grow-1';
+			if (this.startInteractive && this.fullMatchedRows === this.nbrRowsToMatch) {
+				return 'btn btn-success flex-grow-1';
 			}
-			return 'btn btn-sm btn-secondary flex-grow-1';
+			return 'btn btn-outline-secondary flex-grow-1';
 		},
 	},
 	methods: {

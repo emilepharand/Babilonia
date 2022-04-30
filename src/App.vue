@@ -47,6 +47,9 @@
 .view {
   position: absolute;
 }
+h1 {
+  margin-bottom: 20px;
+}
 </style>
 
 <style scoped>
