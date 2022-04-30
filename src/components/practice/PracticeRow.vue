@@ -11,9 +11,11 @@
              class="form-control"
              type="text"
              v-model="typed"
-             @keyup.up="this.$emit('focusPrevious', rowOrder)"
+             @keydown.up.prevent="this.$emit('focusPrevious', rowOrder)"
              @keyup.down="this.$emit('focusNext', rowOrder)"
+             @keyup.delete="currentMaxLength"
              @focus="this.$emit('focusedRow', rowOrder)"
+             :maxlength="this.currentMaxLength"
              :disabled="isFullMatch"
              :class="{'partial-match': isPartialMatch,
                        'full-match': isFullMatch,
@@ -50,12 +52,14 @@ export default defineComponent({
 			isPartialMatch: false,
 			isNoMatch: false,
 			nothingTyped: true,
+			moreLettersAllowed: true,
+			currentMaxLength: 1,
 		};
 	},
 	mounted() {
 		if (this.isFocused) {
 			if (this.$refs.textInput) {
-				(this.$refs.textInput as any).focus();
+				this.focusInput();
 			}
 		}
 	},
@@ -75,7 +79,7 @@ export default defineComponent({
 					if (this.isFullMatch || !this.expression.language.isPractice) {
 						this.$emit('skipFocus');
 					} else if (this.$refs.textInput) {
-						(this.$refs.textInput as any).focus();
+						this.focusInput();
 					}
 				}
 			},
@@ -85,7 +89,7 @@ export default defineComponent({
 			handler() {
 				if (this.startInteractive) {
 					if (this.isFullMatch) {
-						this.$emit('fullMatched', this.rowOrder, false);
+						this.$emit('skipFocus');
 					} else {
 						this.checkMatch();
 					}
@@ -94,6 +98,12 @@ export default defineComponent({
 		},
 	},
 	methods: {
+		focusInput() {
+			(this.$refs.textInput as any).focus();
+			const saved = this.typed;
+			(this.$refs.textInput as any).value = '';
+			(this.$refs.textInput as any).value = saved;
+		},
 		buttonsDisabled() {
 			return !this.expression.language.isPractice || this.isFullMatch;
 		},
@@ -104,6 +114,7 @@ export default defineComponent({
 				this.isNoMatch = false;
 				this.isPartialMatch = false;
 				this.isFullMatch = false;
+				this.currentMaxLength = 1;
 				return;
 			}
 			this.nothingTyped = false;
@@ -118,11 +129,13 @@ export default defineComponent({
 					this.isNoMatch = false;
 					this.isPartialMatch = true;
 					this.isFullMatch = false;
+					this.currentMaxLength = this.typed.length + 1;
 				}
 			} else {
 				this.isNoMatch = true;
 				this.isPartialMatch = false;
 				this.isFullMatch = false;
+				this.moreLettersAllowed = false;
 			}
 		},
 		checkFirstLettersMatch(textToMatch: string, typedWord: string) {
@@ -153,7 +166,7 @@ export default defineComponent({
 			} else {
 				this.typed = this.expression.text.substring(0, 1);
 			}
-			(this.$refs.textInput as any).focus();
+			this.focusInput();
 		},
 		show() {
 			this.typed = this.expression.text;
