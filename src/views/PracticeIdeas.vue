@@ -8,7 +8,13 @@
         <div>
           <div v-for="(e, i) in idea.ee" :key="e.id" class="pb-2">
             <PracticeRow :startInteractive="startInteractive"
-                         :isFocused="isFocused(i)" :rowOrder="i" @fullMatched="fullMatchedRow"
+                         :isFocused="isFocused(i)"
+                         :rowOrder="i"
+                         @focusPrevious="focusPrevious"
+                         @focusNext="focusNext"
+                         @skipFocus="skipFocus"
+                         @focusedRow="focusedRow"
+                         @fullMatched="fullMatchedRow"
                          :expression="e"/>
           </div>
         </div>
@@ -40,6 +46,7 @@ export default defineComponent({
 			fullMatchedRows: 0,
 			nbrRowsToMatch: 0,
 			startInteractive: false,
+			focusDirectionDown: true,
 		};
 	},
 	async mounted() {
@@ -64,6 +71,33 @@ export default defineComponent({
 		},
 	},
 	methods: {
+		focusedRow(rowNumber: number) {
+			this.currentlyFocusedRow = rowNumber;
+		},
+		focusPrevious(rowNumber: number) {
+			this.focusDirectionDown = false;
+			if (this.currentlyFocusedRow === 0) {
+				// Loop around
+				this.currentlyFocusedRow = this.idea.ee.length - 1;
+			} else {
+				this.currentlyFocusedRow = rowNumber - 1;
+			}
+		},
+		focusNext(rowNumber: number) {
+			this.focusDirectionDown = true;
+			if (this.currentlyFocusedRow === this.idea.ee.length - 1) {
+				this.currentlyFocusedRow = 0;
+			} else {
+				this.currentlyFocusedRow = rowNumber + 1;
+			}
+		},
+		skipFocus() {
+			if (this.focusDirectionDown) {
+				this.focusNext(this.currentlyFocusedRow);
+			} else {
+				this.focusPrevious(this.currentlyFocusedRow);
+			}
+		},
 		isFocused(rowNumber: number) {
 			return rowNumber === this.currentlyFocusedRow;
 		},
@@ -71,15 +105,18 @@ export default defineComponent({
 			if (newMatch) {
 				this.fullMatchedRows++;
 			}
-			if (this.idea.ee.length === rowOrder + 1) {
-				if (this.fullMatchedRows === this.nbrRowsToMatch) {
-					this.currentlyFocusedRow = -1;
-					(this.$refs.nextButton as any).focus();
-				} else {
-					this.currentlyFocusedRow = 0;
-				}
+			if (this.fullMatchedRows === this.nbrRowsToMatch) {
+				this.currentlyFocusedRow = -1;
+				(this.$refs.nextButton as any).focus();
+			} else if (this.currentlyFocusedRow === rowOrder) {
+				this.focusNext(rowOrder);
 			} else {
-				this.currentlyFocusedRow = rowOrder + 1;
+				const temp = this.currentlyFocusedRow;
+				this.currentlyFocusedRow = -1;
+				this.$nextTick(() => {
+					// Trigger focus (because value did not change so Vue will not react)
+					this.currentlyFocusedRow = temp;
+				});
 			}
 		},
 		// Reorders expressions to put visible expressions first

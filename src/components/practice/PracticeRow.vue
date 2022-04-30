@@ -1,7 +1,8 @@
 <template>
   <div class="d-flex justify-content-end align-items-center">
     <div class="text-left me-2">{{ expression.language.name }}</div>
-    <div class="input-group input-group-md" style="width: 500px">
+    <div class="input-group input-group-md" style="width: 400px">
+      {{ this.isFocused }}
       <input v-if="!expression.language.isPractice"
              class="form-control"
              type="text"
@@ -11,6 +12,9 @@
              class="form-control"
              type="text"
              v-model="typed"
+             @keyup.up="this.$emit('focusPrevious', rowOrder)"
+             @keyup.down="this.$emit('focusNext', rowOrder)"
+             @focus="this.$emit('focusedRow', rowOrder)"
              :disabled="isFullMatch"
              :class="{'partial-match': isPartialMatch,
                        'full-match': isFullMatch,
@@ -39,7 +43,7 @@ export default defineComponent({
 		isFocused: Boolean,
 		startInteractive: Boolean,
 	},
-	emits: ['fullMatched'],
+	emits: ['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow'],
 	data() {
 		return {
 			typed: '',
@@ -68,13 +72,11 @@ export default defineComponent({
 		},
 		isFocused: {
 			handler() {
-				if (this.startInteractive) {
-					if (this.isFocused) {
-						if (this.isFullMatch || !this.expression.language.isPractice) {
-							this.$emit('fullMatched', this.rowOrder);
-						} else if (this.$refs.textInput) {
-							(this.$refs.textInput as any).focus();
-						}
+				if (this.startInteractive && this.isFocused) {
+					if (this.isFullMatch || !this.expression.language.isPractice) {
+						this.$emit('skipFocus');
+					} else if (this.$refs.textInput) {
+						(this.$refs.textInput as any).focus();
 					}
 				}
 			},
@@ -93,9 +95,6 @@ export default defineComponent({
 		},
 	},
 	methods: {
-		focused() {
-			console.log(`focused ${this.rowOrder}`);
-		},
 		buttonsDisabled() {
 			return !this.expression.language.isPractice || this.isFullMatch;
 		},
