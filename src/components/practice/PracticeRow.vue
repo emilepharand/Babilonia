@@ -17,9 +17,12 @@
                        'full-match': isFullMatch,
                        'no-match': isNoMatch,
                        }"/>
-      <input class="btn btn-sm btn-primary" type="button"
+      <input class="btn btn-sm btn-primary me-2" type="button"
              :disabled="!expression.language.isPractice"
              value="Hint" @click="hint()">
+      <input class="btn btn-sm btn-primary" type="button"
+             :disabled="!expression.language.isPractice"
+             value="Show" @click="show()">
     </div>
   </div>
 </template>
@@ -126,6 +129,9 @@ export default defineComponent({
 			} else {
 				this.typed = this.expression.text.substring(0, 1);
 			}
+		},
+		show() {
+			this.typed = this.expression.text;
 		},
 	},
 },

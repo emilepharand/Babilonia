@@ -45,6 +45,7 @@ export default defineComponent({
 			this.idea = idea;
 			this.focusFirstPracticeRow();
 			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
+			this.fullMatchedRows = 0;
 		} catch {
 			this.noIdeas = true;
 		}
@@ -96,6 +97,7 @@ export default defineComponent({
 			this.idea = idea;
 			this.focusFirstPracticeRow();
 			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
+			this.fullMatchedRows = 0;
 		},
 		keyPressed(txt: string, s: string) {
 			txt.trim();
