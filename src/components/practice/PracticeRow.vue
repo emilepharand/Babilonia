@@ -7,14 +7,15 @@
              v-if="!expression.language.isPractice"
              type="text"
              :value="expression.text" disabled/>
-      <input class="me-2" v-else
+      <input ref="textInput"
+             class="me-2" v-else
              style="max-width: 200px"
              type="text"
              v-model="typed"
              :disabled="isFullMatch"
-             :class="{'partial-match': isPartialMatch(),
+             :class="{'partial-match': isPartialMatch,
                        'full-match': isFullMatch,
-                       'no-match': isNoMatch(),
+                       'no-match': isNoMatch,
                        }"/>
       <input class="btn btn-sm btn-primary" type="button"
              :disabled="!expression.language.isPractice"
@@ -31,12 +32,24 @@ export default defineComponent({
 	props: {
 		// TODO: This should be Expression
 		expression: {} as any,
+		rowOrder: Number,
+		isFocused: Boolean,
 	},
+	emits: ['fullMatched'],
 	data() {
 		return {
 			typed: '',
 			isFullMatch: false,
+			isPartialMatch: false,
+			isNoMatch: true,
 		};
+	},
+	mounted() {
+		if (this.isFocused) {
+			if (this.$refs.textInput) {
+				(this.$refs.textInput as any).focus();
+			}
+		}
 	},
 	watch: {
 		expression: {
@@ -46,25 +59,44 @@ export default defineComponent({
 					this.isFullMatch = false;
 				}
 			},
-			deep: true,
 			immediate: true,
+		},
+		isFocused: {
+			handler() {
+				if (this.isFocused) {
+					if (this.$refs.textInput) {
+						(this.$refs.textInput as any).focus();
+					}
+				}
+			},
+			immediate: true,
+		},
+		typed: {
+			handler() {
+				this.checkMatch();
+			},
 		},
 	},
 	methods: {
-		isPartialMatch() {
+		checkMatch() {
 			const typedWord = this.typed;
 			const firstLettersMatch = this.checkFirstLettersMatch(this.expression.text, typedWord);
 			if (firstLettersMatch) {
 				if (typedWord.length > 0 && typedWord.length === this.expression.text.length) {
+					this.isNoMatch = false;
+					this.isPartialMatch = false;
 					this.isFullMatch = true;
-					return false;
+					this.$emit('fullMatched', this.rowOrder);
+				} else {
+					this.isNoMatch = false;
+					this.isPartialMatch = true;
+					this.isFullMatch = false;
 				}
-				return true;
+			} else {
+				this.isNoMatch = true;
+				this.isPartialMatch = false;
+				this.isFullMatch = false;
 			}
-			return false;
-		},
-		isNoMatch() {
-			return !this.checkFirstLettersMatch(this.expression.text, this.typed);
 		},
 		checkFirstLettersMatch(textToMatch: string, typedWord: string) {
 			if (typedWord as unknown === undefined) {

@@ -6,12 +6,12 @@
     </div>
     <div v-else>
         <div>
-          <div v-for="e in idea.ee" :key="e.id">
-            <PracticeRow :expression="e"/>
+          <div v-for="(e, i) in idea.ee" :key="e.id">
+            <PracticeRow :isFocused="isFocused(i)" :rowOrder="i" @fullMatched="fullMatchedRow" :expression="e"/>
           </div>
         </div>
         <div class="d-flex">
-          <button class="btn btn-sm btn-primary flex-grow-1" @click="next()">Next</button>
+          <button ref="nextButton" :class="nextButtonClass" @click="next()">Next</button>
         </div>
       </div>
   </div>
@@ -30,8 +30,12 @@ export default defineComponent({
 	components: {NotEnoughData, PracticeRow},
 	data() {
 		return {
+			itemRefs: [],
 			idea: getEmptyIdeaNoAsync(),
 			noIdeas: false,
+			currentlyFocusedRow: 0,
+			fullMatchedRows: 0,
+			nbrRowsToMatch: 0,
 		};
 	},
 	async created() {
@@ -39,27 +43,59 @@ export default defineComponent({
 			const idea = await Api.getNextIdea();
 			idea.ee = this.reorderExpressions(idea.ee);
 			this.idea = idea;
+			this.focusFirstPracticeRow();
+			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 		} catch {
 			this.noIdeas = true;
 		}
 	},
+	computed: {
+		nextButtonClass() {
+			if (this.nbrRowsToMatch === this.fullMatchedRows) {
+				return 'btn btn-sm btn-success flex-grow-1';
+			}
+			return 'btn btn-sm btn-dark flex-grow-1';
+		},
+	},
 	methods: {
-		// Reorders expressions to put expressions to practice first
+		isFocused(rowNumber: number) {
+			console.log('isfocused');
+			return rowNumber === this.currentlyFocusedRow;
+		},
+		fullMatchedRow(rowOrder: number) {
+			this.fullMatchedRows++;
+			if (this.idea.ee.length === rowOrder + 1) {
+				this.currentlyFocusedRow = -1;
+				(this.$refs.nextButton as any).focus();
+			} else {
+				this.currentlyFocusedRow = rowOrder + 1;
+			}
+		},
+		focusFirstPracticeRow() {
+			let i = 0;
+			while (!this.idea.ee[i].language.isPractice) {
+				i++;
+			}
+			this.currentlyFocusedRow = i;
+		},
+		// Reorders expressions to put visible expressions first
 		reorderExpressions(ee: Expression[]): Expression[] {
 			return ee.sort((e1, e2) => {
 				if (e1.language.isPractice && !e2.language.isPractice) {
-					return -1;
+					return 1;
 				}
 				if (e1.language.isPractice && e2.language.isPractice) {
 					return 0;
 				}
-				return 1;
+				return -1;
 			});
 		},
 		async next() {
 			const idea = await Api.getNextIdea();
 			idea.ee = this.reorderExpressions(idea.ee);
 			this.idea = idea;
+			this.focusFirstPracticeRow();
+			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 		},
 		keyPressed(txt: string, s: string) {
 			txt.trim();
