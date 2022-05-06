@@ -99,8 +99,6 @@ export default defineComponent({
 			}
 		},
 		skipFocus() {
-			console.log(`skip ${this.currentlyFocusedRow}`);
-			console.log(`${this.focusDirectionDown}`);
 			if (this.focusDirectionDown) {
 				this.focusNext(this.currentlyFocusedRow);
 			} else {
