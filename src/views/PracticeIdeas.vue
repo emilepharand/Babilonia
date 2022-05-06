@@ -58,8 +58,8 @@ export default defineComponent({
 			idea.ee = this.reorderExpressions(idea.ee);
 			this.idea = idea;
 			this.fullMatchedRows = 0;
-			this.currentlyFocusedRow = 0;
 			this.startInteractive = true;
+			this.currentlyFocusedRow = 0;
 			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
 		} catch {
 			this.noIdeas = true;
