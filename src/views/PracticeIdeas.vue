@@ -54,13 +54,7 @@ export default defineComponent({
 	},
 	async mounted() {
 		try {
-			const idea = await Api.getNextIdea();
-			idea.ee = this.reorderExpressions(idea.ee);
-			this.idea = idea;
-			this.fullMatchedRows = 0;
-			this.startInteractive = true;
-			this.currentlyFocusedRow = 0;
-			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
+			await this.displayNextIdea();
 		} catch {
 			this.noIdeas = true;
 		}
@@ -74,6 +68,16 @@ export default defineComponent({
 		},
 	},
 	methods: {
+		async displayNextIdea() {
+			const idea = await Api.getNextIdea();
+			idea.ee = this.reorderExpressions(idea.ee);
+			this.idea = idea;
+			this.fullMatchedRows = 0;
+			this.focusDirectionDown = true;
+			this.startInteractive = true;
+			this.currentlyFocusedRow = 0;
+			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
+		},
 		focusedRow(rowNumber: number) {
 			this.currentlyFocusedRow = rowNumber;
 		},
@@ -95,6 +99,8 @@ export default defineComponent({
 			}
 		},
 		skipFocus() {
+			console.log(`skip ${this.currentlyFocusedRow}`);
+			console.log(`${this.focusDirectionDown}`);
 			if (this.focusDirectionDown) {
 				this.focusNext(this.currentlyFocusedRow);
 			} else {
@@ -135,12 +141,7 @@ export default defineComponent({
 			});
 		},
 		async next() {
-			const idea = await Api.getNextIdea();
-			idea.ee = this.reorderExpressions(idea.ee);
-			this.idea = idea;
-			this.fullMatchedRows = 0;
-			this.currentlyFocusedRow = 0;
-			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
+			await this.displayNextIdea();
 		},
 		keyPressed(txt: string, s: string) {
 			txt.trim();
