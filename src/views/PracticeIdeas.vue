@@ -10,6 +10,7 @@
             <PracticeRow :startInteractive="startInteractive"
                          :isFocused="isFocused(i)"
                          :rowOrder="i"
+                         :reset="resetAll"
                          @focusPrevious="focusPrevious"
                          @focusNext="focusNext"
                          @skipFocus="skipFocus"
@@ -19,7 +20,8 @@
           </div>
         </div>
         <hr>
-        <div class="d-flex">
+        <div class="d-flex btn-group">
+          <button @click="resetRows()" class="btn btn-outline-secondary flex-grow-1">Reset</button>
           <button ref="nextButton" :class="nextButtonClass" @click="next()">Next</button>
         </div>
       </div>
@@ -47,6 +49,7 @@ export default defineComponent({
 			nbrRowsToMatch: 0,
 			startInteractive: false,
 			focusDirectionDown: true,
+			resetAll: false,
 		};
 	},
 	async mounted() {
@@ -142,6 +145,14 @@ export default defineComponent({
 		keyPressed(txt: string, s: string) {
 			txt.trim();
 			s.trim();
+		},
+		resetRows() {
+			this.fullMatchedRows = 0;
+			this.resetAll = true;
+			this.$nextTick(() => {
+				this.resetAll = false;
+			});
+			this.currentlyFocusedRow = 0;
 		},
 	},
 });

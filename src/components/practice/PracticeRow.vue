@@ -22,7 +22,7 @@
                        'no-match': isNoMatch,
                        'neutral': nothingTyped,
                        }"/>
-        <button class="btn btn-outline-dark"
+      <button class="btn btn-outline-dark"
                :disabled="buttonsDisabled()"
                 @keydown.right="this.$refs.showButtom.focus()"
                 @keydown.left="this.$refs.textInput.focus()"
@@ -49,6 +49,7 @@ export default defineComponent({
 		rowOrder: Number,
 		isFocused: Boolean,
 		startInteractive: Boolean,
+		reset: Boolean,
 	},
 	emits: ['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow'],
 	data() {
@@ -107,8 +108,22 @@ export default defineComponent({
 				}
 			},
 		},
+		reset: {
+			handler() {
+				if (this.startInteractive) {
+					this.resetRow();
+				}
+			},
+		},
 	},
 	methods: {
+		resetRow() {
+			this.typed = '';
+			this.isFullMatch = false;
+			this.isPartialMatch = false;
+			this.isNoMatch = false;
+			this.nothingTyped = true;
+		},
 		focusInput() {
 			(this.$refs.textInput as any).focus();
 			const saved = this.typed;
@@ -119,7 +134,12 @@ export default defineComponent({
 			return !this.expression.language.isPractice || this.isFullMatch;
 		},
 		normalizeChar(c: string) {
-			return c.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+			if (this.settings.strictCharacters) {
+				return c;
+			}
+			return c.normalize('NFD')
+				.replace(/[\u0300-\u036f]/g, '')
+				.toLowerCase();
 		},
 		checkMatch() {
 			const typedWord = this.typed;
@@ -134,7 +154,7 @@ export default defineComponent({
 			this.nothingTyped = false;
 			const firstLettersMatch = this.checkFirstLettersMatch(this.expression.text, typedWord);
 			if (firstLettersMatch) {
-				// Show real non-normalized spelling
+				// Show non-normalized spelling
 				this.typed = this.expression.text.substring(0, this.typed.length);
 				if (typedWord.length > 0 && typedWord.length === this.expression.text.length) {
 					this.isNoMatch = false;
