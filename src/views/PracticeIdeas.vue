@@ -5,7 +5,7 @@
       <NotEnoughData noIdea />
     </div>
     <div v-else>
-        <div>
+        <div id="practice-table">
           <div v-for="(e, i) in idea.ee" :key="e.id" class="pb-2">
             <PracticeRow :startInteractive="startInteractive"
                          :isFocused="isFocused(i)"

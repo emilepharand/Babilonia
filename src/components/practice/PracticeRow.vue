@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex justify-content-end align-items-center">
+  <div class="practice-row d-flex justify-content-end align-items-center">
     <div class="text-left me-2">{{ expression.language.name }}</div>
     <div class="input-group input-group-md" style="width: 400px">
       <input v-if="!expression.language.isPractice"
@@ -8,7 +8,7 @@
              :value="expression.text" disabled/>
       <input v-else
              ref="textInput"
-             class="form-control"
+             class="expression-input form-control"
              type="text"
              v-model="typed"
              @keydown.up.prevent="this.$emit('focusPrevious', rowOrder)"
