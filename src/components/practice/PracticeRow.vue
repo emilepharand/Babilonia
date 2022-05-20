@@ -3,7 +3,7 @@
     <div class="text-left me-2">{{ expression.language.name }}</div>
     <div class="input-group input-group-md" style="width: 400px">
       <input v-if="!expression.language.isPractice"
-             class="form-control"
+             class="form-control expression-input"
              type="text"
              :value="expression.text" disabled/>
       <input v-else
@@ -22,13 +22,13 @@
                        'no-match': isNoMatch,
                        'neutral': nothingTyped,
                        }"/>
-      <button class="btn btn-outline-dark"
+      <button class="btn btn-outline-dark hint-button"
                :disabled="buttonsDisabled()"
                 @keydown.right="this.$refs.showButtom.focus()"
                 @keydown.left="this.$refs.textInput.focus()"
                 ref="hintButton"
                value="Hint" @click="hint()">Hint</button>
-        <button class="btn btn-outline-dark"
+        <button class="btn btn-outline-dark show-button"
                 ref="showButtom"
                 @keydown.left="this.$refs.hintButton.focus()"
                :disabled="buttonsDisabled()"
@@ -194,7 +194,7 @@ export default defineComponent({
 				j += 1;
 			}
 			if (j > 0) {
-				if (this.expression.text[j + 1] === ' ') {
+				if (this.expression.text[j] === ' ') {
 					this.typed = this.expression.text.substring(0, j + 2);
 				} else {
 					this.typed = this.expression.text.substring(0, j + 1);

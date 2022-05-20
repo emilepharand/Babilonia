@@ -21,7 +21,7 @@
         </div>
         <hr>
         <div class="d-flex btn-group">
-          <button @click="resetRows()" class="btn btn-outline-secondary flex-grow-1">Reset</button>
+          <button @click="resetRows()" class="btn btn-outline-secondary flex-grow-1 reset-button">Reset</button>
           <button ref="nextButton" :class="nextButtonClass" @click="next()">Next</button>
         </div>
       </div>
@@ -62,9 +62,9 @@ export default defineComponent({
 	computed: {
 		nextButtonClass() {
 			if (this.startInteractive && this.fullMatchedRows === this.nbrRowsToMatch) {
-				return 'btn btn-success flex-grow-1';
+				return 'btn btn-success flex-grow-1 next-button';
 			}
-			return 'btn btn-outline-secondary flex-grow-1';
+			return 'btn btn-outline-secondary flex-grow-1 next-button';
 		},
 	},
 	methods: {
