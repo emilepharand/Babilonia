@@ -15,7 +15,7 @@ function getRow(rowNbr: number) {
 context('Practicing', () => {
 	specify('Practicing works', () => {
 		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
-		// Idea 2: salut, allô, hi, hey, hola, ciao, salve
+		// Idea 2: salut, allô, hi, hey, hola éàíôüáéíóú, ciao, salve
 		cyutils.addIdeas();
 
 		cy.get('#practice-link').click();
@@ -54,8 +54,7 @@ context('Practicing', () => {
 		// Cannot input more letters when no match (previous bug allowed this after backspaces)
 		assertIsTyped(1, 'hellu');
 		assertRowMatchIsNoMatch(1);
-		typeInRow(1, '{backspace}');
-		typeInRow(1, 'o');
+		typeInRow(1, '{backspace}{upArrow}{downArrow}o');
 		assertRowMatchIsFullMatch(1, 'hello');
 
 		getNextButton().should('not.have.class', 'btn-success');
@@ -160,6 +159,19 @@ context('Practicing', () => {
 
 		getNextButton().should('have.class', 'btn-success');
 		getNextButton().should('have.focus');
+
+		getNextButton().click();
+
+		// Wait for table to load
+		cy.get('#practice-table')
+			.find('.practice-row')
+			.should('have.length', 8);
+
+		assertRowInputHasFocus(2);
+
+		// Character mapping
+		typeInRow(4, 'hola eaiouaeiou');
+		assertRowMatchIsFullMatch(4, 'hola éàíôüáéíóú');
 	});
 });
 
@@ -266,10 +278,3 @@ function assertRowMatchIsFullMatch(rowNbr: number, typed: string) {
 	assertIsTyped(rowNbr, typed);
 	assertButtonsAreDisabled(rowNbr);
 }
-
-// Up/down keys with and without matched expressions in between
-// -> should loop around
-// -> should focus at end of text
-// Left/right keys
-// Character mapping
-// Reset button

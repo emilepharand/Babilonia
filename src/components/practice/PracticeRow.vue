@@ -126,6 +126,7 @@ export default defineComponent({
 		},
 		focusInput() {
 			(this.$refs.textInput as any).focus();
+			// Focus end of word... is this needed? I don't remember the exact use case
 			const saved = this.typed;
 			(this.$refs.textInput as any).value = '';
 			(this.$refs.textInput as any).value = saved;

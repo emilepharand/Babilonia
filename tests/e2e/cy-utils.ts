@@ -2,7 +2,14 @@ import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 
 export function addLanguages() {
-	const languageNames = ['français', 'english', 'español', 'italiano', 'deutsch', 'português'];
+	const languageNames = [
+		'français',
+		'english',
+		'español',
+		'italiano',
+		'deutsch',
+		'português',
+	];
 	for (const languageName of languageNames) {
 		cy.request({
 			url: 'http://localhost:5555/languages',
@@ -25,7 +32,7 @@ export function addIdeas() {
 	const e7: ExpressionForAdding = {languageId: 1, text: 'allô'};
 	const e8: ExpressionForAdding = {languageId: 2, text: 'hi'};
 	const e9: ExpressionForAdding = {languageId: 2, text: 'hey'};
-	const e10: ExpressionForAdding = {languageId: 3, text: 'hola'};
+	const e10: ExpressionForAdding = {languageId: 3, text: 'hola éàíôüáéíóú'};
 	const e11: ExpressionForAdding = {languageId: 4, text: 'ciao'};
 	const e12: ExpressionForAdding = {languageId: 4, text: 'salve'};
 	const e13: ExpressionForAdding = {languageId: 5, text: 'Hallo'};
