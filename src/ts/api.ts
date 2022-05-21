@@ -3,6 +3,7 @@ import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
+import {SearchContext} from '../../server/model/search/searchContext';
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
@@ -77,7 +78,9 @@ export default class Api {
 		return (await response.json()) as Language;
 	}
 
-	public static async editLanguages(languages: Language[]): Promise<Language[]> {
+	public static async editLanguages(
+		languages: Language[],
+	): Promise<Language[]> {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
 		const response = await fetch(url, {
 			method: 'PUT',
@@ -126,5 +129,35 @@ export default class Api {
 			method: 'GET',
 		});
 		return (await response.json()) as Settings;
+	}
+
+	// TODO: This is duplicated
+	static paramsFromSearchContext(sc: SearchContext): string {
+		let params = '';
+		if (sc.pattern) {
+			params = `pattern=${sc.pattern}`;
+		}
+		if (sc.strict) {
+			params += '&strict=true';
+		}
+		if (sc.language) {
+			params += `&language=${sc.language}`;
+		}
+		if (sc.ideaHas) {
+			params += `&ideaHas=${sc.ideaHas.join(',')}`;
+		}
+		if (sc.ideaDoesNotHave) {
+			params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
+		}
+		return params;
+	}
+
+	static async searchIdeas(sc: SearchContext): Promise<Idea[]> {
+		const params = Api.paramsFromSearchContext(sc);
+		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas?${params}`;
+		const response = await fetch(url, {
+			method: 'GET',
+		});
+		return (await response.json()) as Idea[];
 	}
 }

@@ -149,8 +149,8 @@ export async function searchRawParamsAndGetResponse(params: string): Promise<Res
 	});
 }
 
-export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
-	let params;
+export function paramsFromSearchContext(sc: SearchContext): string {
+	let params = '';
 	if (sc.pattern) {
 		params = `pattern=${sc.pattern}`;
 	}
@@ -166,6 +166,11 @@ export async function searchAndGetResponse(sc: SearchContext): Promise<Response>
 	if (sc.ideaDoesNotHave) {
 		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
 	}
+	return params;
+}
+
+export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
+	const params = paramsFromSearchContext(sc);
 	const url = encodeURI(`http://localhost:5555/ideas?${params}`);
 	return fetch(url, {
 		method: 'GET',
