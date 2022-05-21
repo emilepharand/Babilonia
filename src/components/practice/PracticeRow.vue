@@ -1,6 +1,6 @@
 <template>
   <div class="practice-row d-flex justify-content-end align-items-center">
-    <div class="text-left me-2">{{ expression.language.name }}</div>
+    <div class="text-left me-2 language-name">{{ expression.language.name }}</div>
     <div class="input-group input-group-md" style="width: 400px">
       <input v-if="!expression.language.isPractice"
              class="form-control expression-input"

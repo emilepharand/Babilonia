@@ -12,6 +12,16 @@ function getRow(rowNbr: number) {
 		.eq(rowNbr);
 }
 
+function waitForTableToLoad(length: number) {
+	cy.get('#practice-table')
+		.find('.practice-row')
+		.should('have.length', length);
+}
+
+function assertLanguageName(rowNbr: number, name: string) {
+	getRow(rowNbr).find('.language-name').should('have.text', name);
+}
+
 context('Practicing', () => {
 	specify('Practicing works', () => {
 		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
@@ -20,10 +30,13 @@ context('Practicing', () => {
 
 		cy.get('#practice-link').click();
 
-		// Wait for table to load
-		cy.get('#practice-table')
-			.find('.practice-row')
-			.should('have.length', 5);
+		waitForTableToLoad(5);
+
+		assertLanguageName(0, 'français');
+		assertLanguageName(1, 'english');
+		assertLanguageName(2, 'español');
+		assertLanguageName(3, 'italiano');
+		assertLanguageName(4, 'deutsch');
 
 		getNextButton().should('not.have.class', 'btn-success');
 
@@ -163,9 +176,16 @@ context('Practicing', () => {
 		getNextButton().click();
 
 		// Wait for table to load
-		cy.get('#practice-table')
-			.find('.practice-row')
-			.should('have.length', 8);
+		waitForTableToLoad(8);
+
+		assertLanguageName(0, 'français');
+		assertLanguageName(1, 'français');
+		assertLanguageName(2, 'english');
+		assertLanguageName(3, 'english');
+		assertLanguageName(4, 'español');
+		assertLanguageName(5, 'italiano');
+		assertLanguageName(6, 'italiano');
+		assertLanguageName(7, 'deutsch');
 
 		assertRowInputHasFocus(2);
 
