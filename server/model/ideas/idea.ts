@@ -14,6 +14,13 @@ export class Idea {
 	}
 }
 
+export function getEmptyIdeaArrayNoAsync(): Idea[] {
+	return [{
+		id: -1,
+		ee: getEmptyNExpressions(1, 0, getEmptyLanguage()),
+	}];
+}
+
 export function getEmptyIdeaNoAsync(): Idea {
 	return {
 		id: -1,

@@ -2,7 +2,7 @@
   <div class="view practice">
     <h1>Practice</h1>
     <div v-if="noIdeas">
-      <NotEnoughData noIdea />
+      <NotEnoughData noPracticeableIdea />
     </div>
     <div v-else>
         <div id="practice-table">
