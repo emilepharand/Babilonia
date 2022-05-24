@@ -53,7 +53,13 @@ describe('searching expressions', () => {
 		const i2 = await addIdea({ee: [fr2, en2]});
 		const i3 = await addIdea({ee: [fr3]});
 
-		const sc: SearchContext = {pattern: 'lorem ipsum', language: fr.id};
+		// No duplicates (3 expressions match 'lorem', but idea should show only once)
+		const sc: SearchContext = {pattern: 'lorem'};
+		const matchedIdeas = await search(sc);
+		expect(matchedIdeas.length).toEqual(1);
+
+		sc.pattern = 'lorem ipsum';
+		sc.language = fr.id;
 		await testSearch(sc, [i1], [['fr lorem ipsum']], fr.id);
 
 		sc.pattern = 'fr';
