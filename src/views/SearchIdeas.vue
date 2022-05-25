@@ -1,15 +1,17 @@
 <template>
   <div>
     <h1>Search Ideas</h1>
-    <input type="text" @keydown.enter="search()" v-model="pattern"/>
-    <input type="button" @click="search()" value="Search">
-    <div id="search-results" v-if="results.length > 0 && results[0].id !== -1">
-      <div v-for="idea of results" v-bind:key="idea.id">
+    <div>
+      <input type="text" @keydown.enter="search()" v-model="pattern"/>
+      <input type="button" @click="search()" value="Search">
+    </div>
+    <div class="d-flex" id="search-results" v-if="results.length > 0 && results[0].id !== -1">
+      <div class="pe-5" v-for="idea of results" v-bind:key="idea.id">
+        <h2><a :href="'/ideas/' + idea.id">Idea {{ idea.id }}</a></h2>
         <div v-for="e of idea.ee" v-bind:key="e.id">
           <span v-if="e.matched"><b v-if="e.matched">{{ e.text }}</b></span>
           <span v-else>{{ e.text }}</span>
         </div>
-        <br>
       </div>
     </div>
   </div>
