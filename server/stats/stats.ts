@@ -1,5 +1,5 @@
 import {Database} from 'sqlite';
-import {getEmptyLanguage, Language} from '../model/languages/language';
+import {getEmptyLanguageNoAsync, Language} from '../model/languages/language';
 import LanguageManager from '../model/languages/languageManager';
 
 export interface NumberIdeasInLanguage {
@@ -9,7 +9,7 @@ export interface NumberIdeasInLanguage {
 
 export function getEmptyNumberIdeasInLanguage(): NumberIdeasInLanguage[] {
 	return [{
-		language: getEmptyLanguage(),
+		language: getEmptyLanguageNoAsync(),
 		count: 0,
 	}];
 }

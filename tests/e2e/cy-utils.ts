@@ -37,6 +37,7 @@ export function addIdeas() {
 	const e12: ExpressionForAdding = {languageId: 4, text: 'salve'};
 	const e13: ExpressionForAdding = {languageId: 5, text: 'Hallo'};
 	const i2: IdeaForAdding = {ee: [e6, e7, e8, e9, e10, e11, e12, e13]};
+	// Make some languages practiceable
 	cy.request({
 		url: 'http://localhost:5555/ideas',
 		method: 'POST',

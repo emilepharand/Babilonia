@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 
-export function getEmptyLanguage(): Language {
+export function getEmptyLanguageNoAsync(): Language {
 	return {
 		id: 0,
 		name: '',
