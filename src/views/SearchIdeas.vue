@@ -26,7 +26,7 @@
         <div class="col-12">
           <label for="ideaHas" class="form-label">In an idea that contains one of these languages:</label>
           <select class="form-select" id="ideaHas" size="3" aria-label="size 3 select example" multiple v-model="ideaHas">
-            <option v-for="language in languages" :key="language.id" :value="language">
+            <option v-for="language in languagesWithoutPlaceholder" :key="language.id" :value="language">
               {{ language.name }}
             </option>
           </select>
@@ -72,6 +72,7 @@ export default defineComponent({
 			results: getEmptyIdeaArrayNoAsync(),
 			strict: false,
 			languages: getEmptyLanguagesNoAsync(),
+			languagesWithoutPlaceholder: getEmptyLanguagesNoAsync(),
 			ideaHas: getEmptyLanguagesNoAsync(),
 			expressionLanguage: getEmptyLanguageNoAsync(),
 			ideaDoesNotHave: getEmptyLanguageNoAsync(),
@@ -79,17 +80,32 @@ export default defineComponent({
 	},
 	async created() {
 		this.languages = await Api.getLanguages();
+		this.languagesWithoutPlaceholder = [...this.languages];
 		this.ideaHas = [];
-		this.ideaDoesNotHave = this.languages[0];
-		this.expressionLanguage = this.languages[0];
+		const placeholderLanguage = getEmptyLanguageNoAsync();
+		placeholderLanguage.id = -1;
+		placeholderLanguage.name = '';
+		this.languages.push(placeholderLanguage);
+		this.ideaDoesNotHave = placeholderLanguage;
+		this.expressionLanguage = placeholderLanguage;
 	},
 	methods: {
 		async search() {
-			const sc2: SearchContext = {
-				pattern: this.pattern,
-			};
+			const sc2: SearchContext = {};
 			if (this.strict) {
 				sc2.strict = true;
+			}
+			if (this.pattern) {
+				sc2.pattern = this.pattern;
+			}
+			if (this.ideaDoesNotHave.id !== -1) {
+				sc2.ideaDoesNotHave = this.ideaDoesNotHave.id;
+			}
+			if (this.ideaHas.length > 0) {
+				sc2.ideaHas = this.ideaHas.map(i => i.id);
+			}
+			if (this.expressionLanguage.id !== -1) {
+				sc2.language = this.expressionLanguage.id;
 			}
 			this.results = await Api.searchIdeas(sc2);
 		},
