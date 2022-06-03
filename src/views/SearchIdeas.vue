@@ -2,7 +2,7 @@
   <div>
     <h1>Search Ideas</h1>
     <div class="d-flex" style="width: 900px">
-      <div class="row d-flex g-3" style="width: 400px">
+      <div class="row d-inline g-3" style="width: 400px">
         <div class="col-md-12">
           <label for="pattern" class="form-label">Search for this expression:</label>
           <input id="pattern" type="email" class="form-control" v-model="pattern">
