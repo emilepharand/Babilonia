@@ -1,8 +1,8 @@
 <template>
   <div>
     <h1>Search Ideas</h1>
-    <div class="d-flex">
-      <div class="row col-md-4 g-3">
+    <div class="d-flex" style="width: 900px">
+      <div class="row d-flex g-3" style="width: 400px">
         <div class="col-md-12">
           <label for="pattern" class="form-label">Search for this expression:</label>
           <input id="pattern" type="email" class="form-control" v-model="pattern">
@@ -43,13 +43,14 @@
           <input type="button" class="btn btn-primary" @click="search()" value="Search">
         </div>
       </div>
-      <div class="col-md-8 ps-3 d-flex" id="search-results" v-if="results.length > 0 && results[0].id !== -1">
-        <div class="me-3" v-for="idea of results" v-bind:key="idea.id">
-          <h2><a :href="'/ideas/' + idea.id">Edit</a></h2>
+      <div class="ps-3 d-flex flex-column" id="search-results" style="width:500px" v-if="results.length > 0 && results[0].id !== -1">
+        <div class="me-3 mb-2 btn btn-outline-primary" v-for="idea of results" v-bind:key="idea.id">
+          <a class="text-reset text-decoration-none" :href="'/ideas/' + idea.id">
           <div v-for="e of idea.ee" v-bind:key="e.id">
-            <span v-if="e.matched"><b v-if="e.matched">{{ e.text }}</b></span>
-            <span v-else>{{ e.text }}</span>
+            <span class="text-break" v-if="e.matched"><b v-if="e.matched">{{ e.text }}</b></span>
+            <span class="text-break" v-else>{{ e.text }}</span>
           </div>
+          </a>
         </div>
       </div>
     </div>
