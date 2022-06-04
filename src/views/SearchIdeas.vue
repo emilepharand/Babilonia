@@ -40,10 +40,12 @@
           </select>
         </div>
         <div class="col-12">
-          <input type="button" class="btn btn-primary" @click="search()" value="Search">
+          <input id="search-button" type="button" class="btn btn-primary w-100" @click="search()" value="Search">
         </div>
+        <span v-if="isShowError" id="error-text" class="pl-2 text-danger">{{ errorText }}</span>
       </div>
-      <div class="ps-3 d-flex flex-column" id="search-results" style="width:500px" v-if="results.length > 0 && results[0].id !== -1">
+      <div class="ps-3 d-flex flex-column" id="search-results" style="width:500px" v-if="!(results.length > 0 && results[0].id === -1)">
+        <h2 v-if="noResults">No results.</h2>
         <div class="me-3 mb-2 btn btn-outline-primary" v-for="idea of results" v-bind:key="idea.id">
           <a class="text-reset text-decoration-none" :href="'/ideas/' + idea.id">
           <div v-for="e of idea.ee" v-bind:key="e.id">
@@ -76,6 +78,9 @@ export default defineComponent({
 			ideaHas: getEmptyLanguagesNoAsync(),
 			expressionLanguage: getEmptyLanguageNoAsync(),
 			ideaDoesNotHave: getEmptyLanguageNoAsync(),
+			isShowError: false,
+			errorText: '',
+			noResults: false,
 		};
 	},
 	async created() {
@@ -92,22 +97,41 @@ export default defineComponent({
 	methods: {
 		async search() {
 			const sc2: SearchContext = {};
+			let atLeastOneFilterSet = false;
 			if (this.strict) {
 				sc2.strict = true;
+				atLeastOneFilterSet = true;
 			}
 			if (this.pattern) {
 				sc2.pattern = this.pattern;
+				atLeastOneFilterSet = true;
 			}
 			if (this.ideaDoesNotHave.id !== -1) {
 				sc2.ideaDoesNotHave = this.ideaDoesNotHave.id;
+				atLeastOneFilterSet = true;
 			}
 			if (this.ideaHas.length > 0) {
 				sc2.ideaHas = this.ideaHas.map(i => i.id);
+				atLeastOneFilterSet = true;
 			}
 			if (this.expressionLanguage.id !== -1) {
 				sc2.language = this.expressionLanguage.id;
+				atLeastOneFilterSet = true;
 			}
-			this.results = await Api.searchIdeas(sc2);
+			if (atLeastOneFilterSet) {
+				this.isShowError = false;
+				const matchedIdeas = await Api.searchIdeas(sc2);
+				if (matchedIdeas.length === 0) {
+					this.results = [];
+					this.noResults = true;
+				} else {
+					this.noResults = false;
+					this.results = matchedIdeas;
+				}
+			} else {
+				this.errorText = 'Please select at least one filter.';
+				this.isShowError = true;
+			}
 		},
 	},
 });
