@@ -2,7 +2,7 @@ import Ajv from 'ajv';
 
 export function getEmptyLanguageNoAsync(): Language {
 	return {
-		id: 0,
+		id: -1,
 		name: '',
 		ordering: 0,
 		isPractice: false,

@@ -33,14 +33,15 @@
         </div>
         <div class="col-12">
           <label for="ideaDoesNotHave" class="form-label">In an idea that does not contain this language:</label>
-          <select id="ideaDoesNotHave" class="expression-language form-select" name="language" v-model="ideaDoesNotHave">
+          <select id="ideaDoesNotHave" class="form-select" name="language" v-model="ideaDoesNotHave">
             <option v-for="language in languages" :key="language.id" :value="language">
               {{ language.name }}
             </option>
           </select>
         </div>
-        <div class="col-12">
-          <input id="search-button" type="button" class="btn btn-primary w-100" @click="search()" value="Search">
+        <div class="d-flex btn-group">
+          <button id="search-button" @click="search()" class="btn btn-outline-secondary flex-grow-1">Search</button>
+          <button id="reset-button" class="btn btn-outline-secondary flex-grow-1" @click="reset()">Reset</button>
         </div>
         <span v-if="isShowError" id="error-text" class="pl-2 text-danger">{{ errorText }}</span>
       </div>
@@ -88,13 +89,18 @@ export default defineComponent({
 		this.languagesWithoutPlaceholder = [...this.languages];
 		this.ideaHas = [];
 		const placeholderLanguage = getEmptyLanguageNoAsync();
-		placeholderLanguage.id = -1;
-		placeholderLanguage.name = '';
 		this.languages.push(placeholderLanguage);
 		this.ideaDoesNotHave = placeholderLanguage;
 		this.expressionLanguage = placeholderLanguage;
 	},
 	methods: {
+		reset() {
+			this.pattern = '';
+			this.strict = false;
+			this.expressionLanguage = getEmptyLanguageNoAsync();
+			this.ideaDoesNotHave = getEmptyLanguageNoAsync();
+			this.ideaHas = [];
+		},
 		async search() {
 			const sc2: SearchContext = {};
 			let atLeastOneFilterSet = false;
