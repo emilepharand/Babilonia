@@ -25,7 +25,6 @@ context('Search', () => {
 		selectIdeaHasLanguages('english', 'deutsch');
 		selectIdeaDoesNotHave('italiano');
 		reset();
-
 		getPatternInput().should('have.value', '');
 		getStrictCheckbox().should('not.be.checked');
 		cy.get('.expression-language :selected').should('have.text', '');
@@ -40,7 +39,7 @@ context('Search', () => {
 			.should('contain.text', 'at least one filter');
 
 		// No results
-		typePattern('this pattern will not find anything');
+		typePattern('this pattern should not find anything');
 		clickSearch();
 		assertThereAreNoResults();
 
@@ -57,11 +56,15 @@ context('Search', () => {
 
 		// Language
 		reset();
-		typePattern('');
 		cy.get('#expressionLanguage').select('français');
-		uncheckStrict();
+		clickSearch();
+		assertThereAreNResults(2);
 	});
 });
+
+function assertThereAreNResults(n: number) {
+	getSearchResultsDiv().find('.search-result').should('have.length', n);
+}
 
 function assertThereAreResults() {
 	getSearchResultsDiv().should('not.contain.text', 'No results');

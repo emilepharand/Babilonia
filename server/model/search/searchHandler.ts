@@ -41,6 +41,9 @@ export default class SearchHandler {
 where languageId in (${sc.ideaHas.join(',')}))
 group by ideaId
 having count(ideaId) >= ${sc.ideaHas.length})`);
+			if (!sc.pattern) {
+				whereCondition.push(`e.languageId in (${sc.ideaHas.join(',')})`);
+			}
 		}
 		if (sc.ideaDoesNotHave) {
 			whereCondition.push(`ideaId not in (select distinct ideaId from expressions where languageId=${sc.ideaDoesNotHave})`);

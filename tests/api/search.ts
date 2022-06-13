@@ -27,6 +27,7 @@ async function testSearch(
 		const expressionsThatShouldMatch = expressionsThatShouldMatch2D[i];
 		expect(matchedIdea.ee.every(e => typeof e.matched === 'boolean'));
 		const matchedExpressions = matchedIdea.ee.filter(e => e.matched);
+		expect(matchedExpressions.length).toEqual(expressionsThatShouldMatch.length);
 		matchedExpressions.forEach((matchedExpression, j) => {
 			const expressionThatShouldMatch = expressionsThatShouldMatch[j];
 			expect(matchedExpression.text).toEqual(expressionThatShouldMatch);
@@ -79,7 +80,7 @@ describe('searching expressions', () => {
 		await testSearch(sc, [i2], [['fr ipsum sed']], fr.id);
 	});
 
-	test('searching for ideas that contain specific languages but miss another', async () => {
+	test('searching for ideas that contain specific languages but don\'t have another', async () => {
 		const fr = await addLanguage('français');
 		const en = await addLanguage('anglais');
 		const es = await addLanguage('español');
@@ -119,9 +120,9 @@ describe('searching expressions', () => {
 		};
 		await testSearch(sc,
 			[i1, i2, i3],
-			[i1.ee.map(e => e.text),
-				i2.ee.map(e => e.text),
-				i3.ee.map(e => e.text)],
+			[[fr1.text, es1.text],
+				[fr2.text, es2.text],
+				[fr3.text, fr4.text, es3.text, es4.text]],
 		);
 
 		// All ideas containing Spanish and French but not Italian
@@ -129,8 +130,8 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = it.id;
 		await testSearch(sc,
 			[i2, i3],
-			[i2.ee.map(e => e.text),
-				i3.ee.map(e => e.text)],
+			[i2.ee.filter(e => e.language.id === es.id || e.language.id === fr.id).map(e => e.text),
+				i3.ee.filter(e => e.language.id === es.id || e.language.id === fr.id).map(e => e.text)],
 		);
 
 		// All ideas containing Spanish and German
@@ -138,8 +139,8 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = undefined;
 		await testSearch(sc,
 			[i1, i2],
-			[i1.ee.map(e => e.text),
-				i2.ee.map(e => e.text)],
+			[i1.ee.filter(e => e.language.id === es.id || e.language.id === de.id).map(e => e.text),
+				i2.ee.filter(e => e.language.id === es.id || e.language.id === de.id).map(e => e.text)],
 		);
 
 		// All ideas containing Spanish and English but not German
@@ -147,7 +148,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = de.id;
 		await testSearch(sc,
 			[i3],
-			[i3.ee.map(e => e.text)],
+			[i3.ee.filter(e => e.language.id === es.id || e.language.id === en.id).map(e => e.text)],
 		);
 
 		// All ideas containing Italian
@@ -155,7 +156,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = undefined;
 		await testSearch(sc,
 			[i1],
-			[i1.ee.map(e => e.text)],
+			[i1.ee.filter(e => e.language.id === it.id).map(e => e.text)],
 		);
 
 		// All ideas containing French but not English
@@ -174,7 +175,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = undefined;
 		await testSearch(sc,
 			[i1, i2],
-			[i1.ee.map(e => e.text), i2.ee.map(e => e.text)],
+			[[fr1.text], [fr2.text]],
 		);
 
 		// Expressions in French matching "b" in languages containing Portuguese but not Italian
@@ -185,7 +186,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = it.id;
 		await testSearch(sc,
 			[i2],
-			[i2.ee.map(e => e.text)],
+			[[fr2.text]],
 		);
 	});
 
