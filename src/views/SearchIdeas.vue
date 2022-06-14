@@ -5,7 +5,7 @@
       <div class="row d-inline g-3" style="width: 400px">
         <div class="col-md-12">
           <label for="pattern" class="form-label">Search for this expression:</label>
-          <input id="pattern" type="email" class="form-control" v-model="pattern">
+          <input id="pattern" @keydown.enter="search()" type="email" class="form-control" v-model="pattern">
         </div>
         <div class="col-12">
           <div class="form-check">
@@ -24,7 +24,7 @@
           </select>
         </div>
         <div class="col-12">
-          <label for="ideaHas" class="form-label">In an idea that contains one of these languages:</label>
+          <label for="ideaHas" class="form-label">In an idea that contains all of these languages:</label>
           <select class="form-select" id="ideaHas" size="3" aria-label="size 3 select example" multiple v-model="ideaHas">
             <option v-for="language in languagesWithoutPlaceholder" :key="language.id" :value="language">
               {{ language.name }}
@@ -47,7 +47,7 @@
       </div>
       <div class="ps-3 d-flex flex-column" id="search-results" style="width:500px" v-if="!(results.length > 0 && results[0].id === -1)">
         <h2 v-if="noResults">No results.</h2>
-        <div class="me-3 mb-2 btn btn-outline-primary" v-for="idea of results" v-bind:key="idea.id">
+        <div class="search-result me-3 mb-2 btn btn-outline-primary" v-for="idea of results" v-bind:key="idea.id">
           <a class="text-reset text-decoration-none" :href="'/ideas/' + idea.id">
           <div v-for="e of idea.ee" v-bind:key="e.id">
             <span class="text-break" v-if="e.matched"><b v-if="e.matched">{{ e.text }}</b></span>

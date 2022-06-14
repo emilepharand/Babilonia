@@ -1,4 +1,4 @@
-import {addIdeas} from '../cy-utils';
+import {addIdeasForSearch} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', 'http://localhost:5555/everything');
@@ -12,9 +12,7 @@ before(() => {
 // thoroughly tested in the API tests
 context('Search', () => {
 	specify('Searching works', () => {
-		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
-		// Idea 2: salut, allô, hi, hey, hola éàíôüáéíóú, ciao, salve
-		addIdeas();
+		addIdeasForSearch();
 
 		cy.get('#search-ideas-link').click();
 
@@ -38,18 +36,19 @@ context('Search', () => {
 			.should('have.class', 'text-danger')
 			.should('contain.text', 'at least one filter');
 
-		// No results
+		// Pattern no results
 		typePattern('this pattern should not find anything');
 		clickSearch();
 		assertThereAreNoResults();
 
 		// Pattern (not strict)
-		typePattern('salu');
+		typePattern('bonjou');
 		clickSearch();
-		assertThereAreResults();
+		assertThereAreNResults(1);
+		assertNthResultHasMatchedExpressions(0, 'bonjour');
 
 		// Pattern (strict)
-		typePattern('salu');
+		typePattern('bonjou');
 		checkStrict();
 		clickSearch();
 		assertThereAreNoResults();
@@ -58,11 +57,34 @@ context('Search', () => {
 		reset();
 		cy.get('#expressionLanguage').select('français');
 		clickSearch();
-		assertThereAreNResults(2);
+		assertThereAreNResults(3);
+
+		// Expressions in French matching "b" in languages containing Portuguese but not Italian
+		reset();
+		typePattern('b');
+		selectLanguage('français');
+		selectIdeaHasLanguages('português');
+		selectIdeaDoesNotHave('italiano');
+		clickSearch();
+		assertThereAreNResults(1);
+		assertNthResultHasMatchedExpressions(0, 'bonne nuit');
+
+		reset();
 	});
 });
 
+function assertNthResultHasMatchedExpressions(nth: number, ...texts: string[]) {
+	for (let i = 0; i < texts.length; i++) {
+		getSearchResultsDiv().find('.search-result')
+			.eq(0)
+			.find('b')
+			.eq(i)
+			.should('have.text', texts[i]);
+	}
+}
+
 function assertThereAreNResults(n: number) {
+	assertThereAreResults();
 	getSearchResultsDiv().find('.search-result').should('have.length', n);
 }
 
@@ -88,10 +110,6 @@ function getStrictCheckbox() {
 
 function checkStrict() {
 	getStrictCheckbox().check();
-}
-
-function uncheckStrict() {
-	cy.get('#strict').uncheck();
 }
 
 function getSearchButton() {

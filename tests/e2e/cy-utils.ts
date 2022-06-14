@@ -20,6 +20,53 @@ export function addLanguages() {
 	}
 }
 
+export function addIdeasForSearch() {
+	addLanguages();
+	// Idea 1: fr, en, es, de, it, pt
+	const fr1: ExpressionForAdding = {text: 'bonjour', languageId: 1};
+	const en1: ExpressionForAdding = {text: 'hello', languageId: 2};
+	const es1: ExpressionForAdding = {text: 'buenos días', languageId: 3};
+	const de1: ExpressionForAdding = {text: 'guten Tag', languageId: 5};
+	const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: 6};
+	const it1: ExpressionForAdding = {text: 'buongiorno', languageId: 4};
+	const i1: IdeaForAdding = {ee: [fr1, en1, es1, de1, pt1, it1]};
+
+	// Idea 2: fr, en, es, de, pt
+	const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: 1};
+	const en2: ExpressionForAdding = {text: 'good night', languageId: 2};
+	const es2: ExpressionForAdding = {text: 'buenas noches', languageId: 3};
+	const pt2: ExpressionForAdding = {text: 'boa noite', languageId: 6};
+	const de2: ExpressionForAdding = {text: 'gute Natch', languageId: 5};
+	const i2: IdeaForAdding = {ee: [fr2, en2, es2, pt2, de2]};
+
+	// Idea 3: fr, en, es
+	const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: 1};
+	const fr4: ExpressionForAdding = {text: 'bonsoir 2', languageId: 1};
+	const en3: ExpressionForAdding = {text: 'good evening', languageId: 2};
+	const en4: ExpressionForAdding = {text: 'good evening 2', languageId: 2};
+	const es3: ExpressionForAdding = {text: 'buenas noches', languageId: 3};
+	const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: 3};
+	const i3: IdeaForAdding = {ee: [fr3, fr4, en3, en4, es3, es4]};
+	cy.request({
+		url: 'http://localhost:5555/ideas',
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: `${JSON.stringify(i1)}`,
+	});
+	cy.request({
+		url: 'http://localhost:5555/ideas',
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: `${JSON.stringify(i2)}`,
+	});
+	cy.request({
+		url: 'http://localhost:5555/ideas',
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: `${JSON.stringify(i3)}`,
+	});
+}
+
 export function addIdeas() {
 	addLanguages();
 	const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour'};
@@ -37,7 +84,6 @@ export function addIdeas() {
 	const e12: ExpressionForAdding = {languageId: 4, text: 'salve'};
 	const e13: ExpressionForAdding = {languageId: 5, text: 'Hallo'};
 	const i2: IdeaForAdding = {ee: [e6, e7, e8, e9, e10, e11, e12, e13]};
-	// Make some languages practiceable
 	cy.request({
 		url: 'http://localhost:5555/ideas',
 		method: 'POST',
@@ -50,6 +96,7 @@ export function addIdeas() {
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i2)}`,
 	});
+	// Make some languages practiceable
 	const json
     = '[{"id":1,"name":"français","ordering":0,"isPractice":false},'
     + '{"id":2,"name":"english","ordering":1,"isPractice":true},'
