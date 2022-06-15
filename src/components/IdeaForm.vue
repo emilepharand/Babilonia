@@ -1,14 +1,15 @@
 <template>
   <div id="ideas" v-if="loaded">
-    <div class="expression" v-for="e in idea.ee" :key="e.id">
-      <select class="expression-language" name="language" v-model="e.language">
-        <option v-for="language in languages" :key="language.id" :value="language">
-          {{ language.name }}
-        </option>
-      </select>
-      <input class="expression-text" type="text" v-model="e.text"/>
+    <div class="expression" style="width: 800px;" v-for="e in idea.ee" :key="e.id">
+      <div class="input-group">
+        <select class="expression-language form-select" name="language" v-model="e.language">
+          <option v-for="language in languages" :key="language.id" :value="language">
+            {{ language.name }}
+          </option>
+        </select>
+      <input class="expression-text form-control" style="flex-grow:2" type="text" v-model="e.text"/>
+      </div>
     </div>
-    <input id="add-rows" type="button" @click="$emit('addRows', 5, this.idea.ee.length)" value="Add rows">
   </div>
 </template>
 

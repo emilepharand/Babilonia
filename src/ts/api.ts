@@ -7,24 +7,30 @@ import {SearchContext} from '../../server/model/search/searchContext';
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/${ideaId}`;
+		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${ideaId}`;
 		const response = await fetch(url, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 		});
+		if (response.status === 404) {
+			return Promise.reject();
+		}
 		return (await response.json()) as Idea;
 	}
 
-	static async editIdea(idea: Idea): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/api/idea/edit/${idea.id}`;
+	static async editIdea(
+		ideaForAdding: IdeaForAdding,
+		id: number,
+	): Promise<Idea> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${id}`;
 		const response = await fetch(url, {
-			method: 'POST',
+			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify(idea),
+			body: JSON.stringify(ideaForAdding),
 		});
 		return (await response.json()) as Idea;
 	}

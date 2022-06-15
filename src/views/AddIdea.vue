@@ -5,8 +5,11 @@
       <NotEnoughData noLanguage />
     </div>
     <div v-else>
-      <IdeaForm @addRows="this.addRows" :idea="idea" title="Add Idea"/>
-      <button id="save-idea" @click="this.save()">Save</button>
+      <IdeaForm :idea="idea" title="Add Idea"/>
+      <div class="d-flex btn-group mt-2">
+        <button @click="addRows()" id="add-rows" class="btn btn-outline-secondary flex-grow-1">More Rows</button>
+        <button id="save-idea" @click="this.save()" class="btn btn-outline-secondary flex-grow-1">Save</button>
+      </div>
     </div>
   </div>
 </template>
@@ -55,9 +58,9 @@ export default defineComponent({
 				e.text = '';
 			});
 		},
-		async addRows(howMany: number, currentSize: number) {
+		async addRows() {
 			const l = await Api.getLanguage(1);
-			this.idea = Utils.addEmptyExpressions(this.idea, howMany, currentSize, l);
+			this.idea = Utils.addEmptyExpressions(this.idea, 5, this.idea.ee.length, l);
 		},
 	},
 });
