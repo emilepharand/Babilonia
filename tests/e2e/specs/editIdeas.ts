@@ -1,5 +1,6 @@
 import {
 	addIdeas,
+	assertExpressionHasValues,
 	assertFetchIdeaReturnsStatus,
 	inputExpression,
 } from '../cy-utils';
@@ -16,15 +17,34 @@ context('The idea page', () => {
 
 		cy.visit('/ideas/100');
 		cy.contains('not found');
-		cy.get('button').should('not.exist');
+		cy.get('button').should('not.be.visible');
 
 		cy.visit('/ideas/1');
 
 		assertFetchIdeaReturnsStatus(1, 200, ['bonjour']);
 
 		// Test editing an idea works
-		inputExpression(0, 'deutsch', 'mutter');
+		inputExpression(0, 'deutsch', 'was');
 		cy.get('#edit-button').click();
-		assertFetchIdeaReturnsStatus(1, 200, ['mutter']);
+		assertFetchIdeaReturnsStatus(1, 200, ['was']);
+
+		// Expressions should be reordered
+		assertExpressionHasValues(0, 'english', 'hello');
+		assertExpressionHasValues(3, 'deutsch', 'was');
+
+		cy.get('#add-rows').click();
+
+		cy.get('#ideas').find('.expression').should('have.length', 10);
+
+		// Expressions should not change
+		assertExpressionHasValues(3, 'deutsch', 'was');
+
+		// Test delete
+		cy.get('#confirm-delete-modal').should('not.be.visible');
+		cy.get('#delete-button').click();
+		cy.get('#confirm-delete-modal').should('be.visible');
+		cy.get('#modal-delete-button').click();
+
+		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
 });

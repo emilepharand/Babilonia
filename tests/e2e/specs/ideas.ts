@@ -1,5 +1,9 @@
 import * as cyutils from '../cy-utils';
-import {assertFetchIdeaReturnsStatus, inputExpression} from '../cy-utils';
+import {
+	assertExpressionHasValues,
+	assertFetchIdeaReturnsStatus,
+	inputExpression,
+} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', 'http://localhost:5555/everything');
@@ -42,7 +46,7 @@ context('The idea page', () => {
 		// Add more rows
 		cy.get('#add-rows').click();
 
-		// There are now 10  rows
+		// There are now 10 rows
 		cy.get('#ideas').find('.expression').should('have.length', 10);
 
 		// Add more rows
@@ -83,13 +87,6 @@ context('The idea page', () => {
 		});
 	});
 });
-
-function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
-	cy.get('#ideas .expression').eq(rowNbr).within(() => {
-		cy.get('.expression-language :selected').should('have.text', languageName);
-		cy.get('.expression-text').should('have.value', text);
-	});
-}
 
 function assertAllInputsEmpty() {
 	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));

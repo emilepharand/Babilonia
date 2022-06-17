@@ -35,12 +35,9 @@ export default class Api {
 		return (await response.json()) as Idea;
 	}
 
-	static async deleteIdea(ideaId: number): Promise<unknown> {
+	static async deleteIdea(ideaId: number): Promise<void> {
 		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${ideaId}`;
-		const response = await fetch(url, {
-			method: 'DELETE',
-		});
-		return response.json();
+		await fetch(url, {method: 'DELETE'});
 	}
 
 	static async deleteLanguage(languageId: number): Promise<void> {

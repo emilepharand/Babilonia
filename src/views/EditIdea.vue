@@ -6,10 +6,28 @@
     </div>
     <div v-else-if="loaded">
       <IdeaForm :idea="idea" title="Edit Idea"/>
-      <button @click="addRows()"  class="btn btn-outline-secondary w-100 mt-2 mb-2">More Rows</button>
+      <button @click="addRows()" id="add-rows" class="btn btn-outline-secondary w-100 mt-2 mb-2">More Rows</button>
       <div class="d-flex btn-group">
         <button id="edit-button" @click="edit()" class="btn btn-outline-primary flex-grow-1">Edit</button>
-        <button id="delete-button" @click="deleteIdea()" class="btn btn-outline-danger flex-grow-1">Delete</button>
+        <button id="delete-button" class="btn btn-outline-danger flex-grow-1"
+                data-bs-toggle="modal" data-bs-target="#confirm-delete-modal">Delete</button>
+      </div>
+    </div>
+    <div class="modal fade" id="confirm-delete-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Do you really want to delete this idea?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="modal-delete-button" type="button" @click="deleteIdea()" class="btn btn-danger" data-bs-dismiss="modal">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -54,6 +72,10 @@ export default defineComponent({
 		},
 		async deleteIdea() {
 			await Api.deleteIdea(this.idea.id);
+			// TODO: This needs to be a redirect through router
+			// Also, redirect to previous page the user was on
+			// when we can handle navigation history properly
+			window.location.href = '/';
 		},
 		async addRows() {
 			const l = await Api.getLanguage(1);

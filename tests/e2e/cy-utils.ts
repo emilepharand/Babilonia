@@ -139,3 +139,10 @@ export function inputExpression(rowNbr: number, language: string, text: string) 
 		.clear()
 		.type(text);
 }
+
+export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
+	cy.get('#ideas .expression').eq(rowNbr).within(() => {
+		cy.get('.expression-language :selected').should('have.text', languageName);
+		cy.get('.expression-text').should('have.value', text);
+	});
+}
