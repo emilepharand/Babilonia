@@ -1,4 +1,5 @@
 import * as cyutils from '../cy-utils';
+import {assertFetchIdeaReturnsStatus, inputExpression} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', 'http://localhost:5555/everything');
@@ -90,34 +91,6 @@ function assertExpressionHasValues(rowNbr: number, languageName: string, text: s
 	});
 }
 
-function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string[]) {
-	cy.request({
-		url: `http://localhost:5555/ideas/${id}`,
-		failOnStatusCode: false,
-	}).then(r => {
-		cy.wrap(r).its('status').should('equal', status);
-		if (contains) {
-			for (const c of contains) {
-				cy.wrap(JSON.stringify(r.body)).should('contain', c);
-			}
-		}
-	});
-}
-
 function assertAllInputsEmpty() {
 	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
-}
-
-function inputExpression(rowNbr: number, language: string, text: string) {
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-language')
-		.select(language);
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-text')
-		.clear()
-		.type(text);
 }

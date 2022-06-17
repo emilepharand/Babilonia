@@ -111,3 +111,31 @@ export function addIdeas() {
 		body: `${json}`,
 	});
 }
+
+export function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string[]) {
+	cy.request({
+		url: `http://localhost:5555/ideas/${id}`,
+		failOnStatusCode: false,
+	}).then(r => {
+		cy.wrap(r).its('status').should('equal', status);
+		if (contains) {
+			for (const c of contains) {
+				cy.wrap(JSON.stringify(r.body)).should('contain', c);
+			}
+		}
+	});
+}
+
+export function inputExpression(rowNbr: number, language: string, text: string) {
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-language')
+		.select(language);
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-text')
+		.clear()
+		.type(text);
+}

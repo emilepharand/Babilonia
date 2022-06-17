@@ -8,8 +8,8 @@
       <IdeaForm :idea="idea" title="Edit Idea"/>
       <button @click="addRows()"  class="btn btn-outline-secondary w-100 mt-2 mb-2">More Rows</button>
       <div class="d-flex btn-group">
-        <button @click="edit()" class="btn btn-outline-primary flex-grow-1">Edit</button>
-        <button @click="deleteIdea()" class="btn btn-outline-danger flex-grow-1">Delete</button>
+        <button id="edit-button" @click="edit()" class="btn btn-outline-primary flex-grow-1">Edit</button>
+        <button id="delete-button" @click="deleteIdea()" class="btn btn-outline-danger flex-grow-1">Delete</button>
       </div>
     </div>
   </div>
