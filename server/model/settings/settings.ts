@@ -5,6 +5,13 @@ export interface Settings {
   strictCharacters: boolean;
 }
 
+export function getEmptySettingsNoAsync(): Settings {
+	return {
+		randomPractice: false,
+		strictCharacters: false,
+	};
+}
+
 const ajv = new Ajv();
 
 const settingsSchema = {

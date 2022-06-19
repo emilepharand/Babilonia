@@ -134,6 +134,17 @@ export default class Api {
 		return (await response.json()) as Settings;
 	}
 
+	public static async setSettings(settings: Settings): Promise<void> {
+		const url = `${process.env.VUE_APP_API_BASE_URL}/settings`;
+		await fetch(url, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(settings),
+		});
+	}
+
 	// TODO: This is duplicated
 	static paramsFromSearchContext(sc: SearchContext): string {
 		let params = '';

@@ -3,7 +3,7 @@
     <h1>Settings</h1>
     <h2>Practicing</h2>
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+      <input v-model="settings.randomPractice" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
       <label class="form-check-label" for="flexCheckDefault">
         Loop ideas randomly
       </label>
@@ -12,7 +12,7 @@
          class="fa-solid fa-circle-question"></i>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault2">
+      <input v-model="settings.strictCharacters" class="form-check-input" type="checkbox" value="" id="flexCheckDefault2">
       <label class="form-check-label" for="flexCheckDefault2">
         Disable relaxed character mode
       </label>
@@ -20,11 +20,15 @@
          data-bs-html="true" data-bs-toggle="tooltip" data-bs-placement="right"
          class="fa-solid fa-circle-question"></i>
     </div>
-    <button class="btn btn-primary">Save</button>
+    <button @click="save()" class="btn btn-primary w-100">Save</button>
+    <p v-if="showSettingsSavedMessage" class="text-success">Settings saved.</p>
   </div>
 </template>
 
 <style scoped>
+input[type="checkbox"], label {
+  cursor: pointer;
+}
 i {
   margin-left: 5px;
 }
@@ -32,14 +36,27 @@ i {
 
 <script lang="ts">
 import {defineComponent} from 'vue';
+import Api from '@/ts/api';
+import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
 const bootstrap = require('bootstrap');
 
 export default defineComponent({
 	name: 'AppSettings',
+	data() {
+		return {
+			settings: getEmptySettingsNoAsync(),
+			showSettingsSavedMessage: false,
+		};
+	},
 	async created() {
+		this.settings = await Api.getSettings();
 	},
 	methods: {
+		async save() {
+			await Api.setSettings(this.settings);
+			this.showSettingsSavedMessage = true;
+		},
 	},
 	mounted() {
 		this.$nextTick(() => {
