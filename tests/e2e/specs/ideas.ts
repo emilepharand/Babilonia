@@ -20,6 +20,9 @@ context('The idea page', () => {
 		// Navigate
 		cy.get('#add-ideas-link').click();
 
+		// No expressions have been entered, this should show an error
+		cy.get('#save-idea').click();
+
 		// Enter expressions
 		const ee = [['français', 'bonjour'],
 			['english', 'hello'],

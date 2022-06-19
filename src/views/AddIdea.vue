@@ -51,6 +51,9 @@ export default defineComponent({
 		},
 		async save() {
 			const ee = this.idea.ee.filter(e => e.text.trim() !== '');
+			if (ee.length === 0) {
+				return;
+			}
 			const ee2 = ee.map(e => getExpressionForAddingFromExpression(e));
 			const ideaForAdding: IdeaForAdding = {ee: ee2};
 			await Api.addIdea(ideaForAdding);
