@@ -25,7 +25,7 @@ function assertLanguageName(rowNbr: number, name: string) {
 context('Practicing', () => {
 	specify('Practicing works', () => {
 		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
-		// Idea 2: salut, allô, hi, hey, hola éàíôüáéíóú, ciao, salve
+		// Idea 2: salut, allô, hi, hey, HOLA éàíôüáéíóú, ciao, salve
 		cyutils.addIdeas();
 
 		cy.get('#practice-link').click();
@@ -190,8 +190,8 @@ context('Practicing', () => {
 		assertRowInputHasFocus(2);
 
 		// Character mapping
-		typeInRow(4, 'hola eaiouaeiou');
-		assertRowMatchIsFullMatch(4, 'hola éàíôüáéíóú');
+		typeInRow(4, 'hola EAIOUAEIOU');
+		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
 	});
 });
 
