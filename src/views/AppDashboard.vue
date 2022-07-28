@@ -17,24 +17,23 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
+<script setup>
+import {ref} from 'vue';
 import Api from '@/ts/api';
+import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
 import NotEnoughData from '@/components/NotEnoughData.vue';
 
-export default defineComponent({
-	name: 'AppDashboard',
-	components: {NotEnoughData},
-	data() {
-		return {
-			ideasPerLanguage: getEmptyNumberIdeasInLanguage(),
-			noIdeas: false,
-		};
-	},
-	async created() {
-		this.ideasPerLanguage = await Api.getStats();
-		this.noIdeas = this.ideasPerLanguage.length === 0;
-	},
-});
+const ideasPerLanguage = ref(getEmptyNumberIdeasInLanguage());
+const error = ref('');
+const noIdeas = ref(false);
+
+(async () => {
+	try {
+		ideasPerLanguage.value = await Api.getStats();
+		noIdeas.value = ideasPerLanguage.value.length === 0;
+	} catch (e) {
+		error.value = e;
+	}
+})();
+
 </script>
