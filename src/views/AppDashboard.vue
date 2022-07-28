@@ -17,22 +17,22 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {ref} from 'vue';
 import Api from '@/ts/api';
 import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
 import NotEnoughData from '@/components/NotEnoughData.vue';
 
 const ideasPerLanguage = ref(getEmptyNumberIdeasInLanguage());
-const error = ref('');
+const error = ref(false);
 const noIdeas = ref(false);
 
 (async () => {
 	try {
 		ideasPerLanguage.value = await Api.getStats();
 		noIdeas.value = ideasPerLanguage.value.length === 0;
-	} catch (e) {
-		error.value = e;
+	} catch {
+		error.value = false;
 	}
 })();
 
