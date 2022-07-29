@@ -24,16 +24,11 @@ import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
 import NotEnoughData from '@/components/NotEnoughData.vue';
 
 const ideasPerLanguage = ref(getEmptyNumberIdeasInLanguage());
-const error = ref(false);
 const noIdeas = ref(false);
 
 (async () => {
-	try {
-		ideasPerLanguage.value = await Api.getStats();
-		noIdeas.value = ideasPerLanguage.value.length === 0;
-	} catch {
-		error.value = false;
-	}
+	ideasPerLanguage.value = await Api.getStats();
+	noIdeas.value = ideasPerLanguage.value.length === 0;
 })();
 
 </script>
