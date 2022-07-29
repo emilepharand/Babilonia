@@ -6,8 +6,8 @@ before(() => {
 	cy.visit('/');
 });
 
-context('Practicing', () => {
-	specify('Practicing works', () => {
+context('Dashboard page', () => {
+	specify('Stats display correctly', () => {
 		cyutils.addIdeasDifferentSet();
 
 		cy.reload();
