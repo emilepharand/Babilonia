@@ -6,7 +6,7 @@
     </div>
     <div v-else>
       <div v-for="(ideaPerLanguage) in ideasPerLanguage" :key="ideaPerLanguage.language.id">
-        <p>
+        <p class="dashboard-row">
           You can express
           <strong>{{ ideaPerLanguage.count }}</strong>
           ideas in

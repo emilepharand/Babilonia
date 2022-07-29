@@ -20,7 +20,7 @@ export function addLanguages() {
 	}
 }
 
-export function addIdeasForSearch() {
+export function addIdeasDifferentSet() {
 	addLanguages();
 	// Idea 1: fr, en, es, de, it, pt
 	const fr1: ExpressionForAdding = {text: 'bonjour', languageId: 1};
