@@ -1,4 +1,4 @@
-import {addIdeasForSearch} from '../cy-utils';
+import {addIdeasDifferentSet} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', 'http://localhost:5555/everything');
@@ -12,7 +12,7 @@ before(() => {
 // thoroughly tested in the API tests
 context('Search', () => {
 	specify('Searching works', () => {
-		addIdeasForSearch();
+		addIdeasDifferentSet();
 
 		cy.get('#search-ideas-link').click();
 
