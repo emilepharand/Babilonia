@@ -34,35 +34,27 @@ i {
 }
 </style>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script lang="ts" setup>
+import {nextTick, ref} from 'vue';
 import Api from '@/ts/api';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
-const bootstrap = require('bootstrap');
+const settings = ref(getEmptySettingsNoAsync());
+const showSettingsSavedMessage = ref(false);
 
-export default defineComponent({
-	name: 'AppSettings',
-	data() {
-		return {
-			settings: getEmptySettingsNoAsync(),
-			showSettingsSavedMessage: false,
-		};
-	},
-	async created() {
-		this.settings = await Api.getSettings();
-	},
-	methods: {
-		async save() {
-			await Api.setSettings(this.settings);
-			this.showSettingsSavedMessage = true;
-		},
-	},
-	mounted() {
-		this.$nextTick(() => {
-			const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-			tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-		});
-	},
+(async () => {
+	settings.value = await Api.getSettings();
+})();
+
+async function save() {
+	await Api.setSettings(settings.value);
+	showSettingsSavedMessage.value = true;
+}
+
+// Tooltip popovers
+const bootstrap = require('bootstrap');
+nextTick(() => {
+	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });
 </script>
