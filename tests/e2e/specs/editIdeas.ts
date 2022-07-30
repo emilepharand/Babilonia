@@ -21,12 +21,16 @@ context('The idea page', () => {
 
 		cy.visit('/ideas/1');
 
+		waitForTableToLoad(5);
+
 		assertFetchIdeaReturnsStatus(1, 200, ['bonjour']);
 
 		// Test editing an idea works
 		inputExpression(0, 'deutsch', 'was');
 		cy.get('#edit-button').click();
 		assertFetchIdeaReturnsStatus(1, 200, ['was']);
+
+		waitForTableToLoad(5);
 
 		// Expressions should be reordered
 		assertExpressionHasValues(0, 'english', 'hello');
@@ -48,3 +52,9 @@ context('The idea page', () => {
 		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
 });
+
+function waitForTableToLoad(length: number) {
+	cy.get('#ideas')
+		.find('.expression')
+		.should('have.length', length);
+}
