@@ -3,10 +3,14 @@
     "browser": true,
     "es2021": true,
     "node": true,
-    "jest": true
+    "jest": true,
+    // Access macros such as `defineEmits`
+    "vue/setup-compiler-macros": true
   },
   "extends": [
+    // eslint.vuejs.org/user-guide
     "plugin:vue/essential",
+    // github.com/xojs/xo
     "xo"
   ],
   "parserOptions": {
