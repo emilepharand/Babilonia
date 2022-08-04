@@ -60,85 +60,80 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-import {SearchContext} from '../../server/model/search/searchContext';
+<script lang="ts" setup>
+import {ref} from 'vue';
 import Api from '@/ts/api';
-import {getEmptyIdeaArrayNoAsync} from '../../server/model/ideas/idea';
 import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
+import {SearchContext} from '../../server/model/search/searchContext';
+import {getEmptyIdeaArrayNoAsync} from '../../server/model/ideas/idea';
 
-export default defineComponent({
-	name: 'SearchIdeas',
-	data() {
-		return {
-			pattern: '',
-			results: getEmptyIdeaArrayNoAsync(),
-			strict: false,
-			languages: getEmptyLanguagesNoAsync(),
-			languagesWithoutPlaceholder: getEmptyLanguagesNoAsync(),
-			ideaHas: getEmptyLanguagesNoAsync(),
-			expressionLanguage: getEmptyLanguageNoAsync(),
-			ideaDoesNotHave: getEmptyLanguageNoAsync(),
-			isShowError: false,
-			errorText: '',
-			noResults: false,
-		};
-	},
-	async created() {
-		this.languages = await Api.getLanguages();
-		this.languagesWithoutPlaceholder = [...this.languages];
-		this.ideaHas = [];
-		const placeholderLanguage = getEmptyLanguageNoAsync();
-		this.languages.push(placeholderLanguage);
-		this.ideaDoesNotHave = placeholderLanguage;
-		this.expressionLanguage = placeholderLanguage;
-	},
-	methods: {
-		reset() {
-			this.pattern = '';
-			this.strict = false;
-			this.expressionLanguage = getEmptyLanguageNoAsync();
-			this.ideaDoesNotHave = getEmptyLanguageNoAsync();
-			this.ideaHas = [];
-		},
-		async search() {
-			const sc2: SearchContext = {};
-			let atLeastOneFilterSet = false;
-			if (this.strict) {
-				sc2.strict = true;
-				atLeastOneFilterSet = true;
-			}
-			if (this.pattern) {
-				sc2.pattern = this.pattern;
-				atLeastOneFilterSet = true;
-			}
-			if (this.ideaDoesNotHave.id !== -1) {
-				sc2.ideaDoesNotHave = this.ideaDoesNotHave.id;
-				atLeastOneFilterSet = true;
-			}
-			if (this.ideaHas.length > 0) {
-				sc2.ideaHas = this.ideaHas.map(i => i.id);
-				atLeastOneFilterSet = true;
-			}
-			if (this.expressionLanguage.id !== -1) {
-				sc2.language = this.expressionLanguage.id;
-				atLeastOneFilterSet = true;
-			}
-			if (atLeastOneFilterSet) {
-				this.isShowError = false;
-				const matchedIdeas = await Api.searchIdeas(sc2);
-				if (matchedIdeas.length === 0) {
-					this.results = [];
-					this.noResults = true;
-				} else {
-					this.noResults = false;
-					this.results = matchedIdeas;
-				}
-			} else {
-				this.errorText = 'Please select at least one filter.';
-				this.isShowError = true;
-			}
-		},
-	},
-});
+const pattern = ref('');
+const results = ref(getEmptyIdeaArrayNoAsync());
+const strict = ref(false);
+const languages = ref(getEmptyLanguagesNoAsync());
+const languagesWithoutPlaceholder = ref(getEmptyLanguagesNoAsync());
+const ideaHas = ref(getEmptyLanguagesNoAsync());
+const expressionLanguage = ref(getEmptyLanguageNoAsync());
+const ideaDoesNotHave = ref(getEmptyLanguageNoAsync());
+const isShowError = ref(false);
+const errorText = ref('');
+const noResults = ref(false);
+
+(async () => {
+	languages.value = await Api.getLanguages();
+	languagesWithoutPlaceholder.value = [...languages.value];
+	ideaHas.value = [];
+	const placeholderLanguage = getEmptyLanguageNoAsync();
+	languages.value.push(placeholderLanguage);
+	ideaDoesNotHave.value = placeholderLanguage;
+	expressionLanguage.value = placeholderLanguage;
+})();
+
+function reset() {
+	pattern.value = '';
+	strict.value = false;
+	expressionLanguage.value = getEmptyLanguageNoAsync();
+	ideaDoesNotHave.value = getEmptyLanguageNoAsync();
+	ideaHas.value = [];
+}
+
+async function search() {
+	const sc2: SearchContext = {};
+	let atLeastOneFilterSet = false;
+	if (strict.value) {
+		sc2.strict = true;
+		atLeastOneFilterSet = true;
+	}
+	if (pattern.value) {
+		sc2.pattern = pattern.value;
+		atLeastOneFilterSet = true;
+	}
+	if (ideaDoesNotHave.value.id !== -1) {
+		sc2.ideaDoesNotHave = ideaDoesNotHave.value.id;
+		atLeastOneFilterSet = true;
+	}
+	if (ideaHas.value.length > 0) {
+		sc2.ideaHas = ideaHas.value.map((i: { id: any; }) => i.id);
+		atLeastOneFilterSet = true;
+	}
+	if (expressionLanguage.value.id !== -1) {
+		sc2.language = expressionLanguage.value.id;
+		atLeastOneFilterSet = true;
+	}
+	if (atLeastOneFilterSet) {
+		isShowError.value = false;
+		const matchedIdeas = await Api.searchIdeas(sc2);
+		if (matchedIdeas.length === 0) {
+			results.value = [];
+			noResults.value = true;
+		} else {
+			noResults.value = false;
+			results.value = matchedIdeas;
+		}
+	} else {
+		errorText.value = 'Please select at least one filter.';
+		isShowError.value = true;
+	}
+}
+
 </script>
