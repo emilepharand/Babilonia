@@ -1,15 +1,13 @@
 import {Idea} from '../../server/model/ideas/idea';
 import {getEmptyNExpressions} from '../../server/model/ideas/expression';
-import {Language} from '../../server/model/languages/language';
+import Api from '@/ts/api';
+
+const NUMBER_ROWS_INCREMENT = 5;
 
 export default class Utils {
-	public static addEmptyExpressions(
-		idea: Idea,
-		howMany: number,
-		currentSize: number,
-		language: Language,
-	): Idea {
-		const ee = getEmptyNExpressions(howMany, currentSize, language);
+	public static async addEmptyExpressions(idea: Idea): Promise<Idea> {
+		const l = await Api.getLanguage(1);
+		const ee = getEmptyNExpressions(NUMBER_ROWS_INCREMENT, idea.ee.length, l);
 		ee.forEach(e => idea.ee.push(e));
 		return idea;
 	}

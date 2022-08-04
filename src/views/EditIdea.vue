@@ -61,8 +61,7 @@ const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
 )();
 
 async function addRows() {
-	const l = await Api.getLanguage(1);
-	idea.value = Utils.addEmptyExpressions(idea.value, 5, idea.value.ee.length, l);
+	idea.value = await Utils.addEmptyExpressions(idea.value);
 }
 
 async function edit() {
