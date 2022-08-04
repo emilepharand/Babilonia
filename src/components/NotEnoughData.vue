@@ -6,15 +6,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-
-export default defineComponent({
-	name: 'NotEnoughData',
-	props: {
-		noLanguage: Boolean,
-		noIdea: Boolean,
-		noPracticeableIdea: Boolean,
-	},
+<script lang="ts" setup>
+defineProps({
+	noLanguage: Boolean,
+	noIdea: Boolean,
+	noPracticeableIdea: Boolean,
 });
 </script>
