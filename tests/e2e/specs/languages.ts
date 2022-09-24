@@ -60,12 +60,15 @@ context('Error handling in the language page', () => {
 		// Blank name
 		addLanguage(' ');
 		assertAddLanguageErrorMsgVisible('valid language');
+		assertSaveLanguagesErrorMsgNotVisible();
 		// Valid language
 		addLanguage('Valid language 2');
 		assertAddLanguageErrorMsgNotVisible();
+		assertSaveLanguagesErrorMsgNotVisible();
 		// Duplicate name
 		addLanguage('Valid language');
 		assertAddLanguageErrorMsgVisible('already exists');
+		assertSaveLanguagesErrorMsgNotVisible();
 	});
 
 	specify('Editing language with invalid input', () => {
@@ -78,15 +81,18 @@ context('Error handling in the language page', () => {
 		inputLanguageChange(0, 'any language', '', true);
 		clickSave();
 		assertSaveLanguageErrorMsgVisible('ordering');
+		assertAddLanguageErrorMsgNotVisible();
 		// Wrong ordering
 		inputLanguageChange(0, 'any language 1', '0', true);
 		inputLanguageChange(1, 'any language 2', '2', true);
 		clickSave();
 		assertSaveLanguageErrorMsgVisible('ordering');
+		assertAddLanguageErrorMsgNotVisible();
 		// Duplicate language names
 		inputLanguageChange(1, 'any language 1', '1', true);
 		clickSave();
 		assertSaveLanguageErrorMsgVisible('duplicate');
+		assertAddLanguageErrorMsgNotVisible();
 	});
 });
 
