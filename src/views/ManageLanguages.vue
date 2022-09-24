@@ -22,10 +22,10 @@
         </tbody>
       </table>
       <div class="d-flex align-items-center">
-        <button id="save-languages-button" class="btn btn-primary btn-sm" @click="save()">
+        <button id="save-languages-button" class="btn btn-primary btn-sm" @click="saveLanguages()">
           Save
         </button>
-        <span id="languages-saved-text" class="pl-2 text-success animate__animated animate__faster d-none">
+        <span id="languages-saved-text" class="pl-2 text-success d-none">
           Languages saved.
         </span>
         <span v-if="isShowSaveError" id="error-save-text" class="pl-2 text-danger">{{ saveErrorText }}</span>
@@ -34,9 +34,9 @@
     <div class="add-language-block">
       <h2>Add</h2>
       <div>
-        <input @keyup.enter="add()" id="new-language-name" type="text" v-model="newLanguageName"/>
+        <input @keyup.enter="addLanguage()" id="new-language-name" type="text" v-model="newLanguageName"/>
         <div class="d-flex align-items-center">
-          <button id="add-language-button" class="btn btn-primary btn-sm" @click="add()">Add</button>
+          <button id="add-language-button" class="btn btn-primary btn-sm" @click="addLanguage()">Add</button>
           <span v-if="isShowAddError" id="error-add-language-text" class="pl-2 text-danger">{{ addErrorText }}</span>
         </div>
       </div>
@@ -64,13 +64,14 @@ const addErrorText = ref('');
 })();
 
 function allowOnlyNumbers(e: any) {
+	// Prevent typing characters that are not numbers in order field
 	const keyCode = (e.keyCode ? e.keyCode : e.which);
 	if (keyCode < 48 || keyCode > 57) {
 		e.preventDefault();
 	}
 }
 
-async function save() {
+async function saveLanguages() {
 	if (languages.value.filter(l => l.name.trim() === '').length > 0) {
 		showSaveError('Languages cannot have a blank name.');
 	} else if (!InputValidator.isValidOrdering(languages.value.map(l => l.ordering))) {
@@ -82,14 +83,14 @@ async function save() {
 			removeAllErrors();
 			await Api.editLanguages(languages.value);
 			languages.value = await Api.getLanguages();
-			showSuccessMessage();
+			showSaveSuccessMessage();
 		} catch {
 			showSaveError('An unexpected error has occurred.');
 		}
 	}
 }
 
-async function add() {
+async function addLanguage() {
 	if (newLanguageName.value.trim() === '') {
 		showAddError('Please enter a valid language name.');
 	} else if (languages.value.some(l => l.name === newLanguageName.value)) {
@@ -118,13 +119,17 @@ function showSaveError(text: string) {
 	saveErrorText.value = text;
 }
 
-function showSuccessMessage() {
-	const languageSavedText = document.querySelector('#languages-saved-text');
+function getLanguagesSavedTextElement() {
+	return document.querySelector('#languages-saved-text');
+}
+
+function showSaveSuccessMessage() {
+	const languageSavedText = getLanguagesSavedTextElement();
 	(languageSavedText as any).classList.remove('d-none');
 }
 
 function removeSuccessMessage() {
-	const languageSavedText = document.querySelector('#languages-saved-text');
+	const languageSavedText = getLanguagesSavedTextElement();
 	(languageSavedText as any).classList.add('d-none');
 }
 
