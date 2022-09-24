@@ -8,153 +8,150 @@
         <div id="practice-table">
           <div v-for="(e, i) in idea.ee" :key="e.id" class="pb-2">
             <PracticeRow :startInteractive="startInteractive"
-                         :isFocused="isFocused(i)"
+                         :isFocused="isFocusedRow(i)"
                          :rowOrder="i"
                          :reset="resetAll"
-                         @focusPrevious="focusPrevious"
-                         @focusNext="focusNext"
+                         @focusPrevious="focusPreviousRow"
+                         @focusNext="focusNextRow"
                          @skipFocus="skipFocus"
-                         @focusedRow="focusedRow"
-                         @fullMatched="fullMatchedRow"
+                         @focusedRow="focusRow"
+                         @fullMatched="rowFullyMatched"
                          :expression="e"/>
           </div>
         </div>
         <hr>
         <div class="d-flex btn-group">
           <button @click="resetRows()" class="btn btn-outline-secondary flex-grow-1 reset-button">Reset</button>
-          <button ref="nextButton" :class="nextButtonClass" @click="next()">Next</button>
+          <button ref="nextIdeaButton" :class="nextButtonClass" @click="nextIdea()">Next</button>
         </div>
       </div>
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script lang="ts" setup>
 import Api from '@/ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import NotEnoughData from '@/components/NotEnoughData.vue';
 import {Expression} from '../../server/model/ideas/expression';
+import {computed, nextTick, ref} from 'vue';
+import NotEnoughData from '@/components/NotEnoughData.vue';
 import PracticeRow from '@/components/practice/PracticeRow.vue';
 
-export default defineComponent({
-	name: 'PracticeIdeas',
-	components: {NotEnoughData, PracticeRow},
-	data() {
-		return {
-			itemRefs: [],
-			idea: getEmptyIdeaNoAsync(),
-			noIdeas: false,
-			currentlyFocusedRow: 0,
-			fullMatchedRows: 0,
-			nbrRowsToMatch: 0,
-			startInteractive: false,
-			focusDirectionDown: true,
-			resetAll: false,
-		};
-	},
-	async mounted() {
-		try {
-			await this.displayNextIdea();
-		} catch {
-			this.noIdeas = true;
+const nextIdeaButton = ref(null);
+const idea = ref(getEmptyIdeaNoAsync());
+const noIdeas = ref(false);
+const currentlyFocusedRow = ref(0);
+const startInteractive = ref(false);
+const focusDirectionDown = ref(true);
+const nbrFullyMatchedRows = ref(0);
+const nbrRowsToMatch = ref(0);
+const resetAll = ref(false);
+
+(async () => {
+	try {
+		await displayNextIdea();
+	} catch {
+		noIdeas.value = true;
+	}
+})();
+
+const nextButtonClass = computed(() => {
+	if (startInteractive.value && nbrFullyMatchedRows.value === nbrRowsToMatch.value) {
+		return 'btn btn-success flex-grow-1 next-button';
+	}
+	return 'btn btn-outline-secondary flex-grow-1 next-button';
+},
+);
+
+async function displayNextIdea() {
+	const nextIdea = await Api.getNextIdea();
+	nextIdea.ee = reorderExpressions(nextIdea.ee);
+	idea.value = nextIdea;
+	nbrFullyMatchedRows.value = 0;
+	focusDirectionDown.value = true;
+	currentlyFocusedRow.value = 0;
+	nbrRowsToMatch.value = idea.value.ee.filter(e => e.language.isPractice).length;
+	startInteractive.value = true;
+}
+
+// Put visible expressions first
+function reorderExpressions(ee: Expression[]): Expression[] {
+	return ee.sort((e1, e2) => {
+		if (e1.language.isPractice && !e2.language.isPractice) {
+			return 1;
 		}
-	},
-	computed: {
-		nextButtonClass() {
-			if (this.startInteractive && this.fullMatchedRows === this.nbrRowsToMatch) {
-				return 'btn btn-success flex-grow-1 next-button';
-			}
-			return 'btn btn-outline-secondary flex-grow-1 next-button';
-		},
-	},
-	methods: {
-		async displayNextIdea() {
-			const idea = await Api.getNextIdea();
-			idea.ee = this.reorderExpressions(idea.ee);
-			this.idea = idea;
-			this.fullMatchedRows = 0;
-			this.focusDirectionDown = true;
-			this.startInteractive = true;
-			this.currentlyFocusedRow = 0;
-			this.nbrRowsToMatch = this.idea.ee.filter(e => e.language.isPractice).length;
-		},
-		focusedRow(rowNumber: number) {
-			this.currentlyFocusedRow = rowNumber;
-		},
-		focusPrevious(rowNumber: number) {
-			this.focusDirectionDown = false;
-			if (this.currentlyFocusedRow === 0) {
-				// Loop around
-				this.currentlyFocusedRow = this.idea.ee.length - 1;
-			} else {
-				this.currentlyFocusedRow = rowNumber - 1;
-			}
-		},
-		focusNext(rowNumber: number) {
-			this.focusDirectionDown = true;
-			if (this.currentlyFocusedRow === this.idea.ee.length - 1) {
-				this.currentlyFocusedRow = 0;
-			} else {
-				this.currentlyFocusedRow = rowNumber + 1;
-			}
-		},
-		skipFocus() {
-			if (this.focusDirectionDown) {
-				this.focusNext(this.currentlyFocusedRow);
-			} else {
-				this.focusPrevious(this.currentlyFocusedRow);
-			}
-		},
-		isFocused(rowNumber: number) {
-			return rowNumber === this.currentlyFocusedRow;
-		},
-		fullMatchedRow(rowOrder: number, newMatch: boolean) {
-			if (newMatch) {
-				this.fullMatchedRows++;
-			}
-			if (this.fullMatchedRows === this.nbrRowsToMatch) {
-				this.currentlyFocusedRow = -1;
-				(this.$refs.nextButton as any).focus();
-			} else if (this.currentlyFocusedRow === rowOrder) {
-				this.focusNext(rowOrder);
-			} else {
-				const temp = this.currentlyFocusedRow;
-				this.currentlyFocusedRow = -1;
-				this.$nextTick(() => {
-					// Trigger focus (because value did not change so Vue will not react)
-					this.currentlyFocusedRow = temp;
-				});
-			}
-		},
-		// Reorders expressions to put visible expressions first
-		reorderExpressions(ee: Expression[]): Expression[] {
-			return ee.sort((e1, e2) => {
-				if (e1.language.isPractice && !e2.language.isPractice) {
-					return 1;
-				}
-				if (e1.language.isPractice && e2.language.isPractice) {
-					return 0;
-				}
-				return -1;
-			});
-		},
-		async next() {
-			await this.displayNextIdea();
-		},
-		keyPressed(txt: string, s: string) {
-			txt.trim();
-			s.trim();
-		},
-		resetRows() {
-			this.fullMatchedRows = 0;
-			this.resetAll = true;
-			this.$nextTick(() => {
-				this.resetAll = false;
-			});
-			this.currentlyFocusedRow = 0;
-		},
-	},
-});
+		if (e1.language.isPractice && e2.language.isPractice) {
+			return 0;
+		}
+		return -1;
+	});
+}
+
+function focusRow(rowNumber: number) {
+	currentlyFocusedRow.value = rowNumber;
+}
+
+function focusPreviousRow(currentRow: number) {
+	focusDirectionDown.value = false;
+	if (currentlyFocusedRow.value === 0) {
+		// Loop around
+		currentlyFocusedRow.value = idea.value.ee.length - 1;
+	} else {
+		currentlyFocusedRow.value = currentRow - 1;
+	}
+}
+
+function focusNextRow(rowNumber: number) {
+	focusDirectionDown.value = true;
+	if (currentlyFocusedRow.value === idea.value.ee.length - 1) {
+		currentlyFocusedRow.value = 0;
+	} else {
+		currentlyFocusedRow.value = rowNumber + 1;
+	}
+}
+
+function skipFocus() {
+	if (focusDirectionDown.value) {
+		focusNextRow(currentlyFocusedRow.value);
+	} else {
+		focusPreviousRow(currentlyFocusedRow.value);
+	}
+}
+
+function isFocusedRow(rowNumber: number) {
+	return rowNumber === currentlyFocusedRow.value;
+}
+
+function rowFullyMatched(rowNumber: number, newMatch: boolean) {
+	if (newMatch) {
+		nbrFullyMatchedRows.value++;
+	}
+	if (nbrFullyMatchedRows.value === nbrRowsToMatch.value) {
+		currentlyFocusedRow.value = -1;
+		(nextIdeaButton.value as any).focus();
+	} else if (currentlyFocusedRow.value === rowNumber) {
+		focusNextRow(rowNumber);
+	} else {
+		const temp = currentlyFocusedRow.value;
+		currentlyFocusedRow.value = -1;
+		nextTick(() => {
+			// Trigger focus (because value did not change so Vue will not react)
+			currentlyFocusedRow.value = temp;
+		});
+	}
+}
+
+async function nextIdea() {
+	await displayNextIdea();
+}
+
+function resetRows() {
+	nbrFullyMatchedRows.value = 0;
+	resetAll.value = true;
+	nextTick(() => {
+		resetAll.value = false;
+	});
+	currentlyFocusedRow.value = 0;
+}
 </script>
 
 <style scoped>
