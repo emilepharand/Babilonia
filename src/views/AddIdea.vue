@@ -2,13 +2,28 @@
   <div class="view">
     <h1>Add Idea</h1>
     <div v-if="noLanguages">
-      <NotEnoughData noLanguage />
+      <NotEnoughData no-language />
     </div>
     <div v-else>
-      <IdeaForm :idea="idea" title="Add Idea"/>
+      <IdeaForm
+        :idea="idea"
+        title="Add Idea"
+      />
       <div class="d-flex btn-group mt-2">
-        <button @click="addRows()" id="add-rows" class="btn btn-outline-secondary flex-grow-1">More Rows</button>
-        <button id="save-idea" @click="save()" class="btn btn-outline-secondary flex-grow-1">Save</button>
+        <button
+          id="add-rows"
+          class="btn btn-outline-secondary flex-grow-1"
+          @click="addRows()"
+        >
+          More Rows
+        </button>
+        <button
+          id="save-idea"
+          class="btn btn-outline-secondary flex-grow-1"
+          @click="save()"
+        >
+          Save
+        </button>
       </div>
     </div>
   </div>

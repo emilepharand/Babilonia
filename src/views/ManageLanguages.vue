@@ -1,43 +1,110 @@
 <template>
   <div class="view">
     <h1>Languages</h1>
-    <div class="edit-languages-block" v-if="loaded && languages.length !== 0">
+    <div
+      v-if="loaded && languages.length !== 0"
+      class="edit-languages-block"
+    >
       <h2>Edit</h2>
       <table class="languages-table table table-sm table-hover">
         <thead>
           <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Order</th>
-            <th scope="col">Practice</th>
-            <th scope="col">Delete</th>
+            <th scope="col">
+              Name
+            </th>
+            <th scope="col">
+              Order
+            </th>
+            <th scope="col">
+              Practice
+            </th>
+            <th scope="col">
+              Delete
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr class="language-row" v-for="lang in languages" :key="lang.id">
-            <td><input class="language-name" type="text" v-model="lang.name"/></td>
-            <td><input class="language-ordering" @keypress="allowOnlyNumbers" type="number" v-model="lang.ordering"></td>
-            <td><input class="language-is-practice" type="checkbox" v-model="lang.isPractice"></td>
-            <td><button @click="deleteLanguage(lang.id)" class="btn btn-danger btn-sm delete-language-button">X</button></td>
+          <tr
+            v-for="lang in languages"
+            :key="lang.id"
+            class="language-row"
+          >
+            <td>
+              <input
+                v-model="lang.name"
+                class="language-name"
+                type="text"
+              >
+            </td>
+            <td>
+              <input
+                v-model="lang.ordering"
+                class="language-ordering"
+                type="number"
+                @keypress="allowOnlyNumbers"
+              >
+            </td>
+            <td>
+              <input
+                v-model="lang.isPractice"
+                class="language-is-practice"
+                type="checkbox"
+              >
+            </td>
+            <td>
+              <button
+                class="btn btn-danger btn-sm delete-language-button"
+                @click="deleteLanguage(lang.id)"
+              >
+                X
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
       <div class="d-flex align-items-center">
-        <button id="save-languages-button" class="btn btn-primary btn-sm" @click="saveLanguages()">
+        <button
+          id="save-languages-button"
+          class="btn btn-primary btn-sm"
+          @click="saveLanguages()"
+        >
           Save
         </button>
-        <span id="languages-saved-text" class="pl-2 text-success d-none">
+        <span
+          id="languages-saved-text"
+          class="pl-2 text-success d-none"
+        >
           Languages saved.
         </span>
-        <span v-if="isShowSaveError" id="error-save-text" class="pl-2 text-danger">{{ saveErrorText }}</span>
+        <span
+          v-if="isShowSaveError"
+          id="error-save-text"
+          class="pl-2 text-danger"
+        >{{ saveErrorText }}</span>
       </div>
     </div>
     <div class="add-language-block">
       <h2>Add</h2>
       <div>
-        <input @keyup.enter="addLanguage()" id="new-language-name" type="text" v-model="newLanguageName"/>
+        <input
+          id="new-language-name"
+          v-model="newLanguageName"
+          type="text"
+          @keyup.enter="addLanguage()"
+        >
         <div class="d-flex align-items-center">
-          <button id="add-language-button" class="btn btn-primary btn-sm" @click="addLanguage()">Add</button>
-          <span v-if="isShowAddError" id="error-add-language-text" class="pl-2 text-danger">{{ addErrorText }}</span>
+          <button
+            id="add-language-button"
+            class="btn btn-primary btn-sm"
+            @click="addLanguage()"
+          >
+            Add
+          </button>
+          <span
+            v-if="isShowAddError"
+            id="error-add-language-text"
+            class="pl-2 text-danger"
+          >{{ addErrorText }}</span>
         </div>
       </div>
     </div>

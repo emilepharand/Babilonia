@@ -1,38 +1,57 @@
 <template>
   <div class="practice-row d-flex justify-content-end align-items-center">
-    <div class="text-left me-2 language-name">{{ expression.language.name }}</div>
-    <div class="input-group input-group-md" style="width: 400px">
-      <input v-if="!expression.language.isPractice"
-             class="form-control expression-input"
-             type="text"
-             :value="expression.text" disabled/>
-      <input v-else
-             ref="textInput"
-             class="expression-input form-control"
-             type="text"
-             v-model="typed"
-             @keydown.up.prevent="this.$emit('focusPrevious', rowOrder)"
-             @keydown.down="this.$emit('focusNext', rowOrder)"
-             @focus="this.$emit('focusedRow', rowOrder)"
-             @keydown.right="this.$refs.hintButton.focus()"
-             :maxlength="this.currentMaxLength"
-             :disabled="isFullMatch"
-             :class="{'partial-match': isPartialMatch,
-                       'full-match': isFullMatch,
-                       'no-match': isNoMatch,
-                       'neutral': nothingTyped,
-                       }"/>
-      <button class="btn btn-outline-dark hint-button"
-               :disabled="buttonsDisabled()"
-                @keydown.right="this.$refs.showButtom.focus()"
-                @keydown.left="this.$refs.textInput.focus()"
-                ref="hintButton"
-               value="Hint" @click="hint()">Hint</button>
-        <button class="btn btn-outline-dark show-button"
-                ref="showButtom"
-                @keydown.left="this.$refs.hintButton.focus()"
-               :disabled="buttonsDisabled()"
-               @click="show()">Show</button>
+    <div class="text-left me-2 language-name">
+      {{ expression.language.name }}
+    </div>
+    <div
+      class="input-group input-group-md"
+      style="width: 400px"
+    >
+      <input
+        v-if="!expression.language.isPractice"
+        class="form-control expression-input"
+        type="text"
+        :value="expression.text"
+        disabled
+      >
+      <input
+        v-else
+        ref="textInput"
+        v-model="typed"
+        class="expression-input form-control"
+        type="text"
+        :maxlength="currentMaxLength"
+        :disabled="isFullMatch"
+        :class="{'partial-match': isPartialMatch,
+                 'full-match': isFullMatch,
+                 'no-match': isNoMatch,
+                 'neutral': nothingTyped,
+        }"
+        @keydown.up.prevent="$emit('focusPrevious', rowOrder)"
+        @keydown.down="$emit('focusNext', rowOrder)"
+        @focus="$emit('focusedRow', rowOrder)"
+        @keydown.right="$refs.hintButton.focus()"
+      >
+      <button
+        ref="hintButton"
+        class="btn btn-outline-dark hint-button"
+        :disabled="buttonsDisabled()"
+        value="Hint"
+        @keydown.right="$refs.showButtom.focus()"
+        @keydown.left="$refs.textInput.focus()"
+        @click="hint()"
+      >
+        Hint
+      </button>
+      <button
+        ref="showButtom"
+        class="btn btn-outline-dark show-button"
+        :disabled="buttonsDisabled()"
+        @keydown.left="$refs.hintButton.focus()"
+        @click="show()"
+      >
+        Show
+      </button>
     </div>
   </div>
 </template>
@@ -120,7 +139,7 @@ function resetRow() {
 }
 
 function focusInput() {
-	if (textInput && textInput.value) {
+	if (textInput.value && textInput.value) {
 		(textInput as any).value.focus();
 		// Focus end of word
 		const saved = typed.value;

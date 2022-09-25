@@ -2,29 +2,46 @@
   <div class="view practice">
     <h1>Practice</h1>
     <div v-if="noIdeas">
-      <NotEnoughData noPracticeableIdea />
+      <NotEnoughData no-practiceable-idea />
     </div>
     <div v-else>
-        <div id="practice-table">
-          <div v-for="(e, i) in idea.ee" :key="e.id" class="pb-2">
-            <PracticeRow :startInteractive="startInteractive"
-                         :isFocused="isFocusedRow(i)"
-                         :rowOrder="i"
-                         :reset="resetAll"
-                         @focusPrevious="focusPreviousRow"
-                         @focusNext="focusNextRow"
-                         @skipFocus="skipFocus"
-                         @focusedRow="focusRow"
-                         @fullMatched="rowFullyMatched"
-                         :expression="e"/>
-          </div>
-        </div>
-        <hr>
-        <div class="d-flex btn-group">
-          <button @click="resetRows()" class="btn btn-outline-secondary flex-grow-1 reset-button">Reset</button>
-          <button ref="nextIdeaButton" :class="nextButtonClass" @click="nextIdea()">Next</button>
+      <div id="practice-table">
+        <div
+          v-for="(e, i) in idea.ee"
+          :key="e.id"
+          class="pb-2"
+        >
+          <PracticeRow
+            :start-interactive="startInteractive"
+            :is-focused="isFocusedRow(i)"
+            :row-order="i"
+            :reset="resetAll"
+            :expression="e"
+            @focusPrevious="focusPreviousRow"
+            @focusNext="focusNextRow"
+            @skipFocus="skipFocus"
+            @focusedRow="focusRow"
+            @fullMatched="rowFullyMatched"
+          />
         </div>
       </div>
+      <hr>
+      <div class="d-flex btn-group">
+        <button
+          class="btn btn-outline-secondary flex-grow-1 reset-button"
+          @click="resetRows()"
+        >
+          Reset
+        </button>
+        <button
+          ref="nextIdeaButton"
+          :class="nextButtonClass"
+          @click="nextIdea()"
+        >
+          Next
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 

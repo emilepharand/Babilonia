@@ -9,7 +9,7 @@
   },
   "extends": [
     // eslint.vuejs.org/user-guide
-    "plugin:vue/essential",
+    "plugin:vue/vue3-recommended",
     // github.com/xojs/xo
     "xo"
   ],

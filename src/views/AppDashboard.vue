@@ -2,10 +2,13 @@
   <div class="view">
     <h1>Dashboard</h1>
     <div v-if="noIdeas">
-      <NotEnoughData noIdea />
+      <NotEnoughData no-idea />
     </div>
     <div v-else>
-      <div v-for="(ideaPerLanguage) in ideasPerLanguage" :key="ideaPerLanguage.language.id">
+      <div
+        v-for="(ideaPerLanguage) in ideasPerLanguage"
+        :key="ideaPerLanguage.language.id"
+      >
         <p class="dashboard-row">
           You can express
           <strong>{{ ideaPerLanguage.count }}</strong>
