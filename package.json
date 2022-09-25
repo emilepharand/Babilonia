@@ -55,6 +55,7 @@
     "@vue/eslint-config-typescript": "^10.0.0",
     "@vue/test-utils": "^2.0.0-rc.17",
     "babel-preset-minify": "^0.5.1",
+    "cypress": "^10.8.0",
     "eslint": "^8.11.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-config-xo": "^0.40.0",
