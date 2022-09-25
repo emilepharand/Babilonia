@@ -4,19 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "run-p serve server",
-    "serve": "vue-cli-service serve --port 8000",
-    "server:old": "cd server && tsnd index.ts",
-    "server": "nodemon server/index.ts",
-    "test:init:nonodemon": "run-p serve:test server:test:nonodemon",
-    "test:init": "run-p serve:test server:test",
+    "start": "run-p vue-serve server",
+    "vue-serve": "vue-cli-service serve --port 8000",
+    "server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
+    "dev:start": "run-p dev:vue-serve dev:server",
+    "dev:vue-serve": "vue-serve",
+    "dev:server": "nodemon server/index.ts",
+    "test:start": "run-p test:vue-serve test:server",
+    "test:vue-serve": "vue-cli-service serve --mode test --port 8888",
+    "test:server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
+    "test:dev:start": "run-p test:dev:vue-serve test:server",
+    "test:dev:vue-serve": "test:vue-serve",
+    "test:dev:server": "nodemon server/index.ts --test-mode",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "serve:test": "vue-cli-service serve --mode test --port 8888",
-    "server:test:old": "cd server && tsnd index.ts --test-mode",
-    "server:test": "nodemon server/index.ts --test-mode",
-    "server:test:nonodemon": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "test:app": "cypress run"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.11.1",
@@ -29,6 +30,7 @@
     "cypress-fail-on-console-error": "^2.1.3",
     "express": "^4.17.3",
     "node-fetch": "^3.2.3",
+    "run-p": "^0.0.0",
     "sql-template-strings": "^2.2.2",
     "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
@@ -68,7 +70,6 @@
     "superagent": "^7.1.1",
     "supertest": "^6.2.2",
     "ts-jest": "^27.1.3",
-    "ts-node-dev": "^1.1.8",
     "typescript": "^4.5.5",
     "typescript-json-validator": "^2.4.2"
   }
