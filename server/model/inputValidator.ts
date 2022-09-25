@@ -1,7 +1,4 @@
-import {
-	IdeaForAdding,
-	validateSchema as validateIdeaForAddingSchema,
-} from './ideas/ideaForAdding';
+import {IdeaForAdding, validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
 import LanguageManager from './languages/languageManager';
 import IdeaManager from './ideas/ideaManager';
 import {Language, validate as validateIdea, validateForAdding} from './languages/language';
@@ -74,7 +71,7 @@ export default class InputValidator {
 		return !(await this.lm.languageNameExists(l.name));
 	}
 
-	public async validateIdeaForAdding(ideaForAdding: unknown): Promise<boolean> {
+	public async validateIdeaForAdding(ideaForAdding: IdeaForAdding): Promise<boolean> {
 		// Shape is valid (properties and their types)
 		if (!validateIdeaForAddingSchema(ideaForAdding)) {
 			return false;
