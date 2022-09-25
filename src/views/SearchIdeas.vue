@@ -18,7 +18,7 @@
         <div class="col-12">
           <label for="expressionLanguage" class="form-label">In this language:</label>
           <select id="expressionLanguage" class="expression-language form-select" name="language" v-model="expressionLanguage">
-            <option v-for="language in languages" :key="language.id" :value="language">
+            <option v-for="language in languagesWithPlaceholder" :key="language.id" :value="language">
               {{ language.name }}
             </option>
           </select>
@@ -26,7 +26,7 @@
         <div class="col-12">
           <label for="ideaHas" class="form-label">In an idea that contains all of these languages:</label>
           <select class="form-select" id="ideaHas" size="3" aria-label="size 3 select example" multiple v-model="ideaHas">
-            <option v-for="language in languagesWithoutPlaceholder" :key="language.id" :value="language">
+            <option v-for="language in languages" :key="language.id" :value="language">
               {{ language.name }}
             </option>
           </select>
@@ -34,7 +34,7 @@
         <div class="col-12">
           <label for="ideaDoesNotHave" class="form-label">In an idea that does not contain this language:</label>
           <select id="ideaDoesNotHave" class="form-select" name="language" v-model="ideaDoesNotHave">
-            <option v-for="language in languages" :key="language.id" :value="language">
+            <option v-for="language in languagesWithPlaceholder" :key="language.id" :value="language">
               {{ language.name }}
             </option>
           </select>
@@ -60,85 +60,82 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-import {SearchContext} from '../../server/model/search/searchContext';
+<script lang="ts" setup>
+import {ref} from 'vue';
 import Api from '@/ts/api';
+import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync, Language} from '../../server/model/languages/language';
+import {SearchContext} from '../../server/model/search/searchContext';
 import {getEmptyIdeaArrayNoAsync} from '../../server/model/ideas/idea';
-import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 
-export default defineComponent({
-	name: 'SearchIdeas',
-	data() {
-		return {
-			pattern: '',
-			results: getEmptyIdeaArrayNoAsync(),
-			strict: false,
-			languages: getEmptyLanguagesNoAsync(),
-			languagesWithoutPlaceholder: getEmptyLanguagesNoAsync(),
-			ideaHas: getEmptyLanguagesNoAsync(),
-			expressionLanguage: getEmptyLanguageNoAsync(),
-			ideaDoesNotHave: getEmptyLanguageNoAsync(),
-			isShowError: false,
-			errorText: '',
-			noResults: false,
-		};
-	},
-	async created() {
-		this.languages = await Api.getLanguages();
-		this.languagesWithoutPlaceholder = [...this.languages];
-		this.ideaHas = [];
-		const placeholderLanguage = getEmptyLanguageNoAsync();
-		this.languages.push(placeholderLanguage);
-		this.ideaDoesNotHave = placeholderLanguage;
-		this.expressionLanguage = placeholderLanguage;
-	},
-	methods: {
-		reset() {
-			this.pattern = '';
-			this.strict = false;
-			this.expressionLanguage = getEmptyLanguageNoAsync();
-			this.ideaDoesNotHave = getEmptyLanguageNoAsync();
-			this.ideaHas = [];
-		},
-		async search() {
-			const sc2: SearchContext = {};
-			let atLeastOneFilterSet = false;
-			if (this.strict) {
-				sc2.strict = true;
-				atLeastOneFilterSet = true;
-			}
-			if (this.pattern) {
-				sc2.pattern = this.pattern;
-				atLeastOneFilterSet = true;
-			}
-			if (this.ideaDoesNotHave.id !== -1) {
-				sc2.ideaDoesNotHave = this.ideaDoesNotHave.id;
-				atLeastOneFilterSet = true;
-			}
-			if (this.ideaHas.length > 0) {
-				sc2.ideaHas = this.ideaHas.map(i => i.id);
-				atLeastOneFilterSet = true;
-			}
-			if (this.expressionLanguage.id !== -1) {
-				sc2.language = this.expressionLanguage.id;
-				atLeastOneFilterSet = true;
-			}
-			if (atLeastOneFilterSet) {
-				this.isShowError = false;
-				const matchedIdeas = await Api.searchIdeas(sc2);
-				if (matchedIdeas.length === 0) {
-					this.results = [];
-					this.noResults = true;
-				} else {
-					this.noResults = false;
-					this.results = matchedIdeas;
-				}
-			} else {
-				this.errorText = 'Please select at least one filter.';
-				this.isShowError = true;
-			}
-		},
-	},
-});
+// Search context
+const pattern = ref('');
+const results = ref(getEmptyIdeaArrayNoAsync());
+const strict = ref(false);
+const ideaHas = ref(getEmptyLanguagesNoAsync());
+const expressionLanguage = ref(getEmptyLanguageNoAsync());
+const ideaDoesNotHave = ref(getEmptyLanguageNoAsync());
+
+// Component data
+const languagesWithPlaceholder = ref(getEmptyLanguagesNoAsync());
+const languages = ref(getEmptyLanguagesNoAsync());
+const isShowError = ref(false);
+const errorText = ref('');
+const noResults = ref(false);
+const LANGUAGE_PLACEHOLDER_ID = -1;
+
+(async () => {
+	const allLanguages = await Api.getLanguages();
+	// Placeholder language represents "any" language
+	const placeholderLanguage = getEmptyLanguageNoAsync();
+	languagesWithPlaceholder.value = [...allLanguages];
+	languagesWithPlaceholder.value.push(placeholderLanguage);
+	ideaDoesNotHave.value = placeholderLanguage;
+	expressionLanguage.value = placeholderLanguage;
+	languages.value = [...allLanguages];
+	ideaHas.value = [];
+})();
+
+function reset() {
+	pattern.value = '';
+	strict.value = false;
+	expressionLanguage.value = getEmptyLanguageNoAsync();
+	ideaDoesNotHave.value = getEmptyLanguageNoAsync();
+	ideaHas.value = [];
+	isShowError.value = false;
+}
+
+async function search() {
+	isShowError.value = false;
+	if (!atLeastOneFilterSet()) {
+		errorText.value = 'Please select at least one filter.';
+		isShowError.value = true;
+		return;
+	}
+	const searchContext = createSearchContext();
+	const matchedIdeas = await Api.searchIdeas(searchContext);
+	noResults.value = matchedIdeas.length === 0;
+	results.value = matchedIdeas;
+}
+
+function atLeastOneFilterSet() {
+	return strict.value || pattern.value || ideaDoesNotHave.value.id !== LANGUAGE_PLACEHOLDER_ID
+      || ideaHas.value.length > 0 || expressionLanguage.value.id !== LANGUAGE_PLACEHOLDER_ID;
+}
+
+function createSearchContext() {
+	const sc2: SearchContext = {};
+	sc2.strict = strict.value;
+	sc2.pattern = pattern.value;
+	if (ideaDoesNotHave.value.id !== LANGUAGE_PLACEHOLDER_ID) {
+		sc2.ideaDoesNotHave = ideaDoesNotHave.value.id;
+	}
+	if (ideaHas.value.length > 0) {
+		sc2.ideaHas = ideaHas.value.map((l: Language) => l.id);
+	}
+	if (expressionLanguage.value.id !== LANGUAGE_PLACEHOLDER_ID) {
+		sc2.language = expressionLanguage.value.id;
+	}
+	return sc2;
+}
+
 </script>

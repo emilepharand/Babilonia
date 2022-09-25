@@ -37,180 +37,178 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
+<script lang="ts" setup>
+import {defineEmits, onMounted, ref, watch} from 'vue';
 import Api from '@/ts/api';
 
-export default defineComponent({
-	name: 'PracticeRow',
-	props: {
-		// TODO: This should be Expression
-		expression: {} as any,
-		rowOrder: Number,
-		isFocused: Boolean,
-		startInteractive: Boolean,
-		reset: Boolean,
-	},
-	emits: ['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow'],
-	data() {
-		return {
-			typed: '',
-			isFullMatch: false,
-			isPartialMatch: false,
-			isNoMatch: false,
-			nothingTyped: true,
-			moreLettersAllowed: true,
-			currentMaxLength: 1,
-			// TODO: This should be Settings
-			settings: {} as any,
-		};
-	},
-	mounted() {
-		if (this.isFocused) {
-			if (this.$refs.textInput) {
-				this.focusInput();
-			}
+const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
+const props = defineProps({
+	// TODO: This should be Expression
+	expression: {} as any,
+	rowOrder: Number,
+	isFocused: Boolean,
+	startInteractive: Boolean,
+	reset: Boolean});
+
+const typed = ref('');
+const isFullMatch = ref(false);
+const isPartialMatch = ref(false);
+const isNoMatch = ref(false);
+const nothingTyped = ref(true);
+const moreLettersAllowed = ref(true);
+const currentMaxLength = ref(1);
+// TODO: This should be Settings
+const settings = ref({} as any);
+
+const textInput = ref(null);
+
+onMounted(() => {
+	if (props.isFocused) {
+		if (props.expression.language.isPractice) {
+			focusInput();
+		} else {
+			emit('skipFocus');
 		}
-	},
-	async created() {
-		this.settings = await Api.getSettings();
-	},
-	watch: {
-		expression: {
-			handler() {
-				if (this.expression.language.isPractice) {
-					this.typed = '';
-					this.isFullMatch = false;
-				}
-			},
-			immediate: true,
-		},
-		isFocused: {
-			handler() {
-				if (this.startInteractive && this.isFocused) {
-					if (this.isFullMatch || !this.expression.language.isPractice) {
-						this.$emit('skipFocus');
-					} else if (this.$refs.textInput) {
-						this.focusInput();
-					}
-				}
-			},
-			immediate: true,
-		},
-		typed: {
-			handler() {
-				if (this.startInteractive) {
-					if (this.isFullMatch) {
-						this.$emit('skipFocus');
-					} else {
-						this.checkMatch();
-					}
-				}
-			},
-		},
-		reset: {
-			handler() {
-				if (this.startInteractive) {
-					this.resetRow();
-				}
-			},
-		},
-	},
-	methods: {
-		resetRow() {
-			this.typed = '';
-			this.isFullMatch = false;
-			this.isPartialMatch = false;
-			this.isNoMatch = false;
-			this.nothingTyped = true;
-		},
-		focusInput() {
-			(this.$refs.textInput as any).focus();
-			// Focus end of word... is this needed? I don't remember the exact use case
-			const saved = this.typed;
-			(this.$refs.textInput as any).value = '';
-			(this.$refs.textInput as any).value = saved;
-		},
-		buttonsDisabled() {
-			return !this.expression.language.isPractice || this.isFullMatch;
-		},
-		normalizeChar(c: string) {
-			if (this.settings.strictCharacters) {
-				return c;
-			}
-			return c.normalize('NFD')
-				.replace(/[\u0300-\u036f]/g, '')
-				.toLowerCase();
-		},
-		checkMatch() {
-			const typedWord = this.typed;
-			if (typedWord.length === 0) {
-				this.nothingTyped = true;
-				this.isNoMatch = false;
-				this.isPartialMatch = false;
-				this.isFullMatch = false;
-				this.currentMaxLength = 1;
-				return;
-			}
-			this.nothingTyped = false;
-			const firstLettersMatch = this.checkFirstLettersMatch(this.expression.text, typedWord);
-			if (firstLettersMatch) {
-				// Show non-normalized spelling
-				this.typed = this.expression.text.substring(0, this.typed.length);
-				if (typedWord.length > 0 && typedWord.length === this.expression.text.length) {
-					this.isNoMatch = false;
-					this.isPartialMatch = false;
-					this.isFullMatch = true;
-					this.$emit('fullMatched', this.rowOrder, true);
-				} else {
-					this.isNoMatch = false;
-					this.isPartialMatch = true;
-					this.isFullMatch = false;
-					this.currentMaxLength = this.typed.length + 1;
-				}
-			} else {
-				this.isNoMatch = true;
-				this.isPartialMatch = false;
-				this.isFullMatch = false;
-				this.moreLettersAllowed = false;
-			}
-		},
-		checkFirstLettersMatch(textToMatch: string, typedWord: string) {
-			if (typedWord as unknown === undefined) {
-				return false;
-			}
-			let i = 0;
-			while (i < typedWord.length) {
-				if (this.normalizeChar(textToMatch.charAt(i)) === this.normalizeChar(typedWord.charAt(i))) {
-					i += 1;
-				} else {
-					return false;
-				}
-			}
-			return true;
-		},
-		hint() {
-			let j = 0;
-			while (j < this.typed.length && this.expression.text.charAt(j) === this.typed.charAt(j)) {
-				j += 1;
-			}
-			if (j > 0) {
-				if (this.expression.text[j] === ' ') {
-					this.typed = this.expression.text.substring(0, j + 2);
-				} else {
-					this.typed = this.expression.text.substring(0, j + 1);
-				}
-			} else {
-				this.typed = this.expression.text.substring(0, 1);
-			}
-			this.focusInput();
-		},
-		show() {
-			this.typed = this.expression.text;
-		},
-	},
-},
-);
+	}
+});
+
+(async () => {
+	settings.value = await Api.getSettings();
+})();
+
+watch(props.expression, () => {
+	if (props.expression.language.isPractice) {
+		typed.value = '';
+		isFullMatch.value = false;
+	}
+});
+
+watch(() => props.isFocused, isFocused => {
+	if (props.startInteractive && isFocused) {
+		if (isFullMatch.value || !props.expression.language.isPractice) {
+			emit('skipFocus');
+		} else if (props.expression.language.isPractice) {
+			focusInput();
+		} else {
+			emit('skipFocus');
+		}
+	}
+});
+
+watch(typed, () => {
+	if (props.startInteractive) {
+		if (isFullMatch.value) {
+			emit('skipFocus');
+		} else {
+			checkMatch();
+		}
+	}
+});
+
+watch(() => props.reset, _ => {
+	if (props.startInteractive) {
+		resetRow();
+	}
+});
+
+function resetRow() {
+	typed.value = '';
+	isFullMatch.value = false;
+	isPartialMatch.value = false;
+	isNoMatch.value = false;
+	nothingTyped.value = true;
+}
+
+function focusInput() {
+	if (textInput && textInput.value) {
+		(textInput as any).value.focus();
+		// Focus end of word
+		const saved = typed.value;
+		(textInput.value as any).value = '';
+		(textInput.value as any).value = saved;
+	}
+}
+
+function buttonsDisabled() {
+	return !props.expression.language.isPractice || isFullMatch.value;
+}
+
+function normalizeChar(c: string) {
+	if (settings.value.strictCharacters) {
+		return c;
+	}
+	return c.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase();
+}
+
+function checkMatch() {
+	const typedWord = typed.value;
+	if (typedWord.length === 0) {
+		nothingTyped.value = true;
+		isNoMatch.value = false;
+		isPartialMatch.value = false;
+		isFullMatch.value = false;
+		currentMaxLength.value = 1;
+		return;
+	}
+	nothingTyped.value = false;
+	const firstLettersMatch = checkFirstLettersMatch(props.expression.text, typedWord);
+	if (firstLettersMatch) {
+		// Show non-normalized spelling
+		typed.value = props.expression.text.substring(0, typed.value.length);
+		if (typedWord.length > 0 && typedWord.length === props.expression.text.length) {
+			isNoMatch.value = false;
+			isPartialMatch.value = false;
+			isFullMatch.value = true;
+			emit('fullMatched', props.rowOrder, true);
+		} else {
+			isNoMatch.value = false;
+			isPartialMatch.value = true;
+			isFullMatch.value = false;
+			currentMaxLength.value = typed.value.length + 1;
+		}
+	} else {
+		isNoMatch.value = true;
+		isPartialMatch.value = false;
+		isFullMatch.value = false;
+		moreLettersAllowed.value = false;
+	}
+}
+
+function checkFirstLettersMatch(textToMatch: string, typedWord: string) {
+	let i = 0;
+	while (i < typedWord.length) {
+		if (normalizeChar(textToMatch.charAt(i)) === normalizeChar(typedWord.charAt(i))) {
+			i += 1;
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+function hint() {
+	let j = 0;
+	while (j < typed.value.length && props.expression.text.charAt(j) === typed.value.charAt(j)) {
+		j += 1;
+	}
+	if (j > 0) {
+		// Don't hint only space but next letter too
+		if (props.expression.text[j] === ' ') {
+			typed.value = props.expression.text.substring(0, j + 2);
+		} else {
+			typed.value = props.expression.text.substring(0, j + 1);
+		}
+	} else {
+		typed.value = props.expression.text.substring(0, 1);
+	}
+	focusInput();
+}
+
+function show() {
+	typed.value = props.expression.text;
+}
 </script>
 
 <style scoped>

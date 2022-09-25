@@ -33,54 +33,49 @@
   </div>
 </template>
 
-<script lang="ts">
-import {defineComponent} from 'vue';
-import IdeaForm from '@/components/IdeaForm.vue';
-import Api from '@/ts/api';
-import Utils from '@/ts/utils';
-import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
+<script lang="ts" setup>
+import {ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
 import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
+import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
+import IdeaForm from '@/components/IdeaForm.vue';
+import Utils from '@/ts/utils';
+import Api from '@/ts/api';
 
-export default defineComponent({
-	name: 'EditIdeas',
-	components: {
-		IdeaForm,
-	},
-	data() {
-		return {
-			idea: getEmptyIdeaNoAsync(),
-			loaded: false,
-			ideaNotFound: false,
-		};
-	},
-	async created() {
-		const ideaId = Number.parseInt(Array.from(this.$route.params.id).join(''), 10);
-		try {
-			this.idea = await Api.getIdea(ideaId);
-			this.loaded = true;
-		} catch {
-			this.ideaNotFound = true;
-		}
-	},
-	expose: ['addRows'],
-	methods: {
-		async edit() {
-			this.idea.ee = this.idea.ee.filter(e => e.text.trim() !== '');
-			await Api.editIdea(getIdeaForAddingFromIdea(this.idea), this.idea.id);
-			// Reorder expressions
-			this.idea = await Api.getIdea(this.idea.id);
-		},
-		async deleteIdea() {
-			await Api.deleteIdea(this.idea.id);
-			// TODO: This needs to be a redirect through router
-			// Also, redirect to previous page the user was on
-			// when we can handle navigation history properly
-			window.location.href = '/';
-		},
-		async addRows() {
-			const l = await Api.getLanguage(1);
-			this.idea = Utils.addEmptyExpressions(this.idea, 5, this.idea.ee.length, l);
-		},
-	},
-});
+const idea = ref(getEmptyIdeaNoAsync());
+const loaded = ref(false);
+const ideaNotFound = ref(false);
+
+const route = useRoute();
+const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
+
+// Initialize idea
+(async () => {
+	try {
+		idea.value = await Api.getIdea(ideaId);
+		loaded.value = true;
+	} catch {
+		ideaNotFound.value = true;
+	}
+}
+)();
+
+async function addRows() {
+	idea.value = await Utils.addEmptyExpressions(idea.value);
+}
+
+async function edit() {
+	// Remove empty expressions
+	idea.value.ee = idea.value.ee.filter(e => e.text.trim() !== '');
+	await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
+	// Reorder expressions
+	idea.value = await Api.getIdea(idea.value.id);
+}
+
+// Router needs to be declared outside function
+const router = useRouter();
+async function deleteIdea() {
+	await Api.deleteIdea(ideaId);
+	await router.push('/');
+}
 </script>
