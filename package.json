@@ -4,20 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "run-p vue-serve server",
-    "vue-serve": "vue-cli-service serve --port 8000",
-    "server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts",
-    "dev:start": "run-p dev:vue-serve dev:server",
-    "dev:vue-serve": "vue-serve",
-    "dev:server": "nodemon server/index.ts",
-    "test:start": "run-p test:vue-serve test:server",
-    "test:vue-serve": "vue-cli-service serve --mode test --port 8888",
-    "test:server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
-    "test:dev:start": "run-p test:dev:vue-serve test:server",
-    "test:dev:vue-serve": "test:vue-serve",
-    "test:dev:server": "nodemon server/index.ts --test-mode",
+    "build": "vue-cli-service build",
+    "start": "run-p start:api start:vue",
+    "start:api": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts",
+    "start:vue": "serve -s dist -l 8000",
+    "dev": "run-p dev:start:api dev:start:vue",
+    "test": "run-p test:start test:api test:vue",
+    "test:start": "run-p test:start:api test:start:vue",
+    "test:start:vue": "vue-cli-service serve --mode test --port 8888",
+    "test:start:api": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:app": "cypress run"
+    "test:vue": "cypress run",
+    "test:dev:start:api": "nodemon server/index.ts --test-mode",
+    "dev:start:vue": "vue-cli-service serve --port 8000",
+    "dev:start:api": "nodemon server/index.ts"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.12.2",
@@ -28,9 +28,11 @@
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "node-fetch": "^3.2.10",
+    "path-browserify": "^1.0.1",
     "run-p": "^0.0.0",
     "sqlite": "^4.1.2",
     "sqlite3": "^5.1.1",
+    "ts-loader": "^9.4.1",
     "vue": "^3.2.39",
     "vue-router": "^4.1.5"
   },
@@ -66,9 +68,12 @@
     "nodemon": "^2.0.20",
     "npm-check-updates": "^16.3.2",
     "npm-run-all": "^4.1.5",
+    "serve": "^14.0.1",
     "ts-jest": "^29.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.3",
-    "typescript-json-validator": "^2.4.2"
+    "typescript-json-validator": "^2.4.2",
+    "webpack-cli": "^4.10.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }
