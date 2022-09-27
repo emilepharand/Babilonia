@@ -1,13 +1,34 @@
 <template>
-  <div id="ideas" v-if="loaded">
-    <div class="expression" style="width: 800px;" v-for="e in idea.ee" :key="e.id">
+  <div
+    v-if="loaded"
+    id="ideas"
+  >
+    <div
+      v-for="e in idea.ee"
+      :key="e.id"
+      class="expression"
+      style="width: 800px;"
+    >
       <div class="input-group">
-        <select class="expression-language form-select" name="language" v-model="e.language">
-          <option v-for="language in languages" :key="language.id" :value="language">
+        <select
+          v-model="e.language"
+          class="expression-language form-select"
+          name="language"
+        >
+          <option
+            v-for="language in languages"
+            :key="language.id"
+            :value="language"
+          >
             {{ language.name }}
           </option>
         </select>
-      <input class="expression-text form-control" style="flex-grow:2" type="text" v-model="e.text"/>
+        <input
+          v-model="e.text"
+          class="expression-text form-control"
+          style="flex-grow:2"
+          type="text"
+        >
       </div>
     </div>
   </div>
@@ -19,8 +40,14 @@ import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import Api from '@/ts/api';
 
 defineProps({
-	title: String,
-	idea: Object,
+	title: {
+		type: String,
+		required: true,
+	},
+	idea: {
+		type: Object,
+		required: true,
+	},
 });
 
 defineEmits(['addRows', 'delete']);

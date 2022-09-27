@@ -1,7 +1,0 @@
-{
-  "pluginsFile": "tests/e2e/plugins/index.cjs",
-  "baseUrl": "http://localhost:8888",
-  "screenshotOnRunFailure": true,
-  "video": false,
-  "sourceType": "module"
-}
