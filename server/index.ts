@@ -1,7 +1,7 @@
 import express, {ErrorRequestHandler} from 'express';
 import cors from 'cors';
 import Routes from './routes';
-import isTestMode from './context';
+import {apiPort, appPort, isDevMode, isTestMode} from './options';
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	if (!isTestMode) {
@@ -12,12 +12,22 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 	next();
 };
 
-const app = express().use(cors()).use(express.json());
-app.use(errorHandler);
-const routes = new Routes(app);
+const apiServer = express().use(cors()).use(express.json());
+apiServer.use(errorHandler);
+const routes = new Routes(apiServer);
 routes.init();
-
-const port = isTestMode ? 5555 : 5000;
-app.listen(port, () => {
-	console.log(`Express server app started. Listening on port ${port}.`);
+apiServer.listen(apiPort, () => {
+	console.log(`API server started. Listening on port ${apiPort}.`);
 });
+
+if (!isDevMode) {
+	const appServer = express().use(cors()).use(express.json());
+	appServer.use(errorHandler);
+	appServer.use(express.static('.'));
+	appServer.all('*', (_, res) => {
+		res.sendFile(`${__dirname}/index.html`);
+	});
+	appServer.listen(appPort, () => {
+		console.log(`App started. Listening on port ${appPort}.`);
+	});
+}

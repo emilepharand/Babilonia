@@ -1,11 +1,16 @@
 import fetch from 'node-fetch';
-import {copy, Language, validate} from '../../server/model/languages/language';
+import {
+	copy,
+	Language,
+	validate,
+} from '../../server/model/languages/language';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {
 	addIdeaRawObjectAndGetResponse,
 	addLanguage,
 	addLanguageAndGetResponse,
 	addLanguageRawObjectAndGetResponse,
+	apiUrl,
 	DEFAULT_IS_PRACTICE,
 	deleteEverything,
 	deleteLanguage,
@@ -90,7 +95,7 @@ describe('getting languages', () => {
 
 describe('getting invalid languages', () => {
 	test('id is not numeric', async () => {
-		const r = await fetch('http://localhost:5555/languages/123letters', {
+		const r = await fetch(`${apiUrl}/languages/123letters`, {
 			method: 'GET',
 			headers: {'Content-Type': 'application/json'},
 		});
@@ -502,7 +507,7 @@ describe('deleting invalid languages', () => {
 
 	test('id is not numeric', async () => {
 		expect((await addLanguageAndGetResponse('a language')).status).toEqual(201);
-		const r = await fetch('http://localhost:5555/languages/123letters', {
+		const r = await fetch(`${apiUrl}/languages/123letters`, {
 			method: 'DELETE',
 		});
 		expect(r.status).toEqual(400);

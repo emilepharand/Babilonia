@@ -4,20 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "run-p vue-serve server",
-    "vue-serve": "vue-cli-service serve --port 8000",
-    "server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts",
-    "dev:start": "run-p dev:vue-serve dev:server",
-    "dev:vue-serve": "vue-serve",
-    "dev:server": "nodemon server/index.ts",
-    "test:start": "run-p test:vue-serve test:server",
-    "test:vue-serve": "vue-cli-service serve --mode test --port 8888",
-    "test:server": "node --loader ts-node/esm --experimental-specifier-resolution=node server/index.ts --test-mode",
-    "test:dev:start": "run-p test:dev:vue-serve test:server",
-    "test:dev:vue-serve": "test:vue-serve",
-    "test:dev:server": "nodemon server/index.ts --test-mode",
+    "clean": "rm -rf dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
+    "build": "npm run clean && npm run build:vue && npm run build:api && cp -rn db dist",
+    "build:vue": "vue-cli-service build --no-clean",
+    "build:api": "webpack ./server/index.ts",
+    "dev": "run-p dev:serve:api dev:serve:vue",
+    "dev:serve:api": "nodemon server/index.ts --dev-mode",
+    "dev:serve:vue": "wait-on tcp:8443 && export $(xargs < .env) && vue-cli-service serve --port $BASE_PORT",
+    "pretest": "npm run test:build",
+    "test:build": "export $(xargs < .env.test) && npm run build",
+    "test": "export $(xargs < .env.test) && start-server-and-test test:serve http://localhost:$BASE_PORT test:run",
+    "test:serve": "node ./dist/index.cjs --test-mode",
+    "test:run": "npm run test:api && npm run test:vue",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:app": "cypress run"
+    "test:vue": "cypress run"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.12.2",
@@ -28,11 +28,14 @@
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "node-fetch": "^3.2.10",
+    "path-browserify": "^1.0.1",
     "run-p": "^0.0.0",
     "sqlite": "^4.1.2",
     "sqlite3": "^5.1.1",
+    "ts-loader": "^9.4.1",
     "vue": "^3.2.39",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.1.5",
+    "webpack": "^5.74.0"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.4",
@@ -53,6 +56,7 @@
     "babel-preset-minify": "^0.5.2",
     "cypress": "^10.8.0",
     "cypress-fail-on-console-error": "^3.3.1",
+    "dotenv": "^16.0.3",
     "eslint": "^8.24.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-config-xo": "^0.42.0",
@@ -66,9 +70,13 @@
     "nodemon": "^2.0.20",
     "npm-check-updates": "^16.3.2",
     "npm-run-all": "^4.1.5",
+    "serve": "^14.0.1",
+    "start-server-and-test": "^1.14.0",
     "ts-jest": "^29.0.2",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.3",
-    "typescript-json-validator": "^2.4.2"
+    "typescript-json-validator": "^2.4.2",
+    "webpack-cli": "^4.10.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }

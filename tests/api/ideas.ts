@@ -9,6 +9,7 @@ import {
 	addIdea,
 	addIdeaRawObjectAndGetResponse,
 	addLanguage,
+	apiUrl,
 	deleteEverything,
 	deleteIdea,
 	editIdeaAndGetResponse,
@@ -19,7 +20,10 @@ import {
 	fetchLanguageAndGetResponse,
 	FIRST_IDEA_ID,
 } from '../utils/utils';
-import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
+import {
+	getIdeaForAddingFromIdea,
+	IdeaForAdding,
+} from '../../server/model/ideas/ideaForAdding';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -97,7 +101,7 @@ describe('getting invalid ideas', () => {
 	});
 
 	test('id is not numeric returns 400', async () => {
-		const r = await fetch('http://localhost:5555/ideas/123letters', {
+		const r = await fetch(`${apiUrl}/ideas/123letters`, {
 			method: 'GET',
 			headers: {'Content-Type': 'application/json'},
 		});
@@ -282,7 +286,7 @@ describe('editing invalid ideas', () => {
 		const ee = [e1];
 		const idea = await addIdea({ee});
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
-		const r = await fetch('http://localhost:5555/ideas/123letters', {
+		const r = await fetch(`${apiUrl}/ideas/123letters`, {
 			method: 'PUT',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(ideaForAdding),
@@ -385,7 +389,7 @@ describe('deleting invalid ideas', () => {
 	});
 
 	test('id is not numeric', async () => {
-		const r = await fetch('http://localhost:5555/ideas/123letters', {
+		const r = await fetch(`${apiUrl}/ideas/123letters`, {
 			method: 'DELETE',
 		});
 		expect(r.status).toEqual(400);

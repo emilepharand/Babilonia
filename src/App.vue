@@ -91,6 +91,23 @@
   </div>
 </template>
 
+<script lang="ts">
+import {defineComponent} from 'vue';
+
+export default defineComponent({
+	name: 'App',
+	data() {
+		return {
+		};
+	},
+	computed: {
+		isManageLink() {
+			return this.$route.path.startsWith('/manage');
+		},
+	},
+});
+</script>
+
 <style>
 .view {
   position: absolute;
@@ -126,20 +143,3 @@ main {
   justify-content: center;
 }
 </style>
-
-<script lang="ts">
-import {defineComponent} from 'vue';
-
-export default defineComponent({
-	name: 'App',
-	data() {
-		return {
-		};
-	},
-	computed: {
-		isManageLink() {
-			return this.$route.path.startsWith('/manage');
-		},
-	},
-});
-</script>

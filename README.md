@@ -1,34 +1,11 @@
-# babilonia-express-vuejs
+# Babilonia
 
-## Project setup
-```
-npm install
-```
+## Prerequisites
+- Node >= v16.13.0
+- Firefox or Chrome
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your unit tests
-```
-npm run test:unit
-```
-
-### Run your end-to-end tests
-```
-npm run test:e2e
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## How to run
+- Download the latest release and unzip it
+- `cd` into the folder
+- Run `node index.cjs`
+- That's it! Babilonia is available at `http://localhost:5000`

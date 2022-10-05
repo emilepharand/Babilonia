@@ -5,14 +5,19 @@ import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
+import * as dotenv from 'dotenv';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
 export const FIRST_ORDERING = 0;
 export const DEFAULT_IS_PRACTICE = false;
 
+dotenv.config();
+
+export const apiUrl = `${process.env.VUE_APP_API_URL}`;
+
 export async function setSettingsRawObjectAndGetResponse(object: any) {
-	return fetch('http://localhost:5555/settings', {
+	return fetch(`${apiUrl}/settings`, {
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
 		body: object,
@@ -28,13 +33,13 @@ export async function setSettings(settings: Settings) {
 }
 
 export async function fetchSettings(): Promise<Settings> {
-	return await (await fetch('http://localhost:5555/settings', {
+	return await (await fetch(`${apiUrl}/settings`, {
 		method: 'GET',
 	})).json() as Settings;
 }
 
 export async function addLanguageRawObjectAndGetResponse(object: any): Promise<Response> {
-	return fetch('http://localhost:5555/languages', {
+	return fetch(`${apiUrl}/languages`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: object,
@@ -50,7 +55,7 @@ export async function addLanguage(name: string): Promise<Language> {
 }
 
 export async function editLanguagesRawObjectAndGetResponse(object: any): Promise<Response> {
-	return fetch('http://localhost:5555/languages', {
+	return fetch(`${apiUrl}/languages`, {
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
 		body: object,
@@ -68,7 +73,7 @@ export async function editLanguages(newLanguages: Language[]): Promise<Language[
 }
 
 export async function fetchLanguageAndGetResponse(id: number): Promise<Response> {
-	return fetch(`http://localhost:5555/languages/${id}`, {
+	return fetch(`${apiUrl}/languages/${id}`, {
 		method: 'GET',
 		headers: {'Content-Type': 'application/json'},
 	});
@@ -79,7 +84,7 @@ export async function fetchLanguage(id: number): Promise<Language> {
 }
 
 export async function fetchLanguagesAndGetResponse(): Promise<Response> {
-	return fetch('http://localhost:5555/languages', {
+	return fetch(`${apiUrl}/languages`, {
 		method: 'GET',
 	});
 }
@@ -89,13 +94,13 @@ export async function fetchLanguages(): Promise<Language[]> {
 }
 
 export async function deleteLanguage(id: number): Promise<Response> {
-	return fetch(`http://localhost:5555/languages/${id}`, {
+	return fetch(`${apiUrl}/languages/${id}`, {
 		method: 'DELETE',
 	});
 }
 
 export async function addIdeaRawObjectAndGetResponse(obj: any): Promise<Response> {
-	return fetch('http://localhost:5555/ideas', {
+	return fetch(`${apiUrl}/ideas`, {
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: obj,
@@ -111,7 +116,7 @@ export async function addIdea(idea: IdeaForAdding): Promise<Idea> {
 }
 
 export async function editIdeaRawObjectAndGetResponse(idea: any, id: number): Promise<Response> {
-	return fetch(`http://localhost:5555/ideas/${id}`, {
+	return fetch(`${apiUrl}/ideas/${id}`, {
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
 		body: idea,
@@ -127,13 +132,13 @@ export async function editIdea(object: any, id: number): Promise<Idea> {
 }
 
 export async function deleteIdea(id: number): Promise<Response> {
-	return fetch(`http://localhost:5555/ideas/${id}`, {
+	return fetch(`${apiUrl}/ideas/${id}`, {
 		method: 'DELETE',
 	});
 }
 
 export async function fetchIdeaAndGetResponse(id: number): Promise<Response> {
-	return fetch(`http://localhost:5555/ideas/${id}`, {
+	return fetch(`${apiUrl}/ideas/${id}`, {
 		method: 'GET',
 	});
 }
@@ -143,7 +148,7 @@ export async function fetchIdea(id: number): Promise<Idea> {
 }
 
 export async function searchRawParamsAndGetResponse(params: string): Promise<Response> {
-	const url = encodeURI(`http://localhost:5555/ideas?${params}`);
+	const url = encodeURI(`${apiUrl}/ideas?${params}`);
 	return fetch(url, {
 		method: 'GET',
 	});
@@ -171,7 +176,7 @@ export function paramsFromSearchContext(sc: SearchContext): string {
 
 export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
 	const params = paramsFromSearchContext(sc);
-	const url = encodeURI(`http://localhost:5555/ideas?${params}`);
+	const url = encodeURI(`${apiUrl}/ideas?${params}`);
 	return fetch(url, {
 		method: 'GET',
 	});
@@ -182,7 +187,7 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 }
 
 export async function rawNextPracticeIdea(): Promise<Response> {
-	return fetch('http://localhost:5555/practice-ideas/next', {
+	return fetch(`${apiUrl}/practice-ideas/next`, {
 		method: 'GET',
 	});
 }
@@ -192,11 +197,11 @@ export async function nextPracticeIdea(): Promise<Idea> {
 }
 
 export async function getStats(): Promise<NumberIdeasInLanguage[]> {
-	return await (await fetch('http://localhost:5555/stats', {
+	return await (await fetch(`${apiUrl}/stats`, {
 		method: 'GET',
 	})).json() as NumberIdeasInLanguage[];
 }
 
 export async function deleteEverything(): Promise<Response> {
-	return fetch('http://localhost:5555/everything', {method: 'DELETE'});
+	return fetch(`${apiUrl}/everything`, {method: 'DELETE'});
 }
