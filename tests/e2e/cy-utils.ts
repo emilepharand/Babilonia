@@ -1,5 +1,10 @@
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
+export const apiUrl = Cypress.env('VUE_APP_API_URL');
 
 export function addLanguages() {
 	const languageNames = [
@@ -12,7 +17,7 @@ export function addLanguages() {
 	];
 	for (const languageName of languageNames) {
 		cy.request({
-			url: 'http://localhost:5555/languages',
+			url: `${apiUrl}/languages`,
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: `{"name":"${languageName}"}`,
@@ -48,19 +53,19 @@ export function addIdeasDifferentSet() {
 	const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: 3};
 	const i3: IdeaForAdding = {ee: [fr3, fr4, en3, en4, es3, es4]};
 	cy.request({
-		url: 'http://localhost:5555/ideas',
+		url: `${apiUrl}/ideas`,
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i1)}`,
 	});
 	cy.request({
-		url: 'http://localhost:5555/ideas',
+		url: `${apiUrl}/ideas`,
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i2)}`,
 	});
 	cy.request({
-		url: 'http://localhost:5555/ideas',
+		url: `${apiUrl}/ideas`,
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i3)}`,
@@ -85,13 +90,13 @@ export function addIdeas() {
 	const e13: ExpressionForAdding = {languageId: 5, text: 'Hallo'};
 	const i2: IdeaForAdding = {ee: [e6, e7, e8, e9, e10, e11, e12, e13]};
 	cy.request({
-		url: 'http://localhost:5555/ideas',
+		url: `${apiUrl}/ideas`,
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i1)}`,
 	});
 	cy.request({
-		url: 'http://localhost:5555/ideas',
+		url: `${apiUrl}/ideas`,
 		method: 'POST',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(i2)}`,
@@ -105,7 +110,7 @@ export function addIdeas() {
     + '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
     + '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
 	cy.request({
-		url: 'http://localhost:5555/languages',
+		url: `${apiUrl}/languages`,
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
 		body: `${json}`,
@@ -114,7 +119,7 @@ export function addIdeas() {
 
 export function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string[]) {
 	cy.request({
-		url: `http://localhost:5555/ideas/${id}`,
+		url: `${apiUrl}/ideas/${id}`,
 		failOnStatusCode: false,
 	}).then(r => {
 		cy.wrap(r).its('status').should('equal', status);

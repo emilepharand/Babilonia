@@ -5,9 +5,11 @@ import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
 import {SearchContext} from '../../server/model/search/searchContext';
 
+const apiUrl = `${process.env.VUE_APP_API_URL}`;
+
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${ideaId}`;
+		const url = `${apiUrl}/ideas/${ideaId}`;
 		const response = await fetch(url, {
 			method: 'GET',
 			headers: {
@@ -24,7 +26,7 @@ export default class Api {
 		ideaForAdding: IdeaForAdding,
 		id: number,
 	): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${id}`;
+		const url = `${apiUrl}/ideas/${id}`;
 		const response = await fetch(url, {
 			method: 'PUT',
 			headers: {
@@ -36,17 +38,17 @@ export default class Api {
 	}
 
 	static async deleteIdea(ideaId: number): Promise<void> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas/${ideaId}`;
+		const url = `${apiUrl}/ideas/${ideaId}`;
 		await fetch(url, {method: 'DELETE'});
 	}
 
 	static async deleteLanguage(languageId: number): Promise<void> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/languages/${languageId}`;
+		const url = `${apiUrl}/languages/${languageId}`;
 		await fetch(url, {method: 'DELETE'});
 	}
 
 	static async addIdea(ifa: IdeaForAdding): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas`;
+		const url = `${apiUrl}/ideas`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -58,7 +60,7 @@ export default class Api {
 	}
 
 	static async getNextIdea(): Promise<Idea> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/practice-ideas/next`;
+		const url = `${apiUrl}/practice-ideas/next`;
 		const res = await fetch(url);
 		if (res.status === 404) {
 			return Promise.reject();
@@ -67,7 +69,7 @@ export default class Api {
 	}
 
 	public static async addLanguage(name: string): Promise<Language> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
+		const url = `${apiUrl}/languages`;
 		const response = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -84,7 +86,7 @@ export default class Api {
 	public static async editLanguages(
 		languages: Language[],
 	): Promise<Language[]> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
+		const url = `${apiUrl}/languages`;
 		const response = await fetch(url, {
 			method: 'PUT',
 			headers: {
@@ -99,7 +101,7 @@ export default class Api {
 	}
 
 	public static async getLanguage(id: number): Promise<Language> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/languages/${id}`;
+		const url = `${apiUrl}/languages/${id}`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});
@@ -107,7 +109,7 @@ export default class Api {
 	}
 
 	public static async getStats(): Promise<NumberIdeasInLanguage[]> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/stats`;
+		const url = `${apiUrl}/stats`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});
@@ -115,7 +117,7 @@ export default class Api {
 	}
 
 	static async getLanguages(): Promise<Language[]> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/languages`;
+		const url = `${apiUrl}/languages`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});
@@ -123,11 +125,11 @@ export default class Api {
 	}
 
 	static async deleteEverything(): Promise<void> {
-		await fetch('http://localhost:5555/everything', {method: 'DELETE'});
+		await fetch(`${apiUrl}/everything`, {method: 'DELETE'});
 	}
 
 	static async getSettings(): Promise<Settings> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/settings`;
+		const url = `${apiUrl}/settings`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});
@@ -135,7 +137,7 @@ export default class Api {
 	}
 
 	public static async setSettings(settings: Settings): Promise<void> {
-		const url = `${process.env.VUE_APP_API_BASE_URL}/settings`;
+		const url = `${apiUrl}/settings`;
 		await fetch(url, {
 			method: 'PUT',
 			headers: {
@@ -168,7 +170,7 @@ export default class Api {
 
 	static async searchIdeas(sc: SearchContext): Promise<Idea[]> {
 		const params = Api.paramsFromSearchContext(sc);
-		const url = `${process.env.VUE_APP_API_BASE_URL}/ideas?${params}`;
+		const url = `${apiUrl}/ideas?${params}`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});

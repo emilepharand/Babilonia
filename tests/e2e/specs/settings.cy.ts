@@ -1,7 +1,9 @@
 import {Settings} from '../../../server/model/settings/settings';
 
+import {apiUrl} from '../cy-utils';
+
 before(() => {
-	cy.request('DELETE', 'http://localhost:5555/everything');
+	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
 });
@@ -23,7 +25,7 @@ describe('The settings page', () => {
 
 function setSettings(settings: Settings) {
 	cy.request({
-		url: 'http://localhost:5555/settings',
+		url: `${apiUrl}/settings`,
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(settings)}`,
@@ -32,7 +34,7 @@ function setSettings(settings: Settings) {
 
 export function assertSettingsEquals(settings: Settings) {
 	cy.request({
-		url: 'http://localhost:5555/settings',
+		url: `${apiUrl}/settings`,
 	}).then(r => {
 		// Little hack to make it work, compare stringified, without double quotes, without backlashes
 		cy.wrap(JSON.stringify(r.body)

@@ -1,14 +1,15 @@
-import * as cyutils from '../cy-utils';
 import {
+	addLanguages,
+	apiUrl,
 	assertExpressionHasValues,
 	assertFetchIdeaReturnsStatus,
 	inputExpression,
 } from '../cy-utils';
 
 before(() => {
-	cy.request('DELETE', 'http://localhost:5555/everything');
-	cyutils.addLanguages();
+	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
+	addLanguages();
 	cy.visit('/');
 });
 

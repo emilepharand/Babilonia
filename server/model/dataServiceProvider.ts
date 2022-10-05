@@ -4,17 +4,17 @@ import IdeaManager from './ideas/ideaManager';
 import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
 import InputValidator from './inputValidator';
-import isTestMode from '../context';
 import SearchHandler from './search/searchHandler';
 import {Stats} from '../stats/stats';
 import SettingsManager from './settings/settingsManager';
+import {databasePath, isTestMode} from '../options';
 
 async function initDb(): Promise<Database> {
 	const localDb = await open({
-		filename: isTestMode ? ':memory:' : 'server/model/db.db',
+		filename: databasePath,
 		driver: sqlite3.Database,
 	});
-	console.log('Database was opened.');
+	console.log(`Database ${databasePath} was opened.`);
 	return localDb;
 }
 

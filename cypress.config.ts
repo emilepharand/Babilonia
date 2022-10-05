@@ -1,5 +1,9 @@
 import {defineConfig} from 'cypress';
 
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 export default defineConfig({
 	screenshotOnRunFailure: true,
 	video: false,
@@ -12,9 +16,12 @@ export default defineConfig({
 		// setupNodeEvents(on, config) {
 		// 	return require('./tests/e2e/plugins/index.cjs')(on, config);
 		// },
-		baseUrl: 'http://localhost:8888',
+		baseUrl: `${process.env.BASE_URL}`,
 		specPattern: 'tests/e2e/specs/**/*.cy.{js,jsx,ts,tsx}',
 		supportFile: 'tests/e2e/support/index.js',
+		env: {
+			VUE_APP_API_URL: `${process.env.VUE_APP_API_URL}`,
+		},
 	},
 });
 
