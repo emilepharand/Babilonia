@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
-    "build": "npm run clean && npm run build:vue && npm run build:api && cp -rn db dist",
+    "build": "npm run clean && npm run build:vue && npm run build:api",
     "build:vue": "vue-cli-service build --no-clean",
     "build:api": "webpack ./server/index.ts",
     "dev": "run-p dev:serve:api dev:serve:vue",
