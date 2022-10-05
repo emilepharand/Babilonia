@@ -1,11 +1,9 @@
 name: Continuous Integration
 
-on:
-  push:
-    branches: [ 26-set-up-continuous-integration ]
+on: [push]
 
 jobs:
-  test_build:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
