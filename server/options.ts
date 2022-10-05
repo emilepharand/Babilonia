@@ -1,4 +1,4 @@
-export let databasePath = 'db/db.db';
+export let databasePath = 'db.db';
 export let isTestMode = false;
 export let isDevMode = false;
 import * as dotenv from 'dotenv';

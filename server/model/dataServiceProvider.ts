@@ -8,8 +8,14 @@ import SearchHandler from './search/searchHandler';
 import {Stats} from '../stats/stats';
 import SettingsManager from './settings/settingsManager';
 import {databasePath, isTestMode} from '../options';
+import * as fs from 'fs';
+
+let dbExists = true;
 
 async function initDb(): Promise<Database> {
+	if (databasePath !== ':memory:' && !fs.existsSync(databasePath)) {
+		dbExists = false;
+	}
 	const localDb = await open({
 		filename: databasePath,
 		driver: sqlite3.Database,
@@ -94,6 +100,6 @@ export default class DataServiceProvider {
 	}
 }
 
-if (isTestMode) {
+if (isTestMode || !dbExists) {
 	await DataServiceProvider.deleteAllData();
 }
