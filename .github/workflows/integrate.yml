@@ -3,7 +3,7 @@ name: Continuous Integration
 on: [push]
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -12,4 +12,16 @@ jobs:
           node-version: 16.13.0
       - run: npm ci
       - run: npm run build
-      - run: npm run test
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16.13.0
+      - run: npm ci
+      - run: npm run test:build
+      - name: unit/api
+        run: npm run test:api:ci
+      - name: e2e/vue
+        run: npm run test:vue:ci
