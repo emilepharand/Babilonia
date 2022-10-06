@@ -59,12 +59,13 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue';
 import Api from '@/ts/api';
+import {Expression, getEmptyExpression} from '../../../server/model/ideas/expression';
+import {getEmptySettingsNoAsync} from '../../../server/model/settings/settings';
 
 const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
 const props = defineProps({
-	// TODO: This should be Expression
-	expression: {} as any,
-	rowOrder: Number,
+	expression: {type: Expression, default: getEmptyExpression()},
+	rowOrder: {type: Number, default: 0},
 	isFocused: Boolean,
 	startInteractive: Boolean,
 	reset: Boolean});
@@ -76,8 +77,7 @@ const isNoMatch = ref(false);
 const nothingTyped = ref(true);
 const moreLettersAllowed = ref(true);
 const currentMaxLength = ref(1);
-// TODO: This should be Settings
-const settings = ref({} as any);
+const settings = ref(getEmptySettingsNoAsync());
 
 const textInput = ref(null);
 
