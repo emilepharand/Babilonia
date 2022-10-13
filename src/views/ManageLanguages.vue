@@ -113,7 +113,7 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import Api from '@/ts/api';
+import Api from '../ts/api';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import InputValidator from '../../server/model/inputValidator';
 

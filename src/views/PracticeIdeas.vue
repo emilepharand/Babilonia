@@ -46,12 +46,12 @@
 </template>
 
 <script lang="ts" setup>
-import Api from '@/ts/api';
+import Api from '../ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';
-import NotEnoughData from '@/components/NotEnoughData.vue';
-import PracticeRow from '@/components/practice/PracticeRow.vue';
+import NotEnoughData from '../components/NotEnoughData.vue';
+import PracticeRow from '../components/practice/PracticeRow.vue';
 
 const nextIdeaButton = ref(null);
 const idea = ref(getEmptyIdeaNoAsync());

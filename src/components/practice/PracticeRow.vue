@@ -58,7 +58,7 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue';
-import Api from '@/ts/api';
+import Api from '../../ts/api';
 
 const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
 const props = defineProps({

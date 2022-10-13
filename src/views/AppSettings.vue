@@ -63,7 +63,7 @@
 
 <script lang="ts" setup>
 import {nextTick, ref} from 'vue';
-import Api from '@/ts/api';
+import Api from '../ts/api';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
 const settings = ref(getEmptySettingsNoAsync());
