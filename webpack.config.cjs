@@ -32,9 +32,9 @@ module.exports = {
 	},
 	plugins: [
 		new webpack.DefinePlugin({
-			'process.env.BASE_PORT': JSON.stringify(process.env.BASE_PORT),
-			'process.env.VUE_APP_API_PORT': JSON.stringify(process.env.VUE_APP_API_PORT),
-			'process.env.VUE_APP_API_URL': JSON.stringify(process.env.VUE_APP_API_URL),
+			'process.env.VITE_BASE_PORT': JSON.stringify(process.env.VITE_BASE_PORT),
+			'process.env.VITE_API_PORT': JSON.stringify(process.env.VITE_API_PORT),
+			'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
 		}),
 	],
 };
