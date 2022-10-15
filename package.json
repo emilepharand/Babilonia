@@ -21,7 +21,7 @@
     "test:serve": "cd dist && nyc --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
     "test:vue:run": "cypress run",
     "test:vue:coverage": "cd tests/coverage && cp cypress/coverage-final.json merged/coverage-cypress.json",
-    "test:coverage": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged --reporter=html"
+    "test:coverage": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged --reporter=html && rm -rf .nyc_output_*"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.12.2",
