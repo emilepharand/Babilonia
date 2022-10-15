@@ -40,6 +40,8 @@
     "webpack": "^5.74.0"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.10.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/bootstrap": "^5.2.4",
     "@types/cors": "^2.8.12",
     "@types/jest": "^29.0.3",
@@ -55,6 +57,7 @@
     "@vue/eslint-config-airbnb": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.2",
     "@vue/test-utils": "^2.0.2",
+    "babel-plugin-istanbul": "^6.1.1",
     "babel-preset-minify": "^0.5.2",
     "cypress": "^10.8.0",
     "cypress-fail-on-console-error": "^3.3.1",
