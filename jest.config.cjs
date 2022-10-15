@@ -7,6 +7,12 @@ module.exports = {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  collectCoverage: true,
+  coverageDirectory: '<rootDir>/tests/coverage/jest',
+    collectCoverageFrom: [
+      'src/**/*.{jsx,ts,vue}',
+      'server/**/*.{jsx,ts}',
+    ],
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
     // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
