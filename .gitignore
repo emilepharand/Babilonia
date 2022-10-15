@@ -29,4 +29,7 @@ src/**/*.js
 *compiled.js
 *.js.map
 
+tests/coverage
+.nyc_output_*
+
 *.db
