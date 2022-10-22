@@ -14,7 +14,7 @@ export const DEFAULT_IS_PRACTICE = false;
 
 dotenv.config();
 
-export const apiUrl = `${import.meta.env.VITE_API_URL}`;
+export const apiUrl = `${process.env.VITE_API_URL}`;
 
 export async function setSettingsRawObjectAndGetResponse(object: any) {
 	return fetch(`${apiUrl}/settings`, {
