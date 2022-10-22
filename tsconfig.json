@@ -41,23 +41,3 @@
     "node_modules"
   ]
 }
-
-//{
-//  "compilerOptions": {
-//    "lib": ["ES2021"],
-//    "module": "esnext",
-//    "target": "esnext",
-//    "strict": true,
-//    "esModuleInterop": true,
-//    "skipLibCheck": true,
-//    "forceConsistentCasingInFileNames": true,
-//    "moduleResolution": "node"
-//  },
-//  "paths": {
-//    "@/*": [
-//      "src/*"
-//    ]
-//  },
-//  "$schema": "https://json.schemastore.org/tsconfig",
-//  "display": "Recommended"
-//}

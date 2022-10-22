@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const apiUrl = Cypress.env('VUE_APP_API_URL');
+export const apiUrl = Cypress.env('VITE_API_URL');
 
 export function addLanguages() {
 	const languageNames = [
