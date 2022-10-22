@@ -10,7 +10,7 @@
     "build:api": "webpack ./server/index.ts",
     "dev": "run-p dev:serve:api dev:serve:vue",
     "dev:serve:vue": "export $(xargs < .env) && vite --port $VITE_BASE_PORT",
-    "dev:serve:api": "nodemon server/index.ts --dev-mode",
+    "dev:serve:api": "export $(xargs < .env) && nodemon server/index.ts --dev-mode",
     "pretest": "npm run test:build",
     "test:build": "export $(xargs < .env.test) && npm run build",
     "test": "export $(xargs < .env.test) && start-server-and-test test:serve http://localhost:$VITE_BASE_PORT test:run",
