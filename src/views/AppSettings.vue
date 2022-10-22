@@ -62,29 +62,8 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue';
-import Api from '@/ts/api';
-import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
-
-const settings = ref(getEmptySettingsNoAsync());
-const showSettingsSavedMessage = ref(false);
-
-(async () => {
-	settings.value = await Api.getSettings();
-})();
-
-async function save() {
-	await Api.setSettings(settings.value);
-	showSettingsSavedMessage.value = true;
-}
-
-// Tooltip popovers
-const bootstrap = require('bootstrap');
-nextTick(() => {
-	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-});
-</script>
+// In a separate file because of #66
+import {save, settings, showSettingsSavedMessage} from '@/views/AppSettings'; </script>
 
 <style scoped>
 input[type="checkbox"], label {

@@ -85,48 +85,6 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
-import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
-import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
+// In a separate file because of #66
 import IdeaForm from '@/components/IdeaForm.vue';
-import Utils from '@/ts/utils';
-import Api from '@/ts/api';
-
-const idea = ref(getEmptyIdeaNoAsync());
-const loaded = ref(false);
-const ideaNotFound = ref(false);
-
-const route = useRoute();
-const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
-
-// Initialize idea
-(async () => {
-	try {
-		idea.value = await Api.getIdea(ideaId);
-		loaded.value = true;
-	} catch {
-		ideaNotFound.value = true;
-	}
-}
-)();
-
-async function addRows() {
-	idea.value = await Utils.addEmptyExpressions(idea.value);
-}
-
-async function edit() {
-	// Remove empty expressions
-	idea.value.ee = idea.value.ee.filter(e => e.text.trim() !== '');
-	await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
-	// Reorder expressions
-	idea.value = await Api.getIdea(idea.value.id);
-}
-
-// Router needs to be declared outside function
-const router = useRouter();
-async function deleteIdea() {
-	await Api.deleteIdea(ideaId);
-	await router.push('/');
-}
-</script>
+import {addRows, deleteIdea, edit, idea, ideaNotFound, loaded} from '@/views/EditIdea'; </script>
