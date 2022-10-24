@@ -17,11 +17,11 @@
             :row-order="i"
             :reset="resetAll"
             :expression="e"
-            @focus-previous="focusPreviousRow"
-            @focus-next="focusNextRow"
-            @skip-focus="skipFocus"
-            @focused-row="focusRow"
-            @full-matched="rowFullyMatched"
+            @focusPrevious="focusPreviousRow"
+            @focusNext="focusNextRow"
+            @skipFocus="skipFocus"
+            @focusedRow="focusRow"
+            @fullMatched="rowFullyMatched"
           />
         </div>
       </div>
