@@ -5,7 +5,7 @@ import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
 import {SearchContext} from '../../server/model/search/searchContext';
 
-const apiUrl = `${process.env.VUE_APP_API_URL}`;
+const apiUrl = `${import.meta.env.VITE_API_URL}`;
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {

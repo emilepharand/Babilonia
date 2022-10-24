@@ -1,6 +1,6 @@
 import {Idea} from '../../server/model/ideas/idea';
 import {getEmptyNExpressions} from '../../server/model/ideas/expression';
-import Api from '@/ts/api';
+import Api from './api';
 
 const NUMBER_ROWS_INCREMENT = 5;
 

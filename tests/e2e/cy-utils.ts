@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export const apiUrl = Cypress.env('VUE_APP_API_URL');
+export const apiUrl = Cypress.env('VITE_API_URL');
 
 export function addLanguages() {
 	const languageNames = [
@@ -146,8 +146,6 @@ export function inputExpression(rowNbr: number, language: string, text: string) 
 }
 
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
-	cy.get('#ideas .expression').eq(rowNbr).within(() => {
-		cy.get('.expression-language :selected').should('have.text', languageName);
-		cy.get('.expression-text').should('have.value', text);
-	});
+	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-language option:checked`).should('have.text', languageName);
+	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-text`).should('have.value', text);
 }

@@ -89,9 +89,9 @@ import {ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import IdeaForm from '@/components/IdeaForm.vue';
-import Utils from '@/ts/utils';
-import Api from '@/ts/api';
+import IdeaForm from '../components/IdeaForm.vue';
+import Utils from '../ts/utils';
+import Api from '../ts/api';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const loaded = ref(false);

@@ -162,7 +162,7 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import Api from '@/ts/api';
+import Api from '../ts/api';
 import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync, Language} from '../../server/model/languages/language';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {getEmptyIdeaArrayNoAsync} from '../../server/model/ideas/idea';

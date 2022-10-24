@@ -33,10 +33,10 @@
 import {ref} from 'vue';
 import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import {getExpressionForAddingFromExpression} from '../../server/model/ideas/expression';
-import IdeaForm from '@/components/IdeaForm.vue';
-import NotEnoughData from '@/components/NotEnoughData.vue';
-import Api from '@/ts/api';
-import Utils from '@/ts/utils';
+import IdeaForm from '../components/IdeaForm.vue';
+import NotEnoughData from '../components/NotEnoughData.vue';
+import Api from '../ts/api';
+import Utils from '../ts/utils';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
