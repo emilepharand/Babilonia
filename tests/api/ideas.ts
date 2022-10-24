@@ -341,7 +341,6 @@ describe('editing invalid ideas', () => {
 
 	test('expression: invalid shapes', async () => {
 		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id, text: 'expression'};
 		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
 		const idea = await addIdea(ideaForAdding);
 		// Additional property
