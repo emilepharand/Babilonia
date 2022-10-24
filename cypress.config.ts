@@ -2,7 +2,7 @@ import {defineConfig} from 'cypress';
 
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({path: '.env.test'});
 
 export default defineConfig({
 	screenshotOnRunFailure: true,
@@ -24,4 +24,3 @@ export default defineConfig({
 		},
 	},
 });
-

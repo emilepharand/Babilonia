@@ -12,7 +12,7 @@ export const FIRST_IDEA_ID = 1;
 export const FIRST_ORDERING = 0;
 export const DEFAULT_IS_PRACTICE = false;
 
-dotenv.config();
+dotenv.config({path: '.env.test'});
 
 export const apiUrl = `${process.env.VITE_API_URL}`;
 
