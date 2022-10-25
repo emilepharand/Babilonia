@@ -92,9 +92,9 @@
     "report-dir": "tests/coverage/cypress",
     "temp-dir": ".nyc_output_cypress",
     "extension": [
-      ".vue"
+      ".vue",
+      ".ts"
     ],
-
     "exclude": [
       "**/*.js"
     ],
