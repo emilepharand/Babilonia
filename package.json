@@ -15,7 +15,7 @@
     "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:api:run && npm run test:api:coverage",
     "test:api:coverage": "cd tests/coverage && mkdir merged && cp jest/coverage-final.json merged/coverage-jest.json && cp nyc/coverage-final.json merged/coverage-nyc.json",
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:serve": "cd dist && nyc -r=json --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
+    "test:serve": "cd dist && nyc --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
     "test:vue": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:vue:run && npm run test:vue:coverage",
     "test:vue:run": "cypress run",
     "test:vue:coverage": "cd tests/coverage && cp cypress/coverage-final.json merged/coverage-cypress.json",
@@ -88,20 +88,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "nyc": {
-    "cache": false,
     "report-dir": "tests/coverage/cypress",
-    "temp-dir": ".nyc_output_cypress",
-    "extension": [
-      ".vue",
-      ".ts"
-    ],
-    "exclude": [
-      "**/*.js"
-    ],
-    "all": true,
-    "excludeAfterRemap": false,
-    "reporter": [
-      "json"
-    ]
+    "temp-dir": ".nyc_output_cypress"
   }
 }
