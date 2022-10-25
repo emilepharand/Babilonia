@@ -24,6 +24,15 @@ if (!isDevMode) {
 	const appServer = express().use(cors()).use(express.json());
 	appServer.use(errorHandler);
 	appServer.use(express.static('.'));
+	if (isTestMode) {
+		// Cypress reads from this
+		appServer.get('/__coverage__', (req, res) => {
+			res.json({
+				// @ts-ignore
+				coverage: global.__coverage__ || null,
+			});
+		});
+	}
 	appServer.all('*', (_, res) => {
 		res.sendFile(`${__dirname}/index.html`);
 	});
