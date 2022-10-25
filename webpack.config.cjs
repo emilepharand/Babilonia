@@ -11,11 +11,17 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.tsx?$/,
-				use: 'ts-loader',
-				exclude: /node_modules/,
+				test: /\.ts$/,
+				use: [
+					{
+						loader: 'babel-loader'
+					},
+					{
+						loader: 'ts-loader'
+					}
+				]
 			},
-		],
+		]
 	},
 	target: 'node',
 	externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.

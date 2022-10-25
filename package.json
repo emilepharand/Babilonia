@@ -11,7 +11,7 @@
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
     "test": "export $(xargs < .env.test) && npm run build && server-test test:serve :$VITE_BASE_PORT test:run",
     "test:build": "export $(xargs < .env.test) && npm run build",
-    "test:serve": "cd dist && node index.cjs --test-mode",
+    "test:serve": "cd dist && nyc --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
     "test:run": "npm run test:api && npm run test:vue",
     "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
     "test:vue": "cypress run"
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.10.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/bootstrap": "^5.2.4",
     "@types/cors": "^2.8.12",
     "@types/jest": "^29.0.3",
