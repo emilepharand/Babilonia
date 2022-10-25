@@ -30,3 +30,6 @@ src/**/*.js
 *.js.map
 
 *.db
+
+tests/coverage
+.nyc_output*
