@@ -10,7 +10,7 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: '<rootDir>/tests/coverage/jest',
   collectCoverageFrom: [
-    'server/**/*.{ts}',
+    'server/**/*',
   ],
   transform: {
     // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
