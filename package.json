@@ -4,17 +4,22 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "clean": "rm -rf dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
+    "clean": "rm -rf .nyc_output* tests/coverage dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
     "build": "npm run clean && vite build && webpack ./server/index.ts",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
     "dev:serve:api": "nodemon server/index.ts --dev-mode",
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
-    "test": "export $(xargs < .env.test) && npm run build && server-test test:serve :$VITE_BASE_PORT test:run",
+    "pretest": "npm run test:build",
     "test:build": "export $(xargs < .env.test) && npm run build",
-    "test:serve": "cd dist && nyc --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
-    "test:run": "npm run test:api && npm run test:vue",
-    "test:api": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
-    "test:vue": "cypress run"
+    "test": "npm run test:api && npm run test:vue && npm run test:coverage",
+    "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:api:run && npm run test:api:coverage",
+    "test:api:coverage": "cd tests/coverage && mkdir merged && cp jest/coverage-final.json merged/coverage-jest.json && cp nyc/coverage-final.json merged/coverage-nyc.json",
+    "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test:serve": "cd dist && nyc -r=json --report-dir=tests/coverage/nyc --temp-dir=.nyc_output_app node index.cjs --test-mode",
+    "test:vue": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:vue:run && npm run test:vue:coverage",
+    "test:vue:run": "cypress run",
+    "test:vue:coverage": "cd tests/coverage && cp cypress/coverage-final.json merged/coverage-cypress.json",
+    "test:coverage": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged --reporter=html && rm -rf .nyc_output_*"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.12.2",
