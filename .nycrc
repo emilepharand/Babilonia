@@ -1,0 +1,15 @@
+{
+  "extends": "@istanbuljs/nyc-config-typescript",
+  "all": true,
+  "include":["src/**/*.{cjs,js,jsx,ts,vue}", "server/**/*.{cjs,js,jsx,ts}"],
+  "cache": false,
+  "extension": [
+    ".vue",
+    ".ts"
+  ],
+  "all": true,
+  "excludeAfterRemap": false,
+  "reporter": [
+    "json"
+  ]
+}

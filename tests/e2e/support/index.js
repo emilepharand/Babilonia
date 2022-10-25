@@ -13,6 +13,8 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+import '@cypress/code-coverage/support';
+
 // Import commands.js using ES2015 syntax:
 import './commands';
 // Alternatively you can use CommonJS syntax:
@@ -21,11 +23,7 @@ import failOnConsoleError, {consoleType} from 'cypress-fail-on-console-error';
 
 const config = {
 	excludeMessages: ['foo', '^some bar-regex.*'],
-	includeConsoleTypes: [
-		consoleType.ERROR,
-		consoleType.WARN,
-		consoleType.INFO,
-	],
+	includeConsoleTypes: [consoleType.ERROR, consoleType.WARN, consoleType.INFO],
 };
 
 failOnConsoleError(config);
