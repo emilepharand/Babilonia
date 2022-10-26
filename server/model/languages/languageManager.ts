@@ -26,13 +26,8 @@ export default class LanguageManager {
 	}
 
 	async deleteLanguage(languageId: number): Promise<void> {
-		// TODO ordering when unique is enforced:
-		// BEGIN TRANSACTION;
-		// update languages set ordering = -ordering;
-		// update languages set ordering = 0 where id = 6;
-		// update languages set ordering = 2 where id = 7;
-		// update languages set ordering = 1 where id = 8;
-		// COMMIT;
+		// eslint-disable-next-line no-warning-comments
+		// TODO ordering when unique is enforced: (Issue #76)
 		const l = await this.getLanguage(languageId);
 		await this.db.run(
 			'update languages set ordering = case when ordering > ? then ordering - 1 else ordering END',
