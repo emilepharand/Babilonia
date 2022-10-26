@@ -19,7 +19,10 @@
     "test:vue": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:vue:run && npm run test:vue:coverage",
     "test:vue:run": "cypress run",
     "test:vue:coverage": "cd tests/coverage && cp cypress/coverage-final.json merged/coverage-cypress.json",
-    "test:coverage": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged --reporter=html && rm -rf .nyc_output_*"
+    "test:coverage": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged --reporter=html && rm -rf .nyc_output_*",
+    "test:dev:vue": "export $(xargs < .env.test) && start-server-and-test test:dev:serve :$VITE_BASE_PORT test:vue:run",
+    "test:dev:serve": "run-p test:dev:serve:api dev:serve:vue",
+    "test:dev:serve:api": "nodemon server/index.ts --dev-mode --test-mode"
   },
   "dependencies": {
     "@cypress/webpack-preprocessor": "^5.12.2",
