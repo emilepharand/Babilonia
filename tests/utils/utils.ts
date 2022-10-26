@@ -5,7 +5,7 @@ import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
-import {paramsFromSearchContext} from '@/ts/api';
+import {paramsFromSearchContext} from '../../src/ts/api';
 import * as dotenv from 'dotenv';
 
 export const FIRST_LANGUAGE_ID = 1;
