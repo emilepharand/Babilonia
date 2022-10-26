@@ -16,11 +16,6 @@
       "jest",
       "cypress"
     ],
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "esnext",
       "dom",

@@ -12,4 +12,7 @@ export default defineConfig({
 			forceBuildInstrument: true,
 		}),
 	],
+	define: {
+		'process.env': process.env,
+	},
 });

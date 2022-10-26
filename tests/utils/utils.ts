@@ -5,6 +5,7 @@ import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
+import {paramsFromSearchContext} from '../../src/ts/api';
 import * as dotenv from 'dotenv';
 
 export const FIRST_LANGUAGE_ID = 1;
@@ -152,26 +153,6 @@ export async function searchRawParamsAndGetResponse(params: string): Promise<Res
 	return fetch(url, {
 		method: 'GET',
 	});
-}
-
-export function paramsFromSearchContext(sc: SearchContext): string {
-	let params = '';
-	if (sc.pattern) {
-		params = `pattern=${sc.pattern}`;
-	}
-	if (sc.strict) {
-		params += '&strict=true';
-	}
-	if (sc.language) {
-		params += `&language=${sc.language}`;
-	}
-	if (sc.ideaHas) {
-		params += `&ideaHas=${sc.ideaHas.join(',')}`;
-	}
-	if (sc.ideaDoesNotHave) {
-		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
-	}
-	return params;
 }
 
 export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {

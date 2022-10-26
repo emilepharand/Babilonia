@@ -5,7 +5,7 @@ import {NumberIdeasInLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
 import {SearchContext} from '../../server/model/search/searchContext';
 
-const apiUrl = `${import.meta.env.VITE_API_URL}`;
+const apiUrl = `${process.env.VITE_API_URL}`;
 
 export default class Api {
 	public static async getIdea(ideaId: number): Promise<Idea> {
@@ -147,33 +147,32 @@ export default class Api {
 		});
 	}
 
-	// TODO: This is duplicated
-	static paramsFromSearchContext(sc: SearchContext): string {
-		let params = '';
-		if (sc.pattern) {
-			params = `pattern=${sc.pattern}`;
-		}
-		if (sc.strict) {
-			params += '&strict=true';
-		}
-		if (sc.language) {
-			params += `&language=${sc.language}`;
-		}
-		if (sc.ideaHas) {
-			params += `&ideaHas=${sc.ideaHas.join(',')}`;
-		}
-		if (sc.ideaDoesNotHave) {
-			params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
-		}
-		return params;
-	}
-
 	static async searchIdeas(sc: SearchContext): Promise<Idea[]> {
-		const params = Api.paramsFromSearchContext(sc);
+		const params = paramsFromSearchContext(sc);
 		const url = `${apiUrl}/ideas?${params}`;
 		const response = await fetch(url, {
 			method: 'GET',
 		});
 		return (await response.json()) as Idea[];
 	}
+}
+
+export function paramsFromSearchContext(sc: SearchContext): string {
+	let params = '';
+	if (sc.pattern) {
+		params = `pattern=${sc.pattern}`;
+	}
+	if (sc.strict) {
+		params += '&strict=true';
+	}
+	if (sc.language) {
+		params += `&language=${sc.language}`;
+	}
+	if (sc.ideaHas) {
+		params += `&ideaHas=${sc.ideaHas.join(',')}`;
+	}
+	if (sc.ideaDoesNotHave) {
+		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
+	}
+	return params;
 }
