@@ -17,15 +17,6 @@ export interface Language {
   isPractice: boolean | '0' | '1';
 }
 
-export function copy(l: Language): Language {
-	return {
-		id: l.id,
-		name: l.name,
-		ordering: l.ordering,
-		isPractice: l.isPractice,
-	};
-}
-
 export function getEmptyLanguagesNoAsync(): Language[] {
 	return [{
 		id: -1,
