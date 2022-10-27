@@ -124,10 +124,6 @@ export default class Api {
 		return (await response.json()) as Language[];
 	}
 
-	static async deleteEverything(): Promise<void> {
-		await fetch(`${apiUrl}/everything`, {method: 'DELETE'});
-	}
-
 	static async getSettings(): Promise<Settings> {
 		const url = `${apiUrl}/settings`;
 		const response = await fetch(url, {

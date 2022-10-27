@@ -97,21 +97,12 @@ onMounted(() => {
 	settings.value = await Api.getSettings();
 })();
 
-watch(props.expression, () => {
-	if (props.expression.language.isPractice) {
-		typed.value = '';
-		isFullMatch.value = false;
-	}
-});
-
 watch(() => props.isFocused, isFocused => {
 	if (props.startInteractive && isFocused) {
 		if (isFullMatch.value || !props.expression.language.isPractice) {
 			emit('skipFocus');
 		} else if (props.expression.language.isPractice) {
 			focusInput();
-		} else {
-			emit('skipFocus');
 		}
 	}
 });

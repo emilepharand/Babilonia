@@ -146,14 +146,10 @@ async function saveLanguages() {
 	} else if (duplicateLanguageNames()) {
 		showSaveError('There are duplicate language names.');
 	} else {
-		try {
-			removeAllErrors();
-			await Api.editLanguages(languages.value);
-			languages.value = await Api.getLanguages();
-			showSaveSuccessMessage();
-		} catch {
-			showSaveError('An unexpected error has occurred.');
-		}
+		removeAllErrors();
+		await Api.editLanguages(languages.value);
+		languages.value = await Api.getLanguages();
+		showSaveSuccessMessage();
 	}
 }
 
@@ -163,14 +159,10 @@ async function addLanguage() {
 	} else if (languages.value.some(l => l.name === newLanguageName.value)) {
 		showAddError('This language already exists.');
 	} else {
-		try {
-			removeAllErrors();
-			await Api.addLanguage(newLanguageName.value);
-			newLanguageName.value = '';
-			languages.value = await Api.getLanguages();
-		} catch {
-			showAddError('An unexpected error has occurred.');
-		}
+		removeAllErrors();
+		await Api.addLanguage(newLanguageName.value);
+		newLanguageName.value = '';
+		languages.value = await Api.getLanguages();
 	}
 }
 

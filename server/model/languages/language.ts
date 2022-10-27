@@ -17,15 +17,6 @@ export interface Language {
   isPractice: boolean | '0' | '1';
 }
 
-export function equal(l1: Language, l2: Language): boolean {
-	return (
-		l1.id === l2.id
-    && l1.name === l2.name
-    && l1.ordering === l2.ordering
-    && l1.isPractice === l2.isPractice
-	);
-}
-
 export function copy(l: Language): Language {
 	return {
 		id: l.id,

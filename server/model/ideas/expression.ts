@@ -1,4 +1,4 @@
-import {getEmptyLanguageNoAsync, Language} from '../languages/language';
+import {Language} from '../languages/language';
 
 export interface ExpressionForAdding {
   text: string;
@@ -11,22 +11,6 @@ export interface Expression {
   language: Language;
   // This is used for search results
   matched?: boolean;
-}
-
-export class Expression {
-	constructor(e: Expression) {
-		this.id = e.id;
-		this.text = e.text;
-		this.language = e.language;
-	}
-}
-
-export function getEmptyExpressionNoAsync(): Expression {
-	return {
-		id: 1,
-		text: '',
-		language: getEmptyLanguageNoAsync(),
-	};
 }
 
 export function getEmptyNExpressions(n: number, startId: number, l: Language): Expression[] {

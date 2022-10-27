@@ -100,11 +100,6 @@ export default defineComponent({
 		return {
 		};
 	},
-	computed: {
-		isManageLink() {
-			return this.$route.path.startsWith('/manage');
-		},
-	},
 });
 </script>
 
