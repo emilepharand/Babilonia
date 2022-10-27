@@ -85,11 +85,7 @@ const textInput = ref(null);
 
 onMounted(() => {
 	if (props.isFocused) {
-		if (props.expression.language.isPractice) {
-			focusInput();
-		} else {
-			emit('skipFocus');
-		}
+		emit('skipFocus');
 	}
 });
 

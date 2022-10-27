@@ -67,7 +67,7 @@ export default class LanguageManager {
 	}
 
 	public async countLanguages(): Promise<number> {
-		return (await this.db.get('select count(*) as count from languages'))?.count ?? 0;
+		return (await this.db.get('select count(*) as count from languages'))?.count;
 	}
 
 	private async editLanguage(id: number, language: Language): Promise<Language> {

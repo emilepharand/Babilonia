@@ -132,8 +132,7 @@ const addErrorText = ref('');
 
 function allowOnlyNumbers(e: any) {
 	// Prevent typing characters that are not numbers in order field
-	const keyCode = (e.keyCode ? e.keyCode : e.which);
-	if (keyCode < 48 || keyCode > 57) {
+	if (e.keyCode < 48 || e.keyCode > 57) {
 		e.preventDefault();
 	}
 }
