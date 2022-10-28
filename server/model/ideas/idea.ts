@@ -7,13 +7,6 @@ export interface Idea {
   ee: Expression[];
 }
 
-export class Idea {
-	constructor(id: number, ee: Expression[]) {
-		this.id = id;
-		this.ee = ee;
-	}
-}
-
 export function getEmptyIdeaArrayNoAsync(): Idea[] {
 	return [{
 		id: -1,

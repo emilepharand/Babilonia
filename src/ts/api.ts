@@ -77,9 +77,6 @@ export default class Api {
 			},
 			body: JSON.stringify({name}),
 		});
-		if (response.status !== 201) {
-			return Promise.reject();
-		}
 		return (await response.json()) as Language;
 	}
 
@@ -94,9 +91,6 @@ export default class Api {
 			},
 			body: JSON.stringify(languages),
 		});
-		if (response.status === 400) {
-			return Promise.reject();
-		}
 		return (await response.json()) as Language[];
 	}
 
@@ -122,10 +116,6 @@ export default class Api {
 			method: 'GET',
 		});
 		return (await response.json()) as Language[];
-	}
-
-	static async deleteEverything(): Promise<void> {
-		await fetch(`${apiUrl}/everything`, {method: 'DELETE'});
 	}
 
 	static async getSettings(): Promise<Settings> {

@@ -1,7 +1,7 @@
 import {IdeaForAdding, validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
 import LanguageManager from './languages/languageManager';
 import IdeaManager from './ideas/ideaManager';
-import {Language, validate as validateIdea, validateForAdding} from './languages/language';
+import {Language, validate as validateLanguage, validateForAdding} from './languages/language';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 
 // Validates input received by the controller
@@ -21,8 +21,15 @@ export default class InputValidator {
 			return false;
 		}
 		const ll = toValidate as Language[];
+		// All languages exist
+		const promises: Promise<boolean>[] = [];
+		const languageIds = new Set(Array.from(ll.values(), l => l.id));
+		languageIds.forEach(id => promises.push(this.lm.languageIdExists(id)));
+		if (!(await Promise.all(promises)).every(exist => exist)) {
+			return false;
+		}
 		// Each language is valid
-		if (ll.some(l => !validateIdea(l))) {
+		if (ll.some(l => !validateLanguage(l))) {
 			return false;
 		}
 		// No language name is blank
@@ -30,19 +37,12 @@ export default class InputValidator {
 			return false;
 		}
 		// There are no duplicate language ids
-		const languageIds = new Set(Array.from(ll.values(), l => l.id));
 		if ((await this.lm.countLanguages()) !== ll.length) {
 			return false;
 		}
 		// There are no duplicate language names
 		const names = new Set(Array.from(ll.values(), l => l.name));
 		if (names.size !== ll.length) {
-			return false;
-		}
-		// All languages exist
-		const promises: Promise<boolean>[] = [];
-		languageIds.forEach(id => promises.push(this.lm.languageIdExists(id)));
-		if (!(await Promise.all(promises)).every(exist => exist)) {
 			return false;
 		}
 		// Ordering is valid

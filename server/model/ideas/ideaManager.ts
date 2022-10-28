@@ -49,7 +49,7 @@ export default class IdeaManager {
 	}
 
 	public async countIdeas(): Promise<number> {
-		return (await this.db.get('select count(*) as count from ideas'))?.count ?? 0;
+		return (await this.db.get('select count(*) as count from ideas'))?.count;
 	}
 
 	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {

@@ -29,7 +29,7 @@ if (!isDevMode) {
 		appServer.get('/__coverage__', (req, res) => {
 			res.json({
 				// @ts-ignore
-				coverage: global.__coverage__ || null,
+				coverage: global.__coverage__,
 			});
 		});
 	}

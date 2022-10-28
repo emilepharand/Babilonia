@@ -1,6 +1,6 @@
 import {Settings} from '../../../server/model/settings/settings';
 
-import {apiUrl} from '../cy-utils';
+import {apiUrl, setSettings} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
@@ -22,15 +22,6 @@ describe('The settings page', () => {
 		assertSettingsEquals({randomPractice: true, strictCharacters: true});
 	});
 });
-
-function setSettings(settings: Settings) {
-	cy.request({
-		url: `${apiUrl}/settings`,
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(settings)}`,
-	});
-}
 
 export function assertSettingsEquals(settings: Settings) {
 	cy.request({

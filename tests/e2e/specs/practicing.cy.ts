@@ -1,5 +1,5 @@
 import * as cyutils from '../cy-utils';
-import {apiUrl} from '../cy-utils';
+import {apiUrl, setSettings} from '../cy-utils';
 
 before(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
@@ -190,8 +190,24 @@ context('Practicing', () => {
 
 		assertRowInputHasFocus(2);
 
-		// Character mapping
+		// Character mapping (strict enabled)
 		typeInRow(4, 'hola EAIOUAEIOU');
+		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
+
+		getResetButton().click();
+
+		// Character mapping (strict disabled)
+		setSettings({randomPractice: false, strictCharacters: true});
+		cy.then(() => {
+			cy.reload();
+		});
+		waitForTableToLoad(5);
+		getNextButton().click();
+		waitForTableToLoad(8);
+		typeInRow(4, 'hola EAIOUAEIOU');
+		assertIsTyped(4, 'h');
+		assertRowMatchIsNoMatch(4);
+		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
 	});
 });

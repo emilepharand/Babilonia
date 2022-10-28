@@ -132,8 +132,7 @@ const addErrorText = ref('');
 
 function allowOnlyNumbers(e: any) {
 	// Prevent typing characters that are not numbers in order field
-	const keyCode = (e.keyCode ? e.keyCode : e.which);
-	if (keyCode < 48 || keyCode > 57) {
+	if (e.keyCode < 48 || e.keyCode > 57) {
 		e.preventDefault();
 	}
 }
@@ -146,14 +145,10 @@ async function saveLanguages() {
 	} else if (duplicateLanguageNames()) {
 		showSaveError('There are duplicate language names.');
 	} else {
-		try {
-			removeAllErrors();
-			await Api.editLanguages(languages.value);
-			languages.value = await Api.getLanguages();
-			showSaveSuccessMessage();
-		} catch {
-			showSaveError('An unexpected error has occurred.');
-		}
+		removeAllErrors();
+		await Api.editLanguages(languages.value);
+		languages.value = await Api.getLanguages();
+		showSaveSuccessMessage();
 	}
 }
 
@@ -163,14 +158,10 @@ async function addLanguage() {
 	} else if (languages.value.some(l => l.name === newLanguageName.value)) {
 		showAddError('This language already exists.');
 	} else {
-		try {
-			removeAllErrors();
-			await Api.addLanguage(newLanguageName.value);
-			newLanguageName.value = '';
-			languages.value = await Api.getLanguages();
-		} catch {
-			showAddError('An unexpected error has occurred.');
-		}
+		removeAllErrors();
+		await Api.addLanguage(newLanguageName.value);
+		newLanguageName.value = '';
+		languages.value = await Api.getLanguages();
 	}
 }
 

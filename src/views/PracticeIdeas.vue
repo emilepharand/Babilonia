@@ -17,6 +17,7 @@
             :row-order="i"
             :reset="resetAll"
             :expression="e"
+            :settings="settings"
             @focus-previous="focusPreviousRow"
             @focus-next="focusNextRow"
             @skip-focus="skipFocus"
@@ -52,6 +53,7 @@ import {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
+import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
 const nextIdeaButton = ref(null);
 const idea = ref(getEmptyIdeaNoAsync());
@@ -62,6 +64,7 @@ const focusDirectionDown = ref(true);
 const nbrFullyMatchedRows = ref(0);
 const nbrRowsToMatch = ref(0);
 const resetAll = ref(false);
+const settings = ref(getEmptySettingsNoAsync());
 
 (async () => {
 	try {
@@ -81,6 +84,7 @@ const nextButtonClass = computed(() => {
 
 async function displayNextIdea() {
 	const nextIdea = await Api.getNextIdea();
+	settings.value = await Api.getSettings();
 	nextIdea.ee = reorderExpressions(nextIdea.ee);
 	idea.value = nextIdea;
 	nbrFullyMatchedRows.value = 0;
