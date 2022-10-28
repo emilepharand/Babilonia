@@ -12,17 +12,15 @@ export default class LanguageManager {
 	}
 
 	public async getLanguage(id: number): Promise<Language> {
-		const query = 'select * from languages where id = ?';
-		const row: Language = (await this.db.get(query, id)) as Language;
-		row.isPractice = row.isPractice === '1';
-		return row;
+		const query = 'select *, isPractice as isPracticeString from languages where id = ?';
+		const row: LanguageWrapper = (await this.db.get(query, id)) as LanguageWrapper;
+		return languageWrapperToLanguage(row);
 	}
 
 	public async getLanguages(): Promise<Language[]> {
-		let languages: Language[] = await this.db.all('select * from languages');
-		languages = languages.map(l => ({...l, isPractice: l.isPractice === '1'}));
+		const languages: LanguageWrapper[] = await this.db.all('select *, isPractice as isPracticeString from languages');
 		languages.sort((l1, l2) => l1.ordering - l2.ordering);
-		return languages;
+		return languages.map(l => languageWrapperToLanguage(l));
 	}
 
 	async deleteLanguage(languageId: number): Promise<void> {
@@ -42,9 +40,8 @@ export default class LanguageManager {
 		const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
 		await this.db.run(query, name.trim(), nextOrdering, false);
 		const languageId = (await this.db.get('select last_insert_rowid() as id')).id;
-		const l = (await this.db.get('select * from languages where id = ?', languageId)) as Language;
-		l.isPractice = l.isPractice === '1';
-		return l;
+		const l = (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', languageId)) as LanguageWrapper;
+		return languageWrapperToLanguage(l);
 	}
 
 	public async getNextOrdering(): Promise<number> {
@@ -53,11 +50,11 @@ export default class LanguageManager {
 	}
 
 	public async languageNameExists(name: string): Promise<boolean> {
-		return (await this.db.get('select * from languages where name = ?', name)) !== undefined;
+		return (await this.db.get('select *, isPractice as isPracticeString from languages where name = ?', name)) !== undefined;
 	}
 
 	async languageIdExists(id: number): Promise<boolean> {
-		return (await this.db.get('select * from languages where id = ?', id)) !== undefined;
+		return (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', id)) !== undefined;
 	}
 
 	async editLanguages(ll: Language[]): Promise<Language[]> {
@@ -76,4 +73,18 @@ export default class LanguageManager {
 		await this.db.run(query, language.name.trim(), language.ordering, language.isPractice, language.id);
 		return this.getLanguage(id);
 	}
+}
+
+// SQLite doesn't have booleans
+interface LanguageWrapper extends Omit<Language, 'isPractice'> {
+	isPracticeString: '0' | '1';
+}
+
+function languageWrapperToLanguage(lw: LanguageWrapper): Language {
+	return {
+		id: lw.id,
+		isPractice: lw.isPracticeString === '1',
+		name: lw.name,
+		ordering: lw.ordering,
+	};
 }

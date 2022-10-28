@@ -13,8 +13,7 @@ export interface Language {
   id: number;
   name: string;
   ordering: number;
-  // SQLite doesn't have booleans
-  isPractice: boolean | '0' | '1';
+  isPractice: boolean;
 }
 
 export function getEmptyLanguagesNoAsync(): Language[] {
