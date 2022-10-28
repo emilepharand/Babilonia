@@ -27,4 +27,4 @@ jobs:
       - name: vue-tsc
         run: npx vue-tsc --noEmit
       - name: eslint
-        run: npx eslint . --ext .ts,.js,.vue --max-warnings=0
+        run: npm run lint
