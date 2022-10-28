@@ -1,6 +1,7 @@
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import * as dotenv from 'dotenv';
+import {Settings} from '../../server/model/settings/settings';
 
 dotenv.config();
 
@@ -148,4 +149,13 @@ export function inputExpression(rowNbr: number, language: string, text: string) 
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
 	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-language option:checked`).should('have.text', languageName);
 	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-text`).should('have.value', text);
+}
+
+export async function setSettings(settings: Settings) {
+	cy.request({
+		url: `${apiUrl}/settings`,
+		method: 'PUT',
+		headers: {'Content-Type': 'application/json'},
+		body: `${JSON.stringify(settings)}`,
+	});
 }
