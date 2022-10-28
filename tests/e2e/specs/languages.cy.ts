@@ -84,12 +84,22 @@ context('Error handling in the language page', () => {
 		clickSave();
 		assertSaveLanguageErrorMsgVisible('ordering');
 		assertAddLanguageErrorMsgNotVisible();
+
+		// Cannot write non-digit in ordering
+		cy.get('.languages-table').find('.language-row').eq(0).within(() => {
+			cy.get('.language-ordering').clear().type('a');
+		});
+		cy.get('.languages-table').find('.language-row')
+			.eq(0).find('.language-ordering')
+			.should('be.empty');
+
 		// Wrong ordering
 		inputLanguageChange(0, 'any language 1', '0', true);
 		inputLanguageChange(1, 'any language 2', '2', true);
 		clickSave();
 		assertSaveLanguageErrorMsgVisible('ordering');
 		assertAddLanguageErrorMsgNotVisible();
+
 		// Duplicate language names
 		inputLanguageChange(1, 'any language 1', '1', true);
 		clickSave();
