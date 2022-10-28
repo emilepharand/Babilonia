@@ -30,24 +30,24 @@
         @keydown.up.prevent="$emit('focusPrevious', rowOrder)"
         @keydown.down="$emit('focusNext', rowOrder)"
         @focus="$emit('focusedRow', rowOrder)"
-        @keydown.right="$refs.hintButton.focus()"
+        @keydown.right="hintButton.focus()"
       >
       <button
         ref="hintButton"
         class="btn btn-outline-dark hint-button"
         :disabled="buttonsDisabled()"
         value="Hint"
-        @keydown.right="$refs.showButtom.focus()"
-        @keydown.left="$refs.textInput.focus()"
+        @keydown.right="showButton.focus()"
+        @keydown.left="textInput.focus()"
         @click="hint()"
       >
         Hint
       </button>
       <button
-        ref="showButtom"
+        ref="showButton"
         class="btn btn-outline-dark show-button"
         :disabled="buttonsDisabled()"
-        @keydown.left="$refs.hintButton.focus()"
+        @keydown.left="hintButton.focus()"
         @click="show()"
       >
         Show
@@ -80,7 +80,9 @@ const nothingTyped = ref(true);
 const moreLettersAllowed = ref(true);
 const currentMaxLength = ref(1);
 
-const textInput = ref(null);
+const textInput = ref(document.createElement('input'));
+const hintButton = ref(document.createElement('button'));
+const showButton = ref(document.createElement('button'));
 
 onMounted(() => {
 	if (props.isFocused) {
