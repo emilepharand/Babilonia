@@ -50,11 +50,11 @@ export default class LanguageManager {
 	}
 
 	public async languageNameExists(name: string): Promise<boolean> {
-		return (await this.db.get('select *, isPractice as isPracticeString from languages where name = ?', name)) !== undefined;
+		return (await this.db.get('select 1 from languages where name = ?', name)) !== undefined;
 	}
 
 	async languageIdExists(id: number): Promise<boolean> {
-		return (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', id)) !== undefined;
+		return (await this.db.get('select 1 from languages where id = ?', id)) !== undefined;
 	}
 
 	async editLanguages(ll: Language[]): Promise<Language[]> {
