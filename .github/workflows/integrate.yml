@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 16.13.0
       - run: npm ci
-      - name: tsc
+      - name: vue-tsc
         run: npx vue-tsc --noEmit
       - name: eslint
         run: npx eslint . --ext .ts,.js,.vue --max-warnings=0
