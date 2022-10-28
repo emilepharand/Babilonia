@@ -59,8 +59,7 @@
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue';
 import {Expression} from '../../../server/model/ideas/expression';
-import Api from '../../ts/api';
-import {getEmptySettingsNoAsync} from '../../../server/model/settings/settings';
+import {Settings} from '../../../server/model/settings/settings';
 
 const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
 
@@ -70,6 +69,7 @@ const props = defineProps<{
   isFocused: Boolean,
   startInteractive: Boolean,
   reset: Boolean
+  settings: Settings,
 }>();
 
 const typed = ref('');
@@ -79,7 +79,6 @@ const isNoMatch = ref(false);
 const nothingTyped = ref(true);
 const moreLettersAllowed = ref(true);
 const currentMaxLength = ref(1);
-const settings = ref(getEmptySettingsNoAsync());
 
 const textInput = ref(null);
 
@@ -88,10 +87,6 @@ onMounted(() => {
 		emit('skipFocus');
 	}
 });
-
-(async () => {
-	settings.value = await Api.getSettings();
-})();
 
 watch(() => props.isFocused, isFocused => {
 	if (props.startInteractive && isFocused) {
@@ -142,7 +137,7 @@ function buttonsDisabled() {
 }
 
 function normalizeChar(c: string) {
-	if (settings.value.strictCharacters) {
+	if (props.settings.strictCharacters) {
 		return c;
 	}
 	return c.normalize('NFD')
