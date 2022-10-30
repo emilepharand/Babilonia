@@ -8,10 +8,11 @@
     "vue/setup-compiler-macros": true
   },
   "extends": [
-    // eslint.vuejs.org/user-guide
-    "plugin:vue/vue3-recommended",
-    // github.com/xojs/xo
-    "xo"
+    "eslint:recommended",
+    "plugin:vue/vue3-essential",
+    "xo",
+    "xo-typescript",
+    "@vue/eslint-config-typescript/recommended"
   ],
   "parserOptions": {
     "ecmaVersion": 12,
