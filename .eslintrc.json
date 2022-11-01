@@ -3,30 +3,23 @@
     "browser": true,
     "es2021": true,
     "node": true,
-    "jest": true,
-    // Access macros such as `defineEmits`
-    "vue/setup-compiler-macros": true
+    "jest": true
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:vue/vue3-essential",
-    "xo",
     "xo-typescript",
     "@vue/eslint-config-typescript/recommended"
   ],
+  "parser": "vue-eslint-parser",
   "parserOptions": {
-    "ecmaVersion": 12,
     "parser": "@typescript-eslint/parser",
-    "sourceType": "module"
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
   },
-  "plugins": [
-    "vue",
-    "@typescript-eslint"
-  ],
   "rules": {
-    "padding-line-between-statements": "off",
+    "@typescript-eslint/padding-line-between-statements": "off",
     "no-redeclare": "off",
     "@typescript-eslint/no-redeclare": ["error"]
   },
-  "ignorePatterns": ["**/dist/*"]
+  "ignorePatterns": ["dist/*", "tests/coverage/*", "tests/**/*.js"]
 }
