@@ -34,27 +34,26 @@ export const inputValidator = new InputValidator(ideaManager, languageManager);
 export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
 export const stats = new Stats(db, languageManager);
 
-export default class DataServiceProvider {
-	public static async deleteAllData(): Promise<void> {
-		await db.run('drop table if exists expressions');
-		await db.run('drop table if exists ideas');
-		await db.run('drop table if exists languages');
-		await db.run('drop table if exists settings');
-		await db.run(
-			'CREATE TABLE "languages" (\n'
+export async function deleteAllData(): Promise<void> {
+	await db.run('drop table if exists expressions');
+	await db.run('drop table if exists ideas');
+	await db.run('drop table if exists languages');
+	await db.run('drop table if exists settings');
+	await db.run(
+		'CREATE TABLE "languages" (\n'
         + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
         + '\t"name"\tTEXT NOT NULL,\n'
         + '\t"ordering"\tINTEGER NOT NULL,\n'
         + '\t"isPractice"\tTEXT NOT NULL\n'
         + ')',
-		);
-		await db.run(
-			'CREATE TABLE "ideas" (\n'
+	);
+	await db.run(
+		'CREATE TABLE "ideas" (\n'
         + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE\n'
         + ')',
-		);
-		await db.run(
-			'CREATE TABLE "expressions" (\n'
+	);
+	await db.run(
+		'CREATE TABLE "expressions" (\n'
         + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
         + '\t"ideaId"\tINTEGER NOT NULL,\n'
         + '\t"languageId"\tINTEGER NOT NULL,\n'
@@ -62,45 +61,44 @@ export default class DataServiceProvider {
         + '\tFOREIGN KEY("languageId") REFERENCES "languages"("id"),\n'
         + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
         + ')',
-		);
-		await db.run(
-			'CREATE TABLE "settings" (\n'
+	);
+	await db.run(
+		'CREATE TABLE "settings" (\n'
       + '"name"\tTEXT NOT NULL UNIQUE,\n'
       + '"value"\tTEXT\n'
       + ')',
-		);
-		practiceManager.clear();
-	}
+	);
+	practiceManager.clear();
+}
 
-	public static getIdeaManager(): IdeaManager {
-		return ideaManager;
-	}
+export function getIdeaManager(): IdeaManager {
+	return ideaManager;
+}
 
-	public static getLanguageManager(): LanguageManager {
-		return languageManager;
-	}
+export function getLanguageManager(): LanguageManager {
+	return languageManager;
+}
 
-	static getPracticeManager(): PracticeManager {
-		return practiceManager;
-	}
+export function getPracticeManager(): PracticeManager {
+	return practiceManager;
+}
 
-	static getInputValidator(): InputValidator {
-		return inputValidator;
-	}
+export function getInputValidator(): InputValidator {
+	return inputValidator;
+}
 
-	static getSearchHandler(): SearchHandler {
-		return searchHandler;
-	}
+export function getSearchHandler(): SearchHandler {
+	return searchHandler;
+}
 
-	static getStats(): Stats {
-		return stats;
-	}
+export function getStats(): Stats {
+	return stats;
+}
 
-	static getSettingsManager(): SettingsManager {
-		return settingsManager;
-	}
+export function getSettingsManager(): SettingsManager {
+	return settingsManager;
 }
 
 if (isTestMode || !dbExists) {
-	await DataServiceProvider.deleteAllData();
+	await deleteAllData();
 }

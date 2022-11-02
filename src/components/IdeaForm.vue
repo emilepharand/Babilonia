@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
-import Api from '../ts/api';
+import * as Api from '../ts/api';
 
 defineProps({
 	title: {

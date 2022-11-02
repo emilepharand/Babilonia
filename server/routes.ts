@@ -1,6 +1,6 @@
 import type {Express} from 'express';
 import {Router} from 'express';
-import Controller from './controller';
+import * as Controller from './controller';
 
 export default class Routes {
 	public router: Router;

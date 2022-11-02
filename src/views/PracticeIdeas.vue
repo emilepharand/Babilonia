@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import Api from '../ts/api';
+import * as Api from '../ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import type {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';

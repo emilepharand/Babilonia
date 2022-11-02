@@ -26,8 +26,7 @@
         "xo-typescript"
       ],
       "rules": {
-        "@typescript-eslint/padding-line-between-statements": "off",
-        "@typescript-eslint/no-extraneous-class": "off"
+        "@typescript-eslint/padding-line-between-statements": "off"
       }
     },
     {
@@ -55,7 +54,15 @@
         "plugin:vue/vue3-recommended",
         "@vue/eslint-config-typescript/recommended"
       ],
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.json"
+        ]
+      },
       "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/padding-line-between-statements": "off"
       }
     }
