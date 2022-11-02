@@ -9,7 +9,7 @@ export default class LanguageManager {
 
 	public async getLanguage(id: number): Promise<Language> {
 		const query = 'select *, isPractice as isPracticeString from languages where id = ?';
-		const row: LanguageWrapper = (await this.db.get(query, id)) as LanguageWrapper;
+		const row: LanguageWrapper = (await this.db.get(query, id))!;
 		return languageWrapperToLanguage(row);
 	}
 
@@ -35,14 +35,14 @@ export default class LanguageManager {
 		const nextOrdering = await this.getNextOrdering();
 		const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
 		await this.db.run(query, name.trim(), nextOrdering, false);
-		const languageId = (await this.db.get('select last_insert_rowid() as id')).id;
-		const l = (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', languageId)) as LanguageWrapper;
+		const languageId = (await this.db.get('select last_insert_rowid() as id')).id as number;
+		const l: LanguageWrapper = (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', languageId))!;
 		return languageWrapperToLanguage(l);
 	}
 
 	public async getNextOrdering(): Promise<number> {
-		const res = await this.db.get('select max(ordering) as nextOrdering from languages');
-		return res.nextOrdering === null ? 0 : res.nextOrdering as number + 1;
+		const res: {nextOrdering: number} = (await this.db.get('select max(ordering) as nextOrdering from languages'))!;
+		return res.nextOrdering === null ? 0 : res.nextOrdering + 1;
 	}
 
 	public async languageNameExists(name: string): Promise<boolean> {
@@ -60,7 +60,7 @@ export default class LanguageManager {
 	}
 
 	public async countLanguages(): Promise<number> {
-		return (await this.db.get('select count(*) as count from languages'))?.count;
+		return (await this.db.get('select count(*) as count from languages'))?.count as number;
 	}
 
 	private async editLanguage(id: number, language: Language): Promise<Language> {

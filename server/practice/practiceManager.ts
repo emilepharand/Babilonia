@@ -15,13 +15,13 @@ export default class PracticeManager {
 		private readonly languageManager: LanguageManager, private readonly settingsManager: SettingsManager) {}
 
 	public async getNextIdea(): Promise<Idea> {
-		let idea = await this.db.get(await this.buildNextIdeaIdQuery());
+		let idea: Idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
 		if (idea === undefined) {
 			if (this.ideasAlreadyGiven.size === 0) {
 				return Promise.reject();
 			}
 			this.ideasAlreadyGiven.clear();
-			idea = await this.db.get(await this.buildNextIdeaIdQuery());
+			idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
 		}
 		this.ideasAlreadyGiven.add(idea.id);
 		return ideaManager.getIdea(idea.id);

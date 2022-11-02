@@ -27,10 +27,6 @@
       ],
       "rules": {
         "@typescript-eslint/padding-line-between-statements": "off",
-        "no-redeclare": "off",
-        "@typescript-eslint/no-unsafe-assignment": "off",
-        "@typescript-eslint/non-nullable-type-assertion-style": "off",
-        "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-extraneous-class": "off"
       }
     },
@@ -59,17 +55,7 @@
         "plugin:vue/vue3-recommended",
         "@vue/eslint-config-typescript/recommended"
       ],
-      "parserOptions": {
-        "parser": "@typescript-eslint/parser",
-        "sourceType": "module",
-        "project": [
-          "./tsconfig.json"
-        ]
-      },
       "rules": {
-        "@typescript-eslint/no-unsafe-call": "off",
-        "@typescript-eslint/no-unsafe-assignment": "off",
-        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/padding-line-between-statements": "off"
       }
     }

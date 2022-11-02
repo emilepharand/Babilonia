@@ -126,11 +126,11 @@ function resetRow() {
 
 function focusInput() {
 	if (textInput.value && textInput.value) {
-		(textInput as any).value.focus();
+		textInput.value.focus();
 		// Focus end of word
 		const saved = typed.value;
-		(textInput.value as any).value = '';
-		(textInput.value as any).value = saved;
+		textInput.value.value = '';
+		textInput.value.value = saved;
 	}
 }
 

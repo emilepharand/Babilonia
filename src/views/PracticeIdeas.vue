@@ -55,7 +55,7 @@ import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
-const nextIdeaButton = ref(null);
+const nextIdeaButton = ref(document.createElement('button'));
 const idea = ref(getEmptyIdeaNoAsync());
 const noIdeas = ref(false);
 const currentlyFocusedRow = ref(0);
@@ -148,7 +148,7 @@ function rowFullyMatched(rowNumber: number, newMatch: boolean) {
 	}
 	if (nbrFullyMatchedRows.value === nbrRowsToMatch.value) {
 		currentlyFocusedRow.value = -1;
-		(nextIdeaButton.value as any).focus();
+		nextIdeaButton.value.focus();
 	} else if (currentlyFocusedRow.value === rowNumber) {
 		focusNextRow(rowNumber);
 	} else {

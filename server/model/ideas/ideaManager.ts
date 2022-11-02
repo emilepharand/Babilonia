@@ -12,7 +12,7 @@ export default class IdeaManager {
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
 		await this.db.run('insert into ideas("id") VALUES (null)');
-		const ideaId = (await this.db.get('select last_insert_rowid() as id')).id;
+		const ideaId = (await this.db.get('select last_insert_rowid() as id')).id as number;
 		await this.insertExpressions(ideaForAdding.ee, ideaId);
 		return this.getIdea(ideaId);
 	}
@@ -43,7 +43,7 @@ export default class IdeaManager {
 	}
 
 	public async countIdeas(): Promise<number> {
-		return (await this.db.get('select count(*) as count from ideas'))?.count;
+		return (await this.db.get('select count(*) as count from ideas'))?.count as number;
 	}
 
 	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {

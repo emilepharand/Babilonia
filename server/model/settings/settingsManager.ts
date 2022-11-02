@@ -5,7 +5,7 @@ export default class SettingsManager {
 	constructor(private readonly db: Database) {}
 
 	async getBooleanSetting(name: string): Promise<boolean> {
-		const setting = await this.db.get('select value from settings where name=?', name);
+		const setting: {value: string} = (await this.db.get('select value from settings where name=?', name))!;
 		if (setting === undefined) {
 			return false;
 		}

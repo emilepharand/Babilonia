@@ -29,7 +29,7 @@ if (!isDevMode) {
 		// Cypress reads from this
 		appServer.get('/__coverage__', (req, res) => {
 			res.json({
-				coverage: global.__coverage__,
+				coverage: global.__coverage__ as string,
 			});
 		});
 	}
