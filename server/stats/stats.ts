@@ -1,11 +1,12 @@
-import {Database} from 'sqlite';
-import {getEmptyLanguageNoAsync, Language} from '../model/languages/language';
-import LanguageManager from '../model/languages/languageManager';
+import type {Database} from 'sqlite';
+import type {Language} from '../model/languages/language';
+import {getEmptyLanguageNoAsync} from '../model/languages/language';
+import type LanguageManager from '../model/languages/languageManager';
 
-export interface NumberIdeasInLanguage {
-  language: Language;
-  count: number;
-}
+export type NumberIdeasInLanguage = {
+	language: Language;
+	count: number;
+};
 
 export function getEmptyNumberIdeasInLanguage(): NumberIdeasInLanguage[] {
 	return [{
@@ -15,23 +16,17 @@ export function getEmptyNumberIdeasInLanguage(): NumberIdeasInLanguage[] {
 }
 
 export class Stats {
-	private db: Database;
-	private lm: LanguageManager;
-
-	constructor(db: Database, lm: LanguageManager) {
-		this.db = db;
-		this.lm = lm;
-	}
+	constructor(private readonly db: Database, private readonly lm: LanguageManager) {}
 
 	public async getIdeasPerLanguage(): Promise<NumberIdeasInLanguage[]> {
-		const ideasPerLanguage:NumberIdeasInLanguage[] = [];
+		const ideasPerLanguage: NumberIdeasInLanguage[] = [];
 		const query = `
 		select languageId, count(distinct ideaId) as count, ordering
     from expressions
     join languages on languageId = languages.id
     group by languageId
     order by ordering`;
-		const rows: [{ languageId: number; count: number; ordering: number }] = await this.db.all(
+		const rows: [{languageId: number; count: number; ordering: number}] = await this.db.all(
 			query,
 		);
 		for (const row of rows) {

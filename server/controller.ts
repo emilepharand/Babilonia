@@ -1,9 +1,9 @@
-import {Request, Response} from 'express';
+import type {Request, Response} from 'express';
 import DataServiceProvider from './model/dataServiceProvider';
-import {Language} from './model/languages/language';
-import {IdeaForAdding} from './model/ideas/ideaForAdding';
-import {SearchContext} from './model/search/searchContext';
-import {Settings} from './model/settings/settings';
+import type {Language} from './model/languages/language';
+import type {IdeaForAdding} from './model/ideas/ideaForAdding';
+import type {SearchContext} from './model/search/searchContext';
+import type {Settings} from './model/settings/settings';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
@@ -104,7 +104,7 @@ export default class Controller {
 	public static async search(req: Request, res: Response): Promise<void> {
 		const sc: SearchContext = {};
 		sc.pattern = (req.query.pattern as string) ?? undefined;
-		sc.strict = req.query.strict as true | undefined;
+		sc.strict = (req.query as SearchContext).strict as true | undefined;
 		if (req.query.language) {
 			if (!await Controller.validateNumberInRequest(req.query.language as string, res)) {
 				return;
@@ -113,7 +113,7 @@ export default class Controller {
 		}
 		if (req.query.ideaHas) {
 			const ideaHasArray = (req.query.ideaHas as string).split(',');
-			const promises: Promise<boolean>[] = [];
+			const promises: Array<Promise<boolean>> = [];
 			ideaHasArray.forEach(ideaHas => promises.push(Controller.validateNumberInRequest(ideaHas, res)));
 			if (!(await Promise.all(promises)).every(validNumber => validNumber)) {
 				return;

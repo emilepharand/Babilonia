@@ -1,24 +1,16 @@
-import {Database} from 'sqlite';
-import LanguageManager from '../languages/languageManager';
-import IdeaManager from '../ideas/ideaManager';
-import {Idea} from '../ideas/idea';
-import {SearchContext} from './searchContext';
+import type {Database} from 'sqlite';
+import type LanguageManager from '../languages/languageManager';
+import type IdeaManager from '../ideas/ideaManager';
+import type {Idea} from '../ideas/idea';
+import type {SearchContext} from './searchContext';
 
 type SearchResultRow = {
-  ideaId: number;
-  expressionId: number;
+	ideaId: number;
+	expressionId: number;
 };
 
 export default class SearchHandler {
-	private db: Database;
-	private lm: LanguageManager;
-	private im: IdeaManager;
-
-	constructor(db: Database, lm: LanguageManager, im: IdeaManager) {
-		this.db = db;
-		this.lm = lm;
-		this.im = im;
-	}
+	constructor(private readonly db: Database, private readonly lm: LanguageManager, private readonly im: IdeaManager) {}
 
 	public async executeQueryForSearchContext(sc: SearchContext): Promise<SearchResultRow[]> {
 		let query
@@ -55,9 +47,9 @@ having count(ideaId) >= ${sc.ideaHas.length})`);
 	}
 
 	public async executeSearch(sc: SearchContext): Promise<Idea[]> {
-		const rows = (await this.executeQueryForSearchContext(sc)) as SearchResultRow[];
+		const rows = (await this.executeQueryForSearchContext(sc));
 		const matchedExpressions: number[] = rows.map(row => row.expressionId);
-		const ideaPromises: Promise<Idea>[] = [];
+		const ideaPromises: Array<Promise<Idea>> = [];
 		const alreadyAddedIdeas = new Set<number>();
 		rows.forEach(row => {
 			if (!alreadyAddedIdeas.has(row.ideaId)) {

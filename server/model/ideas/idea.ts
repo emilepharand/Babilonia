@@ -1,30 +1,32 @@
 import Ajv from 'ajv';
-import {Expression, getEmptyNExpressions} from './expression';
-import {getEmptyLanguageNoAsync, Language} from '../languages/language';
+import type {Expression} from './expression';
+import {getEmptyNexpressions} from './expression';
+import type {Language} from '../languages/language';
+import {getEmptyLanguageNoAsync} from '../languages/language';
 
-export interface Idea {
-  id: number;
-  ee: Expression[];
-}
+export type Idea = {
+	id: number;
+	ee: Expression[];
+};
 
 export function getEmptyIdeaArrayNoAsync(): Idea[] {
 	return [{
 		id: -1,
-		ee: getEmptyNExpressions(1, 0, getEmptyLanguageNoAsync()),
+		ee: getEmptyNexpressions(1, 0, getEmptyLanguageNoAsync()),
 	}];
 }
 
 export function getEmptyIdeaNoAsync(): Idea {
 	return {
 		id: -1,
-		ee: getEmptyNExpressions(1, 0, getEmptyLanguageNoAsync()),
+		ee: getEmptyNexpressions(1, 0, getEmptyLanguageNoAsync()),
 	};
 }
 
 export function getEmptyIdea(howManyExpressions: number, l: Language): Idea {
 	return {
 		id: -1,
-		ee: getEmptyNExpressions(howManyExpressions, 0, l),
+		ee: getEmptyNexpressions(howManyExpressions, 0, l),
 	};
 }
 

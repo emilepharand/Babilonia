@@ -163,8 +163,9 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import Api from '../ts/api';
-import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync, Language} from '../../server/model/languages/language';
-import {SearchContext} from '../../server/model/search/searchContext';
+import type {Language} from '../../server/model/languages/language';
+import {getEmptyLanguageNoAsync, getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
+import type {SearchContext} from '../../server/model/search/searchContext';
 import {getEmptyIdeaArrayNoAsync} from '../../server/model/ideas/idea';
 
 // Search context
@@ -181,7 +182,7 @@ const languages = ref(getEmptyLanguagesNoAsync());
 const isShowError = ref(false);
 const errorText = ref('');
 const noResults = ref(false);
-const LANGUAGE_PLACEHOLDER_ID = -1;
+const languagePlaceholderId = -1;
 
 (async () => {
 	const allLanguages = await Api.getLanguages();
@@ -218,21 +219,21 @@ async function search() {
 }
 
 function atLeastOneFilterSet() {
-	return strict.value || pattern.value || ideaDoesNotHave.value.id !== LANGUAGE_PLACEHOLDER_ID
-      || ideaHas.value.length > 0 || expressionLanguage.value.id !== LANGUAGE_PLACEHOLDER_ID;
+	return strict.value || pattern.value || ideaDoesNotHave.value.id !== languagePlaceholderId
+      || ideaHas.value.length > 0 || expressionLanguage.value.id !== languagePlaceholderId;
 }
 
 function createSearchContext() {
 	const sc2: SearchContext = {};
 	sc2.strict = strict.value;
 	sc2.pattern = pattern.value;
-	if (ideaDoesNotHave.value.id !== LANGUAGE_PLACEHOLDER_ID) {
+	if (ideaDoesNotHave.value.id !== languagePlaceholderId) {
 		sc2.ideaDoesNotHave = ideaDoesNotHave.value.id;
 	}
 	if (ideaHas.value.length > 0) {
 		sc2.ideaHas = ideaHas.value.map((l: Language) => l.id);
 	}
-	if (expressionLanguage.value.id !== LANGUAGE_PLACEHOLDER_ID) {
+	if (expressionLanguage.value.id !== languagePlaceholderId) {
 		sc2.language = expressionLanguage.value.id;
 	}
 	return sc2;

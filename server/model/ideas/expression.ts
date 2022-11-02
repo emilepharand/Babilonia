@@ -1,19 +1,19 @@
-import {Language} from '../languages/language';
+import type {Language} from '../languages/language';
 
-export interface ExpressionForAdding {
-  text: string;
-  languageId: number;
-}
+export type ExpressionForAdding = {
+	text: string;
+	languageId: number;
+};
 
-export interface Expression {
-  id: number;
-  text: string;
-  language: Language;
-  // This is used for search results
-  matched?: boolean;
-}
+export type Expression = {
+	id: number;
+	text: string;
+	language: Language;
+	// This is used for search results
+	matched?: boolean;
+};
 
-export function getEmptyNExpressions(n: number, startId: number, l: Language): Expression[] {
+export function getEmptyNexpressions(n: number, startId: number, l: Language): Expression[] {
 	const ee = [];
 	for (let i = 0; i < n; i++) {
 		const e: Expression = {

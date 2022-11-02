@@ -1,20 +1,14 @@
-import {Database} from 'sqlite';
-import {Expression, ExpressionForAdding} from './expression';
-import {Idea} from './idea';
-import LanguageManager from '../languages/languageManager';
-import {IdeaForAdding} from './ideaForAdding';
+import type {Database} from 'sqlite';
+import type {Expression, ExpressionForAdding} from './expression';
+import type {Idea} from './idea';
+import type LanguageManager from '../languages/languageManager';
+import type {IdeaForAdding} from './ideaForAdding';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager {
-	private db: Database;
-	private lm: LanguageManager;
-
-	constructor(db: Database, lm: LanguageManager) {
-		this.db = db;
-		this.lm = lm;
-	}
+	constructor(private readonly db: Database, private readonly lm: LanguageManager) {}
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
 		await this.db.run('insert into ideas("id") VALUES (null)');
@@ -63,7 +57,7 @@ export default class IdeaManager {
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
 		const query = 'select id, languageId, text from expressions where ideaId = ?';
-		const rows: [{ id: number; languageId: number; text: string }] = await this.db.all(
+		const rows: [{id: number; languageId: number; text: string}] = await this.db.all(
 			query,
 			ideaId,
 		);

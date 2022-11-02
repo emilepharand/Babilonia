@@ -49,7 +49,7 @@
 <script lang="ts" setup>
 import Api from '../ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import {Expression} from '../../server/model/ideas/expression';
+import type {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
@@ -154,7 +154,7 @@ function rowFullyMatched(rowNumber: number, newMatch: boolean) {
 	} else {
 		const temp = currentlyFocusedRow.value;
 		currentlyFocusedRow.value = -1;
-		nextTick(() => {
+		void nextTick(() => {
 			// Trigger focus (because value did not change so Vue will not react)
 			currentlyFocusedRow.value = temp;
 		});
@@ -168,7 +168,7 @@ async function nextIdea() {
 function resetRows() {
 	nbrFullyMatchedRows.value = 0;
 	resetAll.value = true;
-	nextTick(() => {
+	void nextTick(() => {
 		resetAll.value = false;
 	});
 	currentlyFocusedRow.value = 0;

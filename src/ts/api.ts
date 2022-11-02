@@ -1,10 +1,11 @@
-import {Idea} from '../../server/model/ideas/idea';
-import {Language} from '../../server/model/languages/language';
-import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
-import {NumberIdeasInLanguage} from '../../server/stats/stats';
-import {Settings} from '../../server/model/settings/settings';
-import {SearchContext} from '../../server/model/search/searchContext';
+import type {Idea} from '../../server/model/ideas/idea';
+import type {Language} from '../../server/model/languages/language';
+import type {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
+import type {NumberIdeasInLanguage} from '../../server/stats/stats';
+import type {Settings} from '../../server/model/settings/settings';
+import type {SearchContext} from '../../server/model/search/searchContext';
 
+// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 const apiUrl = `${process.env.VITE_API_URL}`;
 
 export default class Api {

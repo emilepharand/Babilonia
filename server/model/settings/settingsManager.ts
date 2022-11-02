@@ -1,12 +1,8 @@
-import {Database} from 'sqlite';
-import {Settings} from './settings';
+import type {Database} from 'sqlite';
+import type {Settings} from './settings';
 
 export default class SettingsManager {
-	private db: Database;
-
-	constructor(db: Database) {
-		this.db = db;
-	}
+	constructor(private readonly db: Database) {}
 
 	async getBooleanSetting(name: string): Promise<boolean> {
 		const setting = await this.db.get('select value from settings where name=?', name);
@@ -34,14 +30,14 @@ export default class SettingsManager {
 		return this.getBooleanSetting('PRACTICE_RANDOM');
 	}
 
-	private async isstrictCharacters() {
-		return this.getBooleanSetting('MAP_CHARACTERS');
-	}
-
 	async getSettings(): Promise<Settings> {
 		return {
 			randomPractice: await this.isRandomPractice(),
 			strictCharacters: await this.isstrictCharacters(),
 		};
+	}
+
+	private async isstrictCharacters() {
+		return this.getBooleanSetting('MAP_CHARACTERS');
 	}
 }

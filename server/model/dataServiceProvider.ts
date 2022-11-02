@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3';
-import {Database, open} from 'sqlite';
+import type {Database} from 'sqlite';
+import {open} from 'sqlite';
 import IdeaManager from './ideas/ideaManager';
 import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
