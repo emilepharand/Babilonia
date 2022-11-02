@@ -113,7 +113,7 @@
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import Api from '../ts/api';
+import * as Api from '../ts/api';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import InputValidator from '../../server/model/inputValidator';
 
@@ -130,7 +130,7 @@ const addErrorText = ref('');
 	loaded.value = true;
 })();
 
-function allowOnlyNumbers(e: any) {
+function allowOnlyNumbers(e: KeyboardEvent) {
 	// Prevent typing characters that are not numbers in order field
 	if (e.keyCode < 48 || e.keyCode > 57) {
 		e.preventDefault();
@@ -183,12 +183,12 @@ function getLanguagesSavedTextElement() {
 
 function showSaveSuccessMessage() {
 	const languageSavedText = getLanguagesSavedTextElement();
-	(languageSavedText as any).classList.remove('d-none');
+	(languageSavedText as HTMLElement).classList.remove('d-none');
 }
 
 function removeSuccessMessage() {
 	const languageSavedText = getLanguagesSavedTextElement();
-	(languageSavedText as any).classList.add('d-none');
+	(languageSavedText as HTMLElement).classList.add('d-none');
 }
 
 function showAddError(text: string) {

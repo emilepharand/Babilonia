@@ -13,6 +13,7 @@ export default defineConfig({
 		}),
 	],
 	define: {
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		'process.env': process.env,
 	},
 });

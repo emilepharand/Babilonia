@@ -1,19 +1,25 @@
-import {IdeaForAdding, validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
-import LanguageManager from './languages/languageManager';
-import IdeaManager from './ideas/ideaManager';
-import {Language, validate as validateLanguage, validateForAdding} from './languages/language';
+import type {IdeaForAdding} from './ideas/ideaForAdding';
+import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
+import type LanguageManager from './languages/languageManager';
+import type IdeaManager from './ideas/ideaManager';
+import type {Language} from './languages/language';
+import {validate as validateLanguage, validateForAdding} from './languages/language';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 
 // Validates input received by the controller
 export default class InputValidator {
-	private lm: LanguageManager;
-
-	private im: IdeaManager;
-
-	constructor(im: IdeaManager, lm: LanguageManager) {
-		this.im = im;
-		this.lm = lm;
+	public static isValidOrdering(orderings: number[]): boolean {
+		const orderingsSet = new Set<number>();
+		orderings.forEach(o => orderingsSet.add(o));
+		for (let i = 0; i < orderings.length; i += 1) {
+			if (!orderingsSet.has(i)) {
+				return false;
+			}
+		}
+		return true;
 	}
+
+	constructor(private readonly im: IdeaManager, private readonly lm: LanguageManager) {}
 
 	public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
 		// Object is an array
@@ -22,7 +28,7 @@ export default class InputValidator {
 		}
 		const ll = toValidate as Language[];
 		// All languages exist
-		const promises: Promise<boolean>[] = [];
+		const promises: Array<Promise<boolean>> = [];
 		const languageIds = new Set(Array.from(ll.values(), l => l.id));
 		languageIds.forEach(id => promises.push(this.lm.languageIdExists(id)));
 		if (!(await Promise.all(promises)).every(exist => exist)) {
@@ -49,22 +55,11 @@ export default class InputValidator {
 		return InputValidator.isValidOrdering(ll.map(l => l.ordering));
 	}
 
-	public static isValidOrdering(orderings: number[]): boolean {
-		const orderingsSet = new Set<number>();
-		orderings.forEach(o => orderingsSet.add(o));
-		for (let i = 0; i < orderings.length; i += 1) {
-			if (!orderingsSet.has(i)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public async validateLanguageForAdding(toValidate: unknown): Promise<boolean> {
 		if (!validateForAdding(toValidate)) {
 			return false;
 		}
-		const l = toValidate as { name: string };
+		const l = toValidate as {name: string};
 		if (l.name.trim() === '') {
 			return false;
 		}
@@ -76,7 +71,7 @@ export default class InputValidator {
 		if (!validateIdeaForAddingSchema(ideaForAdding)) {
 			return false;
 		}
-		const asIdeaForAdding = ideaForAdding as IdeaForAdding;
+		const asIdeaForAdding = ideaForAdding;
 		// Contains at least one expression
 		if (asIdeaForAdding.ee.length === 0) {
 			return false;
@@ -86,7 +81,7 @@ export default class InputValidator {
 			return false;
 		}
 		// All languages exist
-		const languagesExist: Promise<boolean>[] = [];
+		const languagesExist: Array<Promise<boolean>> = [];
 		asIdeaForAdding.ee.forEach(e => languagesExist.push(this.lm.languageIdExists(e.languageId)));
 		if ((await Promise.all(languagesExist)).includes(false)) {
 			return false;

@@ -63,7 +63,7 @@
 
 <script lang="ts" setup>
 import {nextTick, ref} from 'vue';
-import Api from '../ts/api';
+import * as Api from '../ts/api';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as bootstrap from 'bootstrap';
 
@@ -79,7 +79,7 @@ async function save() {
 	showSettingsSavedMessage.value = true;
 }
 
-nextTick(() => {
+void nextTick(() => {
 	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 });

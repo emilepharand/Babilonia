@@ -1,6 +1,6 @@
+/* eslint-disable */
 /// <reference types="vite/client" />
 
-/* eslint-disable */
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
+type ImportMeta = {
+	readonly env: ImportMetaEnv;
+};

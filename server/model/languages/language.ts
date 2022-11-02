@@ -9,12 +9,12 @@ export function getEmptyLanguageNoAsync(): Language {
 	};
 }
 
-export interface Language {
-  id: number;
-  name: string;
-  ordering: number;
-  isPractice: boolean;
-}
+export type Language = {
+	id: number;
+	name: string;
+	ordering: number;
+	isPractice: boolean;
+};
 
 export function getEmptyLanguagesNoAsync(): Language[] {
 	return [{

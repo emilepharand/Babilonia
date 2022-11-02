@@ -3,29 +3,78 @@
     "browser": true,
     "es2021": true,
     "node": true,
-    "jest": true,
-    // Access macros such as `defineEmits`
-    "vue/setup-compiler-macros": true
+    "jest": true
   },
-  "extends": [
-    // eslint.vuejs.org/user-guide
-    "plugin:vue/vue3-recommended",
-    // github.com/xojs/xo
-    "xo"
+  "overrides": [
+    {
+      "files": [
+        "**/*.ts"
+      ],
+      "excludedFiles": "tests/**/*.ts",
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "ecmaVersion": 12,
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.json"
+        ]
+      },
+      "extends": [
+        "eslint:recommended",
+        "xo",
+        "xo-typescript"
+      ],
+      "rules": {
+        "@typescript-eslint/padding-line-between-statements": "off"
+      }
+    },
+    {
+      "files": [
+        "tests/**/*.ts"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "extends": [
+        "eslint:recommended",
+        "xo"
+      ],
+      "rules": {
+        "padding-line-between-statements": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.vue"
+      ],
+      "parser": "vue-eslint-parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.json"
+        ]
+      },
+      "extends": [
+        "eslint:recommended",
+        "xo",
+        "xo-typescript",
+        "plugin:vue/vue3-recommended",
+        "@vue/eslint-config-typescript/recommended"
+      ],
+      "rules": {
+        "@typescript-eslint/padding-line-between-statements": "off"
+      }
+    }
   ],
   "parserOptions": {
-    "ecmaVersion": 12,
     "parser": "@typescript-eslint/parser",
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": [
+      "./tsconfig.json"
+    ]
   },
-  "plugins": [
-    "vue",
-    "@typescript-eslint"
-  ],
-  "rules": {
-    "padding-line-between-statements": "off",
-    "no-redeclare": "off",
-    "@typescript-eslint/no-redeclare": ["error"]
-  },
-  "ignorePatterns": ["**/dist/*"]
+  "ignorePatterns": [
+    "dist/*",
+    "tests/coverage/*"
+  ]
 }

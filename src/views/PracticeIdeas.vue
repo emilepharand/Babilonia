@@ -47,15 +47,15 @@
 </template>
 
 <script lang="ts" setup>
-import Api from '../ts/api';
+import * as Api from '../ts/api';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import {Expression} from '../../server/model/ideas/expression';
+import type {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 
-const nextIdeaButton = ref(null);
+const nextIdeaButton = ref(document.createElement('button'));
 const idea = ref(getEmptyIdeaNoAsync());
 const noIdeas = ref(false);
 const currentlyFocusedRow = ref(0);
@@ -148,13 +148,13 @@ function rowFullyMatched(rowNumber: number, newMatch: boolean) {
 	}
 	if (nbrFullyMatchedRows.value === nbrRowsToMatch.value) {
 		currentlyFocusedRow.value = -1;
-		(nextIdeaButton.value as any).focus();
+		nextIdeaButton.value.focus();
 	} else if (currentlyFocusedRow.value === rowNumber) {
 		focusNextRow(rowNumber);
 	} else {
 		const temp = currentlyFocusedRow.value;
 		currentlyFocusedRow.value = -1;
-		nextTick(() => {
+		void nextTick(() => {
 			// Trigger focus (because value did not change so Vue will not react)
 			currentlyFocusedRow.value = temp;
 		});
@@ -168,7 +168,7 @@ async function nextIdea() {
 function resetRows() {
 	nbrFullyMatchedRows.value = 0;
 	resetAll.value = true;
-	nextTick(() => {
+	void nextTick(() => {
 		resetAll.value = false;
 	});
 	currentlyFocusedRow.value = 0;

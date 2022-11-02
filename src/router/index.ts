@@ -1,10 +1,11 @@
-import {createRouter, createWebHistory, RouteRecordRaw} from 'vue-router';
+import type {RouteRecordRaw} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 
-const routes: Array<RouteRecordRaw> = [
+const routes: RouteRecordRaw[] = [
 	{
 		path: '/',
 		name: 'AppDashboard',
-		component: () =>
+		component: async () =>
 			import(
 				/* webpackChunkName: "AppDashboard" */ '../views/AppDashboard.vue'
 			),
@@ -12,7 +13,7 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/practice',
 		name: 'Practice',
-		component: () =>
+		component: async () =>
 			import(
 				/* webpackChunkName: "PracticeIdeas" */ '../views/PracticeIdeas.vue'
 			),
@@ -20,25 +21,25 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/ideas/add',
 		name: 'AddIdea',
-		component: () =>
+		component: async () =>
 			import(/* webpackChunkName: "AddIdea" */ '../views/AddIdea.vue'),
 	},
 	{
 		path: '/ideas/:id',
 		name: 'EditIdea',
-		component: () =>
+		component: async () =>
 			import(/* webpackChunkName: "AddIdea" */ '../views/EditIdea.vue'),
 	},
 	{
 		path: '/ideas/search',
 		name: 'SearchIdeas',
-		component: () =>
+		component: async () =>
 			import(/* webpackChunkName: "SearchIdeas" */ '../views/SearchIdeas.vue'),
 	},
 	{
 		path: '/languages',
 		name: 'ManageLanguages',
-		component: () =>
+		component: async () =>
 			import(
 				/* webpackChunkName: "ManageLanguages" */ '../views/ManageLanguages.vue'
 			),
@@ -46,13 +47,13 @@ const routes: Array<RouteRecordRaw> = [
 	{
 		path: '/help',
 		name: 'Help',
-		component: () =>
+		component: async () =>
 			import(/* webpackChunkName: "AppHelp" */ '../views/AppHelp.vue'),
 	},
 	{
 		path: '/settings',
 		name: 'AppSettings',
-		component: () =>
+		component: async () =>
 			import(/* webpackChunkName: "AppSettings" */ '../views/AppSettings.vue'),
 	},
 ];

@@ -1,19 +1,15 @@
-import {Database} from 'sqlite';
-import {Language} from './language';
+import type {Database} from 'sqlite';
+import type {Language} from './language';
 
 // Manages languages: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
 export default class LanguageManager {
-	private db: Database;
-
-	constructor(db: Database) {
-		this.db = db;
-	}
+	constructor(private readonly db: Database) {}
 
 	public async getLanguage(id: number): Promise<Language> {
 		const query = 'select *, isPractice as isPracticeString from languages where id = ?';
-		const row: LanguageWrapper = (await this.db.get(query, id)) as LanguageWrapper;
+		const row: LanguageWrapper = (await this.db.get(query, id))!;
 		return languageWrapperToLanguage(row);
 	}
 
@@ -39,13 +35,13 @@ export default class LanguageManager {
 		const nextOrdering = await this.getNextOrdering();
 		const query = 'insert into languages("name", "ordering", "isPractice") values (?, ?, ?)';
 		await this.db.run(query, name.trim(), nextOrdering, false);
-		const languageId = (await this.db.get('select last_insert_rowid() as id')).id;
-		const l = (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', languageId)) as LanguageWrapper;
+		const languageId = (await this.db.get('select last_insert_rowid() as id')).id as number;
+		const l: LanguageWrapper = (await this.db.get('select *, isPractice as isPracticeString from languages where id = ?', languageId))!;
 		return languageWrapperToLanguage(l);
 	}
 
 	public async getNextOrdering(): Promise<number> {
-		const res = await this.db.get('select max(ordering) as nextOrdering from languages');
+		const res: {nextOrdering: number} = (await this.db.get('select max(ordering) as nextOrdering from languages'))!;
 		return res.nextOrdering === null ? 0 : res.nextOrdering + 1;
 	}
 
@@ -58,13 +54,13 @@ export default class LanguageManager {
 	}
 
 	async editLanguages(ll: Language[]): Promise<Language[]> {
-		const promises: Promise<Language>[] = [];
+		const promises: Array<Promise<Language>> = [];
 		ll.forEach(l => promises.push(this.editLanguage(l.id, l)));
 		return Promise.all(promises);
 	}
 
 	public async countLanguages(): Promise<number> {
-		return (await this.db.get('select count(*) as count from languages'))?.count;
+		return (await this.db.get('select count(*) as count from languages'))?.count as number;
 	}
 
 	private async editLanguage(id: number, language: Language): Promise<Language> {
@@ -76,9 +72,9 @@ export default class LanguageManager {
 }
 
 // SQLite doesn't have booleans
-interface LanguageWrapper extends Omit<Language, 'isPractice'> {
+type LanguageWrapper = {
 	isPracticeString: '0' | '1';
-}
+} & Omit<Language, 'isPractice'>;
 
 function languageWrapperToLanguage(lw: LanguageWrapper): Language {
 	return {

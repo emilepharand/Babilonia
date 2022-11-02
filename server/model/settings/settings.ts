@@ -1,9 +1,9 @@
 import Ajv from 'ajv';
 
-export interface Settings {
-  randomPractice: boolean;
-  strictCharacters: boolean;
-}
+export type Settings = {
+	randomPractice: boolean;
+	strictCharacters: boolean;
+};
 
 export function getEmptySettingsNoAsync(): Settings {
 	return {

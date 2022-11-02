@@ -1,10 +1,11 @@
 import Ajv from 'ajv';
-import {ExpressionForAdding, getExpressionForAddingFromExpression} from './expression';
-import {Idea} from './idea';
+import type {ExpressionForAdding} from './expression';
+import {getExpressionForAddingFromExpression} from './expression';
+import type {Idea} from './idea';
 
-export interface IdeaForAdding {
-  ee: ExpressionForAdding[];
-}
+export type IdeaForAdding = {
+	ee: ExpressionForAdding[];
+};
 
 export function getIdeaForAddingFromIdea(idea: Idea): IdeaForAdding {
 	return {

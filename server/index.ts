@@ -1,4 +1,5 @@
-import express, {ErrorRequestHandler} from 'express';
+import type {ErrorRequestHandler} from 'express';
+import express from 'express';
 import cors from 'cors';
 import Routes from './routes';
 import {apiPort, appPort, isDevMode, isTestMode} from './options';
@@ -17,7 +18,7 @@ apiServer.use(errorHandler);
 const routes = new Routes(apiServer);
 routes.init();
 apiServer.listen(apiPort, () => {
-	console.log(`API server started. Listening on port ${apiPort}.`);
+	console.log(`API server started. Listening on port ${apiPort!}.`);
 });
 
 if (!isDevMode) {
@@ -28,8 +29,7 @@ if (!isDevMode) {
 		// Cypress reads from this
 		appServer.get('/__coverage__', (req, res) => {
 			res.json({
-				// @ts-ignore
-				coverage: global.__coverage__,
+				coverage: global.__coverage__ as string,
 			});
 		});
 	}
@@ -37,6 +37,6 @@ if (!isDevMode) {
 		res.sendFile(`${__dirname}/index.html`);
 	});
 	appServer.listen(appPort, () => {
-		console.log(`App started. Listening on port ${appPort}.`);
+		console.log(`App started. Listening on port ${appPort!}.`);
 	});
 }

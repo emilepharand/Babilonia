@@ -58,18 +58,18 @@
 
 <script lang="ts" setup>
 import {onMounted, ref, watch} from 'vue';
-import {Expression} from '../../../server/model/ideas/expression';
-import {Settings} from '../../../server/model/settings/settings';
+import type {Expression} from '../../../server/model/ideas/expression';
+import type {Settings} from '../../../server/model/settings/settings';
 
 const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
 
 const props = defineProps<{
-  expression: Expression,
-  rowOrder: Number,
-  isFocused: Boolean,
-  startInteractive: Boolean,
-  reset: Boolean
-  settings: Settings,
+	expression: Expression;
+	rowOrder: number;
+	isFocused: boolean;
+	startInteractive: boolean;
+	reset: boolean;
+	settings: Settings;
 }>();
 
 const typed = ref('');
@@ -110,7 +110,7 @@ watch(typed, () => {
 	}
 });
 
-watch(() => props.reset, _ => {
+watch(() => props.reset, () => {
 	if (props.startInteractive) {
 		resetRow();
 	}
@@ -126,11 +126,11 @@ function resetRow() {
 
 function focusInput() {
 	if (textInput.value && textInput.value) {
-		(textInput as any).value.focus();
+		textInput.value.focus();
 		// Focus end of word
 		const saved = typed.value;
-		(textInput.value as any).value = '';
-		(textInput.value as any).value = saved;
+		textInput.value.value = '';
+		textInput.value.value = saved;
 	}
 }
 

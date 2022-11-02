@@ -1,10 +1,11 @@
-import {Express, Router} from 'express';
-import Controller from './controller';
+import type {Express} from 'express';
+import {Router} from 'express';
+import * as Controller from './controller';
 
 export default class Routes {
 	public router: Router;
 
-	private app: Express;
+	private readonly app: Express;
 
 	constructor(app: Express) {
 		// eslint-disable-next-line new-cap

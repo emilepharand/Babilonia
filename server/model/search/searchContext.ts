@@ -1,7 +1,7 @@
-export interface SearchContext {
-  pattern?: string;
-  strict?: boolean;
-  language?: number;
-  ideaHas?: number[];
-  ideaDoesNotHave?: number;
-}
+export type SearchContext = {
+	pattern?: string;
+	strict?: boolean;
+	language?: number;
+	ideaHas?: number[];
+	ideaDoesNotHave?: number;
+};

@@ -1,26 +1,34 @@
-import {Database} from 'sqlite';
-import IdeaManager from '../model/ideas/ideaManager';
-import {Idea} from '../model/ideas/idea';
+import type {Database} from 'sqlite';
+import type IdeaManager from '../model/ideas/ideaManager';
+import type {Idea} from '../model/ideas/idea';
 import {ideaManager} from '../model/dataServiceProvider';
-import LanguageManager from '../model/languages/languageManager';
-import SettingsManager from '../model/settings/settingsManager';
+import type LanguageManager from '../model/languages/languageManager';
+import type SettingsManager from '../model/settings/settingsManager';
 
 // Knows which ideas need to be provided to the user to practice
 // Handles the logic for providing ideas to practice
 // Provides ideas for the user to practice them
 export default class PracticeManager {
-	private ideasAlreadyGiven = new Set<number>();
-	private db: Database;
-	private ideaManager: IdeaManager;
-	private languageManager: LanguageManager;
-	private settingsManager: SettingsManager;
+	private readonly ideasAlreadyGiven = new Set<number>();
 
-	constructor(db: Database, ideaManager: IdeaManager, languageManager: LanguageManager,
-		settingsManager: SettingsManager) {
-		this.ideaManager = ideaManager;
-		this.languageManager = languageManager;
-		this.settingsManager = settingsManager;
-		this.db = db;
+	constructor(private readonly db: Database, private readonly ideaManager: IdeaManager,
+		private readonly languageManager: LanguageManager, private readonly settingsManager: SettingsManager) {}
+
+	public async getNextIdea(): Promise<Idea> {
+		let idea: Idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
+		if (idea === undefined) {
+			if (this.ideasAlreadyGiven.size === 0) {
+				return Promise.reject();
+			}
+			this.ideasAlreadyGiven.clear();
+			idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
+		}
+		this.ideasAlreadyGiven.add(idea.id);
+		return ideaManager.getIdea(idea.id);
+	}
+
+	public clear(): void {
+		this.ideasAlreadyGiven.clear();
 	}
 
 	private async buildNextIdeaIdQuery(): Promise<string> {
@@ -41,22 +49,5 @@ export default class PracticeManager {
 		}
 		query += ' limit 1 ';
 		return query;
-	}
-
-	public async getNextIdea(): Promise<Idea> {
-		let idea = await this.db.get(await this.buildNextIdeaIdQuery());
-		if (idea === undefined) {
-			if (this.ideasAlreadyGiven.size === 0) {
-				return Promise.reject();
-			}
-			this.ideasAlreadyGiven.clear();
-			idea = await this.db.get(await this.buildNextIdeaIdQuery());
-		}
-		this.ideasAlreadyGiven.add(idea.id);
-		return ideaManager.getIdea(idea.id);
-	}
-
-	public clear(): void {
-		this.ideasAlreadyGiven.clear();
 	}
 }
