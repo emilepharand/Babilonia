@@ -5,21 +5,84 @@
     "node": true,
     "jest": true
   },
-  "extends": [
-    "xo-typescript",
-    "@vue/eslint-config-typescript/recommended"
+  "overrides": [
+    {
+      "files": [
+        "**/*.ts"
+      ],
+      "excludedFiles": "tests/**/*.ts",
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "ecmaVersion": 12,
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.json"
+        ]
+      },
+      "extends": [
+        "eslint:recommended",
+        "xo",
+        "xo-typescript"
+      ],
+      "rules": {
+        "@typescript-eslint/padding-line-between-statements": "off",
+        "no-redeclare": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/non-nullable-type-assertion-style": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-extraneous-class": "off"
+      }
+    },
+    {
+      "files": [
+        "tests/**/*.ts"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "extends": [
+        "eslint:recommended",
+        "xo"
+      ],
+      "rules": {
+        "padding-line-between-statements": "off"
+      }
+    },
+    {
+      "files": [
+        "**/*.vue"
+      ],
+      "parser": "vue-eslint-parser",
+      "extends": [
+        "eslint:recommended",
+        "xo",
+        "xo-typescript",
+        "plugin:vue/vue3-recommended",
+        "@vue/eslint-config-typescript/recommended"
+      ],
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser",
+        "sourceType": "module",
+        "project": [
+          "./tsconfig.json"
+        ]
+      },
+      "rules": {
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/padding-line-between-statements": "off"
+      }
+    }
   ],
-  "parser": "vue-eslint-parser",
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
-    "ecmaVersion": 12,
     "sourceType": "module",
-    "project": ["./tsconfig.json"]
+    "project": [
+      "./tsconfig.json"
+    ]
   },
-  "rules": {
-    "@typescript-eslint/padding-line-between-statements": "off",
-    "no-redeclare": "off",
-    "@typescript-eslint/no-redeclare": ["error"]
-  },
-  "ignorePatterns": ["dist/*", "tests/coverage/*", "tests/**/*.js"]
+  "ignorePatterns": [
+    "dist/*",
+    "tests/coverage/*"
+  ]
 }
