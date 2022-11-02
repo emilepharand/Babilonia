@@ -47,13 +47,6 @@
         "**/*.vue"
       ],
       "parser": "vue-eslint-parser",
-      "extends": [
-        "eslint:recommended",
-        "xo",
-        "xo-typescript",
-        "plugin:vue/vue3-recommended",
-        "@vue/eslint-config-typescript/recommended"
-      ],
       "parserOptions": {
         "parser": "@typescript-eslint/parser",
         "sourceType": "module",
@@ -61,8 +54,14 @@
           "./tsconfig.json"
         ]
       },
+      "extends": [
+        "eslint:recommended",
+        "xo",
+        "xo-typescript",
+        "plugin:vue/vue3-recommended",
+        "@vue/eslint-config-typescript/recommended"
+      ],
       "rules": {
-        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/padding-line-between-statements": "off"
       }
     }
