@@ -1,7 +1,6 @@
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
 import type LanguageManager from './languages/languageManager';
-import type IdeaManager from './ideas/ideaManager';
 import type {Language} from './languages/language';
 import {validate as validateLanguage, validateForAdding} from './languages/language';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
@@ -19,7 +18,7 @@ export default class InputValidator {
 		return true;
 	}
 
-	constructor(private readonly im: IdeaManager, private readonly lm: LanguageManager) {}
+	constructor(private readonly lm: LanguageManager) {}
 
 	public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
 		// Object is an array

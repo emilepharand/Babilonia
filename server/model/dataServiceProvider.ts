@@ -29,9 +29,9 @@ export const db: Database = await initDb();
 export const settingsManager = new SettingsManager(db);
 export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
-export const practiceManager = new PracticeManager(db, ideaManager, languageManager, settingsManager);
-export const inputValidator = new InputValidator(ideaManager, languageManager);
-export const searchHandler = new SearchHandler(db, languageManager, ideaManager);
+export const practiceManager = new PracticeManager(db, settingsManager);
+export const inputValidator = new InputValidator(languageManager);
+export const searchHandler = new SearchHandler(db, ideaManager);
 export const stats = new Stats(db, languageManager);
 
 export async function deleteAllData(): Promise<void> {

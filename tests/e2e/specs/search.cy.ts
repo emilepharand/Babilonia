@@ -76,7 +76,7 @@ context('Search', () => {
 function assertNthResultHasMatchedExpressions(nth: number, ...texts: string[]) {
 	for (let i = 0; i < texts.length; i++) {
 		getSearchResultsDiv().find('.search-result')
-			.eq(0)
+			.eq(nth)
 			.find('b')
 			.eq(i)
 			.should('have.text', texts[i]);
