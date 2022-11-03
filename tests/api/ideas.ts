@@ -183,6 +183,28 @@ describe('adding invalid ideas', () => {
 		});
 	});
 
+	test('parentheses (context)', async () => {
+		const l1: Language = await addLanguage('language 1');
+		// Unmatched opening parenthesis
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ('}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(to play sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) (sport'}]});
+		// Second opening parenthesis before the first one is closed
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play) sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(lay) sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(la)y) sport'}]});
+		// An expression with only context
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only context)'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '  (only context) '}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '()'}]});
+		// Unmatched closing parenthesis
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play)) sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) spo)rt'}]});
+		// Empty context content
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to () sport'}]});
+	});
+
 	test('two identical expressions (language + text)', async () => {
 		const l1: Language = await addLanguage('language');
 		const e1 = {languageId: l1.id, text: 'duplicate expression'};
