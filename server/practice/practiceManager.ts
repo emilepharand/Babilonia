@@ -1,8 +1,6 @@
 import type {Database} from 'sqlite';
-import type IdeaManager from '../model/ideas/ideaManager';
 import type {Idea} from '../model/ideas/idea';
 import {ideaManager} from '../model/dataServiceProvider';
-import type LanguageManager from '../model/languages/languageManager';
 import type SettingsManager from '../model/settings/settingsManager';
 
 // Knows which ideas need to be provided to the user to practice
@@ -11,8 +9,7 @@ import type SettingsManager from '../model/settings/settingsManager';
 export default class PracticeManager {
 	private readonly ideasAlreadyGiven = new Set<number>();
 
-	constructor(private readonly db: Database, private readonly ideaManager: IdeaManager,
-		private readonly languageManager: LanguageManager, private readonly settingsManager: SettingsManager) {}
+	constructor(private readonly db: Database, private readonly settingsManager: SettingsManager) {}
 
 	public async getNextIdea(): Promise<Idea> {
 		let idea: Idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;

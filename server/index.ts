@@ -4,7 +4,7 @@ import cors from 'cors';
 import Routes from './routes';
 import {apiPort, appPort, isDevMode, isTestMode} from './options';
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
 	if (!isTestMode) {
 		console.error(err.stack);
 	}
@@ -27,7 +27,7 @@ if (!isDevMode) {
 	appServer.use(express.static('.'));
 	if (isTestMode) {
 		// Cypress reads from this
-		appServer.get('/__coverage__', (req, res) => {
+		appServer.get('/__coverage__', (_, res) => {
 			res.json({
 				coverage: global.__coverage__ as string,
 			});

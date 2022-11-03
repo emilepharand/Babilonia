@@ -17,12 +17,12 @@ const sh = DataServiceProvider.getSearchHandler();
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 // It is static because it doesn't hold any state
-export async function getStats(req: Request, res: Response): Promise<void> {
+export async function getStats(_: Request, res: Response): Promise<void> {
 	const ideasPerLanguage = await stats.getIdeasPerLanguage();
 	res.send(JSON.stringify(ideasPerLanguage));
 }
 
-export async function getNextPracticeIdea(req: Request, res: Response): Promise<void> {
+export async function getNextPracticeIdea(_: Request, res: Response): Promise<void> {
 	if ((await im.countIdeas()) === 0) {
 		res.status(404);
 		res.end();
@@ -77,7 +77,7 @@ export async function editLanguages(req: Request, res: Response): Promise<void> 
 	res.send(JSON.stringify(ll));
 }
 
-export async function getLanguages(req: Request, res: Response): Promise<void> {
+export async function getLanguages(_: Request, res: Response): Promise<void> {
 	res.send(JSON.stringify(await lm.getLanguages()));
 }
 
@@ -169,11 +169,11 @@ export async function setSettings(req: Request, res: Response): Promise<void> {
 	res.end();
 }
 
-export async function getSettings(req: Request, res: Response): Promise<void> {
+export async function getSettings(_: Request, res: Response): Promise<void> {
 	res.send(JSON.stringify(await sm.getSettings()));
 }
 
-export async function deleteAllData(req: Request, res: Response): Promise<void> {
+export async function deleteAllData(_: Request, res: Response): Promise<void> {
 	await DataServiceProvider.deleteAllData();
 	res.end();
 }

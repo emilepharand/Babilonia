@@ -1,5 +1,4 @@
 import type {Database} from 'sqlite';
-import type LanguageManager from '../languages/languageManager';
 import type IdeaManager from '../ideas/ideaManager';
 import type {Idea} from '../ideas/idea';
 import type {SearchContext} from './searchContext';
@@ -10,7 +9,7 @@ type SearchResultRow = {
 };
 
 export default class SearchHandler {
-	constructor(private readonly db: Database, private readonly lm: LanguageManager, private readonly im: IdeaManager) {}
+	constructor(private readonly db: Database, private readonly im: IdeaManager) {}
 
 	public async executeQueryForSearchContext(sc: SearchContext): Promise<SearchResultRow[]> {
 		let query

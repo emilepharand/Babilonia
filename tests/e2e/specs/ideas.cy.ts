@@ -86,7 +86,7 @@ context('The idea page', () => {
 		expectedLanguages.push('français', 'français', 'français', 'français', 'english', 'français', 'português', 'français');
 
 		// Check languages stayed the same
-		expectedLanguages.forEach((e, i) => {
+		expectedLanguages.forEach((_, i) => {
 			assertExpressionHasValues(i, expectedLanguages[i], '');
 		});
 	});
