@@ -28,7 +28,7 @@
       <div>
         <span
           v-if="isShowError"
-          id="error-add-language-text"
+          id="error-text"
           class="pl-2 text-danger"
         >{{ errorText }}</span>
       </div>
