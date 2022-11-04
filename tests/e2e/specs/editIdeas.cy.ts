@@ -51,7 +51,7 @@ context('The idea page', () => {
 		cy.get('#edit-button').click();
 		cy.get('#error-text').should('contain.text', 'Empty');
 
-		// Ivvalid parenthesis context
+		// Invalid parenthesis context
 		inputExpression(3, 'english', 'to play sport)');
 		cy.get('#edit-button').click();
 		cy.get('#error-text').should('contain.text', 'context');
