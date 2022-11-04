@@ -197,6 +197,7 @@ describe('adding invalid ideas', () => {
 		// An expression with only context
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only context)'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '  (only context) '}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only) (context)'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '()'}]});
 		// Unmatched closing parenthesis
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play)) sport'}]});
