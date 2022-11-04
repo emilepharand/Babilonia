@@ -44,6 +44,20 @@ context('The idea page', () => {
 		// Expressions should not change
 		assertExpressionHasValues(3, 'deutsch', 'was');
 
+		// Empty idea (not valid)
+		for (let i = 0; i < 5; i++) {
+			inputExpression(i, 'deutsch', '');
+		}
+		cy.get('#edit-button').click();
+		cy.get('#error-text').should('contain.text', 'Empty');
+
+		// Ivvalid parenthesis context
+		inputExpression(3, 'english', 'to play sport)');
+		cy.get('#edit-button').click();
+		cy.get('#error-text').should('contain.text', 'context');
+
+		assertFetchIdeaReturnsStatus(1, 200, ['hello']);
+
 		// Test delete
 		cy.get('#confirm-delete-modal').should('not.be.visible');
 		cy.get('#delete-button').click();
