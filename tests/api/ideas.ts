@@ -204,6 +204,7 @@ describe('adding invalid ideas', () => {
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) spo)rt'}]});
 		// Empty context content
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to () sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (  ) sport'}]});
 	});
 
 	test('two identical expressions (language + text)', async () => {
