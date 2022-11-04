@@ -25,6 +25,13 @@
           Save
         </button>
       </div>
+      <div>
+        <span
+          v-if="isShowError"
+          id="error-add-language-text"
+          class="pl-2 text-danger"
+        >{{ errorText }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +48,8 @@ import {validateIdeaForm} from '../ts/utils';
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
 const loaded = ref(false);
+const errorText = ref('');
+const isShowError = ref(false);
 
 // Initialize data
 (async () => {
@@ -52,7 +61,10 @@ const loaded = ref(false);
 })();
 
 async function save() {
-	const ideaForAdding = validateIdeaForm(idea);
+	const ideaForAdding = validateIdeaForm(idea, errorText);
+	if (errorText.value !== '') {
+		isShowError.value = true;
+	}
 	if (ideaForAdding) {
 		await Api.addIdea(ideaForAdding);
 		// Reset inputs

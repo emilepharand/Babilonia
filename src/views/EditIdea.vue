@@ -33,6 +33,13 @@
           Delete
         </button>
       </div>
+      <div>
+        <span
+          v-if="isShowError"
+          id="error-add-language-text"
+          class="pl-2 text-danger"
+        >{{ errorText }}</span>
+      </div>
     </div>
     <div
       id="confirm-delete-modal"
@@ -97,6 +104,8 @@ import * as Api from '../ts/api';
 const idea = ref(getEmptyIdeaNoAsync());
 const loaded = ref(false);
 const ideaNotFound = ref(false);
+const errorText = ref('');
+const isShowError = ref(false);
 
 const route = useRoute();
 const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
@@ -117,7 +126,10 @@ async function addRows() {
 }
 
 async function edit() {
-	const ideaForAdding = validateIdeaForm(idea);
+	const ideaForAdding = validateIdeaForm(idea, errorText);
+	if (errorText.value !== '') {
+		isShowError.value = true;
+	}
 	if (ideaForAdding) {
 		await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
 		// Reorder expressions
