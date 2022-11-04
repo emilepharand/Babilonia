@@ -91,6 +91,7 @@ import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
 import * as Utils from '../ts/utils';
+import {validateIdeaForm} from '../ts/utils';
 import * as Api from '../ts/api';
 
 const idea = ref(getEmptyIdeaNoAsync());
@@ -116,11 +117,12 @@ async function addRows() {
 }
 
 async function edit() {
-	// Remove empty expressions
-	idea.value.ee = idea.value.ee.filter(e => e.text.trim() !== '');
-	await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
-	// Reorder expressions
-	idea.value = await Api.getIdea(idea.value.id);
+	const ideaForAdding = validateIdeaForm(idea);
+	if (ideaForAdding) {
+		await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
+		// Reorder expressions
+		idea.value = await Api.getIdea(idea.value.id);
+	}
 }
 
 // Router needs to be declared outside function
