@@ -29,7 +29,8 @@ if (!isDevMode) {
 		// Cypress reads from this
 		appServer.get('/__coverage__', (_, res) => {
 			res.json({
-				coverage: global.__coverage__ as string,
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				coverage: (global as any).__coverage__,
 			});
 		});
 	}
