@@ -88,25 +88,29 @@ export default class InputValidator {
 		// No expressions are identical (same language and text)
 		const distinctExpressions = new Set<string>();
 		asIdeaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));
-		const noIdenticalExpressions = distinctExpressions.size === asIdeaForAdding.ee.length;
-		// Parentheses
+		if (distinctExpressions.size !== asIdeaForAdding.ee.length) {
+			return false;
+		}
+		// Context parentheses are valid
 		for (const e of ideaForAdding.ee) {
 			const contexts = e.text.match(/\([^)]*\)/g) ?? [];
-			if (contexts.some(x => x.trim() === '()')) {
+			// No context is empty
+			if (contexts.some(x => x.substring(1, x.length - 1).trim().length === 0)) {
 				return false;
 			}
-			const numberOfContexts = contexts.length;
-			const numberOfOpenPar = (e.text.match(/\(/g) ?? []).length;
-			const numberOfClosingPar = (e.text.match(/\)/g) ?? []).length;
-			if ((numberOfOpenPar !== numberOfClosingPar) || numberOfContexts !== numberOfOpenPar) {
-				return false;
-			}
+			// Expression is not only made of context
 			const expressionWithoutContexts = e.text.replaceAll(/\([^)]*\)/g, '');
 			if (expressionWithoutContexts.trim().length === 0) {
 				return false;
 			}
+			// There are as many closing and opening parentheses as there are contexts
+			const nbrOpeningParentheses = (e.text.match(/[(]/g) ?? []).length;
+			const nbrClosingParentheses = (e.text.match(/[)]/g) ?? []).length;
+			if (contexts.length !== nbrOpeningParentheses || contexts.length !== nbrClosingParentheses) {
+				return false;
+			}
 		}
-		return noIdenticalExpressions;
+		return true;
 	}
 
 	public validateSettings(settings: unknown): boolean {
