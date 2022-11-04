@@ -88,7 +88,25 @@ export default class InputValidator {
 		// No expressions are identical (same language and text)
 		const distinctExpressions = new Set<string>();
 		asIdeaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));
-		return distinctExpressions.size === asIdeaForAdding.ee.length;
+		const noIdenticalExpressions = distinctExpressions.size === asIdeaForAdding.ee.length;
+		// Parentheses
+		for (const e of ideaForAdding.ee) {
+			const contexts = e.text.match(/\([^)]*\)/g) ?? [];
+			if (contexts.some(x => x.trim() === '()')) {
+				return false;
+			}
+			const numberOfContexts = contexts.length;
+			const numberOfOpenPar = (e.text.match(/\(/g) ?? []).length;
+			const numberOfClosingPar = (e.text.match(/\)/g) ?? []).length;
+			if ((numberOfOpenPar !== numberOfClosingPar) || numberOfContexts !== numberOfOpenPar) {
+				return false;
+			}
+			const expressionWithoutContexts = e.text.replaceAll(/\([^)]*\)/g, '');
+			if (expressionWithoutContexts.trim().length === 0) {
+				return false;
+			}
+		}
+		return noIdenticalExpressions;
 	}
 
 	public validateSettings(settings: unknown): boolean {
