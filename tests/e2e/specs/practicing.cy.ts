@@ -1,5 +1,6 @@
-import * as cyutils from '../cy-utils';
-import {apiUrl, setSettings} from '../cy-utils';
+import {addIdeas, addLanguages, apiUrl, setSettings} from '../cy-utils';
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
+import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
 before(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
@@ -27,7 +28,7 @@ context('Practicing', () => {
 	specify('Practicing works', () => {
 		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
 		// Idea 2: salut, allô, hi, hey, HOLA éàíôüáéíóú, ciao, salve
-		cyutils.addIdeas();
+		addIdeas();
 
 		cy.get('#practice-link').click();
 
@@ -209,6 +210,74 @@ context('Practicing', () => {
 		assertRowMatchIsNoMatch(4);
 		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
+	});
+});
+
+context.only('Context', () => {
+	specify('Context works', () => {
+		addLanguages();
+		const e1: ExpressionForAdding = {languageId: 1, text: '(bien le) bonjour (à vous)'};
+		const e2: ExpressionForAdding = {languageId: 1, text: 'salut (mon) cher'};
+		const e3: ExpressionForAdding = {languageId: 2, text: 'hello'};
+		const e4: ExpressionForAdding = {languageId: 3, text: 'buenos días'};
+		const e5: ExpressionForAdding = {languageId: 4, text: 'buongiorno'};
+		const e6: ExpressionForAdding = {languageId: 5, text: 'guten Tag'};
+		const i1: IdeaForAdding = {ee: [e1, e2, e3, e4, e5, e6]};
+		cy.request({
+			url: `${apiUrl}/ideas`,
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: `${JSON.stringify(i1)}`,
+		});
+
+		// Make some languages practiceable
+		const json
+			= '[{"id":1,"name":"français","ordering":0,"isPractice":true},'
+			+ '{"id":2,"name":"english","ordering":1,"isPractice":false},'
+			+ '{"id":3,"name":"español","ordering":2,"isPractice":true},'
+			+ '{"id":4,"name":"italiano","ordering":3,"isPractice":true},'
+			+ '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
+			+ '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
+		cy.request({
+			url: `${apiUrl}/languages`,
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: `${json}`,
+		});
+
+		cy.get('#practice-link').click();
+
+		waitForTableToLoad(5);
+
+		// Context at beginning of expression is shown
+		assertIsTyped(0, '(bien le)');
+		assertRowMatchIsNeutral(0);
+
+		// Start to type
+		typeInRow(0, 'b');
+		assertIsTyped(0, '(bien le) b');
+
+		// Complete
+		assertRowMatchIsPartialMatch(0);
+		typeInRow(0, 'bonjour');
+		assertRowMatchIsFullMatch(0, '(bien le) bonjour (à vous)');
+
+		// Context appears
+		typeInRow(1, 'salu');
+		assertIsTyped(1, 'salu');
+		typeInRow(1, 't');
+		assertIsTyped(1, 'salut (mon)');
+		assertRowMatchIsPartialMatch(1);
+
+		// Don't have to type space
+		typeInRow(1, 'c');
+		assertIsTyped(1, 'salut (mon) c');
+		assertRowMatchIsPartialMatch(1);
+
+		// Complete
+		assertRowMatchIsPartialMatch(1);
+		typeInRow(1, 'her');
+		assertRowMatchIsFullMatch(1, 'salut (mon) cher');
 	});
 });
 
