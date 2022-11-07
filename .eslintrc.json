@@ -66,13 +66,6 @@
       }
     }
   ],
-  "parserOptions": {
-    "parser": "@typescript-eslint/parser",
-    "sourceType": "module",
-    "project": [
-      "./tsconfig.json"
-    ]
-  },
   "ignorePatterns": [
     "dist/*",
     "tests/coverage/*"
