@@ -213,7 +213,7 @@ context('Practicing', () => {
 	});
 });
 
-context.only('Context', () => {
+context('Context', () => {
 	specify('Context works', () => {
 		addLanguages();
 		const e1: ExpressionForAdding = {languageId: 1, text: '(bien le) bonjour (à vous)'};

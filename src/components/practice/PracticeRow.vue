@@ -88,6 +88,7 @@ onMounted(() => {
 	if (props.isFocused) {
 		emit('skipFocus');
 	}
+	showContext();
 });
 
 watch(() => props.isFocused, isFocused => {
@@ -122,6 +123,7 @@ function resetRow() {
 	isPartialMatch.value = false;
 	isNoMatch.value = false;
 	nothingTyped.value = true;
+	showContext();
 }
 
 function focusInput() {
@@ -147,6 +149,16 @@ function normalizeChar(c: string) {
 		.toLowerCase();
 }
 
+function showContext() {
+	if (props.expression.text.startsWith('(')) {
+		let toType = props.expression.text.substring(0, props.expression.text.indexOf(')', typed.value.length) + 1);
+		if (props.expression.text.charAt(toType.length)) {
+			toType += ' ';
+		}
+		typed.value = toType;
+	}
+}
+
 function checkMatch() {
 	const typedWord = typed.value;
 	if (typedWord.length === 0) {
@@ -162,6 +174,14 @@ function checkMatch() {
 	if (firstLettersMatch) {
 		// Show non-normalized spelling
 		typed.value = props.expression.text.substring(0, typed.value.length);
+		const nextTwoChars = props.expression.text.substring(typed.value.length, typed.value.length + 2);
+		if (nextTwoChars.includes('(')) {
+			let toType = props.expression.text.substring(0, props.expression.text.indexOf(')', typed.value.length) + 1);
+			if (props.expression.text.charAt(toType.length)) {
+				toType += ' ';
+			}
+			typed.value = toType;
+		}
 		if (typedWord.length > 0 && typedWord.length === props.expression.text.length) {
 			isNoMatch.value = false;
 			isPartialMatch.value = false;
