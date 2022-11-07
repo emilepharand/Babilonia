@@ -2,7 +2,7 @@ import {addIdeas, addLanguages, apiUrl, setSettings} from '../cy-utils';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');

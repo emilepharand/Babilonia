@@ -67,7 +67,6 @@ const props = defineProps<{
 	expression: Expression;
 	rowOrder: number;
 	isFocused: boolean;
-	startInteractive: boolean;
 	reset: boolean;
 	settings: Settings;
 }>();
@@ -88,11 +87,13 @@ onMounted(() => {
 	if (props.isFocused) {
 		emit('skipFocus');
 	}
-	showContext();
+	if (props.expression.text.startsWith('(')) {
+		showContext();
+	}
 });
 
 watch(() => props.isFocused, isFocused => {
-	if (props.startInteractive && isFocused) {
+	if (isFocused) {
 		if (isFullMatch.value || !props.expression.language.isPractice) {
 			emit('skipFocus');
 		} else if (props.expression.language.isPractice) {
@@ -102,29 +103,16 @@ watch(() => props.isFocused, isFocused => {
 });
 
 watch(typed, () => {
-	if (props.startInteractive) {
-		if (isFullMatch.value) {
-			emit('skipFocus');
-		} else {
-			checkMatch();
-		}
-	}
+	checkMatch();
 });
 
 watch(() => props.reset, () => {
-	if (props.startInteractive) {
-		resetRow();
+	typed.value = '';
+	nothingTyped.value = true;
+	if (props.expression.text.startsWith('(')) {
+		showContext();
 	}
 });
-
-function resetRow() {
-	typed.value = '';
-	isFullMatch.value = false;
-	isPartialMatch.value = false;
-	isNoMatch.value = false;
-	nothingTyped.value = true;
-	showContext();
-}
 
 function focusInput() {
 	if (textInput.value && textInput.value) {
@@ -144,64 +132,75 @@ function normalizeChar(c: string) {
 	if (props.settings.strictCharacters) {
 		return c;
 	}
+	// Remove accents and make lowercase
+	// À -> a, é -> e, etc.
 	return c.normalize('NFD')
 		.replace(/[\u0300-\u036f]/g, '')
 		.toLowerCase();
 }
 
 function showContext() {
-	if (props.expression.text.startsWith('(')) {
-		let toType = props.expression.text.substring(0, props.expression.text.indexOf(')', typed.value.length) + 1);
-		if (props.expression.text.charAt(toType.length)) {
-			toType += ' ';
-		}
-		typed.value = toType;
+	const fullText = props.expression.text;
+	let toType = fullText.substring(0, fullText.indexOf(')', typed.value.length) + 1);
+	if (fullText.charAt(toType.length)) {
+		toType += ' ';
+	}
+	typed.value = toType;
+}
+
+enum Match {
+	NEUTRAL, NONE, PARTIAL, FULL,
+}
+
+function setMatch(match: Match) {
+	isNoMatch.value = false;
+	isPartialMatch.value = false;
+	isFullMatch.value = false;
+	if (match === Match.FULL) {
+		isFullMatch.value = true;
+	} else if (match === Match.PARTIAL) {
+		isPartialMatch.value = true;
+	} else if (match === Match.NONE) {
+		isNoMatch.value = true;
 	}
 }
 
 function checkMatch() {
-	const typedWord = typed.value;
-	if (typedWord.length === 0) {
+	const typedExpression = typed.value;
+	const fullExpression = props.expression.text;
+	if (typedExpression.length === 0) {
 		nothingTyped.value = true;
-		isNoMatch.value = false;
-		isPartialMatch.value = false;
-		isFullMatch.value = false;
+		setMatch(Match.NEUTRAL);
 		currentMaxLength.value = 1;
 		return;
 	}
 	nothingTyped.value = false;
-	const firstLettersMatch = checkFirstLettersMatch(props.expression.text, typedWord);
+	const firstLettersMatch = checkIfFirstLettersMatch(fullExpression, typedExpression);
 	if (firstLettersMatch) {
-		// Show non-normalized spelling
-		typed.value = props.expression.text.substring(0, typed.value.length);
-		const nextTwoChars = props.expression.text.substring(typed.value.length, typed.value.length + 2);
-		if (nextTwoChars.includes('(')) {
-			let toType = props.expression.text.substring(0, props.expression.text.indexOf(')', typed.value.length) + 1);
-			if (props.expression.text.charAt(toType.length)) {
-				toType += ' ';
-			}
-			typed.value = toType;
+		const nonNormalizedSpelling = fullExpression.substring(0, typed.value.length);
+		if (typed.value !== nonNormalizedSpelling) {
+			typed.value = nonNormalizedSpelling;
+			return;
 		}
-		if (typedWord.length > 0 && typedWord.length === props.expression.text.length) {
-			isNoMatch.value = false;
-			isPartialMatch.value = false;
-			isFullMatch.value = true;
+		if (typedExpression.length === fullExpression.length) {
+			setMatch(Match.FULL);
 			emit('fullMatched', props.rowOrder, true);
 		} else {
-			isNoMatch.value = false;
-			isPartialMatch.value = true;
-			isFullMatch.value = false;
-			currentMaxLength.value = typed.value.length + 1;
+			const nextTwoChars = fullExpression.substring(typed.value.length, typed.value.length + 2);
+			if (nextTwoChars.includes('(')) {
+				showContext();
+			} else {
+				setMatch(Match.PARTIAL);
+				currentMaxLength.value = typed.value.length + 1;
+			}
 		}
 	} else {
-		isNoMatch.value = true;
-		isPartialMatch.value = false;
-		isFullMatch.value = false;
+		setMatch(Match.NONE);
 		moreLettersAllowed.value = false;
 	}
 }
 
-function checkFirstLettersMatch(textToMatch: string, typedWord: string) {
+function checkIfFirstLettersMatch(textToMatch: string, typedWord: string) {
 	let i = 0;
 	while (i < typedWord.length) {
 		if (normalizeChar(textToMatch.charAt(i)) === normalizeChar(typedWord.charAt(i))) {
@@ -214,19 +213,20 @@ function checkFirstLettersMatch(textToMatch: string, typedWord: string) {
 }
 
 function hint() {
+	const fullText = props.expression.text;
 	let j = 0;
-	while (j < typed.value.length && props.expression.text.charAt(j) === typed.value.charAt(j)) {
+	while (j < typed.value.length && fullText.charAt(j) === typed.value.charAt(j)) {
 		j += 1;
 	}
 	if (j > 0) {
 		// Don't hint only space but next letter too
-		if (props.expression.text[j] === ' ') {
-			typed.value = props.expression.text.substring(0, j + 2);
+		if (fullText[j] === ' ') {
+			typed.value = fullText.substring(0, j + 2);
 		} else {
-			typed.value = props.expression.text.substring(0, j + 1);
+			typed.value = fullText.substring(0, j + 1);
 		}
 	} else {
-		typed.value = props.expression.text.substring(0, 1);
+		typed.value = fullText.substring(0, 1);
 	}
 	focusInput();
 }
