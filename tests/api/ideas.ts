@@ -277,8 +277,9 @@ describe('editing ideas', () => {
 		const ee = [e1, e2];
 		const idea = await addIdea({ee});
 		const newIdea = getIdeaForAddingFromIdea(idea);
-		newIdea.ee[0].text = 'a new expression';
-		newIdea.ee[1].text = 'a new expression';
+		newIdea.ee[0].text = 'a new expression 1';
+		newIdea.ee[1].text = 'a new expression 2';
+		newIdea.ee[2] = {languageId: l2.id, text: 'a new expression 3'};
 		await editValidIdeaAndTest(idea, newIdea);
 	});
 
