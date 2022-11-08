@@ -84,6 +84,7 @@ async function editValidIdeaAndTest(
 		expect(responseIdea.ee[i].text).toEqual(e.text);
 		expect(responseIdea.ee[i].language.id).toEqual(e.languageId);
 	}
+	return fetchedIdea;
 }
 
 async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number): Promise<void> {
@@ -205,6 +206,13 @@ describe('adding invalid ideas', () => {
 		// Empty context content
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to () sport'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (  ) sport'}]});
+		// Context is trimmed
+		const idea = await addIdea({ee:
+				[{languageId: l1.id, text: 'to ( play ) sport'},
+					{languageId: l1.id, text: 'to (  play) sport'}],
+		});
+		expect(idea.ee[0].text).toEqual('to (play) sport');
+		expect(idea.ee[1].text).toEqual('to (play) sport');
 	});
 
 	test('two identical expressions (language + text)', async () => {
@@ -284,6 +292,17 @@ describe('editing ideas', () => {
 			newIdea.ee[0],
 			newIdea.ee[2],
 		]);
+	});
+
+	test('parentheses (context)', async () => {
+		const l1: Language = await addLanguage('language 1');
+		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
+		let idea = await addIdea({ee: [e1]});
+		// Unmatched opening parenthesis
+		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]}, idea.id);
+		// Context trimming
+		idea = await editValidIdeaAndTest(idea, {ee: [{languageId: l1.id, text: 'to ( play ) sport'}]});
+		expect(idea.ee[0].text).toEqual('to (play) sport');
 	});
 });
 
