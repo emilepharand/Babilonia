@@ -100,6 +100,47 @@ context('The idea page', () => {
 			assertExpressionHasValues(i, expectedLanguages[i], '');
 		});
 	});
+
+	specify('Language template is persisted', () => {
+		// Navigate
+		cy.get('#add-ideas-link').click();
+
+		// Enter expressions
+		const ee = [['français', 'bonjour'],
+			['english', 'hello'],
+			['español', 'buenos días'],
+			['italiano', 'buongiorno'],
+			['deutsch', 'guten Tag']];
+		ee.forEach((e, i) => inputExpression(i, e[0], e[1]));
+
+		// Click save
+		cy.get('#save-idea').click();
+
+		assertExpressionHasValues(0, 'français', '');
+		assertExpressionHasValues(1, 'english', '');
+		assertExpressionHasValues(2, 'español', '');
+		assertExpressionHasValues(3, 'italiano', '');
+		assertExpressionHasValues(4, 'deutsch', '');
+
+		inputExpression(0, 'français', 'hé');
+		inputExpression(1, 'français', 'salut');
+		inputExpression(2, 'español', 'hola');
+		inputExpression(3, 'italiano', 'ciao');
+		inputExpression(4, 'deutsch', 'hallo');
+
+		// Click save
+		cy.get('#save-idea').click();
+
+		// Navigate elsewhere
+		cy.get('#languages-link').click();
+
+		// Layout is still there
+		assertExpressionHasValues(0, 'français', '');
+		assertExpressionHasValues(1, 'français', '');
+		assertExpressionHasValues(2, 'español', '');
+		assertExpressionHasValues(3, 'italiano', '');
+		assertExpressionHasValues(4, 'deutsch', '');
+	});
 });
 
 function assertAllInputsEmpty() {
