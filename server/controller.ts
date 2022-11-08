@@ -87,9 +87,18 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 		res.end();
 		return;
 	}
-	const returnIdea = await im.addIdea(req.body as IdeaForAdding);
+	const ideaForAdding = req.body as IdeaForAdding;
+	trimContext(ideaForAdding);
+	const returnIdea = await im.addIdea(ideaForAdding);
 	res.status(201);
 	res.send(JSON.stringify(returnIdea));
+}
+
+function trimContext(ideaForAdding: IdeaForAdding) {
+	ideaForAdding.ee.forEach(e => {
+		e.text = e.text.replaceAll(/\s+(?=\))|(?<=\()\s+/g, '');
+	});
+	return ideaForAdding;
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
@@ -153,6 +162,7 @@ export async function editIdea(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const idea = req.body as IdeaForAdding;
+	trimContext(idea);
 	await im.editIdea(idea, parseInt(req.params.id, 10));
 	res.send(await im.getIdea(parseInt(req.params.id, 10)));
 }

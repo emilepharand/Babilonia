@@ -23,6 +23,14 @@ context('The idea page', () => {
 
 		// No expressions have been entered, this should show an error
 		cy.get('#save-idea').click();
+		cy.get('#error-text').should('contain.text', 'Empty');
+
+		// Invalid parenthesis context
+		inputExpression(0, 'english', 'to (play sport');
+		cy.get('#save-idea').click();
+		cy.get('#error-text').should('contain.text', 'context');
+
+		assertFetchIdeaReturnsStatus(1, 404);
 
 		// Enter expressions
 		const ee = [['français', 'bonjour'],
@@ -34,6 +42,8 @@ context('The idea page', () => {
 
 		// Click save
 		cy.get('#save-idea').click();
+
+		cy.get('#error-text').should('not.be.visible');
 
 		// Idea 1 was created (testing a sample of expressions)
 		assertFetchIdeaReturnsStatus(1, 200, ['guten Tag', 'bonjour', 'buenos días']);

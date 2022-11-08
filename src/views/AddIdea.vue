@@ -25,6 +25,13 @@
           Save
         </button>
       </div>
+      <div>
+        <span
+          v-if="isShowError"
+          id="error-text"
+          class="pl-2 text-danger"
+        >{{ errorText }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -32,15 +39,17 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import {getExpressionForAddingFromExpression} from '../../server/model/ideas/expression';
 import IdeaForm from '../components/IdeaForm.vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import * as Api from '../ts/api';
 import * as Utils from '../ts/utils';
+import {validateIdeaForm} from '../ts/utils';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
 const loaded = ref(false);
+const errorText = ref('');
+const isShowError = ref(false);
 
 // Initialize data
 (async () => {
@@ -52,19 +61,17 @@ const loaded = ref(false);
 })();
 
 async function save() {
-	// Remove empty expressions
-	const expressions = idea.value.ee.filter(e => e.text.trim() !== '');
-	// Not possible to save empty idea
-	if (expressions.length === 0) {
-		return;
+	const ideaForAdding = validateIdeaForm(idea, errorText);
+	if (errorText.value !== '') {
+		isShowError.value = true;
 	}
-	const expressionsForAdding = expressions.map(e => getExpressionForAddingFromExpression(e));
-	const ideaForAdding = {ee: expressionsForAdding};
-	await Api.addIdea(ideaForAdding);
-	// Reset inputs
-	idea.value.ee.forEach(e => {
-		e.text = '';
-	});
+	if (ideaForAdding) {
+		await Api.addIdea(ideaForAdding);
+		// Reset inputs
+		idea.value.ee.forEach(e => {
+			e.text = '';
+		});
+	}
 }
 
 async function addRows() {

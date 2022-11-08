@@ -4,6 +4,7 @@ import type LanguageManager from './languages/languageManager';
 import type {Language} from './languages/language';
 import {validate as validateLanguage, validateForAdding} from './languages/language';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
+import type {ExpressionForAdding} from './ideas/expression';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -88,10 +89,36 @@ export default class InputValidator {
 		// No expressions are identical (same language and text)
 		const distinctExpressions = new Set<string>();
 		asIdeaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));
-		return distinctExpressions.size === asIdeaForAdding.ee.length;
+		if (distinctExpressions.size !== asIdeaForAdding.ee.length) {
+			return false;
+		}
+		// Context parentheses are valid
+		return validateContextParentheses(ideaForAdding.ee);
 	}
 
 	public validateSettings(settings: unknown): boolean {
 		return validateSettingsSchema(settings);
 	}
+}
+
+export function validateContextParentheses(ee: ExpressionForAdding[]) {
+	for (const e of ee) {
+		const contexts = e.text.match(/\([^)]*\)/g) ?? [];
+		// No context is empty
+		if (contexts.some(x => x.substring(1, x.length - 1).trim().length === 0)) {
+			return false;
+		}
+		// Expression is not only made of context
+		const expressionWithoutContexts = e.text.replaceAll(/\([^)]*\)/g, '');
+		if (expressionWithoutContexts.trim().length === 0) {
+			return false;
+		}
+		// There are as many closing and opening parentheses as there are contexts
+		const nbrOpeningParentheses = (e.text.match(/[(]/g) ?? []).length;
+		const nbrClosingParentheses = (e.text.match(/[)]/g) ?? []).length;
+		if (contexts.length !== nbrOpeningParentheses || contexts.length !== nbrClosingParentheses) {
+			return false;
+		}
+	}
+	return true;
 }
