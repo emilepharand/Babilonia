@@ -88,15 +88,35 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const ideaForAdding = req.body as IdeaForAdding;
-	trimContext(ideaForAdding);
+	normalizeIdea(ideaForAdding);
 	const returnIdea = await im.addIdea(ideaForAdding);
 	res.status(201);
 	res.send(JSON.stringify(returnIdea));
 }
 
+function normalizeIdea(ideaForAdding: IdeaForAdding) {
+	trimExpressions(ideaForAdding);
+	trimContext(ideaForAdding);
+	normalizeWhitespace(ideaForAdding);
+}
+
+function trimExpressions(ideaForAdding: IdeaForAdding) {
+	ideaForAdding.ee.forEach(e => {
+		e.text = e.text.trim();
+	});
+	return ideaForAdding;
+}
+
 function trimContext(ideaForAdding: IdeaForAdding) {
 	ideaForAdding.ee.forEach(e => {
 		e.text = e.text.replaceAll(/\s+(?=\))|(?<=\()\s+/g, '');
+	});
+	return ideaForAdding;
+}
+
+function normalizeWhitespace(ideaForAdding: IdeaForAdding) {
+	ideaForAdding.ee.forEach(e => {
+		e.text = e.text.replaceAll(/\s+/g, ' ');
 	});
 	return ideaForAdding;
 }
@@ -162,7 +182,7 @@ export async function editIdea(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const idea = req.body as IdeaForAdding;
-	trimContext(idea);
+	normalizeIdea(idea);
 	await im.editIdea(idea, parseInt(req.params.id, 10));
 	res.send(await im.getIdea(parseInt(req.params.id, 10)));
 }
