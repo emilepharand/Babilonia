@@ -75,7 +75,7 @@ async function editValidIdeaAndTest(
 	const fetchedIdea = (await r.json()) as Idea;
 	expect(r.status).toEqual(200);
 	expect(validate(fetchedIdea)).toEqual(true);
-	expect(responseIdea.ee.length).toEqual(idea.ee.length);
+	expect(responseIdea.ee.length).toEqual(newIdea.ee.length);
 
 	for (let i = 0; i < responseIdea.ee.length; i += 1) {
 		const e: ExpressionForAdding = expressionsInOrder
@@ -152,6 +152,18 @@ describe('adding valid ideas', () => {
 		const e7 = {languageId: l4.id, text: 'language 4 expression 1'};
 		const e6 = {languageId: l3.id, text: 'language 3 expression 1'};
 		await addValidIdeaAndTest({ee: [e4, e5, e1, e2, e3, e7, e6]}, [e1, e2, e3, e4, e5, e6, e7]);
+	});
+
+	test('whitespace normalization', async () => {
+		const l1: Language = await addLanguage('language 1');
+		const idea = await addIdea({ee:
+				[{languageId: l1.id, text: ' an expression starting with whitespace '},
+					{languageId: l1.id, text: 'an expression	with a tab'},
+					{languageId: l1.id, text: 'an  expression  with  two  spaces'}],
+		});
+		expect(idea.ee[0].text).toEqual('an expression starting with whitespace');
+		expect(idea.ee[1].text).toEqual('an expression with a tab');
+		expect(idea.ee[2].text).toEqual('an expression with two spaces');
 	});
 });
 
@@ -303,6 +315,21 @@ describe('editing ideas', () => {
 		// Context trimming
 		idea = await editValidIdeaAndTest(idea, {ee: [{languageId: l1.id, text: 'to ( play ) sport'}]});
 		expect(idea.ee[0].text).toEqual('to (play) sport');
+	});
+
+	test('whitespace normalization', async () => {
+		const l1: Language = await addLanguage('language 1');
+		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
+		let idea = await addIdea({ee: [e1]});
+		// Context trimming
+		idea = await editValidIdeaAndTest(idea, {ee: [
+			{languageId: l1.id, text: ' an expression starting with whitespace '},
+			{languageId: l1.id, text: 'an expression	with a tab'},
+			{languageId: l1.id, text: 'an  expression  with  two  spaces'},
+		]});
+		expect(idea.ee[0].text).toEqual('an expression starting with whitespace');
+		expect(idea.ee[1].text).toEqual('an expression with a tab');
+		expect(idea.ee[2].text).toEqual('an expression with two spaces');
 	});
 });
 
