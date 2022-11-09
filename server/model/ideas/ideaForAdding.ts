@@ -25,6 +25,7 @@ const ideaForAddingSchema = {
 				properties: {
 					text: {type: 'string'},
 					languageId: {type: 'number'},
+					known: {type: 'boolean'},
 				},
 				required: ['text', 'languageId'],
 				additionalProperties: false,
