@@ -3,6 +3,7 @@ import type {Language} from '../languages/language';
 export type ExpressionForAdding = {
 	text: string;
 	languageId: number;
+	known?: boolean;
 };
 
 export type Expression = {
