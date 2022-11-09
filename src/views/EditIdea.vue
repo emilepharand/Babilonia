@@ -45,14 +45,14 @@
       id="confirm-delete-modal"
       class="modal fade"
       tabindex="-1"
-      aria-labelledby="exampleModalLabel"
+      aria-labelledby="confirm-delete-modal-label"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
-              id="exampleModalLabel"
+              id="confirm-delete-modal-label"
               class="modal-title"
             >
               Confirm
@@ -69,6 +69,7 @@
           </div>
           <div class="modal-footer">
             <button
+              id="modal-cancel-button"
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
