@@ -58,6 +58,7 @@ export async function deleteAllData(): Promise<void> {
         + '\t"ideaId"\tINTEGER NOT NULL,\n'
         + '\t"languageId"\tINTEGER NOT NULL,\n'
         + '\t"text"\tTEXT NOT NULL,\n'
+				+ '\t"known"\tTEXT DEFAULT 0,\n'
         + '\tFOREIGN KEY("languageId") REFERENCES "languages"("id"),\n'
         + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
         + ')',
