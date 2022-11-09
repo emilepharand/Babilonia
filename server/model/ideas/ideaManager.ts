@@ -47,10 +47,10 @@ export default class IdeaManager {
 
 	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
 		for (const e of ee) {
-			const query = 'insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)';
+			const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
 			// Await is needed because order needs to be preserved
 			// eslint-disable-next-line no-await-in-loop
-			await this.db.run(query, ideaId, e.languageId, e.text);
+			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
 		}
 	}
 
