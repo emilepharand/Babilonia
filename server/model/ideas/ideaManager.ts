@@ -33,7 +33,6 @@ export default class IdeaManager {
 
 	public async getIdea(ideaId: number): Promise<Idea> {
 		const ee: Expression[] = await this.getExpressions(ideaId);
-		// Sort ideas by language ordering
 		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
 		return {id: ideaId, ee};
 	}
