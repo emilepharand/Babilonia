@@ -58,12 +58,20 @@ context('The idea page', () => {
 
 		assertFetchIdeaReturnsStatus(1, 200, ['hello']);
 
+		// Delete but cancel
+		cy.get('#confirm-delete-modal').should('not.be.visible');
+		cy.get('#delete-button').click();
+		cy.get('#confirm-delete-modal').should('be.visible');
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.wait(500).get('#modal-cancel-button').click();
+		assertFetchIdeaReturnsStatus(1, 200, ['hello']);
+
 		// Test delete
 		cy.get('#confirm-delete-modal').should('not.be.visible');
 		cy.get('#delete-button').click();
 		cy.get('#confirm-delete-modal').should('be.visible');
-		cy.get('#modal-delete-button').click();
-
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.wait(500).get('#modal-delete-button').click();
 		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
 });

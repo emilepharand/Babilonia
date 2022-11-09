@@ -54,7 +54,9 @@
             <td>
               <button
                 class="btn btn-danger btn-sm delete-language-button"
-                @click="deleteLanguage(lang.id)"
+                data-bs-toggle="modal"
+                data-bs-target="#confirm-delete-modal"
+                @click="languageIdToDelete = lang.id"
               >
                 X
               </button>
@@ -108,6 +110,56 @@
         </div>
       </div>
     </div>
+    <div
+      id="confirm-delete-modal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="confirm-delete-modal-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              id="confirm-delete-modal-label"
+              class="modal-title"
+            >
+              Confirm
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            />
+          </div>
+          <div class="modal-body">
+            Do you really want to delete this language?<br><br>
+            <b>WARNING:</b> All expressions in that language will be deleted.<br><br>
+            This action is irreversible. If in doubt, backup the database first.
+          </div>
+          <div class="modal-footer">
+            <button
+              id="modal-cancel-button"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="modal-delete-button"
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              @click="deleteLanguage()"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -124,6 +176,7 @@ const isShowSaveError = ref(false);
 const saveErrorText = ref('');
 const isShowAddError = ref(false);
 const addErrorText = ref('');
+const languageIdToDelete = ref(-1);
 
 (async () => {
 	languages.value = await Api.getLanguages();
@@ -202,8 +255,8 @@ function duplicateLanguageNames() {
 	return names.size !== languages.value.length;
 }
 
-async function deleteLanguage(id: number) {
-	await Api.deleteLanguage(id);
+async function deleteLanguage() {
+	await Api.deleteLanguage(languageIdToDelete.value);
 	languages.value = await Api.getLanguages();
 }
 
