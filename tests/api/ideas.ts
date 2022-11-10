@@ -54,6 +54,9 @@ async function addValidIdeaAndTest(
 		const fetchedExpression = fetchedIdea.ee[i];
 		expect(fetchedExpression.text).toEqual(e.text);
 		expect(fetchedExpression.language.id).toEqual(e.languageId);
+		if (e.known) {
+			expect(fetchedExpression.known).toEqual(e.known);
+		}
 		// eslint-disable-next-line no-await-in-loop
 		const fetchedLanguage = await fetchLanguage(fetchedExpression.language.id);
 		expect(fetchedLanguage).toEqual(fetchedExpression.language);
@@ -83,6 +86,7 @@ async function editValidIdeaAndTest(
 			: getExpressionForAddingFromExpression(responseIdea.ee[i]);
 		expect(responseIdea.ee[i].text).toEqual(e.text);
 		expect(responseIdea.ee[i].language.id).toEqual(e.languageId);
+		expect(responseIdea.ee[i].known).toEqual(e.known);
 	}
 	return fetchedIdea;
 }
@@ -130,10 +134,10 @@ describe('adding valid ideas', () => {
 		const l1: Language = await addLanguage('language 1');
 		const l2: Language = await addLanguage('language 2');
 		const l3: Language = await addLanguage('language 3');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
+		const e1 = {languageId: l1.id, text: 'language 1 expression 1', known: true};
 		const e2 = {languageId: l1.id, text: 'language 1 expression 2'};
 		const e3 = {languageId: l2.id, text: 'language 2 expression 1'};
-		const e4 = {languageId: l3.id, text: 'language 3 expression 1'};
+		const e4 = {languageId: l3.id, text: 'language 3 expression 1', known: true};
 		const e5 = {languageId: l3.id, text: 'language 3 expression 2'};
 		const ideaForAdding: IdeaForAdding = {ee: [e1, e2, e3, e4, e5]};
 		await addValidIdeaAndTest(ideaForAdding);
@@ -272,14 +276,15 @@ describe('editing ideas', () => {
 	test('simple test', async () => {
 		const l1: Language = await addLanguage('language 1');
 		const l2: Language = await addLanguage('language 2');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const e2 = {languageId: l2.id, text: 'language 1 expression 2'};
+		const e1 = {languageId: l1.id, text: 'language 1 expression 1', known: false};
+		const e2 = {languageId: l2.id, text: 'language 1 expression 2', known: true};
 		const ee = [e1, e2];
 		const idea = await addIdea({ee});
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'a new expression 1';
 		newIdea.ee[1].text = 'a new expression 2';
-		newIdea.ee[2] = {languageId: l2.id, text: 'a new expression 3'};
+		newIdea.ee[2] = {languageId: l2.id, text: 'a new expression 3', known: true};
+		newIdea.ee[3] = {languageId: l2.id, text: 'a new expression 4', known: false};
 		await editValidIdeaAndTest(idea, newIdea);
 	});
 
