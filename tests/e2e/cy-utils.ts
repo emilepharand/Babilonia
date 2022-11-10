@@ -146,6 +146,23 @@ export function inputExpression(rowNbr: number, language: string, text: string) 
 		.type(text);
 }
 
+export function toggleExpressionKnown(rowNbr: number) {
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-known')
+		.click();
+}
+
+export function assertExpressionIsKnown(rowNbr: number, known: boolean) {
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-known')
+		.should('have.text', known ? '✅' : '❌')
+		.should('not.have.text', known ? '❌' : '✅');
+}
+
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
 	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-language option:checked`).should('have.text', languageName);
 	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-text`).should('have.value', text);

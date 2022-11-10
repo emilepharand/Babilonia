@@ -2,8 +2,10 @@ import {
 	addLanguages,
 	apiUrl,
 	assertExpressionHasValues,
+	assertExpressionIsKnown,
 	assertFetchIdeaReturnsStatus,
 	inputExpression,
+	toggleExpressionKnown,
 } from '../cy-utils';
 
 before(() => {
@@ -99,6 +101,24 @@ context('The idea page', () => {
 		expectedLanguages.forEach((_, i) => {
 			assertExpressionHasValues(i, expectedLanguages[i], '');
 		});
+	});
+
+	specify('Known expressions', () => {
+		cy.get('#add-ideas-link').click();
+
+		inputExpression(0, 'français', 'bonjour');
+		inputExpression(1, 'english', 'hello');
+
+		toggleExpressionKnown(0);
+
+		cy.get('#save-idea').click();
+
+		assertFetchIdeaReturnsStatus(1, 200, ['"known":true', '"known":false']);
+
+		cy.visit('/').visit('/ideas/1');
+
+		assertExpressionIsKnown(0, true);
+		assertExpressionIsKnown(1, false);
 	});
 });
 

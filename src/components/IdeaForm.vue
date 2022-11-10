@@ -31,7 +31,7 @@
         >
         <div
           style="cursor: pointer"
-          class="p-2 d-flex align-items-center"
+          class="expression-known p-2 d-flex align-items-center"
           @click="e.known = !e.known"
         >
           <span
