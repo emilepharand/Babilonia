@@ -38,17 +38,12 @@
 import {ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
+import type {Idea} from '../../server/model/ideas/idea';
 
-defineProps({
-	title: {
-		type: String,
-		required: true,
-	},
-	idea: {
-		type: Object,
-		required: true,
-	},
-});
+defineProps<{
+	title: string;
+	idea: Idea;
+}>();
 
 defineEmits(['addRows', 'delete']);
 
