@@ -29,6 +29,20 @@
           style="flex-grow:2"
           type="text"
         >
+        <div
+          style="cursor: pointer"
+          class="p-2 d-flex align-items-center"
+          @click="e.known = !e.known"
+        >
+          <span
+            tabindex="0"
+            style="cursor: pointer"
+            class="form-check-label"
+            @keydown.enter="e.known = !e.known"
+          >
+            {{ e.known ? '✅':'❌' }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
