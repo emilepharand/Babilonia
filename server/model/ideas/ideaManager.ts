@@ -55,8 +55,8 @@ export default class IdeaManager {
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
-		const query = 'select id, languageId, text from expressions where ideaId = ?';
-		const rows: [{id: number; languageId: number; text: string}] = await this.db.all(
+		const query = 'select id, languageId, text, known from expressions where ideaId = ?';
+		const rows: [{id: number; languageId: number; text: string; known: string}] = await this.db.all(
 			query,
 			ideaId,
 		);
@@ -65,6 +65,7 @@ export default class IdeaManager {
 				id: row.id,
 				text: row.text,
 				language: await this.lm.getLanguage(row.languageId),
+				known: row.known === '1',
 			})),
 		);
 	}
