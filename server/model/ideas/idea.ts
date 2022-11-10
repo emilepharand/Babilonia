@@ -43,6 +43,7 @@ const schema = {
 				properties: {
 					id: {type: 'integer'},
 					text: {type: 'string'},
+					known: {type: 'boolean'},
 					language: {
 						type: 'object',
 						properties: {
