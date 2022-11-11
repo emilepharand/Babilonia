@@ -52,6 +52,19 @@
       >
         Show
       </button>
+      <div
+        style="cursor: pointer"
+        class="expression-known p-2 d-flex align-items-center"
+        @click="$emit('toggleKnown', rowOrder)"
+      >
+        <span
+          tabindex="0"
+          style="cursor: pointer"
+          class="form-check-label"
+        >
+          {{ expression.known ? '✅':'❌' }}
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -61,7 +74,7 @@ import {onMounted, ref, watch} from 'vue';
 import type {Expression} from '../../../server/model/ideas/expression';
 import type {Settings} from '../../../server/model/settings/settings';
 
-const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
+const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow', 'toggleKnown']);
 
 const props = defineProps<{
 	expression: Expression;
