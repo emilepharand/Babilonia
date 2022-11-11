@@ -47,6 +47,7 @@
         ref="showButton"
         class="btn btn-outline-dark show-button"
         :disabled="buttonsDisabled()"
+        @keydown.right="knownButton.focus()"
         @keydown.left="hintButton.focus()"
         @click="show()"
       >
@@ -54,13 +55,16 @@
       </button>
       <div
         style="cursor: pointer"
-        class="expression-known p-2 d-flex align-items-center"
+        class="p-2 d-flex align-items-center"
         @click="$emit('toggleKnown', rowOrder)"
+        @keydown.enter="$emit('toggleKnown', rowOrder)"
+        @keydown.left="showButton.focus()"
       >
         <span
+          ref="knownButton"
           tabindex="0"
           style="cursor: pointer"
-          class="form-check-label"
+          class="expression-known form-check-label"
         >
           {{ expression.known ? '✅':'❌' }}
         </span>
@@ -95,6 +99,7 @@ const currentMaxLength = ref(1);
 const textInput = ref(document.createElement('input'));
 const hintButton = ref(document.createElement('button'));
 const showButton = ref(document.createElement('button'));
+const knownButton = ref(document.createElement('div'));
 
 onMounted(() => {
 	if (props.isFocused) {
