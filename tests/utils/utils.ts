@@ -3,7 +3,7 @@ import {Idea} from '../../server/model/ideas/idea';
 import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {SearchContext} from '../../server/model/search/searchContext';
-import {NumberIdeasInLanguage} from '../../server/stats/stats';
+import {StatsPerLanguage} from '../../server/stats/stats';
 import {Settings} from '../../server/model/settings/settings';
 import {paramsFromSearchContext} from '../../src/ts/api';
 import * as dotenv from 'dotenv';
@@ -177,10 +177,10 @@ export async function nextPracticeIdea(): Promise<Idea> {
 	return (await (await rawNextPracticeIdea()).json()) as Idea;
 }
 
-export async function getStats(): Promise<NumberIdeasInLanguage[]> {
+export async function getStats(): Promise<StatsPerLanguage[]> {
 	return await (await fetch(`${apiUrl}/stats`, {
 		method: 'GET',
-	})).json() as NumberIdeasInLanguage[];
+	})).json() as StatsPerLanguage[];
 }
 
 export async function deleteEverything(): Promise<Response> {
