@@ -1,4 +1,10 @@
-import {addIdeas, addLanguages, apiUrl, setSettings} from '../cy-utils';
+import {
+	addIdeas,
+	addLanguages,
+	apiUrl,
+	assertFetchIdeaReturnsStatus,
+	setSettings,
+} from '../cy-utils';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
@@ -96,7 +102,13 @@ context('Practicing', () => {
 			.type('{rightArrow}');
 		getRowShowButton(4)
 			.should('have.focus')
+			.type('{rightArrow}');
+		getRowKnownButton(4)
+			.should('have.focus')
 			.type('{rightArrow}')
+			.should('have.focus')
+			.type('{leftArrow}');
+		getRowShowButton(4)
 			.should('have.focus')
 			.type('{leftArrow}');
 		getRowHintButton(4)
@@ -210,6 +222,20 @@ context('Practicing', () => {
 		assertRowMatchIsNoMatch(4);
 		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
+
+		getRowKnownButton(2).should('have.text', '❌')
+			.click()
+			.should('have.text', '✅')
+			.click()
+			.should('have.text', '❌');
+		typeInRow(3, '{rightArrow}{rightArrow}{rightArrow}');
+		getRowKnownButton(3)
+			.should('have.focus')
+			.should('have.text', '❌')
+			.type('{enter}')
+			.should('have.text', '✅');
+
+		assertFetchIdeaReturnsStatus(2, 200, ['"known":true']);
 	});
 });
 
@@ -323,6 +349,10 @@ function hint(rowNbr: number) {
 
 function getRowHintButton(rowNbr: number) {
 	return getRow(rowNbr).find('.hint-button');
+}
+
+function getRowKnownButton(rowNbr: number) {
+	return getRow(rowNbr).find('.expression-known');
 }
 
 function getNextButton() {
