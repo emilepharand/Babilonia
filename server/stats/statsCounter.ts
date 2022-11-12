@@ -18,10 +18,24 @@ export type LanguageStats = {
 
 export type AllStats = {
 	globalStats: GlobalStats;
-	languageStats: LanguageStats[];
+	allLanguageStats: LanguageStats[];
 };
 
-export function getEmptyNumberIdeasInLanguage(): LanguageStats[] {
+export function getEmptyAllStats(): AllStats {
+	return {
+		globalStats: getEmptyGlobalStats(),
+		allLanguageStats: getEmptyNumberIdeasInLanguage(),
+	};
+}
+
+function getEmptyGlobalStats() {
+	return {
+		totalIdeasCount: 0,
+		totalExpressionsCount: 0,
+	};
+}
+
+function getEmptyNumberIdeasInLanguage(): LanguageStats[] {
 	return [{
 		language: getEmptyLanguageNoAsync(),
 		knownIdeasCount: 0,
@@ -38,7 +52,7 @@ export class StatsCounter {
 	public async getStats(): Promise<AllStats> {
 		return {
 			globalStats: await this.getGlobalStats(),
-			languageStats: await this.getStatsPerLanguage(),
+			allLanguageStats: await this.getAllLanguageStats(),
 		};
 	}
 
@@ -52,21 +66,45 @@ export class StatsCounter {
 		return (await this.db.get(query))!;
 	}
 
-	private async getStatsPerLanguage(): Promise<LanguageStats[]> {
+	private async getAllLanguageStats(): Promise<LanguageStats[]> {
 		const query = `
-			select t1.languageId, knownIdeasCount, totalIdeasCount, knownExpressionsCount, totalExpressionsCount
-			FROM    (select languages.id as languageId, count(distinct ideaId) as totalIdeasCount, count(distinct expressions.id) as totalExpressionsCount, ordering
-			from languages
-			left join expressions on languageId = languages.id
-			group by languageId
-			order by ordering) t1
-			LEFT JOIN
-					(select languages.id as languageId, count(distinct ideaId) as knownIdeasCount,
-			count(distinct expressions.id) as knownExpressionsCount
-			from languages
-			left join expressions on languageId = languages.id and expressions.known='1'
-			group by languageId) t2
-			ON (t1.languageId = t2.languageId)
+with totalExpressions as (select
+languages.id as languageId,
+count(languageId) as totalExpressionsCount
+from languages
+left join expressions on expressions.languageId = languages.id
+group by languageId),
+
+totalIdeas as (with languageIdeaMapping as (select distinct languages.id as languageId, ideaId
+from languages
+left join expressions on expressions.languageId = languages.id)
+select languageId, count(ideaId) as totalIdeasCount
+from languageIdeaMapping
+group by languageId),
+
+totalKnownExpressions as (select
+languages.id as languageId,
+count(languageId) as knownExpressionsCount
+from languages
+left join expressions on expressions.languageId = languages.id  and expressions.known = '1'
+group by languageId),
+
+totalKnownIdeas as (with languageIdeaMapping as (select distinct languages.id as languageId, ideaId
+from languages
+left join expressions on expressions.languageId = languages.id and expressions.known = '1')
+select languageId, count(ideaId) as knownIdeasCount
+from languageIdeaMapping
+group by languageId)
+
+select totalIdeas.languageId,
+coalesce(totalExpressionsCount, 0) as totalExpressionsCount,
+coalesce(totalIdeasCount, 0) as totalIdeasCount,
+coalesce(knownIdeasCount, 0) as knownIdeasCount,
+coalesce(knownExpressionsCount, 0) as knownExpressionsCount
+from totalIdeas
+left join totalExpressions on totalIdeas.languageId=totalExpressions.languageId
+left join totalKnownIdeas on totalIdeas.languageId=totalKnownIdeas.languageId
+left join totalKnownExpressions on totalIdeas.languageId=totalKnownExpressions.languageId
     `;
 		const rows: [{
 			languageId: number;
