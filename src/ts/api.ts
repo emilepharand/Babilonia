@@ -3,7 +3,7 @@ import type {Language} from '../../server/model/languages/language';
 import type {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import type {Settings} from '../../server/model/settings/settings';
 import type {SearchContext} from '../../server/model/search/searchContext';
-import type {LanguageStats} from '../../server/stats/statsCounter';
+import type {AllStats} from '../../server/stats/statsCounter';
 
 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 const apiUrl = `${process.env.VITE_API_URL}`;
@@ -102,12 +102,12 @@ export async function getLanguage(id: number): Promise<Language> {
 	return (await response.json()) as Language;
 }
 
-export async function getStats(): Promise<LanguageStats[]> {
+export async function getStats(): Promise<AllStats> {
 	const url = `${apiUrl}/stats`;
 	const response = await fetch(url, {
 		method: 'GET',
 	});
-	return (await response.json()) as LanguageStats[];
+	return (await response.json()) as AllStats;
 }
 
 export async function getLanguages(): Promise<Language[]> {
