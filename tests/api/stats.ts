@@ -12,6 +12,12 @@ beforeEach(async () => {
 
 describe('getting stats', () => {
 	test('getting stats', async () => {
+		let stats = await getStats();
+
+		expect(stats.languageStats).toHaveLength(0);
+		expect(stats.globalStats.totalExpressionsCount).toBe(0);
+		expect(stats.globalStats.totalIdeasCount).toBe(0);
+
 		const fr = await addLanguage('français');
 		const en = await addLanguage('english');
 		const es = await addLanguage('español');
@@ -46,8 +52,10 @@ describe('getting stats', () => {
 		const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id, known: true};
 		await addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
 
-		const stats = await getStats();
-		expect(stats).toHaveLength(7);
+		stats = await getStats();
+		expect(stats.languageStats).toHaveLength(7);
+		expect(stats.globalStats.totalExpressionsCount).toBe(17);
+		expect(stats.globalStats.totalIdeasCount).toBe(3);
 
 		let frCovered = false;
 		let enCovered = false;
@@ -57,7 +65,7 @@ describe('getting stats', () => {
 		let ptCovered = false;
 		let klCovered = false;
 
-		for (const a of stats) {
+		for (const a of stats.languageStats) {
 			switch (a.language.name) {
 				// Ideas: 1/3, expressions: 1/4
 				case 'français':
