@@ -44,6 +44,27 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <div class="form-check">
+      <input
+        id="practiceOnlyNotKnown"
+        v-model="settings.practiceOnlyNotKnown"
+        class="form-check-input"
+        type="checkbox"
+      >
+      <label
+        class="form-check-label"
+        for="practiceOnlyNotKnown"
+      >
+        Practice only not known expressions
+      </label>
+      <i
+        title="Do not practice expressions that you have marked as known."
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        class="fa-solid fa-circle-question"
+      />
+    </div>
     <button
       id="saveButton"
       class="btn btn-primary w-100"

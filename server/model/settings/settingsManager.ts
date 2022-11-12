@@ -5,7 +5,10 @@ export default class SettingsManager {
 	constructor(private readonly db: Database) {}
 
 	async getBooleanSetting(name: string): Promise<boolean> {
-		const setting: {value: string} = (await this.db.get('select value from settings where name=?', name))!;
+		const setting: {value: string} = (await this.db.get(
+			'select value from settings where name=?',
+			name,
+		))!;
 		if (setting === undefined) {
 			return false;
 		}
@@ -15,6 +18,10 @@ export default class SettingsManager {
 	async setSettings(settings: Settings) {
 		await this.setBooleanSetting('PRACTICE_RANDOM', settings.randomPractice);
 		await this.setBooleanSetting('MAP_CHARACTERS', settings.strictCharacters);
+		await this.setBooleanSetting(
+			'PRACTICE_ONLY_NOT_KNOWN',
+			settings.practiceOnlyNotKnown,
+		);
 	}
 
 	async setBooleanSetting(name: string, value: boolean): Promise<void> {
@@ -23,21 +30,30 @@ export default class SettingsManager {
 			name,
 			value ? '1' : '0',
 		);
-		await this.db.run('update settings set value=? where name=?', value ? '1' : '0', name);
+		await this.db.run(
+			'update settings set value=? where name=?',
+			value ? '1' : '0',
+			name,
+		);
 	}
 
 	async isRandomPractice() {
 		return this.getBooleanSetting('PRACTICE_RANDOM');
 	}
 
+	async isPracticeOnlyNotKnown() {
+		return this.getBooleanSetting('PRACTICE_ONLY_NOT_KNOWN');
+	}
+
 	async getSettings(): Promise<Settings> {
 		return {
 			randomPractice: await this.isRandomPractice(),
-			strictCharacters: await this.isstrictCharacters(),
+			strictCharacters: await this.isStrictCharacters(),
+			practiceOnlyNotKnown: await this.isPracticeOnlyNotKnown(),
 		};
 	}
 
-	private async isstrictCharacters() {
+	private async isStrictCharacters() {
 		return this.getBooleanSetting('MAP_CHARACTERS');
 	}
 }
