@@ -3,12 +3,22 @@ import type {Language} from '../model/languages/language';
 import {getEmptyLanguageNoAsync} from '../model/languages/language';
 import type LanguageManager from '../model/languages/languageManager';
 
+export type GlobalStats = {
+	totalIdeasCount: number;
+	totalExpressionsCount: number;
+};
+
 export type StatsPerLanguage = {
 	language: Language;
 	knownIdeasCount: number;
 	totalIdeasCount: number;
 	totalExpressionsCount: number;
 	knownExpressionsCount: number;
+};
+
+export type Stats = {
+	globalStats: GlobalStats;
+	statsPerLanguage: StatsPerLanguage[];
 };
 
 export function getEmptyNumberIdeasInLanguage(): StatsPerLanguage[] {
@@ -21,11 +31,28 @@ export function getEmptyNumberIdeasInLanguage(): StatsPerLanguage[] {
 	}];
 }
 
-export class Stats {
+export class StatsCounter {
 	constructor(private readonly db: Database, private readonly lm: LanguageManager) {
 	}
 
-	public async getIdeasPerLanguage(): Promise<StatsPerLanguage[]> {
+	public async getStats(): Promise<Stats> {
+		return {
+			globalStats: await this.getGlobalStats(),
+			statsPerLanguage: await this.getStatsPerLanguage(),
+		};
+	}
+
+	private async getGlobalStats(): Promise<GlobalStats> {
+		const query = `
+		select count (distinct ideas.id) as totalIdeasCount,
+		count (distinct expressions.id) as totalExpressionsCount
+		from ideas
+		left join expressions
+		`;
+		return (await this.db.get(query))!;
+	}
+
+	private async getStatsPerLanguage(): Promise<StatsPerLanguage[]> {
 		const query = `
 			select t1.languageId, knownIdeasCount, totalIdeasCount, knownExpressionsCount, totalExpressionsCount
 			FROM    (select languages.id as languageId, count(distinct ideaId) as totalIdeasCount, count(distinct expressions.id) as totalExpressionsCount, ordering
@@ -34,7 +61,7 @@ export class Stats {
 			group by languageId
 			order by ordering) t1
 			LEFT JOIN
-					(select languages.id as languageId, count(distinct ideaId) as knownIdeasCount, 
+					(select languages.id as languageId, count(distinct ideaId) as knownIdeasCount,
 			count(distinct expressions.id) as knownExpressionsCount
 			from languages
 			left join expressions on languageId = languages.id and expressions.known='1'

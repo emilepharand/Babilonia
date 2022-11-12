@@ -10,7 +10,7 @@ const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
 const iv = DataServiceProvider.getInputValidator();
 const sm = DataServiceProvider.getSettingsManager();
-const stats = DataServiceProvider.getStats();
+const statsCounter = DataServiceProvider.getStats();
 const sh = DataServiceProvider.getSearchHandler();
 
 // This is the contact point for the front-end and the back-end
@@ -18,8 +18,8 @@ const sh = DataServiceProvider.getSearchHandler();
 // It must validate arguments before calling methods of the managers
 // It is static because it doesn't hold any state
 export async function getStats(_: Request, res: Response): Promise<void> {
-	const ideasPerLanguage = await stats.getIdeasPerLanguage();
-	res.send(JSON.stringify(ideasPerLanguage));
+	const stats = await statsCounter.getStats();
+	res.send(JSON.stringify(stats));
 }
 
 export async function getNextPracticeIdea(_: Request, res: Response): Promise<void> {

@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import * as Api from '../ts/api';
-import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
+import {getEmptyNumberIdeasInLanguage} from '../../server/stats/statsCounter';
 import NotEnoughData from '../components/NotEnoughData.vue';
 
 const ideasPerLanguage = ref(getEmptyNumberIdeasInLanguage());
