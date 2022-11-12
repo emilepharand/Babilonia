@@ -8,7 +8,7 @@
       style="width: 400px"
     >
       <input
-        v-if="!expression.language.isPractice"
+        v-if="!isRowPracticeable()"
         class="form-control expression-input"
         type="text"
         :value="expression.text"
@@ -112,9 +112,9 @@ onMounted(() => {
 
 watch(() => props.isFocused, isFocused => {
 	if (isFocused) {
-		if (isFullMatch.value || !props.expression.language.isPractice) {
+		if (isFullMatch.value || !isRowPracticeable()) {
 			emit('skipFocus');
-		} else if (props.expression.language.isPractice) {
+		} else if (isRowPracticeable()) {
 			focusInput();
 		}
 	}
@@ -142,8 +142,12 @@ function focusInput() {
 	}
 }
 
+function isRowPracticeable() {
+	return props.expression.language.isPractice && !(props.settings.practiceOnlyNotKnown && props.expression.known);
+}
+
 function buttonsDisabled() {
-	return !props.expression.language.isPractice || isFullMatch.value;
+	return !isRowPracticeable() || isFullMatch.value;
 }
 
 function normalizeChar(c: string) {
