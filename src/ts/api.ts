@@ -102,12 +102,12 @@ export async function getLanguage(id: number): Promise<Language> {
 	return (await response.json()) as Language;
 }
 
-export async function getStats(): Promise<StatsPerLanguage[]> {
+export async function getStats(): Promise<LanguageStats[]> {
 	const url = `${apiUrl}/stats`;
 	const response = await fetch(url, {
 		method: 'GET',
 	});
-	return (await response.json()) as StatsPerLanguage[];
+	return (await response.json()) as LanguageStats[];
 }
 
 export async function getLanguages(): Promise<Language[]> {

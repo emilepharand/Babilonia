@@ -8,7 +8,7 @@ export type GlobalStats = {
 	totalExpressionsCount: number;
 };
 
-export type StatsPerLanguage = {
+export type LanguageStats = {
 	language: Language;
 	knownIdeasCount: number;
 	totalIdeasCount: number;
@@ -16,12 +16,12 @@ export type StatsPerLanguage = {
 	knownExpressionsCount: number;
 };
 
-export type Stats = {
+export type AllStats = {
 	globalStats: GlobalStats;
-	statsPerLanguage: StatsPerLanguage[];
+	languageStats: LanguageStats[];
 };
 
-export function getEmptyNumberIdeasInLanguage(): StatsPerLanguage[] {
+export function getEmptyNumberIdeasInLanguage(): LanguageStats[] {
 	return [{
 		language: getEmptyLanguageNoAsync(),
 		knownIdeasCount: 0,
@@ -35,10 +35,10 @@ export class StatsCounter {
 	constructor(private readonly db: Database, private readonly lm: LanguageManager) {
 	}
 
-	public async getStats(): Promise<Stats> {
+	public async getStats(): Promise<AllStats> {
 		return {
 			globalStats: await this.getGlobalStats(),
-			statsPerLanguage: await this.getStatsPerLanguage(),
+			languageStats: await this.getStatsPerLanguage(),
 		};
 	}
 
@@ -52,7 +52,7 @@ export class StatsCounter {
 		return (await this.db.get(query))!;
 	}
 
-	private async getStatsPerLanguage(): Promise<StatsPerLanguage[]> {
+	private async getStatsPerLanguage(): Promise<LanguageStats[]> {
 		const query = `
 			select t1.languageId, knownIdeasCount, totalIdeasCount, knownExpressionsCount, totalExpressionsCount
 			FROM    (select languages.id as languageId, count(distinct ideaId) as totalIdeasCount, count(distinct expressions.id) as totalExpressionsCount, ordering
@@ -76,12 +76,12 @@ export class StatsCounter {
 			knownExpressionsCount: number;
 			ordering: number;
 		}] = await this.db.all(query);
-		const statsPerLanguages: StatsPerLanguage[] = [];
+		const languageStats: LanguageStats[] = [];
 		for (const row of rows) {
 			// Allow await in loop because order must be preserved
 			// eslint-disable-next-line no-await-in-loop
 			const language = await this.lm.getLanguage(row.languageId);
-			statsPerLanguages.push({
+			languageStats.push({
 				language,
 				knownIdeasCount: row.knownIdeasCount,
 				totalIdeasCount: row.totalIdeasCount,
@@ -89,6 +89,6 @@ export class StatsCounter {
 				knownExpressionsCount: row.knownExpressionsCount,
 			});
 		}
-		return statsPerLanguages;
+		return languageStats;
 	}
 }
