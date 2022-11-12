@@ -210,7 +210,7 @@ context('Practicing', () => {
 		getResetButton().click();
 
 		// Character mapping (strict disabled)
-		setSettings({randomPractice: false, strictCharacters: true});
+		setSettings({randomPractice: false, strictCharacters: true, practiceOnlyNotKnown: false});
 		cy.then(() => {
 			cy.reload();
 		});
