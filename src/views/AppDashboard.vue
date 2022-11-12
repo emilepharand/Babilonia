@@ -17,7 +17,7 @@
             <p
               v-for="(languageStats) in allStats.allLanguageStats"
               :key="languageStats.language.id"
-              class="card-text"
+              class="card-text dashboard-row"
             >
               <strong>{{ languageStats.knownIdeasCount }}</strong>/{{ languageStats.totalIdeasCount }}
               ideas in <strong>{{ languageStats.language.name }}</strong>
