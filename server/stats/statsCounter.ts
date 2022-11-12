@@ -100,11 +100,14 @@ select totalIdeas.languageId,
 coalesce(totalExpressionsCount, 0) as totalExpressionsCount,
 coalesce(totalIdeasCount, 0) as totalIdeasCount,
 coalesce(knownIdeasCount, 0) as knownIdeasCount,
-coalesce(knownExpressionsCount, 0) as knownExpressionsCount
+coalesce(knownExpressionsCount, 0) as knownExpressionsCount,
+languages.ordering
 from totalIdeas
 left join totalExpressions on totalIdeas.languageId=totalExpressions.languageId
 left join totalKnownIdeas on totalIdeas.languageId=totalKnownIdeas.languageId
 left join totalKnownExpressions on totalIdeas.languageId=totalKnownExpressions.languageId
+left join languages on languages.id=totalIdeas.languageId
+order by ordering
     `;
 		const rows: [{
 			languageId: number;

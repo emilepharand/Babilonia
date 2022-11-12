@@ -2,6 +2,7 @@ import {
 	addIdea,
 	addLanguage,
 	deleteEverything,
+	editLanguagesAndGetResponse,
 	getStats,
 } from '../utils/utils';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
@@ -24,12 +25,22 @@ describe('getting stats', () => {
 		const it = await addLanguage('italiano');
 		const de = await addLanguage('deutsch');
 		const pt = await addLanguage('português');
-		await addLanguage('klingon');
+		const kl = await addLanguage('klingon');
 
 		stats = await getStats();
 		expect(stats.allLanguageStats).toHaveLength(7);
 		expect(stats.globalStats.totalExpressionsCount).toBe(0);
 		expect(stats.globalStats.totalIdeasCount).toBe(0);
+
+		// Ordering
+		expect(stats.allLanguageStats[0].language.id).toEqual(fr.id);
+		expect(stats.allLanguageStats[6].language.id).toEqual(kl.id);
+		kl.ordering = 0;
+		fr.ordering = 6;
+		await editLanguagesAndGetResponse([kl, en, es, it, de, pt, fr]);
+		stats = await getStats();
+		expect(stats.allLanguageStats[0].language.id).toEqual(kl.id);
+		expect(stats.allLanguageStats[6].language.id).toEqual(fr.id);
 
 		// Idea 1: fr, en, es
 		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
