@@ -1,6 +1,6 @@
 import type {Database} from 'sqlite';
 import type {Idea} from '../model/ideas/idea';
-import {ideaManager} from '../model/dataServiceProvider';
+import {ideaManager, settingsManager} from '../model/dataServiceProvider';
 import type SettingsManager from '../model/settings/settingsManager';
 
 // Knows which ideas need to be provided to the user to practice
@@ -36,6 +36,7 @@ export default class PracticeManager {
     and id in
     (select ideaId from expressions
     join languages on expressions.languageId = languages.id
+    ${await settingsManager.isPracticeOnlyNotKnown() ? 'and expressions.known = "0"' : ''}
     where isPractice = true)
     and id not in
     (${Array.from(this.ideasAlreadyGiven).join(',')})`;

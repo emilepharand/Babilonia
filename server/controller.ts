@@ -194,6 +194,10 @@ export async function setSettings(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const settings = req.body as Settings;
+	if (await sm.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
+		// Reset practice manager because practiceable ideas may change after changing this setting
+		pm.clear();
+	}
 	await sm.setSettings(settings);
 	res.status(200);
 	res.end();
