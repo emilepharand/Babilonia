@@ -8,7 +8,7 @@
       <h2 class="pb-2">
         Your progress
       </h2>
-      <div class="d-flex gap-3">
+      <div class="d-flex gap-3 mb-4">
         <div class="card border-dark">
           <div class="card-body">
             <h3 class="card-title">
@@ -21,7 +21,11 @@
             >
               <strong>{{ languageStats.knownIdeasCount }}</strong>/{{ languageStats.totalIdeasCount }}
               ideas in <strong>{{ languageStats.language.name }}</strong>
-              (<strong>{{ getKnownIdeasPercentage(languageStats) }}</strong>%)
+              (<strong>{{ getPercentage(languageStats.knownIdeasCount, languageStats.totalIdeasCount) }}</strong>%)
+            </p>
+            <p>
+              Total: <strong>{{ allStats.globalStats.totalKnownIdeas }}</strong>/{{ allStats.globalStats.totalIdeasCount }}
+              ideas (<strong>{{ getPercentage(allStats.globalStats.totalKnownIdeas, allStats.globalStats.totalIdeasCount) }}</strong>%)
             </p>
           </div>
         </div>
@@ -37,7 +41,11 @@
             >
               <strong>{{ languageStats.knownExpressionsCount }}</strong>/{{ languageStats.totalExpressionsCount }}
               expressions in <strong>{{ languageStats.language.name }}</strong>
-              (<strong>{{ getKnownExpressionsPercentage(languageStats) }}</strong>%)
+              (<strong>{{ getPercentage(languageStats.knownExpressionsCount, languageStats.totalExpressionsCount) }}</strong>%)
+            </p>
+            <p>
+              Total: <strong>{{ allStats.globalStats.totalKnownExpressions }}</strong>/{{ allStats.globalStats.totalExpressionsCount }}
+              expressions (<strong>{{ getPercentage(allStats.globalStats.totalKnownExpressions, allStats.globalStats.totalExpressionsCount) }}</strong>%)
             </p>
           </div>
         </div>
@@ -49,20 +57,11 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import * as Api from '../ts/api';
-import type {LanguageStats} from '../../server/stats/statsCounter';
 import {getEmptyAllStats} from '../../server/stats/statsCounter';
 import NotEnoughData from '../components/NotEnoughData.vue';
 
 const allStats = ref(getEmptyAllStats());
 const noIdeas = ref(false);
-
-function getKnownIdeasPercentage(languageStats: LanguageStats) {
-	return getPercentage(languageStats.knownIdeasCount, languageStats.totalIdeasCount);
-}
-
-function getKnownExpressionsPercentage(languageStats: LanguageStats) {
-	return getPercentage(languageStats.knownExpressionsCount, languageStats.totalExpressionsCount);
-}
 
 function getPercentage(numerator: number, denominator: number) {
 	if (denominator === 0) {
