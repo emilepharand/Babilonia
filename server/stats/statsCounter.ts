@@ -6,6 +6,8 @@ import type LanguageManager from '../model/languages/languageManager';
 export type GlobalStats = {
 	totalIdeasCount: number;
 	totalExpressionsCount: number;
+	totalKnownIdeas: number;
+	totalKnownExpressions: number;
 };
 
 export type LanguageStats = {
@@ -32,6 +34,8 @@ function getEmptyGlobalStats() {
 	return {
 		totalIdeasCount: 0,
 		totalExpressionsCount: 0,
+		totalKnownIdeas: 0,
+		totalKnownExpressions: 0,
 	};
 }
 
@@ -58,10 +62,23 @@ export class StatsCounter {
 
 	private async getGlobalStats(): Promise<GlobalStats> {
 		const query = `
-		select count (distinct ideas.id) as totalIdeasCount,
-		count (distinct expressions.id) as totalExpressionsCount
-		from ideas
-		left join expressions
+with total as (select count (distinct ideas.id) as totalIdeasCount,
+count (distinct expressions.id) as totalExpressionsCount
+from ideas
+left join expressions),
+
+knownExpressions as (select count(distinct expressions.id) as totalKnownExpressions
+from languages
+join expressions on expressions.languageId = languages.id and expressions.known = '1'),
+
+knownIdeas as (select count(distinct ideaId) as totalKnownIdeas
+from languages
+join expressions on expressions.languageId = languages.id and expressions.known = '1')
+
+select total.totalIdeasCount, total.totalExpressionsCount, knownExpressions.totalKnownExpressions, knownIdeas.totalKnownIdeas
+from total
+join knownExpressions
+join knownIdeas
 		`;
 		return (await this.db.get(query))!;
 	}
