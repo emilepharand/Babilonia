@@ -1,14 +1,14 @@
 import {
-  addIdea,
-  addLanguage,
-  deleteEverything,
-  editLanguagesAndGetResponse,
-  getStats,
-} from "../utils/utils";
-import { ExpressionForAdding } from "../../server/model/ideas/expression";
+	addIdea,
+	addLanguage,
+	deleteEverything,
+	editLanguagesAndGetResponse,
+	getStats,
+} from '../utils/utils';
+import {ExpressionForAdding} from '../../server/model/ideas/expression';
 
 beforeEach(async () => {
-  await deleteEverything();
+	await deleteEverything();
 });
 
 describe('getting stats', () => {
