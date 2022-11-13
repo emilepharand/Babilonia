@@ -154,6 +154,17 @@ export async function search(req: Request, res: Response): Promise<void> {
 		}
 		sc.ideaDoesNotHave = parseInt(req.query.ideaDoesNotHave as string, 10);
 	}
+	if (req.query.knownExpressions) {
+		if (req.query.knownExpressions === 'true') {
+			sc.knownExpressions = true;
+		} else if (req.query.knownExpressions === 'false') {
+			sc.knownExpressions = false;
+		} else {
+			res.status(400);
+			res.end();
+			return;
+		}
+	}
 	// Nothing to search
 	if (Object.values(sc).every(el => el === undefined)) {
 		res.status(400);

@@ -163,5 +163,8 @@ export function paramsFromSearchContext(sc: SearchContext): string {
 	if (sc.ideaDoesNotHave) {
 		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
 	}
+	if (sc.knownExpressions !== undefined) {
+		params += `&knownExpressions=${sc.knownExpressions ? 'true' : 'false'}`;
+	}
 	return params;
 }

@@ -4,4 +4,5 @@ export type SearchContext = {
 	language?: number;
 	ideaHas?: number[];
 	ideaDoesNotHave?: number;
+	knownExpressions?: boolean;
 };

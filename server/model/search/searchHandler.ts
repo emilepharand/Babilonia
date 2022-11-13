@@ -39,14 +39,21 @@ having count(ideaId) >= ${sc.ideaHas.length})`);
 		if (sc.ideaDoesNotHave) {
 			whereCondition.push(`ideaId not in (select distinct ideaId from expressions where languageId=${sc.ideaDoesNotHave})`);
 		}
+		if (sc.knownExpressions !== undefined) {
+			whereCondition.push(`expressionId in 
+			(select distinct expressions.id from expressions where expressions.known = '${sc.knownExpressions ? '1' : '0'}')`);
+		}
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;
 		}
+		console.log(query);
+		console.log(params);
 		return this.db.all(query, ...params);
 	}
 
 	public async executeSearch(sc: SearchContext): Promise<Idea[]> {
 		const rows = (await this.executeQueryForSearchContext(sc));
+		console.log(`FOUND ${rows.length} ROWS!!`);
 		const matchedExpressions: number[] = rows.map(row => row.expressionId);
 		const ideaPromises: Array<Promise<Idea>> = [];
 		const alreadyAddedIdeas = new Set<number>();
