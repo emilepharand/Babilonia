@@ -190,6 +190,77 @@ describe('searching expressions', () => {
 		);
 	});
 
+	test('known expressions', async () => {
+		const fr = await addLanguage('français');
+		const en = await addLanguage('anglais');
+		const es = await addLanguage('español');
+		const de = await addLanguage('deutsch');
+		const pt = await addLanguage('português');
+
+		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id, known: true};
+		const en1: ExpressionForAdding = {text: 'hello', languageId: en.id, known: true};
+		const es1: ExpressionForAdding = {text: 'buenos días', languageId: es.id, known: true};
+		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id};
+		const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: pt.id};
+		const i1 = await addIdea({ee: [fr1, en1, es1, de1, pt1]});
+
+		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id, known: true};
+		const en2: ExpressionForAdding = {text: 'good night', languageId: en.id, known: true};
+		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id, known: true};
+		const es22: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
+		const pt2: ExpressionForAdding = {text: 'boa noite', languageId: pt.id};
+		const i2 = await addIdea({ee: [fr2, en2, es2, es22, pt2]});
+
+		const en3: ExpressionForAdding = {text: 'good evening', languageId: en.id};
+		const en32: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
+		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
+		const es32: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
+		await addIdea({ee: [en3, en32, es3, es32]});
+
+		const en4: ExpressionForAdding = {text: 'good evening', languageId: en.id};
+		const en42: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
+		const es4: ExpressionForAdding = {text: 'buenas noches', languageId: es.id, known: true};
+		const es42: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
+		const i4 = await addIdea({ee: [en4, en42, es4, es42]});
+
+		// Not known Portuguese
+		const sc: SearchContext = {
+			language: pt.id,
+			knownExpressions: false,
+		};
+		await testSearch(sc,
+			[i1, i2],
+			[[pt1.text], [pt2.text]],
+		);
+
+		// Not known Portuguese containing German
+		sc.ideaHas = [de.id, pt.id];
+		await testSearch(sc,
+			[i1],
+			[[pt1.text]],
+		);
+
+		// Known Spanish containing English
+		sc.knownExpressions = true;
+		sc.language = es.id;
+		sc.ideaHas = [es.id, en.id];
+		await testSearch(sc,
+			[i1, i2, i4],
+			[[es1.text], [es2.text], [es4.text]],
+		);
+
+		// All known
+		sc.knownExpressions = true;
+		sc.language = undefined;
+		sc.ideaHas = undefined;
+		await testSearch(sc,
+			[i1, i2, i4],
+			[[fr1.text, en1.text, es1.text],
+				[fr2.text, en2.text, es2.text],
+				[es4.text]],
+		);
+	});
+
 	describe('searching for expressions erroneously', () => {
 		test('no value set', async () => {
 			const r = await searchAndGetResponse({});
