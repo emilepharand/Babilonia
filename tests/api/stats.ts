@@ -1,14 +1,14 @@
 import {
-	addIdea,
-	addLanguage,
-	deleteEverything,
-	editLanguagesAndGetResponse,
-	getStats,
-} from '../utils/utils';
-import {ExpressionForAdding} from '../../server/model/ideas/expression';
+  addIdea,
+  addLanguage,
+  deleteEverything,
+  editLanguagesAndGetResponse,
+  getStats,
+} from "../utils/utils";
+import { ExpressionForAdding } from "../../server/model/ideas/expression";
 
 beforeEach(async () => {
-	await deleteEverything();
+  await deleteEverything();
 });
 
 describe('getting stats', () => {
@@ -31,6 +31,8 @@ describe('getting stats', () => {
 		expect(stats.allLanguageStats).toHaveLength(7);
 		expect(stats.globalStats.totalExpressionsCount).toBe(0);
 		expect(stats.globalStats.totalIdeasCount).toBe(0);
+		expect(stats.globalStats.totalKnownIdeas).toBe(0);
+		expect(stats.globalStats.totalKnownExpressions).toBe(0);
 
 		// Ordering
 		expect(stats.allLanguageStats[0].language.id).toEqual(fr.id);
@@ -57,6 +59,8 @@ describe('getting stats', () => {
 		expect(stats.allLanguageStats).toHaveLength(7);
 		expect(stats.globalStats.totalExpressionsCount).toBe(7);
 		expect(stats.globalStats.totalIdeasCount).toBe(2);
+		expect(stats.globalStats.totalKnownIdeas).toBe(1);
+		expect(stats.globalStats.totalKnownExpressions).toBe(4);
 
 		let frCovered = false;
 		let enCovered = false;
@@ -158,6 +162,8 @@ describe('getting stats', () => {
 		expect(stats.allLanguageStats).toHaveLength(7);
 		expect(stats.globalStats.totalExpressionsCount).toBe(18);
 		expect(stats.globalStats.totalIdeasCount).toBe(4);
+		expect(stats.globalStats.totalKnownIdeas).toBe(3);
+		expect(stats.globalStats.totalKnownExpressions).toBe(9);
 
 		frCovered = false;
 		enCovered = false;
