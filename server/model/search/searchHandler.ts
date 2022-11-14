@@ -46,14 +46,11 @@ having count(ideaId) >= ${sc.ideaHas.length})`);
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;
 		}
-		console.log(query);
-		console.log(params);
 		return this.db.all(query, ...params);
 	}
 
 	public async executeSearch(sc: SearchContext): Promise<Idea[]> {
 		const rows = (await this.executeQueryForSearchContext(sc));
-		console.log(`FOUND ${rows.length} ROWS!!`);
 		const matchedExpressions: number[] = rows.map(row => row.expressionId);
 		const ideaPromises: Array<Promise<Idea>> = [];
 		const alreadyAddedIdeas = new Set<number>();
