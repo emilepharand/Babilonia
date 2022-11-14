@@ -70,6 +70,18 @@ context('Search', () => {
 		assertNthResultHasMatchedExpressions(0, 'bonne nuit');
 
 		reset();
+
+		getKnownExpressionsCheckbox().check();
+		getKnownExpressionsCheckbox().should('be.checked');
+		getUnknownExpressionsCheckbox().should('not.be.checked');
+		getUnknownExpressionsCheckbox().check();
+		getKnownExpressionsCheckbox().should('not.be.checked');
+		getUnknownExpressionsCheckbox().should('be.checked');
+		clickSearch();
+		assertThereAreNResults(2);
+		getKnownExpressionsCheckbox().check();
+		clickSearch();
+		assertThereAreNResults(1);
 	});
 });
 
@@ -106,6 +118,14 @@ function typePattern(pattern: string) {
 
 function getStrictCheckbox() {
 	return cy.get('#strict');
+}
+
+function getKnownExpressionsCheckbox() {
+	return cy.get('#knownExpressions');
+}
+
+function getUnknownExpressionsCheckbox() {
+	return cy.get('#unknownExpressions');
 }
 
 function checkStrict() {
