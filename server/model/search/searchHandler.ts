@@ -28,10 +28,10 @@ export default class SearchHandler {
 		if (sc.ideaHas) {
 			whereCondition.push(`ideaId in
 			                      (select ideaId from
-(select distinct ideaId, languageId from expressions
-where languageId in (${sc.ideaHas.join(',')}))
-group by ideaId
-having count(ideaId) >= ${sc.ideaHas.length})`);
+			(select distinct ideaId, languageId from expressions
+			where languageId in (${sc.ideaHas.join(',')}))
+			group by ideaId
+			having count(ideaId) >= ${sc.ideaHas.length})`);
 			if (!sc.pattern) {
 				whereCondition.push(`e.languageId in (${sc.ideaHas.join(',')})`);
 			}
