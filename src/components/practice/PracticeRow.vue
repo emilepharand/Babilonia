@@ -8,7 +8,7 @@
       style="width: 400px"
     >
       <input
-        v-if="!expression.language.isPractice"
+        v-if="!isRowPracticeable()"
         class="form-control expression-input"
         type="text"
         :value="expression.text"
@@ -47,11 +47,28 @@
         ref="showButton"
         class="btn btn-outline-dark show-button"
         :disabled="buttonsDisabled()"
+        @keydown.right="knownButton.focus()"
         @keydown.left="hintButton.focus()"
         @click="show()"
       >
         Show
       </button>
+      <div
+        style="cursor: pointer"
+        class="p-2 d-flex align-items-center"
+        @click="$emit('toggleKnown', rowOrder)"
+        @keydown.enter="$emit('toggleKnown', rowOrder)"
+        @keydown.left="showButton.focus()"
+      >
+        <span
+          ref="knownButton"
+          tabindex="0"
+          style="cursor: pointer"
+          class="expression-known form-check-label"
+        >
+          {{ expression.known ? '✅':'❌' }}
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -61,7 +78,7 @@ import {onMounted, ref, watch} from 'vue';
 import type {Expression} from '../../../server/model/ideas/expression';
 import type {Settings} from '../../../server/model/settings/settings';
 
-const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow']);
+const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow', 'toggleKnown']);
 
 const props = defineProps<{
 	expression: Expression;
@@ -82,6 +99,7 @@ const currentMaxLength = ref(1);
 const textInput = ref(document.createElement('input'));
 const hintButton = ref(document.createElement('button'));
 const showButton = ref(document.createElement('button'));
+const knownButton = ref(document.createElement('div'));
 
 onMounted(() => {
 	if (props.isFocused) {
@@ -94,9 +112,9 @@ onMounted(() => {
 
 watch(() => props.isFocused, isFocused => {
 	if (isFocused) {
-		if (isFullMatch.value || !props.expression.language.isPractice) {
+		if (isFullMatch.value || !isRowPracticeable()) {
 			emit('skipFocus');
-		} else if (props.expression.language.isPractice) {
+		} else if (isRowPracticeable()) {
 			focusInput();
 		}
 	}
@@ -124,8 +142,12 @@ function focusInput() {
 	}
 }
 
+function isRowPracticeable() {
+	return props.expression.language.isPractice && !(props.settings.practiceOnlyNotKnown && props.expression.known);
+}
+
 function buttonsDisabled() {
-	return !props.expression.language.isPractice || isFullMatch.value;
+	return !isRowPracticeable() || isFullMatch.value;
 }
 
 function normalizeChar(c: string) {

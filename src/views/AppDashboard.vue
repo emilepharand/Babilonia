@@ -5,16 +5,50 @@
       <NotEnoughData no-idea />
     </div>
     <div v-else>
-      <div
-        v-for="(ideaPerLanguage) in ideasPerLanguage"
-        :key="ideaPerLanguage.language.id"
-      >
-        <p class="dashboard-row">
-          You can express
-          <strong>{{ ideaPerLanguage.count }}</strong>
-          ideas in
-          <strong>{{ ideaPerLanguage.language.name }}</strong>
-        </p>
+      <h2 class="pb-2">
+        Your progress
+      </h2>
+      <div class="d-flex gap-3 mb-4">
+        <div class="card border-dark">
+          <div class="card-body">
+            <h3 class="card-title">
+              You can express
+            </h3>
+            <p
+              v-for="(languageStats) in allStats.allLanguageStats"
+              :key="languageStats.language.id"
+              class="card-text dashboard-row"
+            >
+              <strong>{{ languageStats.knownIdeasCount }}</strong>/{{ languageStats.totalIdeasCount }}
+              ideas in <strong>{{ languageStats.language.name }}</strong>
+              (<strong>{{ getPercentage(languageStats.knownIdeasCount, languageStats.totalIdeasCount) }}</strong>%)
+            </p>
+            <p>
+              Total: <strong>{{ allStats.globalStats.totalKnownIdeas }}</strong>/{{ allStats.globalStats.totalIdeasCount }}
+              ideas (<strong>{{ getPercentage(allStats.globalStats.totalKnownIdeas, allStats.globalStats.totalIdeasCount) }}</strong>%)
+            </p>
+          </div>
+        </div>
+        <div class="card border-dark">
+          <div class="card-body">
+            <h3 class="card-title">
+              You know
+            </h3>
+            <p
+              v-for="(languageStats) in allStats.allLanguageStats"
+              :key="languageStats.language.id"
+              class="card-text"
+            >
+              <strong>{{ languageStats.knownExpressionsCount }}</strong>/{{ languageStats.totalExpressionsCount }}
+              expressions in <strong>{{ languageStats.language.name }}</strong>
+              (<strong>{{ getPercentage(languageStats.knownExpressionsCount, languageStats.totalExpressionsCount) }}</strong>%)
+            </p>
+            <p>
+              Total: <strong>{{ allStats.globalStats.totalKnownExpressions }}</strong>/{{ allStats.globalStats.totalExpressionsCount }}
+              expressions (<strong>{{ getPercentage(allStats.globalStats.totalKnownExpressions, allStats.globalStats.totalExpressionsCount) }}</strong>%)
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -23,15 +57,22 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import * as Api from '../ts/api';
-import {getEmptyNumberIdeasInLanguage} from '../../server/stats/stats';
+import {getEmptyAllStats} from '../../server/stats/statsCounter';
 import NotEnoughData from '../components/NotEnoughData.vue';
 
-const ideasPerLanguage = ref(getEmptyNumberIdeasInLanguage());
+const allStats = ref(getEmptyAllStats());
 const noIdeas = ref(false);
 
+function getPercentage(numerator: number, denominator: number) {
+	if (denominator === 0) {
+		return 0;
+	}
+	return Math.round((numerator / denominator) * 100);
+}
+
 (async () => {
-	ideasPerLanguage.value = await Api.getStats();
-	noIdeas.value = ideasPerLanguage.value.length === 0;
+	allStats.value = await Api.getStats();
+	noIdeas.value = allStats.value.globalStats.totalIdeasCount === 0;
 })();
 
 </script>

@@ -3,12 +3,14 @@ import type {Language} from '../languages/language';
 export type ExpressionForAdding = {
 	text: string;
 	languageId: number;
+	known?: boolean;
 };
 
 export type Expression = {
 	id: number;
 	text: string;
 	language: Language;
+	known: boolean;
 	// This is used for search results
 	matched?: boolean;
 };
@@ -20,6 +22,7 @@ export function getEmptyNexpressions(n: number, startId: number, l: Language): E
 			id: startId + i,
 			text: '',
 			language: l,
+			known: false,
 		};
 		ee.push(e);
 	}
@@ -30,5 +33,6 @@ export function getExpressionForAddingFromExpression(e: Expression): ExpressionF
 	return {
 		languageId: e.language.id,
 		text: e.text,
+		known: e.known,
 	};
 }

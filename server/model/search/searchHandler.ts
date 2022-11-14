@@ -28,16 +28,20 @@ export default class SearchHandler {
 		if (sc.ideaHas) {
 			whereCondition.push(`ideaId in
 			                      (select ideaId from
-(select distinct ideaId, languageId from expressions
-where languageId in (${sc.ideaHas.join(',')}))
-group by ideaId
-having count(ideaId) >= ${sc.ideaHas.length})`);
+			(select distinct ideaId, languageId from expressions
+			where languageId in (${sc.ideaHas.join(',')}))
+			group by ideaId
+			having count(ideaId) >= ${sc.ideaHas.length})`);
 			if (!sc.pattern) {
 				whereCondition.push(`e.languageId in (${sc.ideaHas.join(',')})`);
 			}
 		}
 		if (sc.ideaDoesNotHave) {
 			whereCondition.push(`ideaId not in (select distinct ideaId from expressions where languageId=${sc.ideaDoesNotHave})`);
+		}
+		if (sc.knownExpressions !== undefined) {
+			whereCondition.push(`expressionId in 
+			(select distinct expressions.id from expressions where expressions.known = '${sc.knownExpressions ? '1' : '0'}')`);
 		}
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;

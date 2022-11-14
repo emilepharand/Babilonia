@@ -6,7 +6,7 @@ import LanguageManager from './languages/languageManager';
 import PracticeManager from '../practice/practiceManager';
 import InputValidator from './inputValidator';
 import SearchHandler from './search/searchHandler';
-import {Stats} from '../stats/stats';
+import {StatsCounter} from '../stats/statsCounter';
 import SettingsManager from './settings/settingsManager';
 import {databasePath, isTestMode} from '../options';
 import * as fs from 'fs';
@@ -32,7 +32,7 @@ export const ideaManager = new IdeaManager(db, languageManager);
 export const practiceManager = new PracticeManager(db, settingsManager);
 export const inputValidator = new InputValidator(languageManager);
 export const searchHandler = new SearchHandler(db, ideaManager);
-export const stats = new Stats(db, languageManager);
+export const stats = new StatsCounter(db, languageManager);
 
 export async function deleteAllData(): Promise<void> {
 	await db.run('drop table if exists expressions');
@@ -58,6 +58,7 @@ export async function deleteAllData(): Promise<void> {
         + '\t"ideaId"\tINTEGER NOT NULL,\n'
         + '\t"languageId"\tINTEGER NOT NULL,\n'
         + '\t"text"\tTEXT NOT NULL,\n'
+				+ '\t"known"\tTEXT DEFAULT 0,\n'
         + '\tFOREIGN KEY("languageId") REFERENCES "languages"("id"),\n'
         + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
         + ')',
@@ -91,7 +92,7 @@ export function getSearchHandler(): SearchHandler {
 	return searchHandler;
 }
 
-export function getStats(): Stats {
+export function getStats(): StatsCounter {
 	return stats;
 }
 

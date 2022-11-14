@@ -2,11 +2,13 @@ import {
 	addIdeas,
 	apiUrl,
 	assertExpressionHasValues,
+	assertExpressionIsKnown,
 	assertFetchIdeaReturnsStatus,
 	inputExpression,
+	toggleExpressionKnown,
 } from '../cy-utils';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
@@ -73,6 +75,22 @@ context('The idea page', () => {
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
 		cy.wait(500).get('#modal-delete-button').click();
 		assertFetchIdeaReturnsStatus(1, 404, []);
+	});
+
+	specify('Known expressions', () => {
+		addIdeas();
+		cy.visit('/ideas/1');
+
+		toggleExpressionKnown(3);
+
+		cy.get('#edit-button').click();
+
+		assertFetchIdeaReturnsStatus(1, 200, ['"known":true', '"known":false']);
+
+		cy.visit('/').visit('/ideas/1');
+
+		assertExpressionIsKnown(3, true);
+		assertExpressionIsKnown(0, false);
 	});
 });
 

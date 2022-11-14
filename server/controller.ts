@@ -10,7 +10,7 @@ const im = DataServiceProvider.getIdeaManager();
 const pm = DataServiceProvider.getPracticeManager();
 const iv = DataServiceProvider.getInputValidator();
 const sm = DataServiceProvider.getSettingsManager();
-const stats = DataServiceProvider.getStats();
+const statsCounter = DataServiceProvider.getStats();
 const sh = DataServiceProvider.getSearchHandler();
 
 // This is the contact point for the front-end and the back-end
@@ -18,8 +18,8 @@ const sh = DataServiceProvider.getSearchHandler();
 // It must validate arguments before calling methods of the managers
 // It is static because it doesn't hold any state
 export async function getStats(_: Request, res: Response): Promise<void> {
-	const ideasPerLanguage = await stats.getIdeasPerLanguage();
-	res.send(JSON.stringify(ideasPerLanguage));
+	const stats = await statsCounter.getStats();
+	res.send(JSON.stringify(stats));
 }
 
 export async function getNextPracticeIdea(_: Request, res: Response): Promise<void> {
@@ -154,6 +154,17 @@ export async function search(req: Request, res: Response): Promise<void> {
 		}
 		sc.ideaDoesNotHave = parseInt(req.query.ideaDoesNotHave as string, 10);
 	}
+	if (req.query.knownExpressions) {
+		if (req.query.knownExpressions === 'true') {
+			sc.knownExpressions = true;
+		} else if (req.query.knownExpressions === 'false') {
+			sc.knownExpressions = false;
+		} else {
+			res.status(400);
+			res.end();
+			return;
+		}
+	}
 	// Nothing to search
 	if (Object.values(sc).every(el => el === undefined)) {
 		res.status(400);
@@ -194,6 +205,10 @@ export async function setSettings(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const settings = req.body as Settings;
+	if (await sm.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
+		// Reset practice manager because practiceable ideas may change after changing this setting
+		pm.clear();
+	}
 	await sm.setSettings(settings);
 	res.status(200);
 	res.end();

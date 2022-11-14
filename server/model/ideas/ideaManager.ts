@@ -33,7 +33,6 @@ export default class IdeaManager {
 
 	public async getIdea(ideaId: number): Promise<Idea> {
 		const ee: Expression[] = await this.getExpressions(ideaId);
-		// Sort ideas by language ordering
 		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
 		return {id: ideaId, ee};
 	}
@@ -48,16 +47,16 @@ export default class IdeaManager {
 
 	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
 		for (const e of ee) {
-			const query = 'insert into expressions("ideaId", "languageId", "text") values (?, ?, ?)';
+			const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
 			// Await is needed because order needs to be preserved
 			// eslint-disable-next-line no-await-in-loop
-			await this.db.run(query, ideaId, e.languageId, e.text);
+			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
 		}
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
-		const query = 'select id, languageId, text from expressions where ideaId = ?';
-		const rows: [{id: number; languageId: number; text: string}] = await this.db.all(
+		const query = 'select id, languageId, text, known from expressions where ideaId = ?';
+		const rows: [{id: number; languageId: number; text: string; known: string}] = await this.db.all(
 			query,
 			ideaId,
 		);
@@ -66,6 +65,7 @@ export default class IdeaManager {
 				id: row.id,
 				text: row.text,
 				language: await this.lm.getLanguage(row.languageId),
+				known: row.known === '1',
 			})),
 		);
 	}

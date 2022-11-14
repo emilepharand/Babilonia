@@ -87,6 +87,7 @@ describe('getting practice ideas', () => {
 		let settings: Settings = {
 			randomPractice: true,
 			strictCharacters: false,
+			practiceOnlyNotKnown: false,
 		};
 		await setSettings(settings);
 
@@ -125,7 +126,7 @@ describe('getting practice ideas', () => {
 		// This test might pass when it should fail but the chance is statistically small
 		expect(idsInSameOrder).toEqual(false);
 
-		settings = {randomPractice: false, strictCharacters: false};
+		settings = {randomPractice: false, strictCharacters: false, practiceOnlyNotKnown: false};
 		await setSettings(settings);
 
 		firstIdeaIds = [];
@@ -205,6 +206,51 @@ describe('getting practice ideas', () => {
 		const fetchedIdeaWithPracticeAndNoPracticeLanguage = await addIdea(ideaWithPracticeAndNoPracticeLanguage);
 		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithPracticeAndNoPracticeLanguage.id);
 		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithPracticeAndNoPracticeLanguage.id);
+	});
+
+	test('ideas with only known expressions in practice languages are not practiceable depending on settings', async () => {
+		const practiceLanguage: Language = await addLanguage('practice language 1');
+		const practiceLanguage2: Language = await addLanguage('practice language 2');
+		const noPracticeLanguage: Language = await addLanguage('no practice language 1');
+		practiceLanguage.isPractice = true;
+		practiceLanguage2.isPractice = true;
+		await editLanguages([practiceLanguage, practiceLanguage2, noPracticeLanguage]);
+		const ideaWithOnlyKnownExpressions: IdeaForAdding = {ee: [{languageId: practiceLanguage.id, text: 'expression', known: true},
+			{languageId: noPracticeLanguage.id, text: 'expression2'}]};
+		const ideaWithPracticeAndNoPracticeLanguage: IdeaForAdding = {ee: [{languageId: practiceLanguage.id, text: 'expression'},
+			{languageId: noPracticeLanguage.id, text: 'expression2'}]};
+		const fetchedIdeaWithOnlyKnownExpressions = await addIdea(ideaWithOnlyKnownExpressions);
+		const fetchedIdeaWithPracticeAndNoPracticeLanguage = await addIdea(ideaWithPracticeAndNoPracticeLanguage);
+
+		// Practice only known is false
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithOnlyKnownExpressions.id);
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithPracticeAndNoPracticeLanguage.id);
+
+		// Practice only known is true
+		await setSettings({
+			practiceOnlyNotKnown: true, randomPractice: false, strictCharacters: false,
+		});
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithPracticeAndNoPracticeLanguage.id);
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdeaWithPracticeAndNoPracticeLanguage.id);
+	});
+
+	test('ideas with only known expressions in non practice languages are practiceable', async () => {
+		const practiceLanguage: Language = await addLanguage('practice language 1');
+		const noPracticeLanguage: Language = await addLanguage('no practice language 1');
+		practiceLanguage.isPractice = true;
+		await editLanguages([practiceLanguage, noPracticeLanguage]);
+		const idea: IdeaForAdding = {ee: [{languageId: practiceLanguage.id, text: 'expression'},
+			{languageId: noPracticeLanguage.id, text: 'expression2', known: true}]};
+		const fetchedIdea = await addIdea(idea);
+
+		// Practice only known is false
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea.id);
+
+		// Practice only known is true
+		await setSettings({
+			practiceOnlyNotKnown: true, randomPractice: false, strictCharacters: false,
+		});
+		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea.id);
 	});
 
 	test('ideas with no practice languages are not practiceable', async () => {

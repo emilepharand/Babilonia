@@ -29,6 +29,20 @@
           style="flex-grow:2"
           type="text"
         >
+        <div
+          style="cursor: pointer"
+          class="expression-known p-2 d-flex align-items-center"
+          @click="e.known = !e.known"
+        >
+          <span
+            tabindex="0"
+            style="cursor: pointer"
+            class="form-check-label"
+            @keydown.enter="e.known = !e.known"
+          >
+            {{ e.known ? '✅':'❌' }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -38,17 +52,12 @@
 import {ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
+import type {Idea} from '../../server/model/ideas/idea';
 
-defineProps({
-	title: {
-		type: String,
-		required: true,
-	},
-	idea: {
-		type: Object,
-		required: true,
-	},
-});
+defineProps<{
+	title: string;
+	idea: Idea;
+}>();
 
 defineEmits(['addRows', 'delete']);
 

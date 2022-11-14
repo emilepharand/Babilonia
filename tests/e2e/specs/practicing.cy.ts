@@ -1,4 +1,10 @@
-import {addIdeas, addLanguages, apiUrl, setSettings} from '../cy-utils';
+import {
+	addIdeas,
+	addLanguages,
+	apiUrl,
+	assertFetchIdeaReturnsStatus,
+	setSettings,
+} from '../cy-utils';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
@@ -96,7 +102,13 @@ context('Practicing', () => {
 			.type('{rightArrow}');
 		getRowShowButton(4)
 			.should('have.focus')
+			.type('{rightArrow}');
+		getRowKnownButton(4)
+			.should('have.focus')
 			.type('{rightArrow}')
+			.should('have.focus')
+			.type('{leftArrow}');
+		getRowShowButton(4)
 			.should('have.focus')
 			.type('{leftArrow}');
 		getRowHintButton(4)
@@ -198,7 +210,7 @@ context('Practicing', () => {
 		getResetButton().click();
 
 		// Character mapping (strict disabled)
-		setSettings({randomPractice: false, strictCharacters: true});
+		setSettings({randomPractice: false, strictCharacters: true, practiceOnlyNotKnown: false});
 		cy.then(() => {
 			cy.reload();
 		});
@@ -210,6 +222,76 @@ context('Practicing', () => {
 		assertRowMatchIsNoMatch(4);
 		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
+
+		getRowKnownButton(2).should('have.text', '❌')
+			.click()
+			.should('have.text', '✅')
+			.click()
+			.should('have.text', '❌');
+		typeInRow(3, '{rightArrow}{rightArrow}{rightArrow}');
+		getRowKnownButton(3)
+			.should('have.focus')
+			.should('have.text', '❌')
+			.type('{enter}')
+			.should('have.text', '✅');
+
+		assertFetchIdeaReturnsStatus(2, 200, ['"known":true']);
+	});
+
+	specify('Settings to practice only not know expressions', () => {
+		addLanguages();
+		const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour', known: true};
+		const e2: ExpressionForAdding = {languageId: 1, text: 'salut (mon) cher'};
+		const e3: ExpressionForAdding = {languageId: 1, text: 'salut (mon) (bel) ami'};
+		const e4: ExpressionForAdding = {languageId: 2, text: 'hello'};
+		const e5: ExpressionForAdding = {languageId: 3, text: 'buenos días', known: true};
+		const e6: ExpressionForAdding = {languageId: 4, text: 'buongiorno'};
+		const e7: ExpressionForAdding = {languageId: 5, text: 'guten Tag'};
+		const i1: IdeaForAdding = {ee: [e1, e2, e3, e4, e5, e6, e7]};
+		cy.request({
+			url: `${apiUrl}/ideas`,
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: `${JSON.stringify(i1)}`,
+		});
+
+		// Make some languages practiceable
+		const json
+			= '[{"id":1,"name":"français","ordering":0,"isPractice":true},'
+			+ '{"id":2,"name":"english","ordering":1,"isPractice":false},'
+			+ '{"id":3,"name":"español","ordering":2,"isPractice":true},'
+			+ '{"id":4,"name":"italiano","ordering":3,"isPractice":true},'
+			+ '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
+			+ '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
+		cy.request({
+			url: `${apiUrl}/languages`,
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: `${json}`,
+		});
+
+		cy.get('#practice-link').click();
+
+		waitForTableToLoad(7);
+
+		assertRowMatchIsNeutral(1);
+		assertRowMatchIsNeutral(4);
+
+		setSettings({randomPractice: false, strictCharacters: false, practiceOnlyNotKnown: true});
+		cy.then(() => {
+			cy.reload();
+		});
+
+		waitForTableToLoad(7);
+
+		assertRowInputIsNotPracticeable(1, 'bonjour');
+		assertRowInputIsNotPracticeable(4, 'buenos días');
+		assertRowInputHasFocus(2);
+
+		typeInRow(2, '{downArrow}{downArrow}');
+		assertRowInputHasFocus(5);
+		typeInRow(5, '{downArrow}{downArrow}');
+		assertRowInputHasFocus(2);
 	});
 
 	specify('When there is only one idea', () => {
@@ -368,6 +450,10 @@ function hint(rowNbr: number) {
 
 function getRowHintButton(rowNbr: number) {
 	return getRow(rowNbr).find('.hint-button');
+}
+
+function getRowKnownButton(rowNbr: number) {
+	return getRow(rowNbr).find('.expression-known');
 }
 
 function getNextButton() {

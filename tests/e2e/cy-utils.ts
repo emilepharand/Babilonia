@@ -29,12 +29,12 @@ export function addLanguages() {
 export function addIdeasDifferentSet() {
 	addLanguages();
 	// Idea 1: fr, en, es, de, it, pt
-	const fr1: ExpressionForAdding = {text: 'bonjour', languageId: 1};
-	const en1: ExpressionForAdding = {text: 'hello', languageId: 2};
-	const es1: ExpressionForAdding = {text: 'buenos días', languageId: 3};
-	const de1: ExpressionForAdding = {text: 'guten Tag', languageId: 5};
-	const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: 6};
-	const it1: ExpressionForAdding = {text: 'buongiorno', languageId: 4};
+	const fr1: ExpressionForAdding = {text: 'bonjour', languageId: 1, known: true};
+	const en1: ExpressionForAdding = {text: 'hello', languageId: 2, known: true};
+	const es1: ExpressionForAdding = {text: 'buenos días', languageId: 3, known: true};
+	const de1: ExpressionForAdding = {text: 'guten Tag', languageId: 5, known: true};
+	const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: 6, known: true};
+	const it1: ExpressionForAdding = {text: 'buongiorno', languageId: 4, known: true};
 	const i1: IdeaForAdding = {ee: [fr1, en1, es1, de1, pt1, it1]};
 
 	// Idea 2: fr, en, es, de, pt
@@ -144,6 +144,23 @@ export function inputExpression(rowNbr: number, language: string, text: string) 
 		.find('.expression-text')
 		.clear()
 		.type(text);
+}
+
+export function toggleExpressionKnown(rowNbr: number) {
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-known')
+		.click();
+}
+
+export function assertExpressionIsKnown(rowNbr: number, known: boolean) {
+	cy.get('#ideas')
+		.find('.expression')
+		.eq(rowNbr)
+		.find('.expression-known')
+		.should('have.text', known ? '✅' : '❌')
+		.should('not.have.text', known ? '❌' : '✅');
 }
 
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {

@@ -23,6 +23,7 @@
             @skip-focus="skipFocus"
             @focused-row="focusRow"
             @full-matched="rowFullyMatched"
+            @toggle-known="toggleKnown"
           />
         </div>
       </div>
@@ -54,6 +55,7 @@ import {computed, nextTick, ref} from 'vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
+import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 
 const nextIdeaButton = ref(document.createElement('button'));
 const idea = ref(getEmptyIdeaNoAsync());
@@ -160,6 +162,11 @@ function rowFullyMatched(rowNumber: number, newMatch: boolean) {
 			currentlyFocusedRow.value = temp;
 		});
 	}
+}
+
+async function toggleKnown(rowNbr: number) {
+	idea.value.ee[rowNbr].known = !idea.value.ee[rowNbr].known;
+	await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
 }
 
 async function nextIdea() {

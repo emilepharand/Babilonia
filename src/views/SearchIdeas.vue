@@ -32,9 +32,46 @@
             >
             <label
               class="form-check-label"
+              style="cursor:pointer;"
               for="strict"
             >
               Exact match
+            </label>
+          </div>
+        </div>
+        <div class="col-12 d-flex gap-3">
+          <div class="form-check">
+            <input
+              id="knownExpressions"
+              v-model="knownExpressions"
+              class="form-check-input"
+              type="checkbox"
+              @change="unknownExpressions = false"
+            >
+            <label
+              class="form-check-label"
+              for="knownExpressions"
+              style="cursor:pointer;"
+            >
+              Known
+            </label>
+          </div>
+          <div
+            class="form-check"
+          >
+            <input
+              id="unknownExpressions"
+              v-model="unknownExpressions"
+              class="form-check-input"
+              type="checkbox"
+              @change="knownExpressions = false"
+            >
+            <label
+              class="form-check-label"
+              style="cursor:pointer;"
+              for="unknownExpressions"
+            >
+              Unknown
             </label>
           </div>
         </div>
@@ -175,6 +212,8 @@ const strict = ref(false);
 const ideaHas = ref(getEmptyLanguagesNoAsync());
 const expressionLanguage = ref(getEmptyLanguageNoAsync());
 const ideaDoesNotHave = ref(getEmptyLanguageNoAsync());
+const knownExpressions = ref(false);
+const unknownExpressions = ref(false);
 
 // Component data
 const languagesWithPlaceholder = ref(getEmptyLanguagesNoAsync());
@@ -203,6 +242,8 @@ function reset() {
 	ideaDoesNotHave.value = getEmptyLanguageNoAsync();
 	ideaHas.value = [];
 	isShowError.value = false;
+	knownExpressions.value = false;
+	unknownExpressions.value = false;
 }
 
 async function search() {
@@ -220,6 +261,7 @@ async function search() {
 
 function atLeastOneFilterSet() {
 	return strict.value || pattern.value || ideaDoesNotHave.value.id !== languagePlaceholderId
+      || knownExpressions.value || unknownExpressions.value
       || ideaHas.value.length > 0 || expressionLanguage.value.id !== languagePlaceholderId;
 }
 
@@ -235,6 +277,9 @@ function createSearchContext() {
 	}
 	if (expressionLanguage.value.id !== languagePlaceholderId) {
 		sc2.language = expressionLanguage.value.id;
+	}
+	if (knownExpressions.value || unknownExpressions.value) {
+		sc2.knownExpressions = knownExpressions.value;
 	}
 	return sc2;
 }

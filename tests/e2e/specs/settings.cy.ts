@@ -10,8 +10,8 @@ before(() => {
 
 describe('The settings page', () => {
 	it('Works correctly', () => {
-		setSettings({randomPractice: true, strictCharacters: false});
-		assertSettingsEquals({randomPractice: true, strictCharacters: false});
+		setSettings({randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false});
+		assertSettingsEquals({randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false});
 		cy.get('#settings-link').click();
 		cy.get('#randomPractice').should('be.checked');
 		cy.get('#strictCharacters').should('not.be.checked');
@@ -19,7 +19,7 @@ describe('The settings page', () => {
 		cy.get('#strictCharacters').check();
 		cy.get('#saveButton').click();
 		cy.get('#settingsSavedText').should('be.visible');
-		assertSettingsEquals({randomPractice: true, strictCharacters: true});
+		assertSettingsEquals({randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false});
 	});
 });
 
