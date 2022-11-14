@@ -83,6 +83,7 @@ const nextButtonClass = computed(() => {
 );
 
 async function displayNextIdea() {
+	resetRows();
 	const nextIdea = await Api.getNextIdea();
 	settings.value = await Api.getSettings();
 	nextIdea.ee = reorderExpressions(nextIdea.ee);

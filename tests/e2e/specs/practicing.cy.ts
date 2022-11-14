@@ -211,6 +211,51 @@ context('Practicing', () => {
 		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
 	});
+
+	specify('When there is only one idea', () => {
+		const languageNames = [
+			'français',
+			'english',
+		];
+		for (const languageName of languageNames) {
+			cy.request({
+				url: `${apiUrl}/languages`,
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: `{"name":"${languageName}"}`,
+			});
+		}
+
+		const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour'};
+		const e2: ExpressionForAdding = {languageId: 2, text: 'hello'};
+		const i1: IdeaForAdding = {ee: [e1, e2]};
+		cy.request({
+			url: `${apiUrl}/ideas`,
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: `${JSON.stringify(i1)}`,
+		});
+
+		// Make some languages practiceable
+		const json
+			= '[{"id":1,"name":"français","ordering":0,"isPractice":true},'
+			+ '{"id":2,"name":"english","ordering":1,"isPractice":false}]';
+		cy.request({
+			url: `${apiUrl}/languages`,
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: `${json}`,
+		});
+
+		cy.get('#practice-link').click();
+
+		waitForTableToLoad(2);
+
+		typeInRow(1, 'bonjour');
+		assertRowMatchIsFullMatch(1, 'bonjour');
+		getNextButton().click();
+		assertRowMatchIsNeutral(1);
+	});
 });
 
 context('Context', () => {
