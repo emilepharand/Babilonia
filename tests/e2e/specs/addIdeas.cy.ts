@@ -32,6 +32,12 @@ context('The idea page', () => {
 		cy.get('#save-idea').click();
 		cy.get('#error-text').should('contain.text', 'context');
 
+		// Duplicate expressions
+		inputExpression(0, 'english', 'hi');
+		inputExpression(1, 'english', 'hi');
+		cy.get('#save-idea').click();
+		cy.get('#error-text').should('contain.text', 'identical');
+
 		assertFetchIdeaReturnsStatus(1, 404);
 
 		// Enter expressions
