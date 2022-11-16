@@ -26,6 +26,13 @@ export function validateIdeaForm(idea: Ref<Idea>, errorText: Ref<string>) {
 	}
 	const expressionsForAdding = expressions.map(e => getExpressionForAddingFromExpression(e));
 	const ideaForAdding = {ee: expressionsForAdding};
+	// Identical expressions
+	const distinctExpressions = new Set<string>();
+	ideaForAdding.ee.forEach(e => distinctExpressions.add(JSON.stringify(e)));
+	if (distinctExpressions.size !== ideaForAdding.ee.length) {
+		errorText.value = 'Some expressions are identical.';
+		return null;
+	}
 	if (!validateContextParentheses((ideaForAdding.ee))) {
 		errorText.value = 'Invalid context parentheses.';
 		return null;

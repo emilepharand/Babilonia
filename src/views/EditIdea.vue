@@ -95,7 +95,6 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
 import * as Utils from '../ts/utils';
@@ -132,7 +131,7 @@ async function edit() {
 		isShowError.value = true;
 	}
 	if (ideaForAdding) {
-		await Api.editIdea(getIdeaForAddingFromIdea(idea.value), idea.value.id);
+		await Api.editIdea(ideaForAdding, idea.value.id);
 		// Reorder expressions
 		idea.value = await Api.getIdea(idea.value.id);
 	}

@@ -3,6 +3,7 @@ import {
 	apiUrl,
 	assertExpressionHasValues,
 	assertExpressionIsKnown,
+	assertFetchIdeaDoesNotContain,
 	assertFetchIdeaReturnsStatus,
 	inputExpression,
 	toggleExpressionKnown,
@@ -40,11 +41,17 @@ context('The idea page', () => {
 		assertExpressionHasValues(3, 'deutsch', 'was');
 
 		cy.get('#add-rows').click();
-
 		cy.get('#ideas').find('.expression').should('have.length', 10);
 
 		// Expressions should not change
 		assertExpressionHasValues(3, 'deutsch', 'was');
+
+		// Delete an expression
+		inputExpression(3, 'deutsch', '');
+		cy.get('#edit-button').click();
+		assertFetchIdeaDoesNotContain(1, ['was']);
+
+		cy.get('#add-rows').click();
 
 		// Empty idea (not valid)
 		for (let i = 0; i < 5; i++) {

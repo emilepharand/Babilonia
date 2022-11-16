@@ -132,6 +132,16 @@ export function assertFetchIdeaReturnsStatus(id: number, status: number, contain
 	});
 }
 
+export function assertFetchIdeaDoesNotContain(id: number, notContains: string[]) {
+	cy.request({
+		url: `${apiUrl}/ideas/${id}`,
+	}).then(r => {
+		for (const c of notContains) {
+			cy.wrap(JSON.stringify(r.body)).should('not.contain', c);
+		}
+	});
+}
+
 export function inputExpression(rowNbr: number, language: string, text: string) {
 	cy.get('#ideas')
 		.find('.expression')
