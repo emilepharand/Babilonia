@@ -140,7 +140,7 @@ async function edit() {
 		await Api.editIdea(ideaForAdding, idea.value.id);
 		// Reorder expressions
 		idea.value = await Api.getIdea(idea.value.id);
-		this.isShowSuccess = true;
+		isShowSuccess.value = true;
 	}
 }
 
