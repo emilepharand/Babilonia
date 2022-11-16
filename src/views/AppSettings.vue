@@ -65,6 +65,27 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <div class="form-check">
+      <input
+          id="passiveMode"
+          v-model="settings.passiveMode"
+          class="form-check-input"
+          type="checkbox"
+      >
+      <label
+          class="form-check-label"
+          for="passiveMode"
+      >
+        Enable passive mode
+      </label>
+      <i
+          title="All expressions are shown."
+          data-bs-html="true"
+          data-bs-toggle="tooltip"
+          data-bs-placement="right"
+          class="fa-solid fa-circle-question"
+      />
+    </div>
     <button
       id="saveButton"
       class="btn btn-primary w-100"
