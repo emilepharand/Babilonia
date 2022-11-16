@@ -3,15 +3,17 @@ import vue from '@vitejs/plugin-vue';
 import istanbul from 'vite-plugin-istanbul';
 
 export default defineConfig({
-	build: {sourcemap: 'inline'},
-	plugins: [
-		vue(),
-		istanbul({
-			exclude: ['node_modules', 'test/'],
-			extension: ['.ts', '.vue'],
-			forceBuildInstrument: true,
-		}),
-	],
+	build: process.env.TEST_MODE ? {sourcemap: 'inline'} : {},
+	plugins: process.env.TEST_MODE
+		? [
+			vue(),
+			istanbul({
+				exclude: ['node_modules', 'test/'],
+				extension: ['.ts', '.vue'],
+				forceBuildInstrument: true,
+			}),
+		]
+		: [vue()],
 	define: {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		'process.env': process.env,
