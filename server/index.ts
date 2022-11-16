@@ -25,8 +25,7 @@ if (!isDevMode) {
 	const appServer = express().use(cors()).use(express.json());
 	appServer.use(errorHandler);
 	appServer.use(express.static('.'));
-	if (isTestMode) {
-		// Cypress reads from this
+	if (process.env.TEST_MODE) {
 		appServer.get('/__coverage__', (_, res) => {
 			res.json({
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
