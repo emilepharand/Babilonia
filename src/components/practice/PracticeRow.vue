@@ -102,7 +102,7 @@ const showButton = ref(document.createElement('button'));
 const knownButton = ref(document.createElement('div'));
 
 onMounted(() => {
-	if (props.isFocused) {
+	if (props.isFocused && !props.settings.passiveMode) {
 		emit('skipFocus');
 	}
 	if (props.expression.text.startsWith('(')) {
@@ -143,7 +143,9 @@ function focusInput() {
 }
 
 function isRowPracticeable() {
-	return props.expression.language.isPractice && !(props.settings.practiceOnlyNotKnown && props.expression.known);
+	return props.expression.language.isPractice
+      && !(props.settings.practiceOnlyNotKnown && props.expression.known)
+  && !(props.settings.passiveMode);
 }
 
 function buttonsDisabled() {
