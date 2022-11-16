@@ -294,6 +294,51 @@ context('Practicing', () => {
 		assertRowInputHasFocus(2);
 	});
 
+	specify('Passive mode', () => {
+		setSettings({passiveMode: false});
+
+		addLanguages();
+		const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour', known: true};
+		const e2: ExpressionForAdding = {languageId: 2, text: 'hello', known: true};
+		const i1: IdeaForAdding = {ee: [e1, e2]};
+		cy.request({
+			url: `${apiUrl}/ideas`,
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: `${JSON.stringify(i1)}`,
+		});
+
+		// Make some languages practiceable
+		const json
+			= '[{"id":1,"name":"français","ordering":0,"isPractice":true},'
+			+ '{"id":2,"name":"english","ordering":1,"isPractice":false},'
+			+ '{"id":3,"name":"español","ordering":2,"isPractice":true},'
+			+ '{"id":4,"name":"italiano","ordering":3,"isPractice":true},'
+			+ '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
+			+ '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
+		cy.request({
+			url: `${apiUrl}/languages`,
+			method: 'PUT',
+			headers: {'Content-Type': 'application/json'},
+			body: `${json}`,
+		});
+
+		cy.get('#practice-link').click();
+
+		waitForTableToLoad(2);
+
+		assertRowMatchIsNeutral(1);
+
+		setSettings({passiveMode: true});
+		cy.then(() => {
+			cy.reload();
+		});
+
+		waitForTableToLoad(2);
+
+		assertRowInputIsNotPracticeable(1, 'bonjour');
+	});
+
 	specify('When there is only one idea', () => {
 		const languageNames = [
 			'français',
