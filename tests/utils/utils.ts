@@ -29,8 +29,8 @@ export async function setSettingsAndGetResponse(settings: Settings) {
 	return setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
 }
 
-export async function setSettings(settings: Settings) {
-	await setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
+export async function setSettings(settings: Partial<Settings>) {
+	await setSettingsRawObjectAndGetResponse(JSON.stringify(settingsFromPartial(settings)));
 }
 
 export async function fetchSettings(): Promise<Settings> {
@@ -185,4 +185,13 @@ export async function getStats(): Promise<AllStats> {
 
 export async function deleteEverything(): Promise<Response> {
 	return fetch(`${apiUrl}/everything`, {method: 'DELETE'});
+}
+
+export function settingsFromPartial(partialSettings: Partial<Settings>) {
+	return {
+		passiveMode: partialSettings.passiveMode ? partialSettings.passiveMode : false,
+		practiceOnlyNotKnown: partialSettings.practiceOnlyNotKnown ? partialSettings.practiceOnlyNotKnown : false,
+		randomPractice: partialSettings.randomPractice ? partialSettings.randomPractice : false,
+		strictCharacters: partialSettings.strictCharacters ? partialSettings.strictCharacters : false,
+	};
 }

@@ -10,7 +10,6 @@ import {
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {Idea, validate} from '../../server/model/ideas/idea';
-import {Settings} from '../../server/model/settings/settings';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -84,12 +83,11 @@ describe('getting practice ideas', () => {
 		const l2: Language = await addLanguage('language 2');
 		l1.isPractice = true;
 
-		let settings: Settings = {
+		await setSettings({
 			randomPractice: true,
 			strictCharacters: false,
 			practiceOnlyNotKnown: false,
-		};
-		await setSettings(settings);
+		});
 
 		// Make sure there are practiceable ideas
 		await editLanguages([l1, l2]);
@@ -126,8 +124,7 @@ describe('getting practice ideas', () => {
 		// This test might pass when it should fail but the chance is statistically small
 		expect(idsInSameOrder).toEqual(false);
 
-		settings = {randomPractice: false, strictCharacters: false, practiceOnlyNotKnown: false};
-		await setSettings(settings);
+		await setSettings({randomPractice: false, strictCharacters: false, practiceOnlyNotKnown: false});
 
 		firstIdeaIds = [];
 		for (let i = 0; i < 10; i++) {

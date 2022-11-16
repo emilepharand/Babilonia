@@ -178,11 +178,20 @@ export function assertExpressionHasValues(rowNbr: number, languageName: string, 
 	cy.get(`#ideas .expression:nth-child(${rowNbr + 1}) .expression-text`).should('have.value', text);
 }
 
-export async function setSettings(settings: Settings) {
+export async function setSettings(partialSettings: Partial<Settings>) {
 	cy.request({
 		url: `${apiUrl}/settings`,
 		method: 'PUT',
 		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(settings)}`,
+		body: `${JSON.stringify(settingsFromPartial(partialSettings))}`,
 	});
+}
+
+export function settingsFromPartial(partialSettings: Partial<Settings>) {
+	return {
+		passiveMode: partialSettings.passiveMode ? partialSettings.passiveMode : false,
+		practiceOnlyNotKnown: partialSettings.practiceOnlyNotKnown ? partialSettings.practiceOnlyNotKnown : false,
+		randomPractice: partialSettings.randomPractice ? partialSettings.randomPractice : false,
+		strictCharacters: partialSettings.strictCharacters ? partialSettings.strictCharacters : false,
+	};
 }
