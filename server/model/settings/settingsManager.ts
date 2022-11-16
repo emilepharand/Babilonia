@@ -1,6 +1,10 @@
 import type {Database} from 'sqlite';
 import type {Settings} from './settings';
 
+const practiceRandom = 'PRACTICE_RANDOM';
+const mapCharacters = 'MAP_CHARACTERS';
+const practiceOnlyNotKnown = 'PRACTICE_ONLY_NOT_KNOWN';
+
 export default class SettingsManager {
 	constructor(private readonly db: Database) {}
 
@@ -16,10 +20,10 @@ export default class SettingsManager {
 	}
 
 	async setSettings(settings: Settings) {
-		await this.setBooleanSetting('PRACTICE_RANDOM', settings.randomPractice);
-		await this.setBooleanSetting('MAP_CHARACTERS', settings.strictCharacters);
+		await this.setBooleanSetting(practiceRandom, settings.randomPractice);
+		await this.setBooleanSetting(mapCharacters, settings.strictCharacters);
 		await this.setBooleanSetting(
-			'PRACTICE_ONLY_NOT_KNOWN',
+			practiceOnlyNotKnown,
 			settings.practiceOnlyNotKnown,
 		);
 	}
@@ -38,11 +42,11 @@ export default class SettingsManager {
 	}
 
 	async isRandomPractice() {
-		return this.getBooleanSetting('PRACTICE_RANDOM');
+		return this.getBooleanSetting(practiceRandom);
 	}
 
 	async isPracticeOnlyNotKnown() {
-		return this.getBooleanSetting('PRACTICE_ONLY_NOT_KNOWN');
+		return this.getBooleanSetting(practiceOnlyNotKnown);
 	}
 
 	async getSettings(): Promise<Settings> {
@@ -54,6 +58,6 @@ export default class SettingsManager {
 	}
 
 	private async isStrictCharacters() {
-		return this.getBooleanSetting('MAP_CHARACTERS');
+		return this.getBooleanSetting(mapCharacters);
 	}
 }
