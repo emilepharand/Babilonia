@@ -41,6 +41,7 @@ module.exports = {
 			'process.env.VITE_BASE_PORT': JSON.stringify(process.env.VITE_BASE_PORT),
 			'process.env.VITE_API_PORT': JSON.stringify(process.env.VITE_API_PORT),
 			'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+			'process.env.TEST_MODE': JSON.stringify(process.env.TEST_MODE),
 		}),
 	],
 };
