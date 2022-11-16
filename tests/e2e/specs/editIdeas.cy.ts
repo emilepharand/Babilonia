@@ -31,7 +31,9 @@ context('The idea page', () => {
 
 		// Test editing an idea works
 		inputExpression(0, 'deutsch', 'was');
+		cy.get('#success-text').should('not.exist');
 		cy.get('#edit-button').click();
+		cy.get('#success-text').should('be.visible');
 		assertFetchIdeaReturnsStatus(1, 200, ['was']);
 
 		waitForTableToLoad(5);
