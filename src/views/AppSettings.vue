@@ -67,23 +67,23 @@
     </div>
     <div class="form-check">
       <input
-          id="passiveMode"
-          v-model="settings.passiveMode"
-          class="form-check-input"
-          type="checkbox"
+        id="passiveMode"
+        v-model="settings.passiveMode"
+        class="form-check-input"
+        type="checkbox"
       >
       <label
-          class="form-check-label"
-          for="passiveMode"
+        class="form-check-label"
+        for="passiveMode"
       >
         Enable passive mode
       </label>
       <i
-          title="All expressions are shown."
-          data-bs-html="true"
-          data-bs-toggle="tooltip"
-          data-bs-placement="right"
-          class="fa-solid fa-circle-question"
+        title="All expressions are shown."
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        class="fa-solid fa-circle-question"
       />
     </div>
     <button
@@ -131,6 +131,7 @@ void nextTick(() => {
 input[type="checkbox"], label {
   cursor: pointer;
 }
+
 i {
   margin-left: 5px;
 }
