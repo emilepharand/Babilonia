@@ -4,6 +4,7 @@ export type Settings = {
 	randomPractice: boolean;
 	strictCharacters: boolean;
 	practiceOnlyNotKnown: boolean;
+	passiveMode: boolean;
 };
 
 export function getEmptySettingsNoAsync(): Settings {
@@ -11,6 +12,7 @@ export function getEmptySettingsNoAsync(): Settings {
 		randomPractice: false,
 		strictCharacters: false,
 		practiceOnlyNotKnown: false,
+		passiveMode: false,
 	};
 }
 
@@ -20,8 +22,10 @@ const settingsSchema = {
 	type: 'object',
 	properties: {randomPractice: {type: 'boolean'},
 		strictCharacters: {type: 'boolean'},
-		practiceOnlyNotKnown: {type: 'boolean'}},
-	required: ['randomPractice', 'strictCharacters'],
+		practiceOnlyNotKnown: {type: 'boolean'},
+		passiveMode: {type: 'boolean'},
+	},
+	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode'],
 	additionalProperties: false,
 };
 

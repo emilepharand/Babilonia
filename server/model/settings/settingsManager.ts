@@ -4,6 +4,7 @@ import type {Settings} from './settings';
 const practiceRandom = 'PRACTICE_RANDOM';
 const mapCharacters = 'MAP_CHARACTERS';
 const practiceOnlyNotKnown = 'PRACTICE_ONLY_NOT_KNOWN';
+const passiveMode = 'PASSIVE_MODE';
 
 export default class SettingsManager {
 	constructor(private readonly db: Database) {}
@@ -26,6 +27,7 @@ export default class SettingsManager {
 			practiceOnlyNotKnown,
 			settings.practiceOnlyNotKnown,
 		);
+		await this.setBooleanSetting(passiveMode, settings.passiveMode);
 	}
 
 	async setBooleanSetting(name: string, value: boolean): Promise<void> {
@@ -49,11 +51,16 @@ export default class SettingsManager {
 		return this.getBooleanSetting(practiceOnlyNotKnown);
 	}
 
+	async isPassiveMode() {
+		return this.getBooleanSetting(passiveMode);
+	}
+
 	async getSettings(): Promise<Settings> {
 		return {
 			randomPractice: await this.isRandomPractice(),
 			strictCharacters: await this.isStrictCharacters(),
 			practiceOnlyNotKnown: await this.isPracticeOnlyNotKnown(),
+			passiveMode: await this.isPassiveMode(),
 		};
 	}
 
