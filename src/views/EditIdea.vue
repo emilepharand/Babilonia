@@ -39,6 +39,11 @@
           id="error-text"
           class="pl-2 text-danger"
         >{{ errorText }}</span>
+        <span
+          v-else-if="isShowSuccess"
+          id="success-text"
+          class="pl-2 text-success"
+        >Idea was edited.</span>
       </div>
     </div>
     <div
@@ -106,6 +111,7 @@ const loaded = ref(false);
 const ideaNotFound = ref(false);
 const errorText = ref('');
 const isShowError = ref(false);
+const isShowSuccess = ref(false);
 
 const route = useRoute();
 const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
@@ -134,6 +140,7 @@ async function edit() {
 		await Api.editIdea(ideaForAdding, idea.value.id);
 		// Reorder expressions
 		idea.value = await Api.getIdea(idea.value.id);
+		isShowSuccess.value = true;
 	}
 }
 
