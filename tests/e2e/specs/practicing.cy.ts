@@ -46,6 +46,10 @@ context('Practicing', () => {
 		assertLanguageName(3, 'italiano');
 		assertLanguageName(4, 'deutsch');
 
+		cy.get('#edit-idea-link')
+			.should('have.attr', 'href')
+			.and('include', '/ideas/1');
+
 		getNextButton().should('not.have.class', 'btn-success');
 
 		assertRowInputIsNotPracticeable(0, 'bonjour');
