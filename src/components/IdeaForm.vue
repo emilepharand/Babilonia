@@ -29,10 +29,10 @@
           class="expression-text form-control"
           style="flex-grow:2"
           type="text"
-          @keydown.down="focusNext"
+          @keydown.down="focusDown"
           @keydown.left="focusLeft"
           @keydown.right="focusRight"
-          @keydown.up="focusPrevious"
+          @keydown.up="focusUp"
         >
         <div
           style="cursor: pointer"
@@ -45,8 +45,8 @@
             class="form-check-label expression-known-toggle"
             @keydown.enter="e.known = !e.known"
             @keydown.left="focusLeft"
-            @keydown.down="focusNext"
-            @keydown.up="focusPrevious"
+            @keydown.down="focusDown"
+            @keydown.up="focusUp"
           >
             {{ e.known ? '✅':'❌' }}
           </span>
@@ -77,47 +77,65 @@ const loaded = ref(false);
 	loaded.value = true;
 })();
 
-function focusNext(e: Event) {
-	const element = e.target;
-	const i = getCurrentRowNumber(element as HTMLElement);
-	const selector = getSelectorFromElement(element as HTMLElement);
-	const els = document?.querySelectorAll<HTMLInputElement>(selector) || [];
+function focusDown(e: Event) {
+	const {i, els} = findElementListAndPositionInList(e);
 	if (i !== null) {
 		const indexToUse = i + 1 === els.length ? 0 : i + 1;
-		els[indexToUse].focus();
+		focusEndOfInput(els[indexToUse] as HTMLInputElement);
 	}
 }
 
-function focusPrevious(e: Event) {
-	const element = e.target;
-	const i = getCurrentRowNumber(element as HTMLElement);
-	const selector = getSelectorFromElement(element as HTMLElement);
-	const els = document?.querySelectorAll<HTMLInputElement>(selector) || [];
+function focusUp(e: Event) {
+	const {i, els} = findElementListAndPositionInList(e);
 	if (i !== null) {
 		const indexToUse = i - 1 < 0 ? els.length - 1 : i - 1;
-		els[indexToUse].focus();
+		focusEndOfInput(els[indexToUse] as HTMLInputElement);
 	}
 }
+
+function findElementListAndPositionInList(e: Event) {
+	const element = e.target;
+	const i = getCurrentRowNumber(element as HTMLElement);
+	const className = getClassNameFromElement(element as HTMLElement);
+	const els = findAllElementsWithClassName(className);
+	return {i, els};
+}
+
+function focusEndOfInput(element: HTMLInputElement) {
+	setTimeout(() => {
+		const saved = element.value;
+		element.value = '';
+		element.value = saved;
+	}, 0);
+	setTimeout(() => {
+		element.focus();
+	}, 1);
+}
+
+const expressionLanguageClassName = 'expression-language';
+const expressionTextClassName = 'expression-text';
+const expressionKnownClassName = 'expression-known-toggle';
 
 function focusLeft(e: Event) {
 	const element = e.target;
 	const i = getCurrentRowNumber(element as HTMLElement);
 	if (i !== null) {
-		const currentSelector = getSelectorFromElement(element as HTMLElement);
-		if (currentSelector === '.expression-text') {
+		const currentClassName = getClassNameFromElement(element as HTMLElement);
+		if (currentClassName === expressionTextClassName) {
 			const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
 			if (cursorPosition > 0) {
+				// Don't move left if not at beginning of input
 				return;
 			}
 		}
-		let selectorToFocus;
-		if (currentSelector === '.expression-known-toggle') {
-			selectorToFocus = '.expression-text';
+		let elementWithClassNameToFocus;
+		if (currentClassName === expressionKnownClassName) {
+			elementWithClassNameToFocus = expressionTextClassName;
 		} else {
-			selectorToFocus = '.expression-language';
+			elementWithClassNameToFocus = expressionLanguageClassName;
 		}
-		const els = document?.querySelectorAll<HTMLSelectElement>(selectorToFocus) || [];
-		els[i].focus();
+		const els = findAllElementsWithClassName(elementWithClassNameToFocus);
+		focusEndOfInput(els[i] as HTMLInputElement);
 	}
 }
 
@@ -125,28 +143,29 @@ function focusRight(e: Event) {
 	const element = e.target;
 	const i = getCurrentRowNumber(element as HTMLElement);
 	if (i !== null) {
-		const currentSelector = getSelectorFromElement(e.target as HTMLElement);
-		if (currentSelector === '.expression-text') {
+		const currentSelector = getClassNameFromElement(e.target as HTMLElement);
+		if (currentSelector === expressionTextClassName) {
 			const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
 			const {length} = (element as HTMLInputElement).value;
 			if (cursorPosition < length) {
+				// Don't move right if not at beginning of input
 				return;
 			}
 		}
 		let selectorToFocus;
-		if (currentSelector === '.expression-language') {
-			selectorToFocus = '.expression-text';
+		if (currentSelector === expressionLanguageClassName) {
+			selectorToFocus = expressionTextClassName;
 		} else {
-			selectorToFocus = '.expression-known-toggle';
+			selectorToFocus = expressionKnownClassName;
 		}
-		const els = document?.querySelectorAll<HTMLSelectElement>(selectorToFocus) || [];
+		const els = findAllElementsWithClassName(selectorToFocus);
 		els[i].focus();
 	}
 }
 
 function getCurrentRowNumber(element: HTMLElement) {
-	const selector = getSelectorFromElement(element);
-	const els = document?.querySelectorAll<HTMLElement>(selector) || [];
+	const selector = getClassNameFromElement(element);
+	const els = findAllElementsWithClassName(selector);
 	for (let i = 0; i < els.length; i++) {
 		if (els[i] === element) {
 			return i;
@@ -155,16 +174,19 @@ function getCurrentRowNumber(element: HTMLElement) {
 	return null;
 }
 
-function getSelectorFromElement(element: HTMLElement) {
+function getClassNameFromElement(element: HTMLElement) {
 	let selector;
-	if (element.classList.contains('expression-language')) {
-		selector = '.expression-language';
-	} else if (element.classList.contains('expression-text')) {
-		selector = '.expression-text';
+	if (element.classList.contains(expressionLanguageClassName)) {
+		selector = expressionLanguageClassName;
+	} else if (element.classList.contains(expressionTextClassName)) {
+		selector = expressionTextClassName;
 	} else {
-		selector = '.expression-known-toggle';
+		selector = expressionKnownClassName;
 	}
 	return selector;
 }
 
+function findAllElementsWithClassName(className: string) {
+	return document?.querySelectorAll<HTMLElement>(`.${className}`) || [];
+}
 </script>
