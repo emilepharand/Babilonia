@@ -84,11 +84,10 @@ const expressionKnownClassName = 'expression-known-toggle';
 (async () => {
 	languages.value = await Api.getLanguages();
 	loaded.value = true;
-	initElements();
+	initElements(0);
 })();
 
-function initElements() {
-	// TODO Don't use setTimeout
+function initElements(nbrTries: number) {
 	setTimeout(() => {
 		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
@@ -96,7 +95,10 @@ function initElements() {
 		if (textInputs.length > 0) {
 			textInputs[0].focus();
 		}
-	}, 250);
+		if (textInputs.length === 1 && nbrTries < 10) {
+			initElements(nbrTries + 1);
+		}
+	}, 20);
 }
 
 function moveLeft(e: Event) {
