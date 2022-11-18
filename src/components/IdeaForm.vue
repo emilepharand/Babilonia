@@ -14,7 +14,7 @@
           v-model="e.language"
           class="expression-language form-select"
           name="language"
-          @keydown.right.prevent="focusRight"
+          @keydown.right.prevent="moveRight"
         >
           <option
             v-for="language in languages"
@@ -29,10 +29,10 @@
           class="expression-text form-control"
           style="flex-grow:2"
           type="text"
-          @keydown.down="focusDown"
-          @keydown.left="focusLeft"
-          @keydown.right="focusRight"
-          @keydown.up="focusUp"
+          @keydown.down="moveDown"
+          @keydown.left="moveLeft"
+          @keydown.right="moveRight"
+          @keydown.up="moveUp"
         >
         <div
           style="cursor: pointer"
@@ -44,9 +44,9 @@
             style="cursor: pointer"
             class="form-check-label expression-known-toggle"
             @keydown.enter="e.known = !e.known"
-            @keydown.left="focusLeft"
-            @keydown.down="focusDown"
-            @keydown.up="focusUp"
+            @keydown.left="moveLeft"
+            @keydown.down="moveDown"
+            @keydown.up="moveUp"
           >
             {{ e.known ? '✅':'❌' }}
           </span>
@@ -61,6 +61,7 @@ import {ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
 import type {Idea} from '../../server/model/ideas/idea';
+import {findAllElementsByClassName, focusEndOfInput} from '../ts/domHelper';
 
 defineProps<{
 	title: string;
@@ -69,124 +70,84 @@ defineProps<{
 
 defineEmits(['addRows', 'delete']);
 
+let languageSelects: HTMLElement[] = [];
+let textInputs: HTMLElement[] = [];
+let knownToggles: HTMLElement[] = [];
+
 const languages = ref(getEmptyLanguagesNoAsync());
 const loaded = ref(false);
-
-(async () => {
-	languages.value = await Api.getLanguages();
-	loaded.value = true;
-})();
-
-function focusDown(e: Event) {
-	const {i, els} = findElementListAndPositionInList(e);
-	if (i !== null) {
-		const indexToUse = i + 1 === els.length ? 0 : i + 1;
-		focusEndOfInput(els[indexToUse] as HTMLInputElement);
-	}
-}
-
-function focusUp(e: Event) {
-	const {i, els} = findElementListAndPositionInList(e);
-	if (i !== null) {
-		const indexToUse = i - 1 < 0 ? els.length - 1 : i - 1;
-		focusEndOfInput(els[indexToUse] as HTMLInputElement);
-	}
-}
-
-function findElementListAndPositionInList(e: Event) {
-	const element = e.target;
-	const i = getCurrentRowNumber(element as HTMLElement);
-	const className = getClassNameFromElement(element as HTMLElement);
-	const els = findAllElementsWithClassName(className);
-	return {i, els};
-}
-
-function focusEndOfInput(element: HTMLInputElement) {
-	setTimeout(() => {
-		const saved = element.value;
-		element.value = '';
-		element.value = saved;
-	}, 0);
-	setTimeout(() => {
-		element.focus();
-	}, 1);
-}
 
 const expressionLanguageClassName = 'expression-language';
 const expressionTextClassName = 'expression-text';
 const expressionKnownClassName = 'expression-known-toggle';
 
-function focusLeft(e: Event) {
-	const element = e.target;
-	const i = getCurrentRowNumber(element as HTMLElement);
-	if (i !== null) {
-		const currentClassName = getClassNameFromElement(element as HTMLElement);
-		if (currentClassName === expressionTextClassName) {
-			const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
-			if (cursorPosition > 0) {
-				// Don't move left if not at beginning of input
-				return;
-			}
+(async () => {
+	languages.value = await Api.getLanguages();
+	loaded.value = true;
+	initElements();
+})();
+
+function initElements() {
+	// TODO Don't use setTimeout
+	setTimeout(() => {
+		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
+		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
+		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
+		if (textInputs.length > 0) {
+			textInputs[0].focus();
 		}
-		let elementWithClassNameToFocus;
-		if (currentClassName === expressionKnownClassName) {
-			elementWithClassNameToFocus = expressionTextClassName;
-		} else {
-			elementWithClassNameToFocus = expressionLanguageClassName;
+	}, 250);
+}
+
+function moveLeft(e: Event) {
+	const element = e.target as HTMLElement;
+	if (knownToggles.includes(element)) {
+		focusEndOfInput(textInputs[knownToggles.indexOf(element)] as HTMLInputElement);
+	} else if (textInputs.includes(element)) {
+		const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
+		if (cursorPosition === 0) {
+			// Only move left if at beginning of input
+			languageSelects[textInputs.indexOf(element)].focus();
 		}
-		const els = findAllElementsWithClassName(elementWithClassNameToFocus);
-		focusEndOfInput(els[i] as HTMLInputElement);
 	}
 }
 
-function focusRight(e: Event) {
-	const element = e.target;
-	const i = getCurrentRowNumber(element as HTMLElement);
-	if (i !== null) {
-		const currentSelector = getClassNameFromElement(e.target as HTMLElement);
-		if (currentSelector === expressionTextClassName) {
-			const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
-			const {length} = (element as HTMLInputElement).value;
-			if (cursorPosition < length) {
-				// Don't move right if not at beginning of input
-				return;
-			}
+function moveRight(e: Event) {
+	const element = e.target as HTMLElement;
+	if (languageSelects.includes(element)) {
+		focusEndOfInput(textInputs[languageSelects.indexOf(element)] as HTMLInputElement);
+	} else if (textInputs.includes(element)) {
+		const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
+		if (cursorPosition === (element as HTMLInputElement).value.length) {
+			// Only move right if at end of input
+			knownToggles[textInputs.indexOf(element)].focus();
 		}
-		let selectorToFocus;
-		if (currentSelector === expressionLanguageClassName) {
-			selectorToFocus = expressionTextClassName;
-		} else {
-			selectorToFocus = expressionKnownClassName;
-		}
-		const els = findAllElementsWithClassName(selectorToFocus);
-		els[i].focus();
 	}
 }
 
-function getCurrentRowNumber(element: HTMLElement) {
-	const selector = getClassNameFromElement(element);
-	const els = findAllElementsWithClassName(selector);
-	for (let i = 0; i < els.length; i++) {
-		if (els[i] === element) {
-			return i;
-		}
+function moveDown(e: Event) {
+	const element = e.target as HTMLElement;
+	if (textInputs.includes(element)) {
+		const i = textInputs.indexOf(element);
+		const indexToUse = i + 1 === textInputs.length ? 0 : i + 1;
+		focusEndOfInput(textInputs[indexToUse] as HTMLInputElement);
+	} else if (knownToggles.includes(element)) {
+		const i = knownToggles.indexOf(element);
+		const indexToUse = i + 1 === knownToggles.length ? 0 : i + 1;
+		focusEndOfInput(knownToggles[indexToUse] as HTMLInputElement);
 	}
-	return null;
 }
 
-function getClassNameFromElement(element: HTMLElement) {
-	let selector;
-	if (element.classList.contains(expressionLanguageClassName)) {
-		selector = expressionLanguageClassName;
-	} else if (element.classList.contains(expressionTextClassName)) {
-		selector = expressionTextClassName;
-	} else {
-		selector = expressionKnownClassName;
+function moveUp(e: Event) {
+	const element = e.target as HTMLElement;
+	if (textInputs.includes(element)) {
+		const i = textInputs.indexOf(element);
+		const indexToUse = i - 1 < 0 ? textInputs.length - 1 : i - 1;
+		focusEndOfInput(textInputs[indexToUse] as HTMLInputElement);
+	} else if (knownToggles.includes(element)) {
+		const i = knownToggles.indexOf(element);
+		const indexToUse = i - 1 < 0 ? knownToggles.length - 1 : i - 1;
+		focusEndOfInput(knownToggles[indexToUse] as HTMLInputElement);
 	}
-	return selector;
-}
-
-function findAllElementsWithClassName(className: string) {
-	return document?.querySelectorAll<HTMLElement>(`.${className}`) || [];
 }
 </script>
