@@ -38,7 +38,7 @@
         :disabled="buttonsDisabled()"
         value="Hint"
         @keydown.right="showButton.focus()"
-        @keydown.left="textInput.focus()"
+        @keydown.left="focusInput()"
         @click="hint()"
       >
         Hint
@@ -77,6 +77,7 @@
 import {onMounted, ref, watch} from 'vue';
 import type {Expression} from '../../../server/model/ideas/expression';
 import type {Settings} from '../../../server/model/settings/settings';
+import {focusEndOfInput} from '../../ts/domHelper';
 
 const emit = defineEmits(['fullMatched', 'skipFocus', 'focusNext', 'focusPrevious', 'focusedRow', 'toggleKnown']);
 
@@ -134,11 +135,7 @@ watch(() => props.reset, () => {
 
 function focusInput() {
 	if (textInput.value && textInput.value) {
-		textInput.value.focus();
-		// Focus end of word
-		const saved = typed.value;
-		textInput.value.value = '';
-		textInput.value.value = saved;
+		focusEndOfInput(textInput.value);
 	}
 }
 
