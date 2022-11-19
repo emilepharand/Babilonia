@@ -43,6 +43,16 @@
           Next
         </button>
       </div>
+      <div class="d-flex btn-group mt-2">
+        <a
+          id="edit-idea-link"
+          class="btn btn-outline-secondary flex-grow-1"
+          :href="'/ideas/' + idea.id"
+          target="_blank"
+        >
+          Edit Idea
+        </a>
+      </div>
     </div>
   </div>
 </template>
