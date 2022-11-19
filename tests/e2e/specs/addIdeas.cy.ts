@@ -109,6 +109,166 @@ context('The idea page', () => {
 		});
 	});
 
+	specify('Interactivity', () => {
+		cy.get('#add-ideas-link').click();
+
+		// First row
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getLanguageSelect(0)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getTextInputRow(0)
+			.should('be.focused');
+
+		// Second row
+		getTextInputRow(0)
+			.type('{downArrow}');
+		getTextInputRow(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getKnownExpressionToggle(1)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getTextInputRow(1)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getLanguageSelect(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getTextInputRow(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+
+		// Known expression toggle
+		getKnownExpressionToggle(1)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}');
+		getKnownExpressionToggle(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getKnownExpressionToggle(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+
+		// Inputs and buttons
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{downArrow}');
+		getTextInputRow(1)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		getTextInputRow(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.type('{rightArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{leftArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.type('{rightArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		getTextInputRow(4)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{leftArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
+		getMoreRowsButton()
+			.should('be.focused')
+			.click();
+		getTextInputRow(0)
+			.should('be.focused');
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 10);
+		for (let i = 0; i < 10; i++) {
+			getTextInputRow(i)
+				.should('have.focus')
+				.type('{downArrow}');
+		}
+
+		cy.reload();
+
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 5);
+
+		getTextInputRow(0)
+			.should('be.focused')
+			.type('bonjour');
+
+		getMoreRowsButton()
+			.click();
+
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 10);
+
+		getTextInputRow(1)
+			.should('be.focused')
+			.type('hello')
+			.type('{upArrow}');
+
+		getTextInputRow(0)
+			.should('be.focused')
+			.clear()
+			.type('{downArrow}{downArrow}');
+		getTextInputRow(2)
+			.should('be.focused');
+		getMoreRowsButton()
+			.click();
+
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 15);
+
+		getTextInputRow(0)
+			.should('be.focused');
+	});
+
 	specify('Known expressions', () => {
 		cy.get('#add-ideas-link').click();
 
@@ -130,4 +290,24 @@ context('The idea page', () => {
 
 function assertAllInputsEmpty() {
 	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
+}
+
+function getTextInputRow(n: number) {
+	return cy.get('.expression-text').eq(n);
+}
+
+function getKnownExpressionToggle(n: number) {
+	return cy.get('.expression-known-toggle').eq(n);
+}
+
+function getLanguageSelect(n: number) {
+	return cy.get('.expression-language').eq(n);
+}
+
+function getMoreRowsButton() {
+	return cy.get('#add-rows');
+}
+
+function getSaveButton() {
+	return cy.get('#save-idea');
 }
