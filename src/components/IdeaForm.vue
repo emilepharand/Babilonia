@@ -100,7 +100,7 @@ function initElementsWithNbrTries(nbrTries: number) {
 		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
 		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
-		if (textInputs.length === 0 && nbrTries < 10) {
+		if (textInputs.length < props.idea.ee.length && nbrTries < 10) {
 			initElementsWithNbrTries(nbrTries + 1);
 		} else {
 			const element = findFirstEmptyExpression();
