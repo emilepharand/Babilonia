@@ -8,18 +8,31 @@
       <IdeaForm
         :idea="idea"
         title="Add Idea"
+        @move-focus-down="moveFocusDown"
+        @move-focus-up="moveFocusUp"
+        @set-last-text-input="setLastTextInput"
+        @set-first-text-input="setFirstTextInput"
+        @init-elements="initElements"
       />
       <div class="d-flex btn-group mt-2">
         <button
           id="add-rows"
+          ref="addRowsButton"
           class="btn btn-outline-secondary flex-grow-1"
+          @keydown.right="saveIdeaButton.focus()"
+          @keydown.up="focusLastTextInput"
+          @keydown.down="focusFirstTextInput"
           @click="addRows()"
         >
           More Rows
         </button>
         <button
           id="save-idea"
+          ref="saveIdeaButton"
           class="btn btn-outline-secondary flex-grow-1"
+          @keydown.left="addRowsButton.focus()"
+          @keydown.up="focusLastTextInput"
+          @keydown.down="focusFirstTextInput"
           @click="save()"
         >
           Save
@@ -50,6 +63,11 @@ const noLanguages = ref(false);
 const loaded = ref(false);
 const errorText = ref('');
 const isShowError = ref(false);
+const addRowsButton = ref(document.createElement('button'));
+const saveIdeaButton = ref(document.createElement('button'));
+let lastTextInput = document.createElement('input');
+let firstTextInput = document.createElement('input');
+let lastFocusedButton = document.createElement('button');
 
 // Initialize data
 (async () => {
@@ -76,6 +94,47 @@ async function save() {
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
+	fnToCall();
+}
+
+function moveFocusUp() {
+	if (lastFocusedButton === saveIdeaButton.value) {
+		saveIdeaButton.value.focus();
+	} else {
+		addRowsButton.value.focus();
+	}
+}
+
+function moveFocusDown() {
+	if (lastFocusedButton === saveIdeaButton.value) {
+		saveIdeaButton.value.focus();
+	} else {
+		addRowsButton.value.focus();
+	}
+}
+
+function setLastTextInput(element: HTMLInputElement) {
+	lastTextInput = element;
+}
+
+function setFirstTextInput(element: HTMLInputElement) {
+	firstTextInput = element;
+}
+
+function focusFirstTextInput(e: Event) {
+	lastFocusedButton = e.target as HTMLButtonElement;
+	firstTextInput.focus();
+}
+
+function focusLastTextInput(e: Event) {
+	lastFocusedButton = e.target as HTMLButtonElement;
+	lastTextInput.focus();
+}
+
+let fnToCall: any;
+
+function initElements(fn: any) {
+	fnToCall = fn;
 }
 
 </script>

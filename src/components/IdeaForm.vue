@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
 import type {Idea} from '../../server/model/ideas/idea';
@@ -68,7 +68,7 @@ defineProps<{
 	idea: Idea;
 }>();
 
-defineEmits(['addRows', 'delete']);
+const emit = defineEmits(['moveFocusUp', 'moveFocusDown', 'setLastTextInput', 'setFirstTextInput', 'initElements']);
 
 let languageSelects: HTMLElement[] = [];
 let textInputs: HTMLElement[] = [];
@@ -84,19 +84,28 @@ const expressionKnownClassName = 'expression-known-toggle';
 (async () => {
 	languages.value = await Api.getLanguages();
 	loaded.value = true;
-	initElements(0);
 })();
 
-function initElements(nbrTries: number) {
+onMounted(() => {
+	initElements();
+	emit('initElements', initElements);
+});
+
+function initElements() {
+	initElementsWithNbrTries(0);
+}
+
+function initElementsWithNbrTries(nbrTries: number) {
 	setTimeout(() => {
 		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
 		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
-		if (textInputs.length > 0) {
+		if (textInputs.length !== 5 && nbrTries < 10) {
+			initElementsWithNbrTries(nbrTries + 1);
+		} else {
 			textInputs[0].focus();
-		}
-		if (textInputs.length === 1 && nbrTries < 10) {
-			initElements(nbrTries + 1);
+			emit('setFirstTextInput', textInputs[0]);
+			emit('setLastTextInput', textInputs[textInputs.length - 1]);
 		}
 	}, 20);
 }
@@ -131,12 +140,15 @@ function moveDown(e: Event) {
 	const element = e.target as HTMLElement;
 	if (textInputs.includes(element)) {
 		const i = textInputs.indexOf(element);
-		const indexToUse = i + 1 === textInputs.length ? 0 : i + 1;
-		focusEndOfInput(textInputs[indexToUse] as HTMLInputElement);
+		if (i + 1 === textInputs.length) {
+			emit('moveFocusDown');
+		} else {
+			focusEndOfInput(textInputs[i + 1] as HTMLInputElement);
+		}
 	} else if (knownToggles.includes(element)) {
 		const i = knownToggles.indexOf(element);
 		const indexToUse = i + 1 === knownToggles.length ? 0 : i + 1;
-		focusEndOfInput(knownToggles[indexToUse] as HTMLInputElement);
+		knownToggles[indexToUse].focus();
 	}
 }
 
@@ -144,8 +156,11 @@ function moveUp(e: Event) {
 	const element = e.target as HTMLElement;
 	if (textInputs.includes(element)) {
 		const i = textInputs.indexOf(element);
-		const indexToUse = i - 1 < 0 ? textInputs.length - 1 : i - 1;
-		focusEndOfInput(textInputs[indexToUse] as HTMLInputElement);
+		if (i - 1 < 0) {
+			emit('moveFocusUp');
+		} else {
+			focusEndOfInput(textInputs[i - 1] as HTMLInputElement);
+		}
 	} else if (knownToggles.includes(element)) {
 		const i = knownToggles.indexOf(element);
 		const indexToUse = i - 1 < 0 ? knownToggles.length - 1 : i - 1;
