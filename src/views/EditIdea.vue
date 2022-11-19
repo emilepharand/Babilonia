@@ -13,6 +13,7 @@
         @set-last-text-input="setLastTextInput"
         @set-first-text-input="setFirstTextInput"
         @init-elements="setInitElements"
+        @save="edit()"
       />
       <button
         id="add-rows"
@@ -164,6 +165,7 @@ async function edit() {
 		// Reorder expressions
 		idea.value = await Api.getIdea(idea.value.id);
 		isShowSuccess.value = true;
+		initElements();
 	}
 }
 

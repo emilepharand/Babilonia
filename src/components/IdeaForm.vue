@@ -29,6 +29,7 @@
           class="expression-text form-control"
           style="flex-grow:2"
           type="text"
+          @keydown.enter="emit('save')"
           @keydown.down="moveDown"
           @keydown.left="moveLeft"
           @keydown.right="moveRight"
@@ -63,12 +64,12 @@ import * as Api from '../ts/api';
 import type {Idea} from '../../server/model/ideas/idea';
 import {findAllElementsByClassName, focusEndOfInput} from '../ts/domHelper';
 
-defineProps<{
+const props = defineProps<{
 	title: string;
 	idea: Idea;
 }>();
 
-const emit = defineEmits(['moveFocusUp', 'moveFocusDown', 'setLastTextInput', 'setFirstTextInput', 'initElements']);
+const emit = defineEmits(['moveFocusUp', 'moveFocusDown', 'setLastTextInput', 'setFirstTextInput', 'initElements', 'save']);
 
 let languageSelects: HTMLElement[] = [];
 let textInputs: HTMLElement[] = [];
@@ -84,10 +85,10 @@ const expressionKnownClassName = 'expression-known-toggle';
 (async () => {
 	languages.value = await Api.getLanguages();
 	loaded.value = true;
+	initElements();
 })();
 
 onMounted(() => {
-	initElements();
 	emit('initElements', initElements);
 });
 

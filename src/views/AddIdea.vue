@@ -13,6 +13,7 @@
         @set-last-text-input="setLastTextInput"
         @set-first-text-input="setFirstTextInput"
         @init-elements="setInitElements"
+        @save="save()"
       />
       <div class="d-flex btn-group mt-2">
         <button
@@ -90,6 +91,7 @@ async function save() {
 		idea.value.ee.forEach(e => {
 			e.text = '';
 		});
+		initElements();
 	}
 }
 
