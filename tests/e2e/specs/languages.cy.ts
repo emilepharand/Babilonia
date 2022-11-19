@@ -51,6 +51,27 @@ context('Valid inputs in the language page', () => {
 	});
 });
 
+context('Interactivity', () => {
+	specify('Input focusing', () => {
+		cy.get('#languages-link').click();
+
+		getNewLanguageNameInput()
+			.should('be.focused')
+			.type('fr')
+			.type('{enter}');
+
+		checkLanguageRowHasValues(0, 'fr', '0', false);
+
+		getNewLanguageNameInput()
+			.should('be.focused');
+
+		inputLanguageChange(0, 'en', '0', true);
+
+		getNewLanguageNameInput()
+			.should('not.be.focused');
+	});
+});
+
 context('Error handling in the language page', () => {
 	specify('Adding invalid language', () => {
 		// Empty name
@@ -110,10 +131,14 @@ context('Error handling in the language page', () => {
 	});
 });
 
+function getNewLanguageNameInput() {
+	return cy.get('#new-language-name');
+}
+
 function addLanguage(name: string) {
-	cy.get('#new-language-name').clear();
+	getNewLanguageNameInput().clear();
 	if (name !== '') {
-		cy.get('#new-language-name').type(name);
+		getNewLanguageNameInput().type(name);
 	}
 	cy.get('#add-language-button').click();
 }
