@@ -30,10 +30,10 @@
           style="flex-grow:2"
           type="text"
           @keydown.enter="emit('save')"
-          @keydown.down="moveDown"
           @keydown.left="moveLeft"
           @keydown.right="moveRight"
-          @keydown.up="moveUp"
+          @keydown.up.prevent="moveUp"
+          @keydown.down.prevent="moveDown"
         >
         <div
           style="cursor: pointer"
@@ -58,71 +58,27 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {ref} from 'vue';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
 import type {Idea} from '../../server/model/ideas/idea';
-import {findAllElementsByClassName, focusEndOfInput} from '../ts/domHelper';
+import {focusEndOfInput} from '../ts/domHelper';
+import {knownToggles, languageSelects, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 
-const props = defineProps<{
+defineProps<{
 	title: string;
 	idea: Idea;
 }>();
 
-const emit = defineEmits(['moveFocusUp', 'moveFocusDown', 'setLastTextInput', 'setFirstTextInput', 'initElements', 'save']);
-
-let languageSelects: HTMLElement[] = [];
-let textInputs: HTMLElement[] = [];
-let knownToggles: HTMLElement[] = [];
+const emit = defineEmits(['moveFocusUp', 'moveFocusDown', 'save']);
 
 const languages = ref(getEmptyLanguagesNoAsync());
 const loaded = ref(false);
 
-const expressionLanguageClassName = 'expression-language';
-const expressionTextClassName = 'expression-text';
-const expressionKnownClassName = 'expression-known-toggle';
-
 (async () => {
 	languages.value = await Api.getLanguages();
 	loaded.value = true;
-	initElements();
 })();
-
-onMounted(() => {
-	emit('initElements', initElements);
-});
-
-function initElements() {
-	initElementsWithNbrTries(0);
-}
-
-function initElementsWithNbrTries(nbrTries: number) {
-	setTimeout(() => {
-		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
-		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
-		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
-		if (textInputs.length < props.idea.ee.length && nbrTries < 10) {
-			initElementsWithNbrTries(nbrTries + 1);
-		} else {
-			const element = findFirstEmptyExpression();
-			focusEndOfInput(element as HTMLInputElement);
-			emit('setFirstTextInput', textInputs[0]);
-			emit('setLastTextInput', textInputs[textInputs.length - 1]);
-		}
-	}, 20);
-}
-
-function findFirstEmptyExpression() {
-	let found = false;
-	let i = 0;
-	while (i < textInputs.length && !found) {
-		found = (textInputs[i] as HTMLInputElement).value.trim() === '';
-		if (!found) {
-			i++;
-		}
-	}
-	return found ? textInputs[i] : textInputs[0];
-}
 
 function moveLeft(e: Event) {
 	const element = e.target as HTMLElement;

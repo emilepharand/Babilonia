@@ -10,9 +10,6 @@
         title="Add Idea"
         @move-focus-down="moveFocusDown"
         @move-focus-up="moveFocusUp"
-        @set-last-text-input="setLastTextInput"
-        @set-first-text-input="setFirstTextInput"
-        @init-elements="setInitElements"
         @save="save()"
       />
       <div class="d-flex btn-group mt-2">
@@ -56,8 +53,9 @@ import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import * as Api from '../ts/api';
-import * as Utils from '../ts/utils';
-import {validateIdeaForm} from '../ts/utils';
+import * as Utils from '../ts/ideaForm/utils';
+import {validateIdeaForm} from '../ts/ideaForm/validation';
+import {defaultNbrRows, initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
@@ -66,17 +64,16 @@ const errorText = ref('');
 const isShowError = ref(false);
 const addRowsButton = ref(document.createElement('button'));
 const saveIdeaButton = ref(document.createElement('button'));
-let lastTextInput = document.createElement('input');
-let firstTextInput = document.createElement('input');
 let lastFocusedButton = document.createElement('button');
-let initElements: () => void;
 
 // Initialize data
 (async () => {
 	if ((await Api.getLanguages()).length === 0) {
 		noLanguages.value = true;
+	} else {
+		idea.value = getEmptyIdea(5, (await Api.getLanguages())[0]);
+		initElements(5);
 	}
-	idea.value = getEmptyIdea(5, (await Api.getLanguages())[0]);
 	loaded.value = true;
 })();
 
@@ -91,13 +88,13 @@ async function save() {
 		idea.value.ee.forEach(e => {
 			e.text = '';
 		});
-		initElements();
+		initElements(defaultNbrRows);
 	}
 }
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
-	initElements();
+	initElements(textInputs.length + defaultNbrRows);
 }
 
 function moveFocusUp() {
@@ -116,26 +113,15 @@ function moveFocusDown() {
 	}
 }
 
-function setLastTextInput(element: HTMLInputElement) {
-	lastTextInput = element;
-}
-
-function setFirstTextInput(element: HTMLInputElement) {
-	firstTextInput = element;
-}
-
 function focusFirstTextInput(e: Event) {
 	lastFocusedButton = e.target as HTMLButtonElement;
-	firstTextInput.focus();
+	textInputs[0].focus();
 }
 
 function focusLastTextInput(e: Event) {
+	textInputs[0].focus();
 	lastFocusedButton = e.target as HTMLButtonElement;
-	lastTextInput.focus();
-}
-
-function setInitElements(fn: () => void) {
-	initElements = fn;
+	textInputs[textInputs.length - 1].focus();
 }
 
 </script>

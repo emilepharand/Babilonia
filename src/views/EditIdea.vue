@@ -10,9 +10,6 @@
         title="Edit Idea"
         @move-focus-down="moveFocusDown"
         @move-focus-up="moveFocusUp"
-        @set-last-text-input="setLastTextInput"
-        @set-first-text-input="setFirstTextInput"
-        @init-elements="setInitElements"
         @save="edit()"
       />
       <button
@@ -119,9 +116,11 @@ import {ref} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
-import * as Utils from '../ts/utils';
-import {validateIdeaForm} from '../ts/utils';
+import * as Utils from '../ts/ideaForm/utils';
+import {validateIdeaForm} from '../ts/ideaForm/validation';
 import * as Api from '../ts/api';
+import {initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
+import {focusEndOfInput} from '../ts/domHelper';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const loaded = ref(false);
@@ -135,15 +134,13 @@ const addRowsButton = ref(document.createElement('button'));
 
 const route = useRoute();
 const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
-let lastTextInput = document.createElement('input');
-let firstTextInput = document.createElement('input');
-let initElements: () => void;
 
 // Initialize idea
 (async () => {
 	try {
 		idea.value = await Api.getIdea(ideaId);
 		loaded.value = true;
+		initElements(idea.value.ee.length);
 	} catch {
 		ideaNotFound.value = true;
 	}
@@ -152,7 +149,7 @@ let initElements: () => void;
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
-	initElements();
+	initElements(idea.value.ee.length);
 }
 
 async function edit() {
@@ -165,7 +162,7 @@ async function edit() {
 		// Reorder expressions
 		idea.value = await Api.getIdea(idea.value.id);
 		isShowSuccess.value = true;
-		initElements();
+		initElements(idea.value.ee.length);
 	}
 }
 
@@ -177,28 +174,16 @@ function moveFocusDown() {
 	addRowsButton.value.focus();
 }
 
-function setLastTextInput(element: HTMLInputElement) {
-	lastTextInput = element;
-}
-
-function setFirstTextInput(element: HTMLInputElement) {
-	firstTextInput = element;
-}
-
 function focusFirstTextInput() {
-	firstTextInput.focus();
+	focusEndOfInput(textInputs[0] as HTMLInputElement);
 }
 
 function focusLastTextInput() {
-	lastTextInput.focus();
+	focusEndOfInput(textInputs[textInputs.length - 1] as HTMLInputElement);
 }
 
 function focusBelowAddRows() {
 	editButton.value.focus();
-}
-
-function setInitElements(fn: () => void) {
-	initElements = fn;
 }
 
 // Router needs to be declared outside function
