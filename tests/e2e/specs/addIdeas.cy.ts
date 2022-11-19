@@ -238,26 +238,22 @@ context('The idea page', () => {
 
 		cy.reload();
 
+		// Add rows + more tests
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 5);
-
 		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('bonjour');
-
 		getAddRowsButton()
 			.click();
-
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 10);
-
 		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('hello')
 			.type('{upArrow}');
-
 		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.clear()
@@ -266,11 +262,9 @@ context('The idea page', () => {
 			.should('be.focused');
 		getAddRowsButton()
 			.click();
-
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 15);
-
 		getExpressionTextInputRow(0)
 			.should('be.focused');
 	});
