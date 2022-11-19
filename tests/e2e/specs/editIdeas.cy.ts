@@ -96,7 +96,7 @@ context('The idea page', () => {
 		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
 
-	specify.only('Interactivity', () => {
+	specify('Interactivity', () => {
 		addLanguages();
 
 		const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour'};

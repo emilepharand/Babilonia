@@ -1,6 +1,6 @@
 import {apiUrl} from '../cy-utils';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
@@ -73,7 +73,9 @@ context('Interactivity', () => {
 });
 
 context('Error handling in the language page', () => {
-	specify('Adding invalid language', () => {
+	specify('Adding/editing with invalid input', () => {
+		cy.get('#languages-link').click();
+
 		// Empty name
 		addLanguage('');
 		assertAddLanguageErrorMsgVisible('valid language');
@@ -94,9 +96,7 @@ context('Error handling in the language page', () => {
 		addLanguage('Valid language');
 		assertAddLanguageErrorMsgVisible('already exists');
 		assertSaveLanguagesErrorMsgNotVisible();
-	});
 
-	specify('Editing language with invalid input', () => {
 		// Blank name
 		inputLanguageChange(0, '', '0', true);
 		clickSave();
