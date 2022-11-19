@@ -134,6 +134,12 @@ context('The idea page', () => {
 			.type('{downArrow}');
 		getAddRowsButton()
 			.should('be.focused')
+			.type('{upArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{downArrow}');
+		getAddRowsButton()
+			.should('be.focused')
 			.type('{downArrow}');
 		getEditButton()
 			.should('be.focused')
