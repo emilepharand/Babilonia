@@ -22,13 +22,13 @@ function initElementsWithNbrTries(nbrTries: number, expectedNumberRows: number) 
 		if (textInputs.length !== expectedNumberRows && nbrTries < 10) {
 			initElementsWithNbrTries(nbrTries + 1, expectedNumberRows);
 		} else {
-			const element = findFirstEmptyExpression();
+			const element = findFirstEmptyExpressionElseFirstExpression();
 			focusEndOfInput(element as HTMLInputElement);
 		}
 	}, 20);
 }
 
-function findFirstEmptyExpression() {
+function findFirstEmptyExpressionElseFirstExpression() {
 	let found = false;
 	let i = 0;
 	while (i < textInputs.length && !found) {
