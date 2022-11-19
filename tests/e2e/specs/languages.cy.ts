@@ -36,6 +36,21 @@ context('Valid inputs in the language page', () => {
 		checkLanguageRowHasValues(1, 'Modified language 1', '1', true);
 		checkLanguageRowHasValues(2, 'Modified language 0', '2', true);
 
+		// Test delete modal focus
+		cy.get('.languages-table').find('.language-row')
+			.eq(0)
+			.find('.delete-language-button')
+			.click();
+		cy.get('#modal-cancel-button')
+			.should('be.focused')
+			.type('{rightArrow}');
+		cy.get('#modal-delete-button')
+			.should('be.focused')
+			.type('{leftArrow}');
+		cy.get('#modal-cancel-button')
+			.should('be.focused')
+			.click();
+
 		// Delete languages one by one
 		deleteLanguageButCancel(1);
 		cy.get('.languages-table').find('.language-row').should('have.length', 3);

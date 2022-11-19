@@ -84,7 +84,9 @@ context('The idea page', () => {
 		cy.get('#delete-button').click();
 		cy.get('#confirm-delete-modal').should('be.visible');
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
-		cy.wait(500).get('#modal-cancel-button').click();
+		cy.wait(500).get('#modal-cancel-button')
+			.should('be.focused')
+			.click();
 		assertFetchIdeaReturnsStatus(1, 200, ['hello']);
 
 		// Test delete
@@ -92,7 +94,17 @@ context('The idea page', () => {
 		cy.get('#delete-button').click();
 		cy.get('#confirm-delete-modal').should('be.visible');
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
-		cy.wait(500).get('#modal-delete-button').click();
+		cy.wait(500).get('#modal-cancel-button')
+			.should('be.focused')
+			.type('{rightArrow}');
+		cy.get('#modal-delete-button')
+			.type('{leftArrow}');
+		cy.get('#modal-cancel-button')
+			.should('be.focused')
+			.type('{rightArrow}');
+		cy.get('#modal-delete-button')
+			.should('be.focused')
+			.click();
 		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
 
