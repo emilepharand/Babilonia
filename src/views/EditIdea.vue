@@ -62,6 +62,7 @@
     </div>
     <div
       id="confirm-delete-modal"
+      ref="confirmDeleteModal"
       class="modal fade"
       tabindex="-1"
       aria-labelledby="confirm-delete-modal-label"
@@ -89,18 +90,22 @@
           <div class="modal-footer">
             <button
               id="modal-cancel-button"
+              ref="modalCancelButton"
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
+              @keydown.right="modalDeleteButton.focus()"
             >
               Cancel
             </button>
             <button
               id="modal-delete-button"
+              ref="modalDeleteButton"
               type="button"
               class="btn btn-danger"
               data-bs-dismiss="modal"
               @click="deleteIdea()"
+              @keydown.left="modalCancelButton.focus()"
             >
               Delete
             </button>
@@ -122,15 +127,23 @@ import * as Api from '../ts/api';
 import {initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 import {focusEndOfInput} from '../ts/domHelper';
 
+// Component logic
 const idea = ref(getEmptyIdeaNoAsync());
 const loaded = ref(false);
 const ideaNotFound = ref(false);
 const errorText = ref('');
 const isShowError = ref(false);
 const isShowSuccess = ref(false);
+
+// Idea buttons
 const editButton = ref(document.createElement('button'));
 const deleteButton = ref(document.createElement('button'));
 const addRowsButton = ref(document.createElement('button'));
+
+// Delete idea modal
+const confirmDeleteModal = ref(document.createElement('div'));
+const modalCancelButton = ref(document.createElement('button'));
+const modalDeleteButton = ref(document.createElement('button'));
 
 const route = useRoute();
 const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
@@ -192,4 +205,10 @@ async function deleteIdea() {
 	await Api.deleteIdea(ideaId);
 	await router.push('/');
 }
+
+setTimeout(() => {
+	confirmDeleteModal.value.addEventListener('shown.bs.modal', () => {
+		modalCancelButton.value.focus();
+	});
+}, 0);
 </script>

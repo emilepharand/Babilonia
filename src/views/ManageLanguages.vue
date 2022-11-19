@@ -113,7 +113,8 @@
     </div>
     <div
       id="confirm-delete-modal"
-      class="modal fade"
+      ref="confirmDeleteModal"
+      class="modal fade confirm-delete-modal"
       tabindex="-1"
       aria-labelledby="confirm-delete-modal-label"
       aria-hidden="true"
@@ -142,18 +143,22 @@
           <div class="modal-footer">
             <button
               id="modal-cancel-button"
+              ref="modalCancelButton"
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
+              @keydown.right="modalDeleteButton.focus()"
             >
               Cancel
             </button>
             <button
               id="modal-delete-button"
+              ref="modalDeleteButton"
               type="button"
               class="btn btn-danger"
               data-bs-dismiss="modal"
               @click="deleteLanguage()"
+              @keydown.left="modalCancelButton.focus()"
             >
               Delete
             </button>
@@ -179,6 +184,11 @@ const isShowAddError = ref(false);
 const addErrorText = ref('');
 const languageIdToDelete = ref(-1);
 const newLanguageNameInput = ref(document.createElement('input'));
+
+// Delete language modal
+const confirmDeleteModal = ref(document.createElement('div'));
+const modalCancelButton = ref(document.createElement('button'));
+const modalDeleteButton = ref(document.createElement('button'));
 
 (async () => {
 	languages.value = await Api.getLanguages();
@@ -265,4 +275,9 @@ async function deleteLanguage() {
 	languages.value = await Api.getLanguages();
 }
 
+setTimeout(() => {
+	confirmDeleteModal.value.addEventListener('shown.bs.modal', () => {
+		modalCancelButton.value.focus();
+	});
+}, 0);
 </script>
