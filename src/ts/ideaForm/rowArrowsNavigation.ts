@@ -19,13 +19,13 @@ function initElementsWithNbrTries(nbrTries: number, expectedNumberRows: number) 
 		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
 		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
-		if (textInputs.length !== expectedNumberRows && nbrTries < 10) {
+		if (textInputs.length !== expectedNumberRows && nbrTries < 25) {
 			initElementsWithNbrTries(nbrTries + 1, expectedNumberRows);
 		} else {
 			const element = findFirstEmptyExpressionElseFirstExpression();
 			focusEndOfInput(element as HTMLInputElement);
 		}
-	}, 20);
+	}, 10);
 }
 
 function findFirstEmptyExpressionElseFirstExpression() {
