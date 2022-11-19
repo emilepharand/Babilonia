@@ -8,27 +8,43 @@
       <IdeaForm
         :idea="idea"
         title="Edit Idea"
+        @move-focus-down="moveFocusDown"
+        @move-focus-up="moveFocusUp"
+        @set-last-text-input="setLastTextInput"
+        @set-first-text-input="setFirstTextInput"
+        @init-elements="setInitElements"
       />
       <button
         id="add-rows"
+        ref="addRowsButton"
         class="btn btn-outline-secondary w-100 mt-2 mb-2"
         @click="addRows()"
+        @keydown.up="focusLastTextInput"
+        @keydown.down="focusBelowAddRows"
       >
         More Rows
       </button>
       <div class="d-flex btn-group">
         <button
           id="edit-button"
+          ref="editButton"
           class="btn btn-outline-primary flex-grow-1"
+          @keydown.up="addRowsButton.focus()"
+          @keydown.down="focusFirstTextInput"
+          @keydown.right="deleteButton.focus()"
           @click="edit()"
         >
           Edit
         </button>
         <button
           id="delete-button"
+          ref="deleteButton"
           class="btn btn-outline-danger flex-grow-1"
           data-bs-toggle="modal"
           data-bs-target="#confirm-delete-modal"
+          @keydown.up="addRowsButton.focus()"
+          @keydown.down="focusFirstTextInput"
+          @keydown.left="editButton.focus()"
         >
           Delete
         </button>
@@ -112,9 +128,15 @@ const ideaNotFound = ref(false);
 const errorText = ref('');
 const isShowError = ref(false);
 const isShowSuccess = ref(false);
+const editButton = ref(document.createElement('button'));
+const deleteButton = ref(document.createElement('button'));
+const addRowsButton = ref(document.createElement('button'));
 
 const route = useRoute();
 const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
+let lastTextInput = document.createElement('input');
+let firstTextInput = document.createElement('input');
+let initElements: () => void;
 
 // Initialize idea
 (async () => {
@@ -129,6 +151,7 @@ const ideaId = Number.parseInt(Array.from(route.params.id).join(''), 10);
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
+	initElements();
 }
 
 async function edit() {
@@ -142,6 +165,38 @@ async function edit() {
 		idea.value = await Api.getIdea(idea.value.id);
 		isShowSuccess.value = true;
 	}
+}
+
+function moveFocusUp() {
+	editButton.value.focus();
+}
+
+function moveFocusDown() {
+	addRowsButton.value.focus();
+}
+
+function setLastTextInput(element: HTMLInputElement) {
+	lastTextInput = element;
+}
+
+function setFirstTextInput(element: HTMLInputElement) {
+	firstTextInput = element;
+}
+
+function focusFirstTextInput() {
+	firstTextInput.focus();
+}
+
+function focusLastTextInput() {
+	lastTextInput.focus();
+}
+
+function focusBelowAddRows() {
+	editButton.value.focus();
+}
+
+function setInitElements(fn: () => void) {
+	initElements = fn;
 }
 
 // Router needs to be declared outside function
