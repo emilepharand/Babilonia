@@ -142,16 +142,22 @@ export function assertFetchIdeaDoesNotContain(id: number, notContains: string[])
 	});
 }
 
+export function getExpressionTextInputRow(n: number) {
+	return cy.get('.expression-text').eq(n);
+}
+
+export function getKnownExpressionToggle(n: number) {
+	return cy.get('.expression-known-toggle').eq(n);
+}
+
+export function getLanguageSelect(n: number) {
+	return cy.get('.expression-language').eq(n);
+}
+
 export function inputExpression(rowNbr: number, language: string, text: string) {
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-language')
+	getLanguageSelect(rowNbr)
 		.select(language);
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-text')
+	getExpressionTextInputRow(rowNbr)
 		.clear()
 		.type(text);
 }
