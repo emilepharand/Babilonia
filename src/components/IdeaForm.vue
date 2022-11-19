@@ -100,14 +100,27 @@ function initElementsWithNbrTries(nbrTries: number) {
 		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
 		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
-		if (textInputs.length !== 5 && nbrTries < 10) {
+		if (textInputs.length === 0 && nbrTries < 10) {
 			initElementsWithNbrTries(nbrTries + 1);
 		} else {
-			textInputs[0].focus();
+			const element = findFirstEmptyExpression();
+			focusEndOfInput(element as HTMLInputElement);
 			emit('setFirstTextInput', textInputs[0]);
 			emit('setLastTextInput', textInputs[textInputs.length - 1]);
 		}
 	}, 20);
+}
+
+function findFirstEmptyExpression() {
+	let found = false;
+	let i = 0;
+	while (i < textInputs.length && !found) {
+		found = (textInputs[i] as HTMLInputElement).value.trim() === '';
+		if (!found) {
+			i++;
+		}
+	}
+	return found ? textInputs[i] : textInputs[0];
 }
 
 function moveLeft(e: Event) {
