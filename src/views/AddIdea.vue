@@ -12,7 +12,7 @@
         @move-focus-up="moveFocusUp"
         @set-last-text-input="setLastTextInput"
         @set-first-text-input="setFirstTextInput"
-        @init-elements="initElements"
+        @init-elements="setInitElements"
       />
       <div class="d-flex btn-group mt-2">
         <button
@@ -68,6 +68,7 @@ const saveIdeaButton = ref(document.createElement('button'));
 let lastTextInput = document.createElement('input');
 let firstTextInput = document.createElement('input');
 let lastFocusedButton = document.createElement('button');
+let initElements: () => void;
 
 // Initialize data
 (async () => {
@@ -94,7 +95,7 @@ async function save() {
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
-	fnToCall();
+	initElements();
 }
 
 function moveFocusUp() {
@@ -131,10 +132,8 @@ function focusLastTextInput(e: Event) {
 	lastTextInput.focus();
 }
 
-let fnToCall: any;
-
-function initElements(fn: any) {
-	fnToCall = fn;
+function setInitElements(fn: () => void) {
+	initElements = fn;
 }
 
 </script>
