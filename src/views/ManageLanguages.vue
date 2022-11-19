@@ -90,6 +90,7 @@
       <div>
         <input
           id="new-language-name"
+          ref="newLanguageNameInput"
           v-model="newLanguageName"
           type="text"
           @keyup.enter="addLanguage()"
@@ -177,10 +178,14 @@ const saveErrorText = ref('');
 const isShowAddError = ref(false);
 const addErrorText = ref('');
 const languageIdToDelete = ref(-1);
+const newLanguageNameInput = ref(document.createElement('input'));
 
 (async () => {
 	languages.value = await Api.getLanguages();
 	loaded.value = true;
+	if (languages.value.length === 0) {
+		newLanguageNameInput.value.focus();
+	}
 })();
 
 function allowOnlyNumbers(e: KeyboardEvent) {
