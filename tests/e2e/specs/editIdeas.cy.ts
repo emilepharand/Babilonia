@@ -6,11 +6,15 @@ import {
 	assertExpressionIsKnown,
 	assertFetchIdeaDoesNotContain,
 	assertFetchIdeaReturnsStatus,
+	getAddRowsButton,
+	getDeleteButton,
+	getEditButton,
 	getExpressionTextInputRow,
 	getKnownExpressionToggle,
 	getLanguageSelect,
 	inputExpression,
 	toggleExpressionKnown,
+	waitForTableToLoad,
 } from '../cy-utils';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
@@ -185,21 +189,3 @@ context('The idea page', () => {
 		assertExpressionIsKnown(0, false);
 	});
 });
-
-function waitForTableToLoad(length: number) {
-	cy.get('#ideas')
-		.find('.expression')
-		.should('have.length', length);
-}
-
-function getEditButton() {
-	return cy.get('#edit-button');
-}
-
-function getAddRowsButton() {
-	return cy.get('#add-rows');
-}
-
-function getDeleteButton() {
-	return cy.get('#delete-button');
-}

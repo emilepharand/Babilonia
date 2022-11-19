@@ -1,9 +1,15 @@
 import {
 	addLanguages,
 	apiUrl,
+	assertAllInputsEmpty,
 	assertExpressionHasValues,
 	assertExpressionIsKnown,
 	assertFetchIdeaReturnsStatus,
+	getAddRowsButton,
+	getExpressionTextInputRow,
+	getKnownExpressionToggle,
+	getLanguageSelect,
+	getSaveButton,
 	inputExpression,
 	toggleExpressionKnown,
 } from '../cy-utils';
@@ -113,37 +119,37 @@ context('The idea page', () => {
 		cy.get('#add-ideas-link').click();
 
 		// First row
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{rightArrow}');
 		getKnownExpressionToggle(0)
 			.should('be.focused')
 			.type('{leftArrow}');
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{leftArrow}');
 		getLanguageSelect(0)
 			.should('be.focused')
 			.type('{rightArrow}');
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused');
 
 		// Second row
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.type('{downArrow}');
-		getTextInputRow(1)
+		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('{rightArrow}');
 		getKnownExpressionToggle(1)
 			.should('be.focused')
 			.type('{leftArrow}');
-		getTextInputRow(1)
+		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('{leftArrow}');
 		getLanguageSelect(1)
 			.should('be.focused')
 			.type('{rightArrow}');
-		getTextInputRow(1)
+		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('{rightArrow}');
 
@@ -165,67 +171,67 @@ context('The idea page', () => {
 			.type('{leftArrow}');
 
 		// Inputs and buttons
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{downArrow}');
-		getTextInputRow(1)
+		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('{downArrow}{downArrow}{downArrow}{downArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.type('{downArrow}');
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{upArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.type('{upArrow}');
-		getTextInputRow(4)
+		getExpressionTextInputRow(4)
 			.should('be.focused')
 			.type('{downArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.type('{rightArrow}');
 		getSaveButton()
 			.should('be.focused')
 			.type('{downArrow}');
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{upArrow}');
 		getSaveButton()
 			.should('be.focused')
 			.type('{leftArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.type('{rightArrow}');
 		getSaveButton()
 			.should('be.focused')
 			.type('{downArrow}');
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{upArrow}');
 		getSaveButton()
 			.should('be.focused')
 			.type('{upArrow}');
-		getTextInputRow(4)
+		getExpressionTextInputRow(4)
 			.should('be.focused')
 			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
 		getSaveButton()
 			.should('be.focused')
 			.type('{leftArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.should('be.focused')
 			.click();
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused');
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 10);
 		for (let i = 0; i < 10; i++) {
-			getTextInputRow(i)
+			getExpressionTextInputRow(i)
 				.should('have.focus')
 				.type('{downArrow}');
 		}
@@ -236,36 +242,36 @@ context('The idea page', () => {
 			.find('.expression')
 			.should('have.length', 5);
 
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('bonjour');
 
-		getMoreRowsButton()
+		getAddRowsButton()
 			.click();
 
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 10);
 
-		getTextInputRow(1)
+		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('hello')
 			.type('{upArrow}');
 
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.clear()
 			.type('{downArrow}{downArrow}');
-		getTextInputRow(2)
+		getExpressionTextInputRow(2)
 			.should('be.focused');
-		getMoreRowsButton()
+		getAddRowsButton()
 			.click();
 
 		cy.get('#ideas')
 			.find('.expression')
 			.should('have.length', 15);
 
-		getTextInputRow(0)
+		getExpressionTextInputRow(0)
 			.should('be.focused');
 	});
 
@@ -287,27 +293,3 @@ context('The idea page', () => {
 		assertExpressionIsKnown(1, false);
 	});
 });
-
-function assertAllInputsEmpty() {
-	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
-}
-
-function getTextInputRow(n: number) {
-	return cy.get('.expression-text').eq(n);
-}
-
-function getKnownExpressionToggle(n: number) {
-	return cy.get('.expression-known-toggle').eq(n);
-}
-
-function getLanguageSelect(n: number) {
-	return cy.get('.expression-language').eq(n);
-}
-
-function getMoreRowsButton() {
-	return cy.get('#add-rows');
-}
-
-function getSaveButton() {
-	return cy.get('#save-idea');
-}

@@ -154,6 +154,32 @@ export function getLanguageSelect(n: number) {
 	return cy.get('.expression-language').eq(n);
 }
 
+export function assertAllInputsEmpty() {
+	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
+}
+
+export function getAddRowsButton() {
+	return cy.get('#add-rows');
+}
+
+export function getSaveButton() {
+	return cy.get('#save-idea');
+}
+
+export function waitForTableToLoad(length: number) {
+	cy.get('#ideas')
+		.find('.expression')
+		.should('have.length', length);
+}
+
+export function getEditButton() {
+	return cy.get('#edit-button');
+}
+
+export function getDeleteButton() {
+	return cy.get('#delete-button');
+}
+
 export function inputExpression(rowNbr: number, language: string, text: string) {
 	getLanguageSelect(rowNbr)
 		.select(language);
