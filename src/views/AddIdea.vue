@@ -66,7 +66,6 @@ const addRowsButton = ref(document.createElement('button'));
 const saveIdeaButton = ref(document.createElement('button'));
 let lastFocusedButton = document.createElement('button');
 
-// Initialize data
 (async () => {
 	if ((await Api.getLanguages()).length === 0) {
 		noLanguages.value = true;
