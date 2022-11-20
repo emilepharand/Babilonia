@@ -193,12 +193,19 @@
           </a>
         </div>
         <div
-          v-if="!noResults()"
-          class="me-3 mt-3"
+          class="d-flex gap-2 me-3 mt-3"
         >
           <button
+            id="previous-page-button"
+            class="btn btn-primary w-50"
+            @click="previousPage()"
+          >
+            Previous page
+          </button>
+          <button
+            v-if="!noResults()"
             id="next-page-button"
-            class="btn btn-primary w-100"
+            class="btn btn-primary w-50"
             @click="nextPage()"
           >
             Next page
@@ -301,6 +308,13 @@ function createSearchContext() {
 
 async function nextPage() {
 	currentPage++;
+	results.value = searchResults.slice(currentPage * pageSize, currentPage + pageSize);
+}
+
+async function previousPage() {
+	if (currentPage > 0) {
+		currentPage--;
+	}
 	results.value = searchResults.slice(currentPage * pageSize, currentPage + pageSize);
 }
 
