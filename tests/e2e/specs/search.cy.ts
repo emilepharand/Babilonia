@@ -114,6 +114,8 @@ context('Search', () => {
 
 		assertThereAreNResults(10);
 		assertNthResultHasMatchedExpressions(5, 'bonjour 5');
+		getPreviousPageButton()
+			.should('be.disabled');
 		getNextPageButton()
 			.should('be.visible')
 			.click();
@@ -121,12 +123,27 @@ context('Search', () => {
 		assertThereAreNResults(1);
 		assertNthResultHasMatchedExpressions(0, 'bonjour 10');
 		getNextPageButton()
+			.should('be.disabled');
+		getPreviousPageButton()
+			.should('be.visible')
+			.should('not.be.disabled')
+			.click();
+
+		assertThereAreNResults(10);
+		assertNthResultHasMatchedExpressions(5, 'bonjour 5');
+		getPreviousPageButton()
+			.should('be.disabled');
+		getNextPageButton()
 			.should('be.visible')
 			.click();
 
-		assertThereAreNoResults();
+		assertThereAreNResults(1);
+		assertNthResultHasMatchedExpressions(0, 'bonjour 10');
 		getNextPageButton()
-			.should('not.exist');
+			.should('be.disabled');
+		getPreviousPageButton()
+			.should('be.visible')
+			.should('not.be.disabled');
 	});
 });
 
@@ -179,6 +196,10 @@ function checkStrict() {
 
 function getNextPageButton() {
 	return cy.get('#next-page-button');
+}
+
+function getPreviousPageButton() {
+	return cy.get('#previous-page-button');
 }
 
 function getSearchButton() {

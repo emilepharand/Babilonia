@@ -165,7 +165,7 @@
         class="ps-3 d-flex flex-column"
         style="width:500px"
       >
-        <h2 v-if="noResults()">
+        <h2 v-if="thereAreNoResults()">
           No results.
         </h2>
         <div
@@ -193,23 +193,31 @@
           </a>
         </div>
         <div
-          class="d-flex gap-2 me-3 mt-3"
+          v-if="searchWasDone()"
+          class="d-flex pe-3 mt-3"
         >
-          <button
-            id="previous-page-button"
-            class="btn btn-primary w-50"
-            @click="previousPage()"
+          <div
+            class="w-100 pe-1"
           >
-            Previous page
-          </button>
-          <button
-            v-if="!noResults()"
-            id="next-page-button"
-            class="btn btn-primary w-50"
-            @click="nextPage()"
-          >
-            Next page
-          </button>
+            <button
+              id="previous-page-button"
+              :disabled="getCurrentPage() === 1"
+              class="btn btn-primary w-100"
+              @click="previousPage()"
+            >
+              Previous page
+            </button>
+          </div>
+          <div class="w-100 ps-1">
+            <button
+              id="next-page-button"
+              :disabled="!thereAreMoreResults()"
+              class="btn btn-primary w-100"
+              @click="nextPage()"
+            >
+              Next page
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -234,7 +242,7 @@ const expressionLanguage = ref(getEmptyLanguageNoAsync());
 const ideaDoesNotHave = ref(getEmptyLanguageNoAsync());
 const knownExpressions = ref(false);
 const unknownExpressions = ref(false);
-let currentPage = 0;
+let currentPage = 1;
 const pageSize = 10;
 let searchResults: Idea[];
 
@@ -275,10 +283,9 @@ async function search() {
 		isShowError.value = true;
 		return;
 	}
-	currentPage = 0;
-	const searchContext = createSearchContext();
-	searchResults = await Api.searchIdeas(searchContext);
-	results.value = searchResults.slice(0, pageSize);
+	currentPage = 1;
+	searchResults = await Api.searchIdeas(createSearchContext());
+	results.value = getSearchResultsForPage(currentPage);
 }
 
 function atLeastOneFilterSet() {
@@ -308,17 +315,33 @@ function createSearchContext() {
 
 async function nextPage() {
 	currentPage++;
-	results.value = searchResults.slice(currentPage * pageSize, currentPage + pageSize);
+	results.value = getSearchResultsForPage(currentPage);
 }
 
 async function previousPage() {
-	if (currentPage > 0) {
-		currentPage--;
-	}
-	results.value = searchResults.slice(currentPage * pageSize, currentPage + pageSize);
+	currentPage--;
+	results.value = getSearchResultsForPage(currentPage);
 }
 
-function noResults() {
-	return searchResults.slice(currentPage * pageSize, currentPage + pageSize).length === 0;
+function thereAreNoResults() {
+	return getSearchResultsForPage(currentPage).length === 0;
+}
+
+function thereAreMoreResults() {
+	return getSearchResultsForPage(currentPage + 1).length > 0;
+}
+
+function getSearchResultsForPage(pageNumber: number) {
+	const indexStart = (pageNumber - 1) * pageSize;
+	const indexEnd = indexStart + pageSize;
+	return searchResults.slice(indexStart, indexEnd);
+}
+
+function searchWasDone() {
+	return searchResults !== undefined;
+}
+
+function getCurrentPage() {
+	return currentPage;
 }
 </script>
