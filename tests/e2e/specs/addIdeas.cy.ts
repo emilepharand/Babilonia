@@ -1,9 +1,15 @@
 import {
 	addLanguages,
 	apiUrl,
+	assertAllInputsEmpty,
 	assertExpressionHasValues,
 	assertExpressionIsKnown,
 	assertFetchIdeaReturnsStatus,
+	getAddRowsButton,
+	getExpressionTextInputRow,
+	getKnownExpressionToggle,
+	getLanguageSelect,
+	getSaveButton,
 	inputExpression,
 	toggleExpressionKnown,
 } from '../cy-utils';
@@ -109,6 +115,160 @@ context('The idea page', () => {
 		});
 	});
 
+	specify('Interactivity', () => {
+		cy.get('#add-ideas-link').click();
+
+		// First row
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getLanguageSelect(0)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused');
+
+		// Second row
+		getExpressionTextInputRow(0)
+			.type('{downArrow}');
+		getExpressionTextInputRow(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getKnownExpressionToggle(1)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getExpressionTextInputRow(1)
+			.should('be.focused')
+			.type('{leftArrow}');
+		getLanguageSelect(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+		getExpressionTextInputRow(1)
+			.should('be.focused')
+			.type('{rightArrow}');
+
+		// Known expression toggle
+		getKnownExpressionToggle(1)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}');
+		getKnownExpressionToggle(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getKnownExpressionToggle(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getKnownExpressionToggle(0)
+			.should('be.focused')
+			.type('{leftArrow}');
+
+		// Inputs and buttons
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{downArrow}');
+		getExpressionTextInputRow(1)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		getExpressionTextInputRow(4)
+			.should('be.focused')
+			.type('{downArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.type('{rightArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{leftArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.type('{rightArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('{upArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		getExpressionTextInputRow(4)
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
+		getSaveButton()
+			.should('be.focused')
+			.type('{leftArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.type('{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}{downArrow}');
+		getAddRowsButton()
+			.should('be.focused')
+			.click();
+		getExpressionTextInputRow(0)
+			.should('be.focused');
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 10);
+		for (let i = 0; i < 10; i++) {
+			getExpressionTextInputRow(i)
+				.should('have.focus')
+				.type('{downArrow}');
+		}
+
+		cy.reload();
+
+		// Add rows + more tests
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 5);
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.type('bonjour');
+		getAddRowsButton()
+			.click();
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 10);
+		getExpressionTextInputRow(1)
+			.should('be.focused')
+			.type('hello')
+			.type('{upArrow}');
+		getExpressionTextInputRow(0)
+			.should('be.focused')
+			.clear()
+			.type('{downArrow}{downArrow}');
+		getExpressionTextInputRow(2)
+			.should('be.focused');
+		getAddRowsButton()
+			.click();
+		cy.get('#ideas')
+			.find('.expression')
+			.should('have.length', 15);
+		getExpressionTextInputRow(0)
+			.should('be.focused');
+	});
+
 	specify('Known expressions', () => {
 		cy.get('#add-ideas-link').click();
 
@@ -127,7 +287,3 @@ context('The idea page', () => {
 		assertExpressionIsKnown(1, false);
 	});
 });
-
-function assertAllInputsEmpty() {
-	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
-}

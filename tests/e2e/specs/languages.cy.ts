@@ -1,6 +1,6 @@
 import {apiUrl} from '../cy-utils';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
@@ -36,6 +36,21 @@ context('Valid inputs in the language page', () => {
 		checkLanguageRowHasValues(1, 'Modified language 1', '1', true);
 		checkLanguageRowHasValues(2, 'Modified language 0', '2', true);
 
+		// Test delete modal focus
+		cy.get('.languages-table').find('.language-row')
+			.eq(0)
+			.find('.delete-language-button')
+			.click();
+		cy.get('#modal-cancel-button')
+			.should('be.focused')
+			.type('{rightArrow}');
+		cy.get('#modal-delete-button')
+			.should('be.focused')
+			.type('{leftArrow}');
+		cy.get('#modal-cancel-button')
+			.should('be.focused')
+			.click();
+
 		// Delete languages one by one
 		deleteLanguageButCancel(1);
 		cy.get('.languages-table').find('.language-row').should('have.length', 3);
@@ -51,8 +66,31 @@ context('Valid inputs in the language page', () => {
 	});
 });
 
+context('Interactivity', () => {
+	specify('Input focusing', () => {
+		cy.get('#languages-link').click();
+
+		getNewLanguageNameInput()
+			.should('be.focused')
+			.type('fr')
+			.type('{enter}');
+
+		checkLanguageRowHasValues(0, 'fr', '0', false);
+
+		getNewLanguageNameInput()
+			.should('be.focused');
+
+		inputLanguageChange(0, 'en', '0', true);
+
+		getNewLanguageNameInput()
+			.should('not.be.focused');
+	});
+});
+
 context('Error handling in the language page', () => {
-	specify('Adding invalid language', () => {
+	specify('Adding/editing with invalid input', () => {
+		cy.get('#languages-link').click();
+
 		// Empty name
 		addLanguage('');
 		assertAddLanguageErrorMsgVisible('valid language');
@@ -73,9 +111,7 @@ context('Error handling in the language page', () => {
 		addLanguage('Valid language');
 		assertAddLanguageErrorMsgVisible('already exists');
 		assertSaveLanguagesErrorMsgNotVisible();
-	});
 
-	specify('Editing language with invalid input', () => {
 		// Blank name
 		inputLanguageChange(0, '', '0', true);
 		clickSave();
@@ -110,10 +146,14 @@ context('Error handling in the language page', () => {
 	});
 });
 
+function getNewLanguageNameInput() {
+	return cy.get('#new-language-name');
+}
+
 function addLanguage(name: string) {
-	cy.get('#new-language-name').clear();
+	getNewLanguageNameInput().clear();
 	if (name !== '') {
-		cy.get('#new-language-name').type(name);
+		getNewLanguageNameInput().type(name);
 	}
 	cy.get('#add-language-button').click();
 }

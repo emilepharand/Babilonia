@@ -8,18 +8,29 @@
       <IdeaForm
         :idea="idea"
         title="Add Idea"
+        @move-focus-down="moveFocusDown"
+        @move-focus-up="moveFocusUp"
+        @save="save()"
       />
       <div class="d-flex btn-group mt-2">
         <button
           id="add-rows"
+          ref="addRowsButton"
           class="btn btn-outline-secondary flex-grow-1"
+          @keydown.right="saveIdeaButton.focus()"
+          @keydown.up="focusLastTextInput"
+          @keydown.down="focusFirstTextInput"
           @click="addRows()"
         >
           More Rows
         </button>
         <button
           id="save-idea"
+          ref="saveIdeaButton"
           class="btn btn-outline-secondary flex-grow-1"
+          @keydown.left="addRowsButton.focus()"
+          @keydown.up="focusLastTextInput"
+          @keydown.down="focusFirstTextInput"
           @click="save()"
         >
           Save
@@ -42,21 +53,26 @@ import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import * as Api from '../ts/api';
-import * as Utils from '../ts/utils';
-import {validateIdeaForm} from '../ts/utils';
+import * as Utils from '../ts/ideaForm/utils';
+import {validateIdeaForm} from '../ts/ideaForm/validation';
+import {defaultNbrRows, initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
 const loaded = ref(false);
 const errorText = ref('');
 const isShowError = ref(false);
+const addRowsButton = ref(document.createElement('button'));
+const saveIdeaButton = ref(document.createElement('button'));
+let lastFocusedButton = document.createElement('button');
 
-// Initialize data
 (async () => {
 	if ((await Api.getLanguages()).length === 0) {
 		noLanguages.value = true;
+	} else {
+		idea.value = getEmptyIdea(5, (await Api.getLanguages())[0]);
+		initElements(5);
 	}
-	idea.value = getEmptyIdea(5, (await Api.getLanguages())[0]);
 	loaded.value = true;
 })();
 
@@ -71,11 +87,40 @@ async function save() {
 		idea.value.ee.forEach(e => {
 			e.text = '';
 		});
+		initElements(defaultNbrRows);
 	}
 }
 
 async function addRows() {
 	idea.value = await Utils.addEmptyExpressions(idea.value);
+	initElements(textInputs.length + defaultNbrRows);
+}
+
+function moveFocusUp() {
+	if (lastFocusedButton === saveIdeaButton.value) {
+		saveIdeaButton.value.focus();
+	} else {
+		addRowsButton.value.focus();
+	}
+}
+
+function moveFocusDown() {
+	if (lastFocusedButton === saveIdeaButton.value) {
+		saveIdeaButton.value.focus();
+	} else {
+		addRowsButton.value.focus();
+	}
+}
+
+function focusFirstTextInput(e: Event) {
+	lastFocusedButton = e.target as HTMLButtonElement;
+	textInputs[0].focus();
+}
+
+function focusLastTextInput(e: Event) {
+	textInputs[0].focus();
+	lastFocusedButton = e.target as HTMLButtonElement;
+	textInputs[textInputs.length - 1].focus();
 }
 
 </script>

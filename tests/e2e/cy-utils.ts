@@ -142,16 +142,48 @@ export function assertFetchIdeaDoesNotContain(id: number, notContains: string[])
 	});
 }
 
+export function getExpressionTextInputRow(n: number) {
+	return cy.get('.expression-text').eq(n);
+}
+
+export function getKnownExpressionToggle(n: number) {
+	return cy.get('.expression-known-toggle').eq(n);
+}
+
+export function getLanguageSelect(n: number) {
+	return cy.get('.expression-language').eq(n);
+}
+
+export function assertAllInputsEmpty() {
+	cy.get('.expression-text').each(e => cy.wrap(e).should('have.value', ''));
+}
+
+export function getAddRowsButton() {
+	return cy.get('#add-rows');
+}
+
+export function getSaveButton() {
+	return cy.get('#save-idea');
+}
+
+export function waitForTableToLoad(length: number) {
+	cy.get('#ideas')
+		.find('.expression')
+		.should('have.length', length);
+}
+
+export function getEditButton() {
+	return cy.get('#edit-button');
+}
+
+export function getDeleteButton() {
+	return cy.get('#delete-button');
+}
+
 export function inputExpression(rowNbr: number, language: string, text: string) {
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-language')
+	getLanguageSelect(rowNbr)
 		.select(language);
-	cy.get('#ideas')
-		.find('.expression')
-		.eq(rowNbr)
-		.find('.expression-text')
+	getExpressionTextInputRow(rowNbr)
 		.clear()
 		.type(text);
 }
