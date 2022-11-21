@@ -27,7 +27,8 @@
         "xo-typescript"
       ],
       "rules": {
-        "@typescript-eslint/padding-line-between-statements": "off"
+        "@typescript-eslint/padding-line-between-statements": "off",
+        "@typescript-eslint/no-non-null-assertion": "off"
       }
     },
     {
