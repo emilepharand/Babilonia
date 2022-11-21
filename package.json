@@ -19,7 +19,7 @@
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand && npm run test:api:coverage",
     "test:api:coverage": "curl localhost:$VITE_BASE_PORT/__coverage__ | cut -c13- | rev | cut -c2- | rev > tests/coverage/merged/coverage-nyc.json",
     "test:vue": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_BASE_PORT test:vue:run",
-    "test:vue:run": "cypress run && npm run test:coverage",
+    "test:vue:run": "cypress run --browser chromium && npm run test:coverage",
     "test:coverage": "npm run test:merge && npm run test:report",
     "test:merge": "cp tests/coverage/cypress/coverage-final.json tests/coverage/merged/coverage-cypress.json",
     "test:report": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged -r=html && rm -rf .nyc_output*",
