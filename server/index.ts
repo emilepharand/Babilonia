@@ -1,8 +1,8 @@
+import cors from 'cors';
 import type {ErrorRequestHandler} from 'express';
 import express from 'express';
-import cors from 'cors';
-import Routes from './routes';
 import {apiPort, appPort, isDevMode, isTestMode} from './options';
+import Routes from './routes';
 
 const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
 	if (!isTestMode) {
@@ -28,7 +28,7 @@ if (!isDevMode) {
 	if (process.env.TEST_MODE) {
 		appServer.get('/__coverage__', (_, res) => {
 			res.json({
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
 				coverage: (global as any).__coverage__,
 			});
 		});
