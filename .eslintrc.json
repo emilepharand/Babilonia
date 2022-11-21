@@ -22,6 +22,7 @@
       },
       "extends": [
         "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "xo",
         "xo-typescript"
       ],
@@ -58,6 +59,7 @@
         "eslint:recommended",
         "xo",
         "xo-typescript",
+        "plugin:@typescript-eslint/recommended",
         "plugin:vue/vue3-recommended",
         "@vue/eslint-config-typescript/recommended"
       ],
