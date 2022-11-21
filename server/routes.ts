@@ -15,6 +15,14 @@ export default class Routes {
 
 	public init(): void {
 		this.app.use('/', this.router);
+		// Used to signal
+		if (process.env.TEST_MODE) {
+			// Signals that the server is running
+			this.router.get('/', (_, res) => {
+				res.status(200);
+				res.end();
+			});
+		}
 		// Languages
 		this.router.get('/languages', Controller.getLanguages);
 		this.router.post('/languages', Controller.addLanguage);
