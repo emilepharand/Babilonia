@@ -1,6 +1,8 @@
-import {addIdeasDifferentSet, apiUrl} from '../cy-utils';
+import {ExpressionForAdding} from 'server/model/ideas/expression';
+import {IdeaForAdding} from 'server/model/ideas/ideaForAdding';
+import {addIdeasDifferentSet, addLanguages, apiUrl} from '../cy-utils';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
@@ -83,6 +85,66 @@ context('Search', () => {
 		clickSearch();
 		assertThereAreNResults(1);
 	});
+
+	specify('Paging', () => {
+		addLanguages();
+
+		// Add 11 ideas
+		for (let i = 0; i < 11; i++) {
+			const fr1: ExpressionForAdding = {text: `bonjour ${i}`, languageId: 1, known: true};
+			const en1: ExpressionForAdding = {text: 'hello', languageId: 2, known: true};
+			const es1: ExpressionForAdding = {text: 'buenos días', languageId: 3, known: true};
+			const de1: ExpressionForAdding = {text: 'guten Tag', languageId: 5, known: true};
+			const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: 6, known: true};
+			const it1: ExpressionForAdding = {text: 'buongiorno', languageId: 4, known: true};
+			const i1: IdeaForAdding = {ee: [fr1, en1, es1, de1, pt1, it1]};
+
+			cy.request({
+				url: `${apiUrl}/ideas`,
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: `${JSON.stringify(i1)}`,
+			});
+		}
+
+		cy.get('#search-ideas-link').click();
+
+		getKnownExpressionsCheckbox().check();
+		clickSearch();
+
+		assertThereAreNResults(10);
+		assertNthResultHasMatchedExpressions(5, 'bonjour 5');
+		getPreviousPageButton()
+			.should('be.disabled');
+		getNextPageButton()
+			.should('be.visible')
+			.click();
+
+		assertThereAreNResults(1);
+		assertNthResultHasMatchedExpressions(0, 'bonjour 10');
+		getNextPageButton()
+			.should('be.disabled');
+		getPreviousPageButton()
+			.should('be.visible')
+			.should('not.be.disabled')
+			.click();
+
+		assertThereAreNResults(10);
+		assertNthResultHasMatchedExpressions(5, 'bonjour 5');
+		getPreviousPageButton()
+			.should('be.disabled');
+		getNextPageButton()
+			.should('be.visible')
+			.click();
+
+		assertThereAreNResults(1);
+		assertNthResultHasMatchedExpressions(0, 'bonjour 10');
+		getNextPageButton()
+			.should('be.disabled');
+		getPreviousPageButton()
+			.should('be.visible')
+			.should('not.be.disabled');
+	});
 });
 
 function assertNthResultHasMatchedExpressions(nth: number, ...texts: string[]) {
@@ -130,6 +192,14 @@ function getUnknownExpressionsCheckbox() {
 
 function checkStrict() {
 	getStrictCheckbox().check();
+}
+
+function getNextPageButton() {
+	return cy.get('#next-page-button');
+}
+
+function getPreviousPageButton() {
+	return cy.get('#previous-page-button');
 }
 
 function getSearchButton() {

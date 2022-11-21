@@ -1,6 +1,6 @@
 import type {Database} from 'sqlite';
-import type IdeaManager from '../ideas/ideaManager';
 import type {Idea} from '../ideas/idea';
+import type IdeaManager from '../ideas/ideaManager';
 import type {SearchContext} from './searchContext';
 
 type SearchResultRow = {
@@ -46,6 +46,10 @@ export default class SearchHandler {
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;
 		}
+		// Setting an arbitrary limit for now to prevent too large result to be returned
+		// eslint-disable-next-line no-warning-comments
+		// TODO #47
+		query += ' LIMIT 5000 ';
 		return this.db.all(query, ...params);
 	}
 

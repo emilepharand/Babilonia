@@ -1,7 +1,7 @@
 import type {Request, Response} from 'express';
 import * as DataServiceProvider from './model/dataServiceProvider';
-import type {Language} from './model/languages/language';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
+import type {Language} from './model/languages/language';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 
@@ -122,7 +122,7 @@ function normalizeWhitespace(ideaForAdding: IdeaForAdding) {
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
-	if (!(await validateIdeaIdInRequest(req, res))) {
+	if (!await validateIdeaIdInRequest(req, res)) {
 		return;
 	}
 	const idea = await im.getIdea(parseInt(req.params.id, 10));
@@ -134,22 +134,22 @@ export async function search(req: Request, res: Response): Promise<void> {
 	sc.pattern = (req.query.pattern as string) ?? undefined;
 	sc.strict = (req.query as SearchContext).strict as true | undefined;
 	if (req.query.language) {
-		if (!await validateNumberInRequest(req.query.language as string, res)) {
+		if (!validateNumberInRequest(req.query.language as string, res)) {
 			return;
 		}
 		sc.language = parseInt(req.query.language as string, 10);
 	}
 	if (req.query.ideaHas) {
 		const ideaHasArray = (req.query.ideaHas as string).split(',');
-		const promises: Array<Promise<boolean>> = [];
-		ideaHasArray.forEach(ideaHas => promises.push(validateNumberInRequest(ideaHas, res)));
-		if (!(await Promise.all(promises)).every(validNumber => validNumber)) {
-			return;
+		for (const ideaHas of ideaHasArray) {
+			if (!(validateNumberInRequest(ideaHas, res))) {
+				return;
+			}
 		}
 		sc.ideaHas = (req.query.ideaHas as string).split(',').map(i => parseInt(i, 10));
 	}
 	if (req.query.ideaDoesNotHave) {
-		if (!await validateNumberInRequest(req.query.ideaDoesNotHave as string, res)) {
+		if (!validateNumberInRequest(req.query.ideaDoesNotHave as string, res)) {
 			return;
 		}
 		sc.ideaDoesNotHave = parseInt(req.query.ideaDoesNotHave as string, 10);
@@ -224,7 +224,7 @@ export async function deleteAllData(_: Request, res: Response): Promise<void> {
 }
 
 async function validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
-	if (!await validateNumberInRequest(req.params.id, res)) {
+	if (!validateNumberInRequest(req.params.id, res)) {
 		return false;
 	}
 	const ideaId = parseInt(req.params.id, 10);
@@ -237,7 +237,7 @@ async function validateLanguageIdInRequest(req: Request, res: Response): Promise
 }
 
 async function validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
-	if (!await validateNumberInRequest(req.params.id, res)) {
+	if (!validateNumberInRequest(req.params.id, res)) {
 		return false;
 	}
 	const ideaId = parseInt(req.params.id, 10);
@@ -249,7 +249,7 @@ async function validateIdeaIdInRequest(req: Request, res: Response): Promise<boo
 	return true;
 }
 
-async function validateNumberInRequest(expectedNumber: string, res: Response): Promise<boolean> {
+function validateNumberInRequest(expectedNumber: string, res: Response): boolean {
 	if (Number.isNaN(Number(expectedNumber))) {
 		res.status(400);
 		res.end();
