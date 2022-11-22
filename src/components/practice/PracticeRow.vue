@@ -55,7 +55,7 @@
       </button>
       <div
         style="cursor: pointer"
-        class="p-2 d-flex align-items-center"
+        class="p-2 d-flex align-items-center expression-known"
         title="Known expression"
         data-bs-html="true"
         data-bs-toggle="tooltip"
@@ -68,7 +68,7 @@
           ref="knownButton"
           type="checkbox"
           style="cursor: pointer"
-          class="expression-known form-check-label"
+          class="expression-known-checkbox form-check-label"
           :checked="expression.known"
         >
       </div>

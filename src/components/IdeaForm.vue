@@ -37,18 +37,19 @@
         >
         <div
           style="cursor: pointer"
-          class="p-2 d-flex align-items-center"
+          class="p-2 d-flex align-items-center expression-known-wrapper"
           title="Known expression"
           data-bs-html="true"
           data-bs-toggle="tooltip"
           data-bs-placement="right"
+          @click="e.known = !e.known"
         >
           <input
             ref="knownButton"
             v-model="e.known"
             type="checkbox"
             style="cursor: pointer"
-            class="expression-known-toggle form-check-label"
+            class="expression-known-checkbox form-check-label"
             @keydown.enter="e.known = !e.known"
             @keydown.left="moveLeft"
             @keydown.down="moveDown"
@@ -61,8 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import * as bootstrap from 'bootstrap';
-import {nextTick, ref} from 'vue';
+import {ref} from 'vue';
 import type {Idea} from '../../server/model/ideas/idea';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
@@ -141,9 +141,4 @@ function moveUp(e: Event) {
 		focusEndOfInput(knownToggles[indexToUse] as HTMLInputElement);
 	}
 }
-
-void nextTick(() => {
-	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-});
 </script>
