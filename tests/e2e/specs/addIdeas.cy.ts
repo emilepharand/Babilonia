@@ -156,6 +156,10 @@ context('The idea page', () => {
 		// Known expression toggle
 		getKnownExpressionToggle(1)
 			.should('be.focused')
+			.type('{enter}')
+			.should('be.checked')
+			.type('{enter}')
+			.should('not.be.checked')
 			.type('{downArrow}{downArrow}{downArrow}');
 		getKnownExpressionToggle(4)
 			.should('be.focused')

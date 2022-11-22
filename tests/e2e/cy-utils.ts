@@ -1,6 +1,6 @@
-import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
-import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import * as dotenv from 'dotenv';
+import {ExpressionForAdding} from '../../server/model/ideas/expression';
+import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Settings} from '../../server/model/settings/settings';
 
 dotenv.config();
@@ -192,7 +192,7 @@ export function toggleExpressionKnown(rowNbr: number) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known')
+		.find('.expression-known-toggle')
 		.click();
 }
 
@@ -200,9 +200,8 @@ export function assertExpressionIsKnown(rowNbr: number, known: boolean) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known')
-		.should('have.text', known ? '✅' : '❌')
-		.should('not.have.text', known ? '❌' : '✅');
+		.find('.expression-known-toggle')
+		.should(known ? 'be.checked' : 'not.be.checked');
 }
 
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
