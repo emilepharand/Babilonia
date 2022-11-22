@@ -37,20 +37,23 @@
         >
         <div
           style="cursor: pointer"
-          class="expression-known p-2 d-flex align-items-center"
-          @click="e.known = !e.known"
+          class="p-2 d-flex align-items-center"
+          title="Mark expression as known"
+          data-bs-html="true"
+          data-bs-toggle="tooltip"
+          data-bs-placement="right"
         >
-          <span
-            tabindex="0"
+          <input
+            ref="knownButton"
+            v-model="e.known"
+            type="checkbox"
             style="cursor: pointer"
-            class="form-check-label expression-known-toggle"
+            class="expression-known-toggle form-check-label"
             @keydown.enter="e.known = !e.known"
             @keydown.left="moveLeft"
             @keydown.down="moveDown"
             @keydown.up="moveUp"
           >
-            {{ e.known ? '✅':'❌' }}
-          </span>
         </div>
       </div>
     </div>
@@ -58,10 +61,11 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import * as bootstrap from 'bootstrap';
+import {nextTick, ref} from 'vue';
+import type {Idea} from '../../server/model/ideas/idea';
 import {getEmptyLanguagesNoAsync} from '../../server/model/languages/language';
 import * as Api from '../ts/api';
-import type {Idea} from '../../server/model/ideas/idea';
 import {focusEndOfInput} from '../ts/domHelper';
 import {knownToggles, languageSelects, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 
@@ -137,4 +141,9 @@ function moveUp(e: Event) {
 		focusEndOfInput(knownToggles[indexToUse] as HTMLInputElement);
 	}
 }
+
+void nextTick(() => {
+	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
 </script>
