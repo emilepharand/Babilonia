@@ -56,7 +56,7 @@
       <div
         style="cursor: pointer"
         class="p-2 d-flex align-items-center"
-        title="Mark expression as known"
+        title="Known expression"
         data-bs-html="true"
         data-bs-toggle="tooltip"
         data-bs-placement="right"
