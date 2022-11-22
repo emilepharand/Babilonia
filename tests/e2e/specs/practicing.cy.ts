@@ -232,6 +232,10 @@ context('Practicing', () => {
 			.click()
 			.should('be.checked')
 			.click()
+			.should('not.be.checked')
+			.type('{enter}')
+			.should('be.checked')
+			.type('{enter}')
 			.should('not.be.checked');
 		typeInRow(3, '{rightArrow}{rightArrow}{rightArrow}');
 		getRowKnownButton(3)
