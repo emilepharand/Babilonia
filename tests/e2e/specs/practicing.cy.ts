@@ -1,3 +1,5 @@
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
+import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {
 	addIdeas,
 	addLanguages,
@@ -5,8 +7,6 @@ import {
 	assertFetchIdeaReturnsStatus,
 	setSettings,
 } from '../cy-utils';
-import {ExpressionForAdding} from '../../../server/model/ideas/expression';
-import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
 beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
@@ -227,17 +227,32 @@ context('Practicing', () => {
 		typeInRow(4, '{backspace}HOLA éàíôüáéíóú');
 		assertRowMatchIsFullMatch(4, 'HOLA éàíôüáéíóú');
 
-		getRowKnownButton(2).should('have.text', '❌')
+		getRowKnownButton(2)
+			.should('not.be.checked')
 			.click()
-			.should('have.text', '✅')
+			.should('be.checked')
 			.click()
-			.should('have.text', '❌');
+			.should('not.be.checked')
+			.type('{enter}')
+			.should('be.checked')
+			.type('{enter}')
+			.should('not.be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(2)
+			.click();
+		getRowKnownButton(2)
+			.should('be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(2)
+			.click();
+		getRowKnownButton(2)
+			.should('not.be.checked');
 		typeInRow(3, '{rightArrow}{rightArrow}{rightArrow}');
 		getRowKnownButton(3)
 			.should('have.focus')
-			.should('have.text', '❌')
+			.should('not.be.checked')
 			.type('{enter}')
-			.should('have.text', '✅');
+			.should('be.checked');
 
 		assertFetchIdeaReturnsStatus(2, 200, ['"known":true']);
 	});
@@ -502,7 +517,7 @@ function getRowHintButton(rowNbr: number) {
 }
 
 function getRowKnownButton(rowNbr: number) {
-	return getRow(rowNbr).find('.expression-known');
+	return getRow(rowNbr).find('.expression-known-checkbox');
 }
 
 function getNextButton() {

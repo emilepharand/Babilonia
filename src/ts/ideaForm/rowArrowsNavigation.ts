@@ -1,3 +1,4 @@
+import * as bootstrap from 'bootstrap';
 import {findAllElementsByClassName, focusEndOfInput} from '../domHelper';
 
 export const defaultNbrRows = 5;
@@ -8,7 +9,7 @@ export let knownToggles: HTMLElement[] = [];
 
 const expressionLanguageClassName = 'expression-language';
 const expressionTextClassName = 'expression-text';
-const expressionKnownClassName = 'expression-known-toggle';
+const expressionKnownClassName = 'expression-known-checkbox';
 
 export function initElements(expectedNumberRows: number) {
 	initElementsWithNbrTries(0, expectedNumberRows);
@@ -16,16 +17,22 @@ export function initElements(expectedNumberRows: number) {
 
 function initElementsWithNbrTries(nbrTries: number, expectedNumberRows: number) {
 	setTimeout(() => {
-		languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
 		textInputs = Array.from(findAllElementsByClassName(expressionTextClassName));
-		knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
 		if (textInputs.length !== expectedNumberRows && nbrTries < 25) {
 			initElementsWithNbrTries(nbrTries + 1, expectedNumberRows);
 		} else {
+			knownToggles = Array.from(findAllElementsByClassName(expressionKnownClassName));
+			languageSelects = Array.from(findAllElementsByClassName(expressionLanguageClassName));
+			initToolTips();
 			const element = findFirstEmptyExpressionElseFirstExpression();
 			focusEndOfInput(element as HTMLInputElement);
 		}
 	}, 10);
+}
+
+function initToolTips() {
+	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 }
 
 function findFirstEmptyExpressionElseFirstExpression() {
