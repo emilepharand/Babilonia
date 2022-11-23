@@ -30,8 +30,12 @@
       <hr>
       <div class="d-flex btn-group">
         <button
+          ref="resetButton"
           class="btn btn-outline-secondary flex-grow-1 reset-button"
           @click="resetRows()"
+          @keydown.right="nextIdeaButton.focus()"
+          @keydown.down="editIdeaButton.focus()"
+          @keydown.up="focusLastRow()"
         >
           Reset
         </button>
@@ -39,6 +43,9 @@
           ref="nextIdeaButton"
           :class="nextButtonClass"
           @click="nextIdea()"
+          @keydown.left="resetButton.focus()"
+          @keydown.down="editIdeaButton.focus()"
+          @keydown.up="focusLastRow()"
         >
           Next
         </button>
@@ -46,9 +53,12 @@
       <div class="d-flex btn-group mt-2">
         <a
           id="edit-idea-link"
+          ref="editIdeaButton"
           class="btn btn-outline-secondary flex-grow-1"
           :href="'/ideas/' + idea.id"
           target="_blank"
+          @keydown.up="nextIdeaButton.focus()"
+          @keydown.down="focusFirstRow()"
         >
           Edit Idea
         </a>
@@ -58,16 +68,15 @@
 </template>
 
 <script lang="ts" setup>
-import * as Api from '../ts/api';
-import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
-import type {Expression} from '../../server/model/ideas/expression';
 import {computed, nextTick, ref} from 'vue';
+import type {Expression} from '../../server/model/ideas/expression';
+import {getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
+import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
+import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import PracticeRow from '../components/practice/PracticeRow.vue';
-import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
-import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
+import * as Api from '../ts/api';
 
-const nextIdeaButton = ref(document.createElement('button'));
 const idea = ref(getEmptyIdeaNoAsync());
 const noIdeas = ref(false);
 const currentlyFocusedRow = ref(0);
@@ -77,6 +86,10 @@ const nbrFullyMatchedRows = ref(0);
 const nbrRowsToMatch = ref(0);
 const resetAll = ref(false);
 const settings = ref(getEmptySettingsNoAsync());
+
+const nextIdeaButton = ref(document.createElement('button'));
+const resetButton = ref(document.createElement('button'));
+const editIdeaButton = ref(document.createElement('button'));
 
 (async () => {
 	try {
@@ -127,17 +140,44 @@ function focusRow(rowNumber: number) {
 function focusPreviousRow(currentRow: number) {
 	focusDirectionDown.value = false;
 	if (currentlyFocusedRow.value === 0) {
-		// Loop around
-		currentlyFocusedRow.value = idea.value.ee.length - 1;
+		if (startInteractive.value) {
+			editIdeaButton.value.focus();
+		} else {
+			// Focus loops until first practiceable expression is loaded
+			currentlyFocusedRow.value = idea.value.ee.length - 1;
+		}
 	} else {
 		currentlyFocusedRow.value = currentRow - 1;
 	}
 }
 
+function focusFirstRow() {
+	focusDirectionDown.value = true;
+	// Trigger change
+	currentlyFocusedRow.value = -1;
+	void nextTick(() => {
+		currentlyFocusedRow.value = 0;
+	});
+}
+
+function focusLastRow() {
+	focusDirectionDown.value = false;
+	// Trigger change
+	currentlyFocusedRow.value = -1;
+	void nextTick(() => {
+		currentlyFocusedRow.value = idea.value.ee.length - 1;
+	});
+}
+
 function focusNextRow(rowNumber: number) {
 	focusDirectionDown.value = true;
 	if (currentlyFocusedRow.value === idea.value.ee.length - 1) {
-		currentlyFocusedRow.value = 0;
+		if (startInteractive.value) {
+			nextIdeaButton.value.focus();
+		} else {
+			// Focus loops until first practiceable expression is loaded
+			currentlyFocusedRow.value = 0;
+		}
 	} else {
 		currentlyFocusedRow.value = rowNumber + 1;
 	}
