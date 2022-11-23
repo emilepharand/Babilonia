@@ -1,3 +1,5 @@
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
+import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {
 	addIdeas,
 	addLanguages,
@@ -10,14 +12,12 @@ import {
 	getDeleteButton,
 	getEditButton,
 	getExpressionTextInputRow,
-	getKnownExpressionToggle,
+	getKnownExpressionCheckbox,
 	getLanguageSelect,
 	inputExpression,
 	toggleExpressionKnown,
 	waitForTableToLoad,
 } from '../cy-utils';
-import {ExpressionForAdding} from '../../../server/model/ideas/expression';
-import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 
 beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
@@ -134,7 +134,7 @@ context('The idea page', () => {
 		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{rightArrow}');
-		getKnownExpressionToggle(0)
+		getKnownExpressionCheckbox(0)
 			.should('be.focused')
 			.type('{downArrow}')
 			.should('be.focused')

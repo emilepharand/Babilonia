@@ -1,6 +1,6 @@
-import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
-import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import * as dotenv from 'dotenv';
+import {ExpressionForAdding} from '../../server/model/ideas/expression';
+import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Settings} from '../../server/model/settings/settings';
 
 dotenv.config();
@@ -146,8 +146,8 @@ export function getExpressionTextInputRow(n: number) {
 	return cy.get('.expression-text').eq(n);
 }
 
-export function getKnownExpressionToggle(n: number) {
-	return cy.get('.expression-known-toggle').eq(n);
+export function getKnownExpressionCheckbox(n: number) {
+	return cy.get('.expression-known-checkbox').eq(n);
 }
 
 export function getLanguageSelect(n: number) {
@@ -192,7 +192,7 @@ export function toggleExpressionKnown(rowNbr: number) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known')
+		.find('.expression-known-checkbox')
 		.click();
 }
 
@@ -200,9 +200,8 @@ export function assertExpressionIsKnown(rowNbr: number, known: boolean) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known')
-		.should('have.text', known ? '✅' : '❌')
-		.should('not.have.text', known ? '❌' : '✅');
+		.find('.expression-known-checkbox')
+		.should(known ? 'be.checked' : 'not.be.checked');
 }
 
 export function assertExpressionHasValues(rowNbr: number, languageName: string, text: string) {
