@@ -55,26 +55,30 @@
       </button>
       <div
         style="cursor: pointer"
-        class="p-2 d-flex align-items-center"
+        class="p-2 d-flex align-items-center expression-known-wrapper"
+        title="Known expression"
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
         @click="$emit('toggleKnown', rowOrder)"
         @keydown.enter="$emit('toggleKnown', rowOrder)"
         @keydown.left="showButton.focus()"
       >
-        <span
+        <input
           ref="knownButton"
-          tabindex="0"
+          type="checkbox"
           style="cursor: pointer"
-          class="expression-known form-check-label"
+          class="expression-known-checkbox form-check-label"
+          :checked="expression.known"
         >
-          {{ expression.known ? '✅':'❌' }}
-        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, watch} from 'vue';
+import * as bootstrap from 'bootstrap';
+import {nextTick, onMounted, ref, watch} from 'vue';
 import type {Expression} from '../../../server/model/ideas/expression';
 import type {Settings} from '../../../server/model/settings/settings';
 import {focusEndOfInput} from '../../ts/domHelper';
@@ -100,7 +104,7 @@ const currentMaxLength = ref(1);
 const textInput = ref(document.createElement('input'));
 const hintButton = ref(document.createElement('button'));
 const showButton = ref(document.createElement('button'));
-const knownButton = ref(document.createElement('div'));
+const knownButton = ref(document.createElement('input'));
 
 onMounted(() => {
 	if (props.isFocused && !props.settings.passiveMode) {
@@ -255,6 +259,11 @@ function hint() {
 function show() {
 	typed.value = props.expression.text;
 }
+
+void nextTick(() => {
+	const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+	tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
 </script>
 
 <style scoped>
