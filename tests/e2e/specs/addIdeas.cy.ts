@@ -7,7 +7,7 @@ import {
 	assertFetchIdeaReturnsStatus,
 	getAddRowsButton,
 	getExpressionTextInputRow,
-	getKnownExpressionToggle,
+	getKnownExpressionCheckbox,
 	getLanguageSelect,
 	getSaveButton,
 	inputExpression,
@@ -122,7 +122,7 @@ context('The idea page', () => {
 		getExpressionTextInputRow(0)
 			.should('be.focused')
 			.type('{rightArrow}');
-		getKnownExpressionToggle(0)
+		getKnownExpressionCheckbox(0)
 			.should('be.focused')
 			.type('{leftArrow}');
 		getExpressionTextInputRow(0)
@@ -140,7 +140,7 @@ context('The idea page', () => {
 		getExpressionTextInputRow(1)
 			.should('be.focused')
 			.type('{rightArrow}');
-		getKnownExpressionToggle(1)
+		getKnownExpressionCheckbox(1)
 			.should('be.focused')
 			.type('{leftArrow}');
 		getExpressionTextInputRow(1)
@@ -154,23 +154,33 @@ context('The idea page', () => {
 			.type('{rightArrow}');
 
 		// Known expression toggle
-		getKnownExpressionToggle(1)
+		getKnownExpressionCheckbox(1)
 			.should('be.focused')
 			.type('{enter}')
 			.should('be.checked')
 			.type('{enter}')
+			.should('not.be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(1)
+			.click();
+		getKnownExpressionCheckbox(1)
+			.should('be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(1)
+			.click();
+		getKnownExpressionCheckbox(1)
 			.should('not.be.checked')
 			.type('{downArrow}{downArrow}{downArrow}');
-		getKnownExpressionToggle(4)
+		getKnownExpressionCheckbox(4)
 			.should('be.focused')
 			.type('{downArrow}');
-		getKnownExpressionToggle(0)
+		getKnownExpressionCheckbox(0)
 			.should('be.focused')
 			.type('{upArrow}');
-		getKnownExpressionToggle(4)
+		getKnownExpressionCheckbox(4)
 			.should('be.focused')
 			.type('{downArrow}');
-		getKnownExpressionToggle(0)
+		getKnownExpressionCheckbox(0)
 			.should('be.focused')
 			.type('{leftArrow}');
 

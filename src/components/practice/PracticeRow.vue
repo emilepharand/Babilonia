@@ -55,7 +55,7 @@
       </button>
       <div
         style="cursor: pointer"
-        class="p-2 d-flex align-items-center expression-known"
+        class="p-2 d-flex align-items-center expression-known-wrapper"
         title="Known expression"
         data-bs-html="true"
         data-bs-toggle="tooltip"

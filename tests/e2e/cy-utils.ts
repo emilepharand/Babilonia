@@ -146,8 +146,8 @@ export function getExpressionTextInputRow(n: number) {
 	return cy.get('.expression-text').eq(n);
 }
 
-export function getKnownExpressionToggle(n: number) {
-	return cy.get('.expression-known-toggle').eq(n);
+export function getKnownExpressionCheckbox(n: number) {
+	return cy.get('.expression-known-checkbox').eq(n);
 }
 
 export function getLanguageSelect(n: number) {
@@ -192,7 +192,7 @@ export function toggleExpressionKnown(rowNbr: number) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known-toggle')
+		.find('.expression-known-checkbox')
 		.click();
 }
 
@@ -200,7 +200,7 @@ export function assertExpressionIsKnown(rowNbr: number, known: boolean) {
 	cy.get('#ideas')
 		.find('.expression')
 		.eq(rowNbr)
-		.find('.expression-known-toggle')
+		.find('.expression-known-checkbox')
 		.should(known ? 'be.checked' : 'not.be.checked');
 }
 

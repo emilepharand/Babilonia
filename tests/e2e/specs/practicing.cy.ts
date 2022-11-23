@@ -237,6 +237,16 @@ context('Practicing', () => {
 			.should('be.checked')
 			.type('{enter}')
 			.should('not.be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(2)
+			.click();
+		getRowKnownButton(2)
+			.should('be.checked');
+		cy.get('.expression-known-wrapper')
+			.eq(2)
+			.click();
+		getRowKnownButton(2)
+			.should('not.be.checked');
 		typeInRow(3, '{rightArrow}{rightArrow}{rightArrow}');
 		getRowKnownButton(3)
 			.should('have.focus')
@@ -507,7 +517,7 @@ function getRowHintButton(rowNbr: number) {
 }
 
 function getRowKnownButton(rowNbr: number) {
-	return getRow(rowNbr).find('.expression-known');
+	return getRow(rowNbr).find('.expression-known-checkbox');
 }
 
 function getNextButton() {

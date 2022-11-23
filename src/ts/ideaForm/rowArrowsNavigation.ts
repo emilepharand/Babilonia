@@ -9,7 +9,7 @@ export let knownToggles: HTMLElement[] = [];
 
 const expressionLanguageClassName = 'expression-language';
 const expressionTextClassName = 'expression-text';
-const expressionKnownClassName = 'expression-known-toggle';
+const expressionKnownClassName = 'expression-known-checkbox';
 
 export function initElements(expectedNumberRows: number) {
 	initElementsWithNbrTries(0, expectedNumberRows);
