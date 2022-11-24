@@ -336,7 +336,7 @@ context('Practicing', () => {
 
 		typeInRow(2, '{downArrow}{downArrow}');
 		assertRowInputHasFocus(5);
-		typeInRow(5, '{downArrow}{downArrow}');
+		typeInRow(5, '{downArrow}{downArrow}{downArrow}{downArrow}');
 		assertRowInputHasFocus(2);
 	});
 
