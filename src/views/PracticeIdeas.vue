@@ -169,6 +169,15 @@ function focusLastRow() {
 	});
 }
 
+function focusNextUnmatchedRow(rowNumber: number) {
+	focusDirectionDown.value = true;
+	if (currentlyFocusedRow.value === idea.value.ee.length - 1) {
+		currentlyFocusedRow.value = 0;
+	} else {
+		currentlyFocusedRow.value = rowNumber + 1;
+	}
+}
+
 function focusNextRow(rowNumber: number) {
 	focusDirectionDown.value = true;
 	if (currentlyFocusedRow.value === idea.value.ee.length - 1) {
@@ -203,7 +212,7 @@ function rowFullyMatched(rowNumber: number, newMatch: boolean) {
 		currentlyFocusedRow.value = -1;
 		nextIdeaButton.value.focus();
 	} else if (currentlyFocusedRow.value === rowNumber) {
-		focusNextRow(rowNumber);
+		focusNextUnmatchedRow(rowNumber);
 	} else {
 		const temp = currentlyFocusedRow.value;
 		currentlyFocusedRow.value = -1;

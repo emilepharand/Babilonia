@@ -5,7 +5,7 @@ import {
 	addLanguages,
 	apiUrl,
 	assertFetchIdeaReturnsStatus,
-	setSettings,
+	setSettings
 } from '../cy-utils';
 
 beforeEach(() => {
@@ -93,11 +93,36 @@ context('Practicing', () => {
 		typeInRow(3, '{downArrow}');
 		assertRowInputHasFocus(4);
 		typeInRow(4, '{downArrow}');
+		getNextButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getEditButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		getNextButton()
+			.should('be.focused')
+			.type('{leftArrow}');
+		getResetButton()
+			.should('be.focused')
+			.type('{rightArrow}');
+		getNextButton()
+			.should('be.focused')
+			.type('{upArrow}');
+		assertRowInputHasFocus(4);
+		typeInRow(4, '{downArrow}');
+		getNextButton()
+			.should('be.focused')
+			.type('{downArrow}');
+		getEditButton()
+			.should('be.focused')
+			.type('{downArrow}');
 		assertRowInputHasFocus(2);
 		// UpArrow must be last because it is not the usual direction so we need to make sure it's
 		// not stuck in that direction the next time it changes focus
 		typeInRow(2, '{upArrow}');
-		assertRowInputHasFocus(4);
+		getEditButton()
+			.should('be.focused')
+			.type('{upArrow}{upArrow}{upArrow}');
 
 		// Test right and left arrows
 		typeInRow(4, '{rightArrow}');
@@ -183,8 +208,10 @@ context('Practicing', () => {
 		show(4);
 		assertRowInputHasFocus(3);
 		typeInRow(3, '{upArrow}');
+		getEditButton().should('be.focused').type('{downArrow}');
 		assertRowInputHasFocus(3);
 		typeInRow(3, '{downArrow}');
+		getNextButton().should('be.focused').type('{upArrow}');
 		assertRowInputHasFocus(3);
 		show(3);
 
@@ -526,6 +553,10 @@ function getNextButton() {
 
 function getResetButton() {
 	return cy.get('.reset-button');
+}
+
+function getEditButton() {
+	return cy.get('#edit-idea-link');
 }
 
 function getRowShowButton(rowNbr: number) {
