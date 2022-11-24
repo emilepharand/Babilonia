@@ -54,8 +54,12 @@ context('The idea page', () => {
 			['deutsch', 'guten Tag']];
 		ee.forEach((e, i) => inputExpression(i, e[0], e[1]));
 
+		cy.intercept('POST', `${apiUrl}/ideas`).as('saveIdea');
+
 		// Click save
 		cy.get('#save-idea').click();
+
+		cy.wait('@saveIdea').its('response.statusCode').should('eq', 201);
 
 		cy.get('#error-text').should('not.be.visible');
 
@@ -96,6 +100,8 @@ context('The idea page', () => {
 
 		// Click save
 		cy.get('#save-idea').click();
+
+		cy.wait('@saveIdea').its('response.statusCode').should('eq', 201);
 
 		// Idea 2 was created (testing a sample of expressions)
 		assertFetchIdeaReturnsStatus(2, 200, ['toto', 'bom dia', 'hi', 'salut', 'bonjour', 'guten Tag']);
