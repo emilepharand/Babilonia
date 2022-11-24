@@ -1,15 +1,15 @@
-import sqlite3 from 'sqlite3';
+import * as fs from 'fs';
 import type {Database} from 'sqlite';
 import {open} from 'sqlite';
-import IdeaManager from './ideas/ideaManager';
-import LanguageManager from './languages/languageManager';
+import sqlite3 from 'sqlite3';
+import {databasePath} from '../options';
 import PracticeManager from '../practice/practiceManager';
-import InputValidator from './inputValidator';
-import SearchHandler from './search/searchHandler';
 import {StatsCounter} from '../stats/statsCounter';
+import IdeaManager from './ideas/ideaManager';
+import InputValidator from './inputValidator';
+import LanguageManager from './languages/languageManager';
+import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
-import {databasePath, isTestMode} from '../options';
-import * as fs from 'fs';
 
 let dbExists = true;
 
@@ -100,6 +100,6 @@ export function getSettingsManager(): SettingsManager {
 	return settingsManager;
 }
 
-if (isTestMode || !dbExists) {
-	await deleteAllData();
+if (!dbExists) {
+	await clearDatabaseAndCreateSchema();
 }

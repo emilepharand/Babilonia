@@ -1,11 +1,11 @@
 import cors from 'cors';
 import type {ErrorRequestHandler} from 'express';
 import express from 'express';
-import {apiPort, appPort, isDevMode, isTestMode} from './options';
+import {apiPort, appPort, isDevMode} from './options';
 import Routes from './routes';
 
 const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
-	if (!isTestMode) {
+	if (!process.env.TEST_MODE) {
 		console.error(err.stack);
 	}
 	res.status(400);
