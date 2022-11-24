@@ -34,7 +34,7 @@ export const inputValidator = new InputValidator(languageManager);
 export const searchHandler = new SearchHandler(db, ideaManager);
 export const stats = new StatsCounter(db, languageManager);
 
-export async function deleteAllData(): Promise<void> {
+export async function clearDatabaseAndCreateSchema(): Promise<void> {
 	await db.run('drop table if exists expressions');
 	await db.run('drop table if exists ideas');
 	await db.run('drop table if exists languages');
