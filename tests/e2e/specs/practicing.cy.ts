@@ -5,7 +5,7 @@ import {
 	addLanguages,
 	apiUrl,
 	assertFetchIdeaReturnsStatus,
-	setSettings
+	setSettings,
 } from '../cy-utils';
 
 beforeEach(() => {
