@@ -20,6 +20,14 @@ routes.init();
 apiServer.listen(apiPort, () => {
 	console.log(`API server started. Listening on port ${apiPort!}.`);
 });
+if (process.env.TEST_MODE) {
+	apiServer.get('/__coverage__', (_, res) => {
+		res.json({
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+			coverage: (global as any).__coverage__,
+		});
+	});
+}
 
 if (!isDevMode) {
 	const appServer = express().use(cors()).use(express.json());
