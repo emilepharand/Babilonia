@@ -14,7 +14,7 @@
     "pretest": "npm run check && npm run test:build",
     "test:build": "export $(xargs < .env.test) && npm run build && mkdir -p tests/coverage/merged",
     "test": "npm run test:bash && npm run test:api && npm run test:vue",
-    "test:serve": "cd dist && node index.cjs --db=:memory:",
+    "test:serve": "cd dist && node index.cjs --db=:memory: 2>/dev/null",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
     "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_API_PORT test:api:run",
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand && npm run test:api:coverage",
