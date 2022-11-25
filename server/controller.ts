@@ -219,7 +219,7 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
-	await DataServiceProvider.deleteAllData();
+	await DataServiceProvider.clearDatabaseAndCreateSchema();
 	res.end();
 }
 

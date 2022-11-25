@@ -1,13 +1,11 @@
 import cors from 'cors';
 import type {ErrorRequestHandler} from 'express';
 import express from 'express';
-import {apiPort, appPort, isDevMode, isTestMode} from './options';
+import {apiPort, appPort, isDevMode} from './options';
 import Routes from './routes';
 
 const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
-	if (!isTestMode) {
-		console.error(err.stack);
-	}
+	console.error(err.stack);
 	res.status(400);
 	res.end();
 	next();
@@ -20,6 +18,14 @@ routes.init();
 apiServer.listen(apiPort, () => {
 	console.log(`API server started. Listening on port ${apiPort!}.`);
 });
+if (process.env.TEST_MODE) {
+	apiServer.get('/__coverage__', (_, res) => {
+		res.json({
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+			coverage: (global as any).__coverage__,
+		});
+	});
+}
 
 if (!isDevMode) {
 	const appServer = express().use(cors()).use(express.json());

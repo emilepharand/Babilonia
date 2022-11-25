@@ -185,6 +185,12 @@ context('The idea page', () => {
 			.type('{upArrow}');
 		getKnownExpressionCheckbox(4)
 			.should('be.focused')
+			.type('{upArrow}');
+		getKnownExpressionCheckbox(3)
+			.should('be.focused')
+			.type('{downArrow}');
+		getKnownExpressionCheckbox(4)
+			.should('be.focused')
 			.type('{downArrow}');
 		getKnownExpressionCheckbox(0)
 			.should('be.focused')

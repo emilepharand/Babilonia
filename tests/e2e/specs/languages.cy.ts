@@ -87,7 +87,7 @@ context('Interactivity', () => {
 	});
 });
 
-context('Error handling in the language page', () => {
+context('Error handling on the language page', () => {
 	specify('Adding/editing with invalid input', () => {
 		cy.get('#languages-link').click();
 

@@ -1,3 +1,6 @@
+import {ExpressionForAdding} from '../../server/model/ideas/expression';
+import {Idea} from '../../server/model/ideas/idea';
+import {SearchContext} from '../../server/model/search/searchContext';
 import {
 	addIdea,
 	addLanguage,
@@ -6,9 +9,6 @@ import {
 	searchAndGetResponse,
 	searchRawParamsAndGetResponse,
 } from '../utils/utils';
-import {ExpressionForAdding} from '../../server/model/ideas/expression';
-import {Idea} from '../../server/model/ideas/idea';
-import {SearchContext} from '../../server/model/search/searchContext';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -279,6 +279,11 @@ describe('searching expressions', () => {
 
 		test('ideaDoesNotHave is not numeric', async () => {
 			const r = await searchRawParamsAndGetResponse('ideaDoesNotHave=a');
+			expect(r.status).toEqual(400);
+		});
+
+		test('knownExpressions is not boolean', async () => {
+			const r = await searchRawParamsAndGetResponse('knownExpressions=invalid');
 			expect(r.status).toEqual(400);
 		});
 	});
