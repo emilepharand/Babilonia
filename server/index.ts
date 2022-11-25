@@ -5,9 +5,7 @@ import {apiPort, appPort, isDevMode} from './options';
 import Routes from './routes';
 
 const errorHandler: ErrorRequestHandler = (err, _, res, next) => {
-	if (!process.env.TEST_MODE) {
-		console.error(err.stack);
-	}
+	console.error(err.stack);
 	res.status(400);
 	res.end();
 	next();
