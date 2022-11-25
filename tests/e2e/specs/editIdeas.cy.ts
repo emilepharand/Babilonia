@@ -65,6 +65,8 @@ context('The idea page', () => {
 
 		getAddRowsButton().click();
 
+		waitForTableToLoad(9);
+
 		// Empty idea (not valid)
 		for (let i = 0; i < 5; i++) {
 			inputExpression(i, 'deutsch', '');
