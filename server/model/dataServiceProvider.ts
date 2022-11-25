@@ -14,7 +14,7 @@ import SettingsManager from './settings/settingsManager';
 let dbExists = true;
 
 async function initDb(): Promise<Database> {
-	if (databasePath !== ':memory:' && !fs.existsSync(databasePath)) {
+	if (databasePath === ':memory:' || !fs.existsSync(databasePath)) {
 		dbExists = false;
 	}
 	const localDb = await open({
