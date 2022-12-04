@@ -1,14 +1,12 @@
 import type {Idea} from '../../server/model/ideas/idea';
-import type {Language} from '../../server/model/languages/language';
 import type {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
-import type {Settings} from '../../server/model/settings/settings';
+import type {Language} from '../../server/model/languages/language';
 import type {SearchContext} from '../../server/model/search/searchContext';
+import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-const apiUrl = `${process.env.VITE_API_URL ?? import.meta.VITE_API_URL}`;
+const apiUrl = `${process.env.VITE_API_URL ?? import.meta.env.VITE_API_URL}`;
 
 export async function getIdea(ideaId: number): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
