@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  babilonia:
+    image: babilonia
+    ports:
+      - "8000:8000"
+      - "5000:5000"
+#    volumes:
+#      - ./db.db:/usr/src/babilonia/dist/db.db
+    container_name: babilonia
