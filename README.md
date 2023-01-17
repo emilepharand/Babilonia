@@ -5,8 +5,7 @@ TODO
 
 # Babilonia
 
-Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen their vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary im
-proves, so do your language skills!
+Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen their vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
 
 At its core, Babilonia leverages your **muscle memory** to help you learn **more words**, **faster**. Also, unlike traditionnal methods, Babilonia lets you practice **multiple languages *at the same time***! :heart_eyes:
 
@@ -23,48 +22,52 @@ At its core, Babilonia leverages your **muscle memory** to help you learn **more
 ### Powerful help as you're practicing
 A core component of Babilonia is its practice feature. It gives you *instant feedback* as you're typing, and *useful hints* when you need them. It's like your own personal teacher!
 
-Babilonia's approach is to help you remember words *on your own*. Often, you will find you remember *some* part of a word, but not the word *in full*. Maybe you know the first letter, how it ends, or perhaps you just need a little hint for the memory to spring back to your mind. The expression "on the tip of one's tongue" exists for good reason!
+Babilonia's approach is to help you remember words *on your own*. Often, you will find you remember *some* part of a word, but not the word *in full*. Maybe you know the first letter, how it ends, or perhaps you just need a little hint for the memory to spring back to your mind. The expression "on the tip of one's tongue" wasn't invented for nothing!
 
-In such instances, rather than revealing the full word, Babilonia can give you the next letter: a hint for the whole word. You can go from hint to hint like so, and type what you know when you know it. Not only is that more interactive and fun, but most importantly, through this way of practicing, you're much more likely to remember more parts of the word the next time around!
+In such instances, rather than revealing the full word, Babilonia can give you the next letter as a hint for the whole word. You can go from hint to hint like so, and type what you know, when you know it. Not only is that more interactive and fun, but most importantly, through this way of practicing, you're much more likely to remember more parts of each word the next time around!
 
 [Insert screenshot here]
 
 In Babilonia, *partial knowledge* of a word is rewarded and built upon. If you know some letters in a word, you can still get it partially correct. Remembering more letters means progress, even if you don't remember the full word. That is very motivating, and also it lets you focus more on the letters that you actually didn't get right.
 
-Of course, when you don't know, you don't know. You don't have to go through hints then: you can just get the full word revealed. After all, you have to start somewhere!
+Of course, when you don't know, you don't know. No need to go through hints then: you can just get the full word revealed. After all, you have to start somewhere!
 
 ### A polyglot's paradise
-Babilonia was designed to let users practice words *in many languages at the same time*. Most language tools are focused on learning one language at a time. But what if you want to master *multiple* languages? Wouldn't it be quite convenient to be able to practice *all of them, all at the same time*? Babilonia enables you to do just that!
+Babilonia was designed to let users practice words *in many languages at the same time*. Most language tools only let you practice one language at a time. But what if you want to master *multiple* languages? Wouldn't it be quite convenient to be able to practice *all of them, all at the same time*? Babilonia enables you to do just that!
 
-There are many benefits. First, you get to exercise the mental gymnastics of *quickly switching between languages*, which is an invaluable skill for a polyglot. Also, you learn to *link together* the different words in different languages to convey the same idea, which help you remember them more easily. Plus, it's an incredibly efficient way to practice multiple languages when your goal is to master them.
+That has many benefits. First, you get to exercise the mental gymnastics of *quickly switching between languages*, which is an invaluable skill for a polyglot. Also, you learn to associate between them the words in different languages to convey the same idea, which help you remember them more easily. Plus, it's an incredibly efficient way to practice when you want to learn multiple languages.
 
-However, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languagues, or even just one. Maybe your goal is not even to become a polyglot! At any time, you can always choose which languages you would like to study.
+However, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languages, or even just one. Maybe your goal is not to become a polyglot! At any time, you can choose which languages you would like to study.
 
 ### Easily track your progress and personalize your learning
-Being able to track your progress is a key element to stay motivated. Babilonia can tell you how many words you know in each language. Seeing those numbers go up is, on its own, a worthwhile goal to have. It is also an excellent measure of your progress in any given language and can help you compare which languages you know more than others and to which extent.
+Being able to track your progress is a key element for staying motivated. Babilonia can tell you how many words you know in each language. Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an excellent measure of your progress in any given language and helps you compare which languages you know better than others and where to direct your efforts.
 
 [Insert screenshot here]
 
 How it works is that you mark expressions as `known` as you encounter them. What qualifies as "known" is entirely up to you, as you are the best judge of whether you truly know an expression.
 
-Marking expressions as known allows you to get a more personalized experience. Indeed, a useful setting to for known expressions to not appear when practicing. That way, you can focus on practicing only the expressions that you actually don't know!
+Marking expressions as known allows you to get a more personalized experience. You can set known expressions to not appear when practicing. That way, you can focus on practicing only the expressions that you actually don't know!
 
-### The concept of `ideas` and `expressions`
-Ideas and expressions have a special meaning in Babilonia.
+### Use `expressions` to express your `ideas`
+In Babilonia, `ideas` and `expressions` have a special meaning.
+
+In short, for each `idea`, you learn which `expressions` allow you to convey it in each language you are learning.
 
 #### Expressions
-Very often, an `expression` is simply a word, like `very`, `beer`, `cold` or `to drink`. However, it could also be an expression (literally), an idiom, a saying, or any otherwise useful sentence, for example: `how are you?`, `what's your name?`, `cost of living`, `it's raining cats and dogs`, and so on.
+Very often, an `expression` is a word, like `beer`, `cold`, `very` or `to drink`. But it could also be an expression, an idiom, a saying, or any useful sentence. For example, `how are you?`, `what's your name?`, `watch out!`, `cost of living`, `it's raining cats and dogs`, and so on.
 
-Thus, because `word` is too restrictive to fit this definition, `expressions` was chosen to represent this notion.
+Expressions are words, or groups of words, expressed in a single language, that carry one well-defined meaning, and which can be translated to other languages. They are the actual elements that we want to learn.
 
 #### Ideas
-As Babilonia lets you practice multiple languages at the same time, we soon run into interesting problems. Let's say you want to practice the word `to play`. In French, you can almost always translate that word with `jouer`. But in Spanish, you don't play soccer like you play piano, you `juegas` soccer and you `tocas` piano.
+When practicing multiple languages at the same time, we find ourselves running into interesting problems. Let's say you want to practice the word `to play`. In Spanish, you don't play soccer and play piano, you `juegas` soccer and `tocas` piano.
 
-Such homonyms are very common and a lot of them are not so obvious, because we are so used to using them. And as you increase the number of languages, they become more and more apparent. To overcome this problem, we need to think of `meanings` more than we think of `words`.
+Thus, do you put `jugar` and `tocar` as translations for `to play`? That would mean placing English as the point of reference. For example, if you wanted to practice from Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why `jugar` isn't in its own entry with `giocare`, and similarly `tocar` with `suonare`?
 
-When we think of the word `to play` as in to play a sport, we are thinking of a different idea than when we think of the word `to play` as in to play an instrument. It's not even immediately obvious why we use the same word to express those two distinct ideas. Therefore, why would we practice them together then?
+Such homonyms are very common and a lot of them are not so obvious, as we are so used to using them. And as you increase the number of languages, they become more and more apparent. To overcome this problem, we must think of `meanings` more than we think of `words`.
 
-In Babilonia, you practice one `idea` at a time. You learn which `expression` allows you to convey that specific `idea` in each language.
+Actually, when we think of the word `to play` as in to play a sport, we have a completely different picture in our minds than when we think of the word `to play` in the context of playing an instrument. Therefore, in Babilonia, they are two distinct `ideas`. Some languages will use the same `expression` to express them, and some will not. That solves the problem of practicing the word `to play` in all languages, along with all other homonyms.
+
+That is also why Babilonia tracks how many ideas you can express in each language. Indeed, even if you know the word `to play` in the context of piano in Spanish, it does not mean you know how to say `to play` soccer.
 
 An `idea` is any concept that exists in our minds and that can be expressed through `expressions` in a given language. Put simply, the `idea` is the notion, and the `expression` is the word that we use to express it. An `expression` has a language, an `idea` does not.
 
