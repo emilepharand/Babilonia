@@ -5,53 +5,53 @@ TODO
 
 # Babilonia
 
-Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen their vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
+Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
 
-At its core, Babilonia leverages your **muscle memory** to help you learn **more words**, **faster**. Also, unlike traditionnal methods, Babilonia lets you practice **multiple languages *at the same time***! :heart_eyes:
+At its core, Babilonia leverages your **muscle memory** to help you learn **more words**, **faster**. Also, unlike traditionnal methods, Babilonia lets you practice multiple languages **at the same time**! :heart_eyes:
 
 ## Main features
-- Allows you memorize a *maximum* amount of words in a *minimum* amount of time
-- Contains clever tricks to help you remember words *as you're typing*
-- Builds on top of partial knowledge of words
-- Keeps track of how many words you know in each language
-- Uses a novel method based on universal ideas
-- Lets you practice any set of languages *all at once*!
+- Enables you memorize a **maximum** amount of words in a **minimum** amount of time ⌛
+- Contains clever tricks to help you remember words **as you're typing** 🧠
+- Builds on top of **partial knowledge** of words 🏗️
+- **Keeps track** of how many words you know in each language 📈
+- Uses a novel method based on **universal ideas** 💡
+- Lets you practice any set of languages **all at once**! 🤯
 
 ## How it works
 
-### Powerful help as you're practicing
-A core component of Babilonia is its practice feature. It gives you *instant feedback* as you're typing, and *useful hints* when you need them. It's like your own personal teacher!
+### The power of targeted help
+Learning works best when it's **interactive**. Babilonia works with what you know and builds up from there. It gives you **instant feedback** as you're practicing, and **useful hints** when you need them. It's like your own personal teacher!
 
-Babilonia's approach is to help you remember words *on your own*. Often, you will find you remember *some* part of a word, but not the word *in full*. Maybe you know the first letter, how it ends, or perhaps you just need a little hint for the memory to spring back to your mind. The expression "on the tip of one's tongue" wasn't invented for nothing!
+As you're typing, Babilonia will **highlight** your answer in **red** or **green** to let you know if you're on the right track.
 
-In such instances, rather than revealing the full word, Babilonia can give you the next letter as a hint for the whole word. You can go from hint to hint like so, and type what you know, when you know it. Not only is that more interactive and fun, but most importantly, through this way of practicing, you're much more likely to remember more parts of each word the next time around!
+Babilonia's approach is to help you remember words **on your own**. Often, you will find you remember *some* part of a word, but not the word in full. Maybe you know the first letter, how it ends, or perhaps you **just need a hint** for the memory to spring back to your mind. The expression "on the tip of one's tongue" wasn't invented for nothing!
+
+In such cases, **rather than revealing the full word** (and preventing you from remembering it on your own), Babilonia can give you **the next letter** as a hint for the whole word. You can go from hint to hint like so, and type what you know, when you know it. Not only is that more interactive and fun, but most importantly, through this way of practicing, you're much more likely to remember more parts of the word the next time around!
 
 [Insert screenshot here]
 
-In Babilonia, *partial knowledge* of a word is rewarded and built upon. If you know some letters in a word, you can still get it partially correct. Remembering more letters means progress, even if you don't remember the full word. That is very motivating, and also it lets you focus more on the letters that you actually didn't get right.
+This is why we say that **partial knowledge** is rewarded and built upon in Babilonia. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't remember the full word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
 
-Of course, when you don't know, you don't know. No need to go through hints then: you can just get the full word revealed. After all, you have to start somewhere!
+Of course, when you don't know, you don't know. No need to go through hints then: **you can just get the full word revealed**. After all, you have to start somewhere!
 
 ### A polyglot's paradise
-Babilonia was designed to let users practice words *in many languages at the same time*. Most language tools only let you practice one language at a time. But what if you want to master *multiple* languages? Wouldn't it be quite convenient to be able to practice *all of them, all at the same time*? Babilonia enables you to do just that!
+Babilonia was designed to let users practice **any number of languages at the same time**. Most language learning tools only let you practice one language at a time. But what if you want to master *multiple* languages? Wouldn't it be quite convenient to be able to practice *all of them, all at the same time*? Babilonia enables you to do just that!
 
-That has many benefits. First, you get to exercise the mental gymnastics of *quickly switching between languages*, which is an invaluable skill for a polyglot. Also, you learn to associate between them the words in different languages to convey the same idea, which help you remember them more easily. Plus, it's an incredibly efficient way to practice when you want to learn multiple languages.
+That has many benefits. First, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot. Also, you learn to **associate between them** the words in different languages to convey the same idea, which help you remember them more easily. Plus, it's an incredibly **efficient** way to practice when you want to learn multiple languages.
 
-However, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languages, or even just one. Maybe your goal is not to become a polyglot! At any time, you can choose which languages you would like to study.
+Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languages, or even just one. Maybe your goal is not to become a polyglot! At any time, you can choose which languages you would like to study.
 
 ### Easily track your progress and personalize your learning
-Being able to track your progress is a key element for staying motivated. Babilonia can tell you how many words you know in each language. Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an excellent measure of your progress in any given language and helps you compare which languages you know better than others and where to direct your efforts.
+Being able to track your progress is a key element for **staying motivated**. Babilonia can tell you **how many words** you know in each language. Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an **excellent measure of your progress** in any given language and helps you compare which languages you know better than others and **where to direct your efforts**.
 
 [Insert screenshot here]
 
 How it works is that you mark expressions as `known` as you encounter them. What qualifies as "known" is entirely up to you, as you are the best judge of whether you truly know an expression.
 
-Marking expressions as known allows you to get a more personalized experience. You can set known expressions to not appear when practicing. That way, you can focus on practicing only the expressions that you actually don't know!
+Marking expressions as known allows you to get a more personalized experience. You can set known expressions to not appear when practicing. That way, you can focus on practicing only the expressions that you actually don't know.
 
 ### Use `expressions` to express your `ideas`
-In Babilonia, `ideas` and `expressions` have a special meaning.
-
-In short, for each `idea`, you learn which `expressions` allow you to convey it in each language you are learning.
+In Babilonia, `ideas` and `expressions` have a special meaning. In short, for each `idea`, you learn which `expressions` allow you to convey it.
 
 #### Expressions
 Very often, an `expression` is a word, like `beer`, `cold`, `very` or `to drink`. But it could also be an expression, an idiom, a saying, or any useful sentence. For example, `how are you?`, `what's your name?`, `watch out!`, `cost of living`, `it's raining cats and dogs`, and so on.
@@ -61,7 +61,7 @@ Expressions are words, or groups of words, expressed in a single language, that 
 #### Ideas
 When practicing multiple languages at the same time, we find ourselves running into interesting problems. Let's say you want to practice the word `to play`. In Spanish, you don't play soccer and play piano, you `juegas` soccer and `tocas` piano.
 
-Thus, do you put `jugar` and `tocar` as translations for `to play`? That would mean placing English as the point of reference. For example, if you wanted to practice from Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why `jugar` isn't in its own entry with `giocare`, and similarly `tocar` with `suonare`?
+Thus, do you put `jugar` and `tocar` as translations for `to play`? That would mean placing English as the point of reference. For example, if you wanted to practice from Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why isn't `jugar` in its own entry with `giocare`, and similarly `tocar` with `suonare`?
 
 Such homonyms are very common and a lot of them are not so obvious, as we are so used to using them. And as you increase the number of languages, they become more and more apparent. To overcome this problem, we must think of `meanings` more than we think of `words`.
 
@@ -84,9 +84,13 @@ A context is additional information in an expression that only serves to identif
 If you want to practice multiple languages at the same time, and those languages use different alphabets, you may not want to constantly be changing your keyboard settings. Or maybe you think you can learn faster if you forget about accents first. That's why you can disable "strict mode" and, for instance, `e` will be accepted for `é`.
 
 ### The data
-The application's data is stored in the `db.db` file at the project's root in `SQLite` format.
+As of version 1.0, the application comes with a set of [insert number here] expressions and [insert number here] ideas in 5 languages: English, French, German, Spanish and Italian. More get added with every release.
 
-You can either start empty and add your own ideas, or you can import predefined ideas. Predefined ideas are a list that grows with each release. If you choose to import predefined ideas, be aware that those ideas could change in a future update. Your custom-added ideas will not be touched.
+You can also easily add your own expressions, ideas and languages.
+
+Keep in mind that ideas and expressions that are included with the app can change at any time in a future update. However, your custom-added data is never modified.
+
+The application's data is stored in the `db.db` file at the project's root in `SQLite` format.
 
 ### Finally: one important caveat
 Of course, vocabulary is only one part of language learning. That's why Babilonia does not seek to be the *be-all and end-all* of language learning tools. In fact, *nothing* is. Learning languages require a variety of sources. *However*, we believe that acquiring vocabulary is the single most important aspect of learning languages, that unlocks a world of possibilities. Babilonia fulfills that goal in a powerful way.
