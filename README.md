@@ -1,11 +1,9 @@
-![Example 1](public/img/logo.png)
+# ![Example 1](public/img/logo.png)
 
 TODO
 - Use the word "practice" less
 - Use examples in more languages
 - Less !
-
-# Babilonia
 
 Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
 
@@ -32,51 +30,55 @@ In such cases, **rather than revealing the full word** (and preventing you from 
 
 [Insert screenshot here]
 
-This is why we say that **partial knowledge** is rewarded and built upon in Babilonia. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't remember the full word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
+This is why we say that **partial knowledge** is rewarded and built upon. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't remember the full word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
 
-Of course, when you don't know, you don't know. No need to go through hints then: **you can just get the full word revealed**. After all, you have to start somewhere!
+Of course, when you don't know, you don't know. No need to go through hints then: **you can just get the full word** revealed. After all, you have to start somewhere!
 
 ### A polyglot's paradise
 Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only let you practice one language at a time. But what if you want to master *multiple* languages? Wouldn't it be quite convenient to be able to practice *all of them, all at the same time*? Babilonia enables you to do just that!
 
 That has many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot. Also, you learn to **associate between them** the words in different languages to convey the same idea, which help you remember them more easily. Plus, it's an incredibly **efficient** way to practice when you want to learn multiple languages.
 
-Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languages, or even just one. Maybe your goal is not to become a polyglot! At any time, you can choose which languages you would like to study.
+Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! Maybe you'd like to focus on some languages, or even just one. Maybe your goal isn't even to become a polyglot! At any time, you can choose which languages you would like to study.
 
-### Easily track your progress and personalize your learning
-Being able to track your progress is a key element for **staying motivated**. Babilonia can tell you **how many words** you know in each language. Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an **excellent measure of your progress** in any given language and helps you compare which languages you know better than others and **where to direct your efforts**.
+### Personalize your learning
+**Mark expressions as "known"** as you encounter them. Doing so allows you to get **personalized learning**, as you can tell Babilonia to make you **practice only words that you have not yet mastered**. That means you can focus on practicing what you really need to learn and not repeat words that you have already acquired.
 
 [Insert screenshot here]
 
-How it works is that you mark expressions as `known` as you encounter them. What qualifies as "known" is entirely up to you, as you are the best judge of whether you truly know an expression.
+### Track your progress
+Being able to track your progress is a key element for **staying motivated**. Another benefit of marking expressions as known is that Babilonia can **track your progress** and show you **statistics** on how many words you have learned.
 
-Marking expressions as known allows you to get a more personalized experience. You can set known expressions to not appear when practicing. That way, you can focus on practicing only the expressions that you actually don't know.
+Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an **excellent measure** of your progress in any given language and helps you compare which languages you know better than others and thus **where to direct your efforts**.
 
-### Use `expressions` to express your `ideas`
-An important concept that Babilonia uses is the notion of `ideas` and `expressions`, which we need to define.
+### Use **expressions** to express your **ideas**
+An important concept that Babilonia uses is the notion of `ideas` and `expressions`.
 
-An `idea` is any concept that exists in our minds and that can be expressed through `expressions` in a given language. `Ideas` are universal, `expressions` are language-specific. An `expression` has a language, an `idea` does not.
+Put simply: an idea is any concept that exists in our minds, and expressions are the actual words that we use to express it. An expression has a language, an idea does not.
 
-Picture a house. The image in your head is the `idea`, and `house` is the `expression` in English. In Spanish, it's `casa`, and so on for every language. But the `idea` itself is the same. And although it's harder to picture more abstract ideas such as `love` or `strength`, the same basic concept holds.
+Think of a house. The image in your head is the idea, and `house` is the expression in English. In Spanish, it's `casa`, and so on for every language. And although it's harder to picture more abstract ideas such as `love` or `strength`, the same basic concept holds.
 
-#### Expressions
-Very often, an `expression` is simply a word, like `beer`, `cold`, `very` or `to drink`. But it could also be an expression, an idiom, a saying, or any useful sentence. That's why `word` could not be used for this concept. For example, `how are you?`, `what's your name?`, `watch out!`, `the cost of living`, `it's raining cats and dogs`, and so on.
+#### Expressions are more than words
+Very often, an expression is simply a word, like `beer`, `cold`, `very` or `to drink`.
 
-More precisely, expressions are words, or groups of words, expressed in a single language, that carry one well-defined meaning, and which can be translated into other languages. They are the actual elements that we want to learn.
+But it could also be a phrase, an expression, an idiom, a saying, or any other useful sentence. That's why `word` could not be used to represent this concept. For example, these are all expressions:
+- `how are you?`
+- `what's your name?`
+- `watch out!`
+- `the cost of living`
+- `it's raining cats and dogs`
 
-#### Ideas
-When practicing multiple languages at the same time, we find ourselves running into interesting problems. Let's say you want to practice the word `to play`. In French, `jouer` is a correct translation in most cases. But in Spanish, you don't play soccer and play piano, you `juegas` soccer and `tocas` piano.
+#### Ideas are universal
+When practicing multiple languages at the same time, we find ourselves running into interesting problems. Let's say you want to translate the word `to play`. In French, `jouer` is the correct translation in most cases. But in Spanish, you don't play soccer and play piano, you `juegas` soccer and `tocas` piano!
 
-Thus, do you put `jugar` and `tocar` as translations for `to play`? That would mean placing English as the point of reference. For example, if you wanted to practice from Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why isn't `jugar` in its own entry with `giocare`, and similarly `tocar` with `suonare`?
+The problem arises from the fact that Babilonia lets you practice multiple languages at the same time. Putting `jugar` and `tocar` as translations for `to play` would mean placing English as the point of reference. For example, Italian makes the same distinction. If you wanted to practice Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why isn't `jugar` in its own entry with `giocare`, and similarly `tocar` with `suonare`? For a native Spanish speaker, that would only make sense.
 
-Such homonyms are very common and a lot of them are not so obvious, as we are so used to using them. And as you increase the number of languages, they become more and more apparent. To overcome this problem, we must think of `meanings` more than we think of `words`.
+In fact, all languages have such **homonyms**. To overcome this problem, we must think of **meanings** more than we think of **words**. We need to think about **ideas**.
 
-When we think of the word `to play` as in to play a sport, we have a completely different picture in our minds than when we think of the word `to play` in the context of playing an instrument. Therefore, in Babilonia, they are two distinct `ideas`. Some languages will use the same `expression` to express them, and some will not.
-
-Similarly, some words do not always have a direct translation in other languages. For example, French does not have a dedicated word for `siblings`, but they will say `frères et soeurs` to convey the same meaning. Still, `siblings` is an `idea` in itself, only expressed with different `expressions` in different languages.
+When we think of the word `to play` as in to play a sport, we have a completely different picture in our minds than when we think of the word `to play` in the context of playing an instrument. Therefore, in Babilonia, they are **two distinct ideas**. Some languages will use the same expression to express them, and some will not.
 
 ### Simplified accents and keyboard layouts
-When practicing multiple languages that use different alphabets, you may not want to constantly be changing your keyboard settings. Or maybe you think you will learn faster if you forget about accents first. Babilonia lets you disable "strict mode" and, for instance, `e` will be accepted for `é`.
+When practicing multiple languages that use different alphabets, you may not want to constantly be changing your keyboard settings. Or maybe you think you will learn faster if you forget about accents first. Babilonia lets you **disable "strict mode"** and, for instance, `e` will be accepted for `é`.
 
 ### The data
 As of version 1.0, the application comes with a set of **[insert number here] expressions** and **[insert number here] ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added with each release**.
