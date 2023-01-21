@@ -4,6 +4,7 @@ TODO
 - Use the word "practice" less
 - Use examples in more languages
 - Less !
+- Proofread tool
 
 Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
 
@@ -47,41 +48,44 @@ Of course, even though you *could* practice tons of languages at the same time, 
 [Insert screenshot here]
 
 ### Track your progress
-Being able to track your progress is a key element for **staying motivated**. Another benefit of marking expressions as known is that Babilonia can **track your progress** and show you **statistics** on how many words you have learned.
+Being able to track your progress is a key element for **staying motivated**. Another benefit of marking expressions as "known" is that Babilonia can **track your progress** and show you **statistics** on how many words you have learned.
 
 Seeing those numbers go up is, on its own, a worthwhile goal to pursue. It is also an **excellent measure** of your progress in any given language and helps you compare which languages you know better than others and thus **where to direct your efforts**.
 
 ### Use **expressions** to express your **ideas**
-An important concept that Babilonia uses is the notion of `ideas` and `expressions`.
+Two important concepts that Babilonia use are `ideas` and `expressions`. They are very simple yet powerful notions.
 
-Put simply: an idea is any concept that exists in our minds, and expressions are the actual words that we use to express it. An expression has a language, an idea does not.
+#### Ideas are universal
 
-Think of a house. The image in your head is the idea, and `house` is the expression in English. In Spanish, it's `casa`, and so on for every language. And although it's harder to picture more abstract ideas such as `love` or `strength`, the same basic concept holds.
+In a nutshell, the concept of ideas is that words in one language are **grouped with words to express the same idea** in other languages. While dictionaries organize vocabulary **by words**, Babilonia organizes vocabulary **by ideas**. There can be as many ideas as there are **meanings** for a word.
+
+That's because in Babilonia, **no language is the single point of reference**. Every language has its own quirks, similarities and differences. Thus, being able to practice 10 languages at the same time requires a system that is **universal**.
+
+For example, in English, `to play` is used to mean to play a music instrument as well as to play a sport. It's a homonym: all languages have them. In Spanish, those two meanings are conveyed by two different words: `tocar` and `jugar`. While an English-Spanish dictionary would list those two words under `to play`, Babilonia considers them as **two distinct ideas**. You will not practice them at the same time but rather as two distinct entities.
 
 #### Expressions are more than words
-Very often, an expression is simply a word, like `beer`, `cold`, `very` or `to drink`.
+Very often, an expression is simply a **word**, like `beer`, `cold`, `very` or `to drink`.
 
-But it could also be a phrase, an expression, an idiom, a saying, or any other useful sentence. That's why `word` could not be used to represent this concept. For example, these are all expressions:
+But it could also be **a phrase, an expression, an idiom, a saying, or any other useful sentence**. That's why `word` could not be used to represent this concept. For example, these are all expressions:
 - `how are you?`
 - `what's your name?`
 - `watch out!`
 - `the cost of living`
 - `it's raining cats and dogs`
 
-#### Ideas are universal
-When practicing multiple languages at the same time, we find ourselves running into interesting problems. Let's say you want to translate the word `to play`. In French, `jouer` is the correct translation in most cases. But in Spanish, you don't play soccer and play piano, you `juegas` soccer and `tocas` piano!
+Expressions are the **fundamental elements** that you practice in Babilonia.
 
-The problem arises from the fact that Babilonia lets you practice multiple languages at the same time. Putting `jugar` and `tocar` as translations for `to play` would mean placing English as the point of reference. For example, Italian makes the same distinction. If you wanted to practice Spanish to Italian, you would find `jugar` and `tocar` grouped together as translations for `giocare` and `suonare`. That would beg the question: why isn't `jugar` in its own entry with `giocare`, and similarly `tocar` with `suonare`? For a native Spanish speaker, that would only make sense.
+### Never change your keyboard layout again
+When **simultaneously** practicing languages that use **different alphabets**, you may find it impractical to always type in **the right letter with the correct accent** in every word of every language. Not only does that require you to constantly change your keyboard settings, but also to learn what combination of keys on your keyboard allow you to type each one of them.
 
-In fact, all languages have such **homonyms**. To overcome this problem, we must think of **meanings** more than we think of **words**. We need to think about **ideas**.
+That can add a lot of friction to your learning. Sure, mastering the correct spelling *is* important, but if your goal is to practice as many words as possible in as short a time as possible, getting each accent right may not be your priority. Furthermore, some people may also find it useful to learn first without the added difficulty of accents.
 
-When we think of the word `to play` as in to play a sport, we have a completely different picture in our minds than when we think of the word `to play` in the context of playing an instrument. Therefore, in Babilonia, they are **two distinct ideas**. Some languages will use the same expression to express them, and some will not.
+To solve this problem, Babilonia lets you **disable "strict mode"**. With this setting enabled, the **unaccented form** of a letter will be accepted for any accented form. For example, `e` will be accepted instead of `è`. Babilonia will transform it into the accented letter and will show you the correct form.
 
-### Simplified accents and keyboard layouts
-When practicing multiple languages that use different alphabets, you may not want to constantly be changing your keyboard settings. Or maybe you think you will learn faster if you forget about accents first. Babilonia lets you **disable "strict mode"** and, for instance, `e` will be accepted for `é`.
+Currently, this feature only supports languages using the Latin alphabet. Future releases will include ways to never change your keyboard layout for *any* alphabet. Stay tuned!
 
-### The data
-As of version 1.0, the application comes with a set of **[insert number here] expressions** and **[insert number here] ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added with each release**.
+### Use included vocabulary and add your own
+As of version 2.0, the application comes with a set of **[insert number here] expressions** and **[insert number here] ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added with each release**.
 
 You can also easily **add your own** expressions, ideas and languages.
 
