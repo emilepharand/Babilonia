@@ -4,8 +4,10 @@ TODO
 - Use the word "practice" less
 - Use examples in more languages
 - Less !
+- Synonyms for: very, ...
+- Explain muscle memory
 
-Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary to express your thoughts and understand native speakers. In a nutshell, as your vocabulary improves, so do your language skills!
+Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary to express your thoughts and understand languages. As your vocabulary improves, so do your language skills!
 
 At its core, Babilonia leverages your **muscle memory** to help you learn **more words**, **faster**. Also, unlike traditional methods, Babilonia lets you practice multiple languages **at the same time**! 😍
 
@@ -22,22 +24,22 @@ Learning works best when it's **interactive**. Babilonia works with what you kno
 
 As you're typing, Babilonia will **highlight** your answer in **red** or **green** to let you know if you're on the right track.
 
-Babilonia's approach is to help you remember words **on your own**. Often, you will find you remember *some* part of a word, but not the word in full. Maybe you know the first letter, how it ends, or perhaps you **just need a hint** for the memory to spring back to your mind. The expression "on the tip of one's tongue" was invented for good reason!
+Babilonia's approach is to help you remember **on your own**. Often, you will find that even if you can't remember a word, you can still remember **parts of it**. It may be its first letter, its ending, or how it sounds. If you **get a hint**, the memory may spring back to your mind. There's a good reason for the idiom "it's on the tip of my tongue"!
 
-In such cases, **rather than revealing the entire word** (and preventing you from remembering it on your own), Babilonia can give you **the next letter** as a hint for the whole word. You can go from hint to hint like so, and type what you know, when you know it. Not only is that more interactive and fun, but most importantly, through this way of practicing, you're much more likely to remember more parts of the word the next time!
+Rather than revealing **the entire word**, which would prevent you from remembering it by yourself, Babilonia gives you **the next letter**. Going from getting a hint, to typing what you know, to getting another hint is much more **interactive and fun**. Most importantly, this way of practicing makes you significantly **more likely to remember** more parts of the word the next time!
 
 [Insert screenshot here]
 
 That is why we say that Babilonia rewards and builds upon **partial knowledge**. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't recall the entire word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
 
-Of course, sometimes, you simply don't know. No need to go through hints then: **you can get the complete word** revealed. After all, you have to start somewhere!
+Of course, sometimes, you simply don't know. No need to go through hints then: you can get **the complete word**. After all, you have to start somewhere!
 
 ## A Polyglot's Paradise
-Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only allow you to practice one language at a time. But what if you want to master *multiple* languages? It would be pretty convenient to practice them at the same time! Babilonia enables you to do just that.
+Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only allow you to practice one language at a time. But what if you want to master *multiple* languages? It would be incredibly convenient to practice them at the same time! Babilonia enables you to do just that.
 
 That comes with many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot. Also, you learn to **associate between them** the words in different languages to convey the same idea, which helps you remember them more easily. Plus, it's an incredibly **efficient** way to practice when you want to learn multiple languages.
 
-Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! You can always choose which languages you would like to study. That could be one, two or any combination of languages. Flexibility is key.
+Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! You can always choose which languages you would like to study. It could be one, two or any combination of languages. Flexibility is key.
 
 ## Personalize Your Learning
 **Mark expressions as "known"** as you encounter them. Doing so allows you to get **personalized learning**, as you can tell Babilonia to make you **practice only words that you have not yet mastered**. That means you can focus on practicing what you actually need to learn and not repeat words you have already acquired.
@@ -58,7 +60,7 @@ In a nutshell, the concept of ideas is that words in one language are **grouped*
 
 That's because, in Babilonia, **no language is the single point of reference**. Every language has its quirks, similarities and differences. Thus, practicing multiple languages at the same time requires a **universal system**.
 
-For example, in English, you `play` music like you `play` a sport. It's a homonym: all languages have them. Spanish conveys those two meanings with two distinct words: `tocar` and `jugar`. While an English-Spanish dictionary would list those two words under `to play`, Babilonia considers them as **two separate ideas**. Learners practice them separately as they *are* two distinct entities.
+For example, in English, you `play` music like you `play` a sport. It's a homonym: all languages have them. Spanish conveys those two meanings with two distinct words: `tocar` and `jugar`. While an English-Spanish dictionary would list those two words under `to play`, Babilonia views them as **two separate ideas**. Learners practice them separately as they *are* two distinct entities.
 
 ### Expressions are more than words
 Often, an expression is simply a **word**, like `beer`, `cold`, `very`, or `to drink`.
@@ -75,7 +77,7 @@ Expressions are the **fundamental elements** that you practice in Babilonia.
 ## Never change your keyboard layout again
 When **simultaneously** practicing languages that use **different alphabets**, you may find it impractical to type in **the right letter with the correct accent** in every word of every language. Not only does that require you to change your keyboard settings a lot, but also to learn what combination of keys on your keyboard allows you to type each accented letter.
 
-That can add a lot of friction to your learning. Mastering spelling *is* important, but if your goal is to **practice as many words as possible**, getting each accent right may not be your priority. Furthermore, some people find it valuable to learn a new language **without the added difficulty of accents**.
+That can add a lot of friction to your learning. Mastering spelling *is* important, but if your goal is to **practice as many words as possible**, getting each accent right may not be your priority. Furthermore, many people find it valuable to learn a new language **without the added difficulty of accents**.
 
 To help with that, you can **disable "strict mode"**. With this setting enabled, Babilonia will accept the **unaccented form** of a letter instead of any accented form. For example, `e` will automatically be transformed into `è`.
 
