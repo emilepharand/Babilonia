@@ -104,5 +104,4 @@ Of course! Feel free to open an issue or make a pull request.
 
 <br>
 <br>
-<br>
 <sub>People often say that motivation doesn't last. Well, neither does bathing — that's why we recommend it daily. - Zig Ziglar</sub>
