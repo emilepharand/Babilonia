@@ -16,11 +16,11 @@ Babilonia helps you learn **more words**, **faster**. Also, unlike traditional m
 ## Powerful, targeted help
 Learning works best when it's **interactive**. Babilonia works with what you know and builds up from there. It gives you **instant feedback** as you're practicing and **helpful hints** when you need them. In other words, it's like your own personal teacher!
 
-As you're typing, Babilonia **highlights** your answer in **red** or **green** to let you know if you're on the right track. By **steering you in the right direction**, you assimilate information more easily. *You* are the one who types the correct answer, which develops your **muscle memory**.
+As you're typing, Babilonia **highlights** your answer in **red** or **green** to let you know if you're on the right track. By **steering you in the right direction**, you assimilate information more easily. In fact, as *you* are the one who types the correct answer, it becomes part of your **muscle memory**.
 
 Babilonia's approach is to help you remember **on your own**. Often, even if you don't recall a word, you still remember **parts of it**. It may be its first letter, its ending, or how it sounds. If you **get a hint**, the memory may well spring back to your mind. There's a good reason for the idiom "it's on the tip of my tongue"!
 
-Instead of revealing **the entire word**, which would prevent you from remembering it by yourself, Babilonia gives you **the next letter**. Going from getting a hint, to typing what you know, to getting another hint is much more **interactive** and **fun**. Most importantly, this way of practicing makes you significantly **more likely to remember** more parts of the word the next time!
+Instead of revealing **the entire word**, which would prevent you from remembering it by yourself, Babilonia gives you **the next letter**. Going from getting a hint, to typing what you know, to getting another hint is much more **interactive** and **fun**. Most importantly, this way of practicing makes you significantly **more likely to remember** more parts of the word the next time.
 
 [Insert screenshot here]
 
@@ -36,7 +36,7 @@ That comes with many benefits. For one, you get to exercise the **mental gymnast
 Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! You can always choose which languages you would like to study. It could be one, two or any combination of languages. Flexibility is key.
 
 ## Personalized learning
-**Mark expressions as "known"** as you encounter them. Doing so allows you to get **personalized learning**, as you can tell Babilonia to make you **practice only words that you have not yet mastered**. That means you can focus on practicing what you actually need to learn and not repeat words you have already acquired.
+**Mark expressions as "known"** as you encounter them. Doing so allows you to get **personalized learning**, as you can tell Babilonia to make you practice only **words that you have not yet mastered**. That means you can focus on practicing what you actually need to learn and not repeat words you have already acquired.
 
 [Insert screenshot here]
 
@@ -58,14 +58,16 @@ For example, in English, you `play` music like you `play` a sport. Spanish conve
 That's because, in Babilonia, **no language is the single point of reference**. Every language has its quirks, similarities and differences. Thus, practicing multiple languages at the same time requires a **universal system**. In Babilonia, that system is the concept of `ideas`.
 
 ### Expressions are more than words
-Expressions are the **fundamental elements** that you practice in Babilonia. Often, an expression is simply a **word**, like `beer`, `cold`, `very`, or `to drink`.
+Often, an expression is simply a **word**, like `beer`, `cold`, `very`, or `to drink`.
 
-But it could also be **a phrase, an expression, an idiom, a saying, or any other useful sentence**. For example, these are all expressions:
+But it could also be **a phrase**, **an expression**, **an idiom**, **a saying**, or **any other useful sentence**. For example, these are all expressions:
 - `how are you?`
 - `what's your name?`
 - `watch out!`
 - `the cost of living`
 - `it's raining cats and dogs`
+
+Expressions are the **fundamental elements** that you practice in Babilonia. 
 
 ## Simplified keyboard input
 When simultaneously practicing languages that use **different alphabets**, you may find it impractical to type in the **right letter** with the **correct accent** in **every word** of **every language**. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
