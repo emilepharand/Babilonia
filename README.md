@@ -1,4 +1,4 @@
-# ![Example 1](public/img/logo.png)
+# ![Logo](public/img/logo.png)
 
 Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand languages. As your vocabulary improves, so do your language skills!
 
@@ -14,6 +14,9 @@ Babilonia helps you learn **more words**, **faster**. Also, unlike traditional m
 - Lets you practice any set of languages **all at once**! 🤯
 
 ## Powerful, targeted help
+
+<img align="left" src="img/practice.png" width="300" />
+
 Learning works best when it's **interactive**. Babilonia works with what you know and builds up from there. It gives you **instant feedback** as you're practicing and **helpful hints** when you need them. In other words, it's like your own personal teacher!
 
 As you're typing, Babilonia **highlights** your answer in **red** or **green** to let you know if you're on the right track. By **steering you in the right direction**, you assimilate information more easily. In fact, as *you* are the one who types the correct answer, it becomes part of your **muscle memory**.
@@ -21,8 +24,6 @@ As you're typing, Babilonia **highlights** your answer in **red** or **green** t
 Babilonia's approach is to help you remember **on your own**. Often, even if you don't recall a word, you still remember **parts of it**. It may be its first letter, its ending, or how it sounds. If you **get a hint**, the memory may well spring back to your mind. There's a good reason for the idiom "it's on the tip of my tongue"!
 
 Instead of revealing **the entire word**, which would prevent you from remembering it by yourself, Babilonia gives you **the next letter**. Going from getting a hint, to typing what you know, to getting another hint is much more **interactive** and **fun**. Most importantly, this way of practicing makes you significantly **more likely to remember** more parts of the word the next time.
-
-[Insert screenshot here]
 
 That is why we say that Babilonia rewards and builds upon **partial knowledge**. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't recall the entire word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
 
