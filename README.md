@@ -15,7 +15,7 @@ Babilonia helps you learn **more words**, **faster**. Also, unlike traditional m
 
 ## Powerful, targeted help
 
-<img align="right" src="img/practice.png" width="300" />
+<img align="left" src="img/practice-example.gif" />
 
 Learning works best when it's **interactive**. Babilonia works with what you know and builds up from there. It gives you **instant feedback** as you're practicing and **helpful hints** when you need them. In other words, it's like your own personal teacher!
 
