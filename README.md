@@ -15,8 +15,6 @@ Babilonia helps you learn **more words**, **faster**. Also, unlike traditional m
 
 ## Powerful, targeted help
 
-<img align="right" src="img/practice-example.gif" />
-
 Learning works best when it's **interactive**. Babilonia works with what you know and builds up from there. It gives you **instant feedback** as you're practicing and **helpful hints** when you need them. In other words, it's like your own personal teacher!
 
 As you're typing, Babilonia **highlights** your answer in **red** or **green** to let you know if you're on the right track. By **steering you in the right direction**, you assimilate information more easily. In fact, as *you* are the one who types the correct answer, it becomes part of your **muscle memory**.
@@ -28,6 +26,9 @@ Instead of revealing **the entire word**, which would prevent you from rememberi
 That is why we say that Babilonia rewards and builds upon **partial knowledge**. If you know *some* letters in a word, you can still get it partially correct. **Remembering more letters means progress**, even if you don't recall the entire word. That is very motivating, and it also lets you focus more on the letters that you actually didn't get right.
 
 Of course, sometimes, you simply don't know. No need to go through hints then: you can get **the complete word**. After all, you do have to start somewhere!
+
+### A gif is worth a thousand words
+<img src="img/practice-example.gif" />
 
 ## A polyglot's paradise
 Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only allow you to practice one language at a time. But what if you want to master *multiple* languages? It would be incredibly convenient to practice them at the same time, right? Babilonia enables you to do just that!
