@@ -11,7 +11,10 @@ jobs:
         with:
           node-version: 18
       - run: npm ci
-      - run: npm run test:build
+      - name: build
+        run: npm run test:build
+      - name: bash
+        run: npm run test:bash
       - name: api
         run: npm run test:api
       - name: e2e
