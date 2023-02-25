@@ -12,9 +12,9 @@ jobs:
           node-version: 18.4.2
       - run: npm ci
       - run: npm run test:build
-      - name: unit/api
+      - name: api
         run: npm run test:api
-      - name: e2e/vue
+      - name: e2e
         run: npm run test:vue
   code-quality:
     runs-on: ubuntu-latest
