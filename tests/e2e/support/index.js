@@ -19,11 +19,11 @@ import '@cypress/code-coverage/support';
 import './commands';
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
-import failOnConsoleError, {consoleType} from 'cypress-fail-on-console-error';
+import failOnConsoleError from 'cypress-fail-on-console-error';
 
 const config = {
-	excludeMessages: ['foo', '^some bar-regex.*'],
-	includeConsoleTypes: [consoleType.ERROR, consoleType.WARN, consoleType.INFO],
+	consoleTypes: ['error', 'warn', 'info'],
+	debug: false,
 };
 
 failOnConsoleError(config);

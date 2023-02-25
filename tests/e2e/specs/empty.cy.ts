@@ -1,6 +1,6 @@
 import {apiUrl} from '../cy-utils';
 
-before(() => {
+beforeEach(() => {
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');
