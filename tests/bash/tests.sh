@@ -2,7 +2,7 @@
 
 write_coverage() {
   local output_file="$1"
-  curl -sf "localhost:$VITE_BASE_PORT/__coverage__" | cut -c13- | sed 's/.$//' > "../tests/coverage/merged/${output_file}"
+  curl -sf "localhost:$VITE_API_PORT/__coverage__" | cut -c13- | sed 's/.$//' > "../tests/coverage/merged/${output_file}"
 }
 
 dbFileName="newDbFile.db"
