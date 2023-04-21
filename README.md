@@ -1,15 +1,16 @@
 # ![Logo](public/img/logo.png)
 
-Babilonia is an innovative tool for language enthusiasts who want to **grow and strengthen** their **vocabulary** in foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand languages. As your vocabulary improves, so do your language skills!
+Babilonia is an innovative tool for language enthusiasts who want to **expand their vocabulary** and **reinforce their memory** of foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand languages. As your vocabulary improves, so do your language skills!
 
 Babilonia helps you learn **more words**, **faster**. Also, unlike traditional methods, Babilonia lets you practice multiple languages **at the same time**! 😍
 
 ## Features
-- Enables you to memorize a **maximum** amount of words in a **minimum** amount of time ⌛
+- Enables you to memorize a **maximum** amount of words in a **minimum** amount of time ⏳
 - Leverages **muscle memory** and **visual memory** as a mental boost 🧠
 - Contains clever tricks to help you remember words **as you're typing** 💡
-- Builds on top of **partial knowledge** of words 🏗️
+- Builds on top of **partial knowledge** of words 🧩
 - Tracks **how many words** you know in each language 📈
+- Personalized learning: focus on words you haven't mastered yet 🎯
 - Uses a novel method based on **universal ideas** ♾️
 - Lets you practice any set of languages **all at once**! 🤯
 
@@ -27,13 +28,13 @@ That is why we say that Babilonia rewards and builds upon **partial knowledge**.
 
 Of course, sometimes, you simply don't know. No need to go through hints then: you can get **the complete word**. After all, you do have to start somewhere!
 
-### A gif is worth a thousand words
+### A GIF is worth a thousand words
 <img src="img/practice-example.gif" />
 
 ## A polyglot's paradise
 Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only allow you to practice one language at a time. But what if you want to master *multiple* languages? It would be incredibly convenient to practice them at the same time, right? Babilonia enables you to do just that!
 
-That comes with many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot. Also, you learn to **associate between them** the words in different languages to convey the same idea, which helps you remember them more easily. Plus, it's an incredibly **efficient way** to practice when you want to learn multiple languages.
+That comes with many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot to have. Also, you learn to **associate between them** the words in different languages to convey the same idea, which helps you remember them more easily. Plus, it's an incredibly **efficient way** to practice when you want to learn multiple languages.
 
 Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! You can always choose which languages you would like to study. It could be one, two or any combination of languages. Flexibility is key.
 
@@ -69,16 +70,14 @@ But it could also be **a phrase**, **an expression**, **an idiom**, **a saying**
 - `the cost of living`
 - `it's raining cats and dogs`
 
-Expressions are the **fundamental elements** that you practice in Babilonia. 
+Expressions are the **actual language elements** that you type and practice in Babilonia.
 
 ## Simplified keyboard input
-When simultaneously practicing languages that use **different alphabets**, you may find it impractical to type in the **right letter** with the **correct accent** in **every word** of **every language**. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
+When simultaneously practicing multiple languages that use **different alphabets**, typing the **right letter** with the **correct accent** in **every word** of **every language** can be impractical and add friction to your learning. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
 
-That can add a lot of friction to your learning. Sure, mastering spelling *is* important, but if your goal is to practice **as many words as possible**, getting each accent right may not be your priority. Furthermore, many people find it valuable to first learn a new language without the **added difficulty of accents**.
+That can add a lot of friction to your learning. Sure, mastering spelling *is* important, but if your goal is to practice as many words as possible, getting each accent right might not be your priority. Furthermore, many people find it valuable to first learn a new language without the **added difficulty of accents**.
 
-To help with that, you can **disable "strict mode"**. Babilonia will then accept the **unaccented form** of a letter instead of its accented form. For example, `e` will automatically be transformed into `è` if that is the correct letter for that word.
-
-Currently, this feature only supports languages using the Latin alphabet. Future releases will include ways to never have to change your keyboard layout for more scripts. Stay tuned!
+To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
 As of version 2.0, the application comes with a set of **[insert number here] expressions** and **[insert number here] ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** with each release.
