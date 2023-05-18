@@ -76,7 +76,7 @@
                 class="nav-link"
               >
                 Help
-            </a>
+              </a>
             </li>
           </ul>
         </div>
