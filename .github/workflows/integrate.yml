@@ -9,12 +9,15 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 16.13.0
+          node-version: 18
       - run: npm ci
-      - run: npm run test:build
-      - name: unit/api
+      - name: build
+        run: npm run test:build
+      - name: bash
+        run: npm run test:bash
+      - name: api
         run: npm run test:api
-      - name: e2e/vue
+      - name: e2e
         run: npm run test:vue
   code-quality:
     runs-on: ubuntu-latest
@@ -22,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 16.13.0
+          node-version: 18
       - run: npm ci
       - name: vue-tsc
         run: npx vue-tsc --noEmit

@@ -60,7 +60,7 @@ export async function addLanguage(req: Request, res: Response): Promise<void> {
 		res.end();
 		return;
 	}
-	const l: Language = await lm.addLanguage(req.body.name);
+	const l: Language = await lm.addLanguage(req.body.name as string);
 	res.status(201);
 	res.send(JSON.stringify(l));
 }
@@ -71,7 +71,7 @@ export async function editLanguages(req: Request, res: Response): Promise<void> 
 		res.end();
 		return;
 	}
-	const ll = await lm.editLanguages(req.body);
+	const ll = await lm.editLanguages(req.body as Language[]);
 	// Reset practice manager because practiceable ideas may change after editing languages
 	pm.clear();
 	res.send(JSON.stringify(ll));
@@ -82,7 +82,7 @@ export async function getLanguages(_: Request, res: Response): Promise<void> {
 }
 
 export async function addIdea(req: Request, res: Response): Promise<void> {
-	if (!(await iv.validateIdeaForAdding(req.body))) {
+	if (!(await iv.validateIdeaForAdding(req.body as IdeaForAdding))) {
 		res.status(400);
 		res.end();
 		return;
@@ -187,7 +187,7 @@ export async function editIdea(req: Request, res: Response): Promise<void> {
 	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
-	if (!(await iv.validateIdeaForAdding(req.body))) {
+	if (!(await iv.validateIdeaForAdding(req.body as IdeaForAdding))) {
 		res.status(400);
 		res.end();
 		return;
