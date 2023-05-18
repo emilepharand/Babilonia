@@ -8,9 +8,9 @@ Babilonia helps you learn **more words**, **faster**. Also, unlike traditional m
 - Enables you to memorize a **maximum** amount of words in a **minimum** amount of time ⏳
 - Leverages **muscle memory** and **visual memory** as a mental boost 🧠
 - Contains clever tricks to help you remember words **as you're typing** 💡
-- Builds on top of **partial knowledge** of words 🧩
+- Builds on top of **partial knowledge** of words 📚
 - Tracks **how many words** you know in each language 📈
-- Personalized learning: focus on words you haven't mastered yet 🎯
+- Allows you to focus on words you haven't mastered yet for **personalized** learning 🎯
 - Uses a novel method based on **universal ideas** ♾️
 - Lets you practice any set of languages **all at once**! 🤯
 
@@ -40,8 +40,6 @@ Of course, even though you *could* practice tons of languages at the same time, 
 
 ## Personalized learning
 **Mark expressions as "known"** as you encounter them. Doing so allows you to get **personalized learning**, as you can tell Babilonia to make you practice only **words that you have not yet mastered**. That means you can focus on practicing what you actually need to learn and not repeat words you have already acquired.
-
-[Insert screenshot here]
 
 ## Track your progress
 Another benefit of marking expressions as "known" is that Babilonia can **track your progress** and show you **statistics** on how many words you have learned. Tracking your progress is key for **staying motivated** because you can see how much you have improved.
@@ -80,20 +78,19 @@ That can add a lot of friction to your learning. Sure, mastering spelling *is* i
 To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
-As of version 2.0, the application comes with a set of **[insert number here] expressions** and **[insert number here] ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** with each release.
+As of version 2.0, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** with each release.
 
 You can also easily **add your own** expressions, ideas and languages.
 
 Keep in mind that ideas and expressions that Babilonia comes with can change at any time in a future update. That includes any change you make to them. However, any new ideas that you add will never be modified.
 
-The application stores its data in the `db.db` file at the project's root in `SQLite` format.
-
 ## An important caveat
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary is the single most important aspect of learning languages, which unlocks a world of possibilities. Babilonia aims to fulfill that goal in an efficient manner.
 
-## How to run
+## How to use
+All you need is `node` and `Chromium` or `Firefox`. Grab the most recent release, unzip it, `cd` into the folder and execute `node index.cjs`.
 
-All you need is `node` (tested with `16.16.0`) and `Chromium` or `Firefox`. Grab the most recent release, `cd` into your download folder and execute `node index.cjs`.
+The application stores its data in the `db.db` file at the project's root in `SQLite` format.
 
 ## License
 
