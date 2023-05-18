@@ -307,6 +307,8 @@ context('The idea page', () => {
 
 		assertFetchIdeaReturnsStatus(1, 200, ['"known":true', '"known":false']);
 
+		cy.get('.expression-known-checkbox').each(e => cy.wrap(e).should('not.be.checked'));
+
 		cy.visit('/').visit('/ideas/1');
 
 		assertExpressionIsKnown(0, true);
