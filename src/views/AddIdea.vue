@@ -86,7 +86,7 @@ async function save() {
 		// Reset inputs
 		idea.value.ee.forEach(e => {
 			e.text = '';
-      e.known = false;
+			e.known = false;
 		});
 		initElements(defaultNbrRows);
 	}
