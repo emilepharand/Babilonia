@@ -53,9 +53,9 @@ import {getEmptyIdea, getEmptyIdeaNoAsync} from '../../server/model/ideas/idea';
 import IdeaForm from '../components/IdeaForm.vue';
 import NotEnoughData from '../components/NotEnoughData.vue';
 import * as Api from '../ts/api';
+import {defaultNbrRows, initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 import * as Utils from '../ts/ideaForm/utils';
 import {validateIdeaForm} from '../ts/ideaForm/validation';
-import {defaultNbrRows, initElements, textInputs} from '../ts/ideaForm/rowArrowsNavigation';
 
 const idea = ref(getEmptyIdeaNoAsync());
 const noLanguages = ref(false);
@@ -86,6 +86,7 @@ async function save() {
 		// Reset inputs
 		idea.value.ee.forEach(e => {
 			e.text = '';
+      e.known = false;
 		});
 		initElements(defaultNbrRows);
 	}
