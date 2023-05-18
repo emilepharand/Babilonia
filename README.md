@@ -85,7 +85,7 @@ You can also easily **add your own** expressions, ideas and languages.
 Keep in mind that ideas and expressions that Babilonia comes with can change at any time in a future update. That includes any change you make to them. However, any new ideas that you add will never be modified.
 
 ## An important caveat
-**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary is the single most important aspect of learning languages, which unlocks a world of possibilities. Babilonia aims to fulfill that goal in an efficient manner.
+**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary is the single most important aspect of learning languages, which unlocks a world of possibilities.
 
 ## How to use
 All you need is `node` and `Chromium` or `Firefox`. Grab the most recent release, unzip it, `cd` into the folder and execute `node index.cjs`.
