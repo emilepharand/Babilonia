@@ -69,13 +69,14 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link
+              <a
                 id="help-link"
-                to="/help"
+                href="https://github.com/emilepharand/Babilonia"
+                target="_blank"
                 class="nav-link"
               >
                 Help
-              </router-link>
+              </a>
             </li>
           </ul>
         </div>
