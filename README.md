@@ -88,9 +88,9 @@ Keep in mind that ideas and expressions that Babilonia comes with can change at 
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary is the single most important aspect of learning languages, which unlocks a world of possibilities.
 
 ## How to use
-All you need is `node` and `Chromium` or `Firefox`. Grab the most recent release, unzip it, `cd` into the folder and execute `node index.cjs`.
+All you need is `node` and `Chromium` or `Firefox`. Download the most recent release, unzip it, `cd` into the folder and run `node index.cjs`. It should work on most `Windows` and `Linux` environments.
 
-The application stores its data in the `db.db` file at the project's root in `SQLite` format.
+Alternatively, you can clone the repository, run `npm install`, `npm run build`, `cd dist` and `node index.cjs`. That will create an empty database, but you can replace the `db.db` file with the one from the release to get all ideas and expressions.
 
 ## License
 
