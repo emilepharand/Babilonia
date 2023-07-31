@@ -31,3 +31,5 @@ jobs:
         run: npx vue-tsc --noEmit
       - name: eslint
         run: npm run lint
+      - name: codacy
+        uses: codacy/codacy-analysis-cli-action@v4.3.0
