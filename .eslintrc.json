@@ -22,9 +22,7 @@
       },
       "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "xo",
-        "xo-typescript"
+        "plugin:@typescript-eslint/recommended"
       ],
       "rules": {
         "@typescript-eslint/padding-line-between-statements": "off",
@@ -37,8 +35,7 @@
       ],
       "parser": "@typescript-eslint/parser",
       "extends": [
-        "eslint:recommended",
-        "xo"
+        "eslint:recommended"
       ],
       "rules": {
         "padding-line-between-statements": "off"
@@ -58,8 +55,6 @@
       },
       "extends": [
         "eslint:recommended",
-        "xo",
-        "xo-typescript",
         "plugin:@typescript-eslint/recommended",
         "plugin:vue/vue3-recommended",
         "@vue/eslint-config-typescript/recommended"
