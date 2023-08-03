@@ -11,7 +11,7 @@
     "moduleResolution": "node",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "baseUrl": ".",
     "types": [
       "webpack-env",
