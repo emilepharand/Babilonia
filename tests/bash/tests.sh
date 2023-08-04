@@ -3,13 +3,14 @@
 cleanup() {
   pkill -f "server/index.ts"
   pkill -f "node_modules/.bin/vite"
+  pkill -f "node index.cjs"
   rm -f temp.txt
   dir=$(basename "$PWD" | grep -q "dist" && dirname "$PWD" || echo "$PWD")
   sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$dir/index.html"
   sed -i 's@API server started!@API server started.@' "$dir/server/index.ts"
 }
 
-# Kill potential processes from previous run
+# Cleanup previous run
 cleanup
 
 write_coverage() {
@@ -39,7 +40,7 @@ fi
 
 # Run
 node index.cjs --db="$dbFileName" &
-PID=$!
+
 sleep 1
 
 # Coverage
@@ -47,8 +48,6 @@ write_coverage "coverage-bash.json"
 
 # Create data for the next test
 curl -sfq "localhost:$VITE_API_PORT/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' > /dev/null
-
-kill $PID
 
 dbFileSize=$(stat -c%s "$dbFileName")
 
@@ -66,6 +65,8 @@ else
    echo -e "\n--> Result: success!\n"
 fi
 
+cleanup
+
 ####################################################
 # Test 2
 ####################################################
@@ -78,7 +79,7 @@ echo "--------------------------------------------------------"
 
 # Run
 node index.cjs --db="$dbFileName" &
-PID=$!
+
 sleep 1
 
 # Coverage
@@ -89,13 +90,12 @@ res=$(curl -sf localhost:$VITE_API_PORT/languages/1 -H "Content-Type: applicatio
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
     echo "Result: failure!"
     echo "Database was overwritten."
-    kill $PID
     cleanup && exit 1
 else
     echo -e "\n--> Result: success!\n"
 fi
 
-kill $PID
+cleanup
 
 ######################################
 # Test 3
@@ -108,7 +108,7 @@ echo " --dev-mode does not start webserver                  "
 echo "------------------------------------------------------"
 
 node index.cjs --dev-mode &
-PID=$!
+
 sleep 1
 
 # Coverage
@@ -117,13 +117,12 @@ write_coverage "coverage-bash-3.json"
 if curl -sf --output /dev/null --silent --head --fail "localhost:$VITE_BASE_PORT"; then
   echo "--> Result: failure!"
   echo "URL exists: localhost:$VITE_BASE_PORT"
-  kill $PID
   cleanup && exit 1
 else
   echo -e "\n--> Result: success!\n"
 fi
 
-kill $PID
+cleanup
 
 ######################################
 # Test 4
@@ -141,7 +140,6 @@ echo "------------------------------------------------------"
 
 nodemon server/index.ts --dev-mode > temp.txt &
 vite --port=$VITE_BASE_PORT 2> /dev/null &
-VUEPID=$!
 
 sleep 5
 
@@ -150,13 +148,11 @@ indexContent=$(curl -sf localhost:$VITE_BASE_PORT)
 if [ -z "$indexContent" ]; then
     echo "--> Result: failure!"
     echo "Vue did not start."
-    kill $VUEPID
     cleanup && exit 1
 elif ! curl -sf -o /dev/null "localhost:$VITE_API_PORT/languages"; then
     echo "--> Result: failure!"
     echo "API server did not start at localhost:$VITE_API_PORT"
-    kill $VUEPID
-    exit 1
+    cleanup && exit 1
 else
     echo -e "\n--> Result: success!\n"
 fi
@@ -180,7 +176,7 @@ fi
 if ! grep -Fq "[nodemon] restarting due to changes..." "temp.txt"; then
     echo "--> Result: failure!"
     echo "API server did not restart."
-    exit 1
+    cleanup && exit 1
 else
     echo -e "\n--> Result: success!\n"
 fi
