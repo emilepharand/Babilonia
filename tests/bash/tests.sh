@@ -15,7 +15,7 @@ cleanup
 
 write_coverage() {
   local output_file="$1"
-  curl -sf "localhost:$VITE_API_PORT/__coverage__" | cut -c13- | sed 's/.$//' > "../tests/coverage/merged/${output_file}"
+  curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' > "../tests/coverage/merged/${output_file}"
 }
 
 dbFileName="newDbFile.db"
@@ -47,7 +47,7 @@ sleep 1
 write_coverage "coverage-bash.json"
 
 # Create data for the next test
-curl -sfq "localhost:$VITE_API_PORT/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' > /dev/null
+curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' > /dev/null
 
 dbFileSize=$(stat -c%s "$dbFileName")
 
@@ -85,7 +85,7 @@ sleep 1
 # Coverage
 write_coverage "coverage-bash-2.json"
 
-res=$(curl -sf localhost:$VITE_API_PORT/languages/1 -H "Content-Type: application/json")
+res=$(curl -sf $VITE_API_URL/languages/1 -H "Content-Type: application/json")
 
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
     echo "Result: failure!"
@@ -114,9 +114,9 @@ sleep 1
 # Coverage
 write_coverage "coverage-bash-3.json"
 
-if curl -sf --output /dev/null --silent --head --fail "localhost:$VITE_BASE_PORT"; then
+if curl -sf --output /dev/null --silent --head --fail "$VITE_BASE_URL"; then
   echo "--> Result: failure!"
-  echo "URL exists: localhost:$VITE_BASE_PORT"
+  echo "URL exists: $VITE_BASE_URL"
   cleanup && exit 1
 else
   echo -e "\n--> Result: success!\n"
@@ -141,13 +141,13 @@ npm run dev > temp.txt &
 
 sleep 5
 
-indexContent=$(curl -sf localhost:$VITE_BASE_PORT_DEV)
+indexContent=$(curl -sf $VITE_BASE_URL_DEV)
 
 if [ -z "$indexContent" ]; then
     echo "--> Result: failure!"
     echo "Vue did not start."
     cleanup && exit 1
-elif ! curl -sf -o /dev/null "localhost:$VITE_API_PORT_DEV/languages"; then
+elif ! curl -sf -o /dev/null "$VITE_API_URL_DEV/languages"; then
     echo "--> Result: failure!"
     echo "API server did not start."
     cleanup && exit 1
@@ -161,7 +161,7 @@ sed -i 's@API server started.@API server started!@' server/index.ts
 
 sleep 5
 
-indexContent2=$(curl -sf localhost:$VITE_BASE_PORT_DEV)
+indexContent2=$(curl -sf $VITE_BASE_URL_DEV)
 
 if [[ "$indexContent" == *"Babilonia"* && "$indexContent" != *"Babilonius"* && "$indexContent2" == *"Babilonius"* && "$indexContent2" != *"Babilonia"* ]]; then
     echo -e "\n--> Result: success!\n"
