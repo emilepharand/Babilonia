@@ -137,7 +137,7 @@ echo "------------------------------------------------------"
 
 npm run dev > temp.txt &
 
-sleep 4
+sleep 8
 
 indexContent=$(curl -sf $VITE_BASE_URL_DEV)
 
@@ -155,7 +155,7 @@ fi
 sed -i 's@<title>Babilonia</title>@<title>Babilonius</title>@' index.html
 sed -i 's@API server started.@API server started!@' server/index.ts
 
-sleep 4
+sleep 8
 
 indexContent2=$(curl -sf $VITE_BASE_URL_DEV)
 
