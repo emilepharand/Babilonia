@@ -2,8 +2,8 @@
 
 cleanup() {
   pkill -f "server/index.ts"
+  pkill -f "index.cjs"
   pkill -f "node_modules/.bin/vite"
-  pkill -f "node index.cjs"
   rm -f temp.txt
   dir=$(basename "$PWD" | grep -q "dist" && dirname "$PWD" || echo "$PWD")
   sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$dir/index.html"
@@ -130,28 +130,26 @@ cleanup
 
 cd ..
 
-echo $(pwd)
 
 echo "------------------------------------------------------"
 echo " Test 4                                               "
 echo "------------------------------------------------------"
-echo " Dev mode and hot reload work                         "
+echo " Hot reload work                                      "
 echo "------------------------------------------------------"
 
-nodemon server/index.ts --dev-mode > temp.txt &
-vite --port=$VITE_BASE_PORT 2> /dev/null &
+npm run dev > temp.txt &
 
 sleep 5
 
-indexContent=$(curl -sf localhost:$VITE_BASE_PORT)
+indexContent=$(curl -sf localhost:8000)
 
 if [ -z "$indexContent" ]; then
     echo "--> Result: failure!"
     echo "Vue did not start."
     cleanup && exit 1
-elif ! curl -sf -o /dev/null "localhost:$VITE_API_PORT/languages"; then
+elif ! curl -sf -o /dev/null "localhost:5000/languages"; then
     echo "--> Result: failure!"
-    echo "API server did not start at localhost:$VITE_API_PORT"
+    echo "API server did not start."
     cleanup && exit 1
 else
     echo -e "\n--> Result: success!\n"
@@ -163,7 +161,7 @@ sed -i 's@API server started.@API server started!@' server/index.ts
 
 sleep 5
 
-indexContent2=$(curl -sf localhost:$VITE_BASE_PORT)
+indexContent2=$(curl -sf localhost:8000)
 
 if [[ "$indexContent" == *"Babilonia"* && "$indexContent" != *"Babilonius"* && "$indexContent2" == *"Babilonius"* && "$indexContent2" != *"Babilonia"* ]]; then
     echo -e "\n--> Result: success!\n"
