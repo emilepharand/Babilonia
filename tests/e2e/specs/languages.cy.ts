@@ -125,7 +125,8 @@ context('Error handling on the language page', () => {
 
 		// Cannot write non-digit in ordering
 		cy.get('.languages-table').find('.language-row').eq(0).within(() => {
-			cy.get('.language-ordering').clear().type('a');
+			cy.get('.language-ordering').clear();
+			cy.get('.language-ordering').type('a');
 		});
 		cy.get('.languages-table').find('.language-row')
 			.eq(0).find('.language-ordering')
@@ -200,8 +201,10 @@ function assertSaveLanguageErrorMsgVisible(containsText: string) {
 
 function inputLanguageChange(rowNbr: number, name: string, ordering: string, isPractice: boolean) {
 	cy.get('.languages-table').find('.language-row').eq(rowNbr).within(() => {
-		cy.get('.language-name').clear().type(name);
-		cy.get('.language-ordering').clear().type(ordering.toString());
+		cy.get('.language-name').clear();
+		cy.get('.language-ordering').clear();
+		cy.get('.language-name').type(name);
+		cy.get('.language-ordering').type(ordering.toString());
 		if (isPractice) {
 			cy.get('.language-is-practice').check();
 		} else {
