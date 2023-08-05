@@ -23,7 +23,7 @@
     "test:vue:run": "cypress run --browser chromium && npm run test:coverage",
     "test:coverage": "npm run test:merge && npm run test:report",
     "test:merge": "cp tests/coverage/cypress/coverage-final.json tests/coverage/merged/coverage-cypress.json",
-    "test:report": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged -r=html && rm -rf .nyc_output*",
+    "test:report": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged -r=html -r=cobertura && rm -rf .nyc_output*",
     "test:dev:vue": "export $(xargs < .env.test) && start-server-and-test test:dev:serve :$VITE_BASE_PORT test:vue:run",
     "test:dev:serve": "export $(xargs < .env.test) && run-p test:dev:serve:api dev:serve:vue",
     "test:dev:serve:api": "nodemon server/index.ts --dev-mode --db=:memory:"
