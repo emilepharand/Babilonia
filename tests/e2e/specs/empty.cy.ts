@@ -14,7 +14,7 @@ describe('When database is empty', () => {
 	});
 	it('Displays practice page correctly', () => {
 		cy.get('#practice-link').click();
-		cy.contains('No ideas');
+		cy.contains('No practiceable ideas');
 		cy.get('button').should('not.exist');
 	});
 	it('Displays add ideas page correctly', () => {
