@@ -45,12 +45,6 @@ const routes: RouteRecordRaw[] = [
 			),
 	},
 	{
-		path: '/help',
-		name: 'Help',
-		component: async () =>
-			import(/* webpackChunkName: "AppHelp" */ '../views/AppHelp.vue'),
-	},
-	{
 		path: '/settings',
 		name: 'AppSettings',
 		component: async () =>

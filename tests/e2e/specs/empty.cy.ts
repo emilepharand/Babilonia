@@ -36,7 +36,4 @@ describe('When database is empty', () => {
 	it('Displays settings page correctly', () => {
 		cy.get('#settings-link').click();
 	});
-	it('Displays help page correctly', () => {
-		cy.get('#help-link').click();
-	});
 });
