@@ -140,12 +140,7 @@ function focusRow(rowNumber: number) {
 function focusPreviousRow(currentRow: number) {
 	focusDirectionDown.value = false;
 	if (currentlyFocusedRow.value === 0) {
-		if (startInteractive.value) {
-			editIdeaButton.value.focus();
-		} else {
-			// Focus loops until first practiceable expression is loaded
-			currentlyFocusedRow.value = idea.value.ee.length - 1;
-		}
+		editIdeaButton.value.focus();
 	} else {
 		currentlyFocusedRow.value = currentRow - 1;
 	}
