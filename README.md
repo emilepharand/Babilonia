@@ -1,5 +1,7 @@
 # ![Logo](public/img/logo.png)
 
+[![codecov](https://codecov.io/github/emilepharand/Babilonia/branch/main/graph/badge.svg?token=NBO8T8S2FV)](https://codecov.io/github/emilepharand/Babilonia)
+
 Babilonia is an innovative tool for language enthusiasts who want to **expand their vocabulary** and **reinforce their memory** of foreign languages. It seeks to unlock the power of vocabulary as a means to express your thoughts and understand languages. As your vocabulary improves, so do your language skills!
 
 Babilonia helps you learn **more words**, **faster**. Also, unlike traditional methods, Babilonia lets you practice multiple languages **at the same time**! 😍
