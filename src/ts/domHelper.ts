@@ -10,5 +10,5 @@ export function focusEndOfInput(element: HTMLInputElement) {
 }
 
 export function findAllElementsByClassName(className: string) {
-	return (document?.querySelectorAll<HTMLElement>(`.${className}`)) || [];
+	return (document?.querySelectorAll<HTMLElement>(`.${className}`));
 }

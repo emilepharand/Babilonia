@@ -89,7 +89,7 @@ function moveLeft(e: Event) {
 	if (knownToggles.includes(element)) {
 		focusEndOfInput(textInputs[knownToggles.indexOf(element)] as HTMLInputElement);
 	} else if (textInputs.includes(element)) {
-		const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
+		const cursorPosition = (element as HTMLInputElement).selectionStart;
 		if (cursorPosition === 0) {
 			// Only move left if at beginning of input
 			languageSelects[textInputs.indexOf(element)].focus();
@@ -102,7 +102,7 @@ function moveRight(e: Event) {
 	if (languageSelects.includes(element)) {
 		focusEndOfInput(textInputs[languageSelects.indexOf(element)] as HTMLInputElement);
 	} else if (textInputs.includes(element)) {
-		const cursorPosition = (element as HTMLInputElement).selectionStart ?? 1;
+		const cursorPosition = (element as HTMLInputElement).selectionStart;
 		if (cursorPosition === (element as HTMLInputElement).value.length) {
 			// Only move right if at end of input
 			knownToggles[textInputs.indexOf(element)].focus();
