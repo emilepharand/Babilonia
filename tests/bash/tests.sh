@@ -159,9 +159,15 @@ sleep 8
 
 indexContent2=$(curl -sf $VITE_BASE_URL_DEV)
 
-if ![[ "$indexContent" == *"Babilonia"* && "$indexContent" != *"Babilonius"* && "$indexContent2" == *"Babilonius"* && "$indexContent2" != *"Babilonia"* ]]; then
+if [[ "$indexContent" == *"Babilonius"* ]]; then
     echo "--> Result: failure!"
-    echo "Vue did not restart."
+    echo "Index already has the new content."
+    cleanup && exit 1
+fi
+
+if [[ "$indexContent2" != *"Babilonius"* || "$indexContent2" == *"Babilonia"* ]]; then
+    echo "--> Result: failure!"
+    echo "Vue server did not restart properly."
     cleanup && exit 1
 fi
 
