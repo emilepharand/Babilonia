@@ -5,7 +5,7 @@ import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
 
-const apiUrl = `${process.env.VITE_API_URL ?? import.meta.env.VITE_API_URL}`;
+const apiUrl = `${process.env.VITE_API_URL}`;
 
 export async function getIdea(ideaId: number): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
