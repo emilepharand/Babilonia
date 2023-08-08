@@ -1,8 +1,7 @@
 #!/bin/bash
 
-set -e
-
 cleanup() {
+  echo "cleanup"
   pkill -f "server/index.ts"
   pkill -f "index.cjs"
   pkill -f "node_modules/.bin/vite"
