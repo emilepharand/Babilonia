@@ -36,7 +36,8 @@ Of course, sometimes, you simply don't know. No need to go through hints then: y
 ## A polyglot's paradise
 Babilonia lets you practice **any number of languages at the same time**. Most language learning tools only allow you to practice one language at a time. But what if you want to master *multiple* languages? It would be incredibly convenient to practice them at the same time, right? Babilonia enables you to do just that!
 
-That comes with many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**, which is an invaluable skill for a polyglot to have. Also, you learn to **associate between them** the words in different languages to convey the same idea, which helps you remember them more easily. Plus, it's an incredibly **efficient way** to practice when you want to learn multiple languages.
+That comes with many benefits. For one, you get to exercise the **mental gymnastics** of quickly **switching between languages**,
+which is an invaluable skill for a polyglot to have. Also, you learn to **associate between them** the words in different languages to convey the same idea, which helps you remember them more easily. Plus, it's an incredibly **efficient way** to practice when you want to learn multiple languages.
 
 Of course, even though you *could* practice tons of languages at the same time, it doesn't mean you *have* to! You can always choose which languages you would like to study. It could be one, two or any combination of languages. Flexibility is key.
 
@@ -73,11 +74,13 @@ But it could also be **a phrase**, **an expression**, **an idiom**, **a saying**
 Expressions are the **actual language elements** that you type and practice in Babilonia.
 
 ## Simplified keyboard input
-When simultaneously practicing multiple languages that use **different alphabets**, typing the **right letter** with the **correct accent** in **every word** of **every language** can be impractical and add friction to your learning. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
+When simultaneously practicing multiple languages that use **different alphabets**, typing the **right letter** with the **correct accent**
+in **every word** of **every language** can be impractical and add friction to your learning. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
 
 That can add a lot of friction to your learning. Sure, mastering spelling *is* important, but if your goal is to practice as many words as possible, getting each accent right might not be your priority. Furthermore, many people find it valuable to first learn a new language without the **added difficulty of accents**.
 
-To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
+To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently
+only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
 As of version 2.0, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** with each release.
@@ -87,7 +90,8 @@ You can also easily **add your own** expressions, ideas and languages.
 Keep in mind that ideas and expressions that Babilonia comes with can change at any time in a future update. That includes any change you make to them. However, any new ideas that you add will never be modified.
 
 ## An important caveat
-**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary is the single most important aspect of learning languages, which unlocks a world of possibilities.
+**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
+is the single most important aspect of learning languages, which unlocks a world of possibilities.
 
 ## How to use
 All you need is `node` and `Chromium` or `Firefox`. Download the most recent release, unzip it, `cd` into the folder and run `node index.cjs`. It should work on most `Windows` and `Linux` environments.
