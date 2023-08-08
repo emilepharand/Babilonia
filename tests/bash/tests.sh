@@ -22,12 +22,15 @@ after_success() {
 
 write_coverage() {
   local output_file="$1"
-  curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' > "../tests/coverage/merged/${output_file}"
+  curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' >"../tests/coverage/merged/${output_file}"
 }
 
 dbFileName="newDbFile.db"
 
-cd dist || { echo "cd dist failed"; exit 1; }
+cd dist || {
+  echo "cd dist failed"
+  exit 1
+}
 
 ####################################################
 # Test 1
@@ -41,8 +44,8 @@ echo "------------------------------------------------------"
 
 # Previous test may have left a file
 if [ -f "$dbFileName" ]; then
-    echo "File $dbFileName already exists. Deleting."
-    rm $dbFileName
+  echo "File $dbFileName already exists. Deleting."
+  rm $dbFileName
 fi
 
 # Run
@@ -54,18 +57,17 @@ sleep 1
 write_coverage "coverage-bash.json"
 
 # Create data for the next test
-curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' > /dev/null
+curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' >/dev/null
 
 # Test that database file has been created and is not empty
 if [ ! -f "$dbFileName" ]; then
-    echo "--> Result: failure!"
-    echo "File $dbFileName was not created."
-    cleanup && exit 1
-elif [ ! -s "$dbFileName" ]
-then 
-   echo "--> Result: failure!"
-   echo "File $dbFileName was created but is empty."
-   cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "File $dbFileName was not created."
+  cleanup && exit 1
+elif [ ! -s "$dbFileName" ]; then
+  echo "--> Result: failure!"
+  echo "File $dbFileName was created but is empty."
+  cleanup && exit 1
 fi
 
 after_success
@@ -91,9 +93,9 @@ write_coverage "coverage-bash-2.json"
 res=$(curl -sf "$VITE_API_URL/languages/1" -H "Content-Type: application/json")
 
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
-    echo "Result: failure!"
-    echo "Database was overwritten."
-    cleanup && exit 1
+  echo "Result: failure!"
+  echo "Database was overwritten."
+  cleanup && exit 1
 fi
 
 after_success
@@ -127,7 +129,10 @@ after_success
 # Test 4
 ######################################
 
-cd .. || { echo "cd .. failed"; exit 1; }
+cd .. || {
+  echo "cd .. failed"
+  exit 1
+}
 
 echo "------------------------------------------------------"
 echo " Test 4                                               "
@@ -135,20 +140,20 @@ echo "------------------------------------------------------"
 echo " Hot reload works                                     "
 echo "------------------------------------------------------"
 
-npm run dev > temp.txt &
+npm run dev >temp.txt &
 
 sleep 8
 
 indexContent=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [ -z "$indexContent" ]; then
-    echo "--> Result: failure!"
-    echo "Vue did not start."
-    cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "Vue did not start."
+  cleanup && exit 1
 elif ! curl -sf -o /dev/null "$VITE_API_URL_DEV/languages"; then
-    echo "--> Result: failure!"
-    echo "API server did not start."
-    cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "API server did not start."
+  cleanup && exit 1
 fi
 
 # Trigger hot reload
@@ -160,21 +165,21 @@ sleep 8
 indexContent2=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [[ "$indexContent" == *"Babilonius"* ]]; then
-    echo "--> Result: failure!"
-    echo "Index already has the new content."
-    cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "Index already has the new content."
+  cleanup && exit 1
 fi
 
 if [[ "$indexContent2" != *"Babilonius"* || "$indexContent2" == *"Babilonia"* ]]; then
-    echo "--> Result: failure!"
-    echo "Vue server did not restart properly."
-    cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "Vue server did not restart properly."
+  cleanup && exit 1
 fi
 
 if ! grep -Fq "[nodemon] restarting due to changes..." "temp.txt" || ! grep -Fq "API server started!" "temp.txt"; then
-    echo "--> Result: failure!"
-    echo "API server did not restart."
-    cleanup && exit 1
+  echo "--> Result: failure!"
+  echo "API server did not restart."
+  cleanup && exit 1
 fi
 
 after_success
