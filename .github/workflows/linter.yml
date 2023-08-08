@@ -47,7 +47,7 @@
           # Run Linter against code base #
           ################################
           - name: Lint Code Base
-            uses: super-linter/super-linter@v5
+            uses: super-linter/super-linter:slim-v5
             env:
               VALIDATE_ALL_CODEBASE: true
               # JS and TS are already linted in another job
