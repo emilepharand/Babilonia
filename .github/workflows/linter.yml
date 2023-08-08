@@ -50,5 +50,10 @@
             uses: super-linter/super-linter@v5
             env:
               VALIDATE_ALL_CODEBASE: true
+              # JS and TS are already linted in another job
+              VALIDATE_JAVASCRIPT_ES: false
+              VALIDATE_JAVASCRIPT_STANDARD: false
+              VALIDATE_TYPESCRIPT_ES: false
+              VALIDATE_TYPESCRIPT_STANDARD: false
               DEFAULT_BRANCH: main
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
