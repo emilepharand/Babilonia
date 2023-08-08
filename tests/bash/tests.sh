@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 cleanup() {
   pkill -f "server/index.ts"
   pkill -f "index.cjs"
@@ -25,7 +27,7 @@ write_coverage() {
 
 dbFileName="newDbFile.db"
 
-cd dist
+cd dist || { echo "cd dist failed"; exit 1; }
 
 ####################################################
 # Test 1
@@ -53,8 +55,6 @@ write_coverage "coverage-bash.json"
 
 # Create data for the next test
 curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' > /dev/null
-
-dbFileSize=$(stat -c%s "$dbFileName")
 
 # Test that database file has been created and is not empty
 if [ ! -f "$dbFileName" ]; then
@@ -88,7 +88,7 @@ sleep 1
 # Coverage
 write_coverage "coverage-bash-2.json"
 
-res=$(curl -sf $VITE_API_URL/languages/1 -H "Content-Type: application/json")
+res=$(curl -sf "$VITE_API_URL/languages/1" -H "Content-Type: application/json")
 
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
     echo "Result: failure!"
@@ -127,7 +127,7 @@ after_success
 # Test 4
 ######################################
 
-cd ..
+cd .. || { echo "cd .. failed"; exit 1; }
 
 echo "------------------------------------------------------"
 echo " Test 4                                               "
@@ -139,7 +139,7 @@ npm run dev > temp.txt &
 
 sleep 8
 
-indexContent=$(curl -sf $VITE_BASE_URL_DEV)
+indexContent=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [ -z "$indexContent" ]; then
     echo "--> Result: failure!"
@@ -157,7 +157,7 @@ sed -i 's@API server started.@API server started!@' server/index.ts
 
 sleep 8
 
-indexContent2=$(curl -sf $VITE_BASE_URL_DEV)
+indexContent2=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [[ "$indexContent" == *"Babilonius"* ]]; then
     echo "--> Result: failure!"
