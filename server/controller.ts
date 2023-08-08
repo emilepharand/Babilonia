@@ -60,7 +60,7 @@ export async function addLanguage(req: Request, res: Response): Promise<void> {
 		res.end();
 		return;
 	}
-	const l: Language = await lm.addLanguage(req.body.name as string);
+		const l: Language = await lm.addLanguage(req.body.name as string);
 	res.status(201);
 	res.send(JSON.stringify(l));
 }
