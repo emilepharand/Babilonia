@@ -19,7 +19,7 @@ jobs:
         run: npm run test:api
       - name: e2e
         run: npm run test:vue
-      - name: coverage=
+      - name: coverage
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
