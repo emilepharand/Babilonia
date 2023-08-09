@@ -3,11 +3,12 @@ import type {Expression, ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
 import type LanguageManager from '../languages/languageManager';
 import type {IdeaForAdding} from './ideaForAdding';
+import {type Manager} from '../manager';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
-export default class IdeaManager {
+export default class IdeaManager implements Manager {
 	constructor(private readonly db: Database, private readonly lm: LanguageManager) {}
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {

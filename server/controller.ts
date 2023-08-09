@@ -4,8 +4,7 @@ import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import type LanguageManager from './model/languages/languageManager';
-import type IdeaManager from './model/ideas/ideaManager';
+import {type Manager} from './model/manager';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
@@ -18,7 +17,7 @@ const sh = DataServiceProvider.getSearchHandler();
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
-// It is static because it doesn't hold any state
+
 export async function getStats(_: Request, res: Response): Promise<void> {
 	const stats = await statsCounter.getStats();
 	res.send(JSON.stringify(stats));
@@ -225,7 +224,7 @@ export async function deleteAllData(_: Request, res: Response): Promise<void> {
 	res.end();
 }
 
-async function validateIdInRequest(req: Request, res: Response, manager: LanguageManager | IdeaManager): Promise<boolean> {
+async function validateIdInRequest(req: Request, res: Response, manager: Manager): Promise<boolean> {
 	if (!validateNumberInRequest(req.params.id, res)) {
 		return false;
 	}
