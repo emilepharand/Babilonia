@@ -55,5 +55,7 @@
               VALIDATE_JAVASCRIPT_STANDARD: false
               VALIDATE_TYPESCRIPT_ES: false
               VALIDATE_TYPESCRIPT_STANDARD: false
+              # Re-enable when #33 is fixed
+              VALIDATE_JSCPD: false
               DEFAULT_BRANCH: main
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
