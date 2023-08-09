@@ -49,7 +49,7 @@ export default class LanguageManager {
 		return (await this.db.get('select 1 from languages where name = ?', name)) !== undefined;
 	}
 
-	async languageIdExists(id: number): Promise<boolean> {
+	async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select 1 from languages where id = ?', id)) !== undefined;
 	}
 

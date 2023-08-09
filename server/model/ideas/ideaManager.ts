@@ -37,7 +37,7 @@ export default class IdeaManager {
 		return {id: ideaId, ee};
 	}
 
-	public async ideaExists(id: number): Promise<boolean> {
+	public async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
 	}
 

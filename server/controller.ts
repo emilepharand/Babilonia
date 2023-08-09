@@ -4,6 +4,8 @@ import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
+import type LanguageManager from './model/languages/languageManager';
+import type IdeaManager from './model/ideas/ideaManager';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
@@ -223,12 +225,12 @@ export async function deleteAllData(_: Request, res: Response): Promise<void> {
 	res.end();
 }
 
-async function validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
+async function validateIdInRequest(req: Request, res: Response, manager: LanguageManager | IdeaManager): Promise<boolean> {
 	if (!validateNumberInRequest(req.params.id, res)) {
 		return false;
 	}
-	const ideaId = parseInt(req.params.id, 10);
-	if (!(await lm.languageIdExists(ideaId))) {
+	const id = parseInt(req.params.id, 10);
+	if (!(await manager.idExists(id))) {
 		res.status(404);
 		res.end();
 		return false;
@@ -236,17 +238,12 @@ async function validateLanguageIdInRequest(req: Request, res: Response): Promise
 	return true;
 }
 
+async function validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
+	return validateIdInRequest(req, res, lm);
+}
+
 async function validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
-	if (!validateNumberInRequest(req.params.id, res)) {
-		return false;
-	}
-	const ideaId = parseInt(req.params.id, 10);
-	if (!(await im.ideaExists(ideaId))) {
-		res.status(404);
-		res.end();
-		return false;
-	}
-	return true;
+	return validateIdInRequest(req, res, im);
 }
 
 function validateNumberInRequest(expectedNumber: string, res: Response): boolean {
