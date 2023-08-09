@@ -1,10 +1,11 @@
 import type {Database} from 'sqlite';
 import type {Language} from './language';
+import {type Manager} from '../manager';
 
 // Manages languages: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
-export default class LanguageManager {
+export default class LanguageManager implements Manager {
 	constructor(private readonly db: Database) {}
 
 	public async getLanguage(id: number): Promise<Language> {
@@ -49,7 +50,7 @@ export default class LanguageManager {
 		return (await this.db.get('select 1 from languages where name = ?', name)) !== undefined;
 	}
 
-	async languageIdExists(id: number): Promise<boolean> {
+	async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select 1 from languages where id = ?', id)) !== undefined;
 	}
 
