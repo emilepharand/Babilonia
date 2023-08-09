@@ -30,7 +30,7 @@ export default class InputValidator {
 		// All languages exist
 		const promises: Array<Promise<boolean>> = [];
 		const languageIds = new Set(Array.from(ll.values(), l => l.id));
-		languageIds.forEach(id => promises.push(this.lm.languageIdExists(id)));
+		languageIds.forEach(id => promises.push(this.lm.idExists(id)));
 		if (!(await Promise.all(promises)).every(exist => exist)) {
 			return false;
 		}
@@ -82,7 +82,7 @@ export default class InputValidator {
 		}
 		// All languages exist
 		const languagesExist: Array<Promise<boolean>> = [];
-		asIdeaForAdding.ee.forEach(e => languagesExist.push(this.lm.languageIdExists(e.languageId)));
+		asIdeaForAdding.ee.forEach(e => languagesExist.push(this.lm.idExists(e.languageId)));
 		if ((await Promise.all(languagesExist)).includes(false)) {
 			return false;
 		}
