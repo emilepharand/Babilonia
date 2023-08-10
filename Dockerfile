@@ -1,4 +1,4 @@
-FROM node:19.2
+FROM node:20.5
 
 WORKDIR /usr/src/babilonia
 
