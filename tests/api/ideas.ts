@@ -25,6 +25,12 @@ import {
 	IdeaForAdding,
 } from '../../server/model/ideas/ideaForAdding';
 
+type IdeaForTesting = {
+	ee: (Omit<ExpressionForAdding, 'languageId'> & {
+		language: string;
+	})[];
+};
+
 beforeEach(async () => {
 	await deleteEverything();
 });
@@ -123,11 +129,8 @@ describe('adding valid ideas', () => {
 	});
 
 	test('one language', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const e2 = {languageId: l1.id, text: 'language 1 expression 2'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1, e2]};
-		await addValidIdeaAndTest(ideaForAdding);
+		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
+		await addValidIdeaAndTest(await makeIdeaForAdding(i));
 	});
 
 	test('simple test', async () => {
@@ -470,3 +473,22 @@ describe('deleting invalid ideas', () => {
 		expect(r.status).toEqual(400);
 	});
 });
+
+async function makeIdeaForAdding(i: IdeaForTesting): Promise<IdeaForAdding> {
+	const languageNames: String[] = [];
+	const languagePromises: Promise<Language>[] = [];
+	const ee: ExpressionForAdding[] = [];
+	for (const e of i.ee) {
+		const l = languageNames.find(l => l === e.language);
+		if (!l) {
+			languagePromises.push(addLanguage(e.language));
+			languageNames.push(e.language);
+		}
+	}
+	const ll = await Promise.all(languagePromises);
+	i.ee.forEach(e => {
+		const l = ll.find(l => l.name === e.language)!;
+		ee.push({languageId: l.id, text: e.text});
+	});
+	return {ee};
+}
