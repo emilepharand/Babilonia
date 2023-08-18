@@ -31,6 +31,17 @@ type IdeaForTesting = {
 	})[];
 };
 
+async function makeIdeaForAdding(i: IdeaForTesting): Promise<IdeaForAdding> {
+	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
+	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
+	const ll = await Promise.all(languagePromises);
+	const ee = i.ee.map(e => {
+		const l = ll.find(lang => lang.name === e.language)!;
+		return {languageId: l.id, text: e.text};
+	});
+	return {ee};
+}
+
 beforeEach(async () => {
 	await deleteEverything();
 });
@@ -473,14 +484,3 @@ describe('deleting invalid ideas', () => {
 		expect(r.status).toEqual(400);
 	});
 });
-
-async function makeIdeaForAdding(i: IdeaForTesting): Promise<IdeaForAdding> {
-	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
-	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
-	const ll = await Promise.all(languagePromises);
-	const ee = i.ee.map(e => {
-		const l = ll.find(lang => lang.name === e.language)!;
-		return {languageId: l.id, text: e.text};
-	});
-	return {ee};
-}
