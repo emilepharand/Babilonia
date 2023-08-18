@@ -475,20 +475,12 @@ describe('deleting invalid ideas', () => {
 });
 
 async function makeIdeaForAdding(i: IdeaForTesting): Promise<IdeaForAdding> {
-	const languageNames: String[] = [];
-	const languagePromises: Promise<Language>[] = [];
-	const ee: ExpressionForAdding[] = [];
-	for (const e of i.ee) {
-		const l = languageNames.find(l => l === e.language);
-		if (!l) {
-			languagePromises.push(addLanguage(e.language));
-			languageNames.push(e.language);
-		}
-	}
+	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
+	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
 	const ll = await Promise.all(languagePromises);
-	i.ee.forEach(e => {
-		const l = ll.find(l => l.name === e.language)!;
-		ee.push({languageId: l.id, text: e.text});
+	const ee = i.ee.map(e => {
+		const l = ll.find(lang => lang.name === e.language)!;
+		return {languageId: l.id, text: e.text};
 	});
 	return {ee};
 }
