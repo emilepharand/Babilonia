@@ -117,7 +117,7 @@ function trimExpressions(ideaForAdding: IdeaForAdding) {
 
 function trimContext(ideaForAdding: IdeaForAdding) {
 	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s+(?=\))|(?<=\()\s+/g, '');
+		e.text = e.text.replaceAll(/\s(?=\))|(?<=\()\s/g, '');
 	});
 	return ideaForAdding;
 }
