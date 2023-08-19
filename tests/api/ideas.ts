@@ -230,6 +230,9 @@ describe('adding invalid ideas', () => {
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ('}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(to play sport'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) (sport'}]});
+		// Double parenthesis
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play sport))'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ( (play sport))'}]});
 		// Second opening parenthesis before the first one is closed
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play) sport'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(lay) sport'}]});
