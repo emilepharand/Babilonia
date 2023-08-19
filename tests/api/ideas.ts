@@ -145,16 +145,14 @@ describe('adding valid ideas', () => {
 	});
 
 	test('simple test', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const l2: Language = await addLanguage('language 2');
-		const l3: Language = await addLanguage('language 3');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1', known: true};
-		const e2 = {languageId: l1.id, text: 'language 1 expression 2'};
-		const e3 = {languageId: l2.id, text: 'language 2 expression 1'};
-		const e4 = {languageId: l3.id, text: 'language 3 expression 1', known: true};
-		const e5 = {languageId: l3.id, text: 'language 3 expression 2'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1, e2, e3, e4, e5]};
-		await addValidIdeaAndTest(ideaForAdding);
+		const i: IdeaForTesting = {ee: [
+			{language: 'l1', text: 'l1 e1', known: true},
+			{language: 'l1', text: 'l1 e2'},
+			{language: 'l2', text: 'l2 e1'},
+			{language: 'l3', text: 'l3 e1', known: true},
+			{language: 'l3', text: 'l3 e2'},
+		]};
+		await addValidIdeaAndTest(await makeIdeaForAdding(i));
 	});
 
 	test('ordering of expressions', async () => {
