@@ -104,8 +104,8 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 
 function normalizeIdea(ideaForAdding: IdeaForAdding) {
 	trimExpressions(ideaForAdding);
-	trimContext(ideaForAdding);
 	normalizeWhitespace(ideaForAdding);
+	trimContext(ideaForAdding);
 }
 
 function trimExpressions(ideaForAdding: IdeaForAdding) {
