@@ -100,6 +100,16 @@ describe('getting invalid languages', () => {
 });
 
 describe('adding languages', () => {
+	test('concurrent requests', async () => {
+		const promises: Array<Promise<Language>> = [];
+		for (let i = 0; i < 10; i++) {
+			promises.push(addLanguage(`language ${i}`));
+		}
+		const promises2 = await Promise.all(promises);
+		const uniqueLanguages = Array.from(new Set(promises2.map(p => p.id)));
+		expect(uniqueLanguages.length).toEqual(10);
+	});
+
 	test('adding two languages', async () => {
 		await addValidLanguageAndTest('first language', FIRST_LANGUAGE_ID, FIRST_ORDERING);
 		await addValidLanguageAndTest('second language', FIRST_LANGUAGE_ID + 1, FIRST_ORDERING + 1);

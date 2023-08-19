@@ -132,6 +132,17 @@ describe('getting invalid ideas', () => {
 });
 
 describe('adding valid ideas', () => {
+	test('concurrent requests', async () => {
+		const l = await addLanguage('l');
+		const promises: Array<Promise<Idea>> = [];
+		for (let i = 0; i < 10; i++) {
+			promises.push(addIdea({ee: [{languageId: l.id, text: 'e'}]}));
+		}
+		const promises2 = await Promise.all(promises);
+		const uniqueIdeas = Array.from(new Set(promises2.map(i => i.id)));
+		expect(uniqueIdeas.length).toEqual(10);
+	});
+
 	test('one expression', async () => {
 		const l1: Language = await addLanguage('language 1');
 		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
