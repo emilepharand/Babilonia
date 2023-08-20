@@ -46,6 +46,12 @@ beforeEach(async () => {
 	await deleteEverything();
 });
 
+async function addMultipleInvalidIdeasAndTest(l: Language, expressions: String[]): Promise<void> {
+	const promises = expressions.map(e => addIdeaRawObjectAndGetResponse(JSON.stringify({ee: [{languageId: l.id, text: e}]})));
+	const responses = await Promise.all(promises);
+	responses.forEach(response => expect(response.status).toEqual(400));
+}
+
 async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
 	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
 	expect(r.status).toEqual(400);
@@ -144,10 +150,8 @@ describe('adding valid ideas', () => {
 	});
 
 	test('one expression', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1]};
-		await addValidIdeaAndTest(ideaForAdding);
+		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}]};
+		await addValidIdeaAndTest(await makeIdeaForAdding(i));
 	});
 
 	test('one language', async () => {
@@ -183,11 +187,12 @@ describe('adding valid ideas', () => {
 
 	test('whitespace normalization', async () => {
 		const l1: Language = await addLanguage('language 1');
-		const idea = await addIdea({ee:
-				[{languageId: l1.id, text: ' an expression starting with whitespace '},
-					{languageId: l1.id, text: 'an expression	with a tab'},
-					{languageId: l1.id, text: 'an  expression  with  two  spaces'}],
-		});
+		const ee = {ee:	[
+			{languageId: l1.id, text: ' an expression starting with whitespace '},
+			{languageId: l1.id, text: 'an expression	with a tab'},
+			{languageId: l1.id, text: 'an  expression  with  two  spaces'},
+		]};
+		const idea = await addIdea(ee);
 		expect(idea.ee[0].text).toEqual('an expression starting with whitespace');
 		expect(idea.ee[1].text).toEqual('an expression with a tab');
 		expect(idea.ee[2].text).toEqual('an expression with two spaces');
@@ -212,48 +217,31 @@ describe('adding invalid ideas', () => {
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: ''}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: ' '}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '  '}]});
-		await addInvalidIdeaAndTest({
-			ee: [
-				{languageId: l1.id, text: 'not empty'},
-				{
-					languageId: l1.id,
-					text: '',
-				},
-			],
-		});
+		await addInvalidIdeaAndTest({ee: [
+			{languageId: l1.id, text: 'not empty'},
+			{languageId: l1.id,	text: ''},
+		]});
 	});
 
 	test('parentheses (context)', async () => {
 		const l1: Language = await addLanguage('language 1');
-		// Unmatched opening parenthesis
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ('}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(to play sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) (sport'}]});
 		// Double parenthesis
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play sport))'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ( (play sport))'}]});
-		// Second opening parenthesis before the first one is closed
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play) sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(lay) sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(to (play)) sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(la)y) sport'}]});
-		// An expression with only context
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only context)'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '  (only context) '}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only) (context)'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '()'}]});
+		await addMultipleInvalidIdeasAndTest(l1, ['to ((play sport))', 'to ( (play sport))', 'to ( (play sport)']);
+		// Opening parenthesis before the first one is closed
+		await addMultipleInvalidIdeasAndTest(l1, ['to ((play) sport', 'to (p(lay) sport', '(to (play)) sport', 'to (play (sport))', 'to (p(la)y) sport']);
+		// An expression that contains only context
+		await addMultipleInvalidIdeasAndTest(l1, ['(only context)', '  (only context) ', '(only) (context)', '()']);
+		// Unclosed opening parenthesis
+		await addMultipleInvalidIdeasAndTest(l1, ['to (play sport', 'to (', 'to ((play sport)', '(to play sport', 'to (play) (sport']);
 		// Unmatched closing parenthesis
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play)) sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play) spo)rt'}]});
+		await addMultipleInvalidIdeasAndTest(l1, ['to play) sport', 'to (play)) sport', 'to (play) sport)', ')(to play sport)']);
+		// Parentheses are not balanced
+		await addMultipleInvalidIdeasAndTest(l1, ['to )play( sport', 'to )play( (sport', 'to (play) )sport', ')(']);
 		// Empty context content
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to () sport'}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (  ) sport'}]});
+		await addMultipleInvalidIdeasAndTest(l1, ['to () sport', 'to (  ) sport']);
 		// Context is trimmed
-		const idea = await addIdea({ee:
-				[{languageId: l1.id, text: 'to ( play ) sport'},
-					{languageId: l1.id, text: 'to (  play) sport'}],
-		});
+		const idea = await addIdea({ee:	[{languageId: l1.id, text: 'to ( play ) sport'},
+			{languageId: l1.id, text: 'to (  play) sport'}]});
 		expect(idea.ee[0].text).toEqual('to (play) sport');
 		expect(idea.ee[1].text).toEqual('to (play) sport');
 	});
