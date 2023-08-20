@@ -103,11 +103,7 @@ export default class InputValidator {
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
 	for (const e of ee) {
-		// No opening parenthesis before the first is closed (done to avoid ReDoS, found by CodeQL)
-		if (e.text.match(/\([^)]*\(/g)) {
-			return false;
-		}
-		const contexts = e.text.match(/\([^)]*\)/g) ?? [];
+		const contexts = e.text.match(/\([^)(]*\)/g) ?? [];
 		// No context is empty
 		if (contexts.some(x => x.substring(1, x.length - 1).trim().length === 0)) {
 			return false;
