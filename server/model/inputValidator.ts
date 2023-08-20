@@ -109,7 +109,7 @@ export function validateContextParentheses(ee: ExpressionForAdding[]) {
 			return false;
 		}
 		// Expression is not only made of context
-		const expressionWithoutContexts = e.text.replaceAll(/\([^)]*\)/g, '');
+		const expressionWithoutContexts = e.text.replaceAll(/\([^)(]*\)/g, '');
 		if (expressionWithoutContexts.trim().length === 0) {
 			return false;
 		}
