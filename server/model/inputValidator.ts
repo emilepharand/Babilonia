@@ -103,8 +103,8 @@ export default class InputValidator {
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
 	for (const e of ee) {
-		// No double parentheses (do this check here to avoid ReDoS in the regex, found by CodeQL)
-		if (e.text.includes('((')) {
+		// No opening parenthesis before the first is closed (done to avoid ReDoS, found by CodeQL)
+		if (e.text.match(/\([^)]*\(/g)) {
 			return false;
 		}
 		const contexts = e.text.match(/\([^)]*\)/g) ?? [];
