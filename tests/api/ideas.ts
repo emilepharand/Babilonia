@@ -246,19 +246,10 @@ describe('adding invalid ideas', () => {
 		expect(idea.ee[1].text).toEqual('to (play) sport');
 	});
 
-	test('two identical expressions (language + text)', async () => {
-		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id, text: 'duplicate expression'};
-		const e2 = {languageId: l1.id, text: 'duplicate expression'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1, e2]};
-		await addInvalidIdeaAndTest(ideaForAdding);
-	});
-
-	test('array', async () => {
-		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id, text: 'expression'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1]};
-		await addInvalidIdeaAndTest([ideaForAdding]);
+	test('duplicate expressions', async () => {
+		await addInvalidIdeaAndTest(makeIdeaForAdding({
+			ee: [{language: 'l', text: 'duplicate'}, {language: 'l', text: 'duplicate'}],
+		}));
 	});
 
 	test('idea: invalid shapes', async () => {
@@ -270,6 +261,8 @@ describe('adding invalid ideas', () => {
 		await addInvalidIdeaAndTest({id: 1, ee: [e1]});
 		// Property is of an invalid type
 		await addInvalidIdeaAndTest({ee: 'expression'});
+		// Array
+		await addInvalidIdeaAndTest([{ee: 'expression'}]);
 	});
 
 	test('expression: invalid shapes', async () => {
@@ -356,26 +349,21 @@ describe('editing ideas', () => {
 
 describe('editing invalid ideas', () => {
 	test('language doesn\'t exist', async () => {
-		const l1: Language = await addLanguage('language');
-		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
 		const idea = await addIdea(ideaForAdding);
-		ideaForAdding.ee[0].languageId = l1.id + 1;
+		ideaForAdding.ee[0].languageId += 1;
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
 	test('no expression', async () => {
-		const l1: Language = await addLanguage('language');
-		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
 		const idea = await addIdea(ideaForAdding);
 		ideaForAdding.ee = [];
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
 	test('id is not numeric', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const ee = [e1];
-		const idea = await addIdea({ee});
+		const idea = await addIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}));
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
 		const r = await fetch(`${apiUrl}/ideas/123letters`, {
 			method: 'PUT',
@@ -400,7 +388,7 @@ describe('editing invalid ideas', () => {
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
-	test('two identical expressions (language + text)', async () => {
+	test('duplicate expressions', async () => {
 		const l1: Language = await addLanguage('language');
 		const e1 = {languageId: l1.id, text: 'duplicate expression'};
 		const e2 = {languageId: l1.id, text: 'not a duplicate expression'};
@@ -408,13 +396,6 @@ describe('editing invalid ideas', () => {
 		const idea = await addIdea(ideaForAdding);
 		ideaForAdding.ee[1].text = 'duplicate expression';
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-	});
-
-	test('array', async () => {
-		const l1: Language = await addLanguage('language');
-		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
-		const idea = await addIdea(ideaForAdding);
-		await editInvalidIdeaAndTest([ideaForAdding], idea.id);
 	});
 
 	test('idea: invalid shapes', async () => {
@@ -428,6 +409,8 @@ describe('editing invalid ideas', () => {
 		await editInvalidIdeaAndTest({id: 1, ee: [e1]}, idea.id);
 		// Property is of an invalid type
 		await editInvalidIdeaAndTest({ee: 'expression'}, idea.id);
+		// Array
+		await editInvalidIdeaAndTest([ideaForAdding], idea.id);
 	});
 
 	test('expression: invalid shapes', async () => {
