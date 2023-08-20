@@ -236,6 +236,7 @@ describe('adding invalid ideas', () => {
 		// Second opening parenthesis before the first one is closed
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to ((play) sport'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(lay) sport'}]});
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(to (play)) sport'}]});
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (p(la)y) sport'}]});
 		// An expression with only context
 		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '(only context)'}]});
