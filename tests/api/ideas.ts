@@ -12,6 +12,7 @@ import {
 	apiUrl,
 	deleteEverything,
 	deleteIdea,
+	editIdea,
 	editIdeaAndGetResponse,
 	editIdeaRawObjectAndGetResponse,
 	fetchIdea,
@@ -61,7 +62,7 @@ async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
 async function addValidIdeaAndTest(
 	ideaForAdding: IdeaForAdding,
 	expressionsInOrder?: ExpressionForAdding[],
-): Promise<void> {
+): Promise<Idea> {
 	let r = await addIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding));
 	expect(r.status).toEqual(201);
 	const responseIdea = (await r.json()) as Idea;
@@ -84,6 +85,8 @@ async function addValidIdeaAndTest(
 		const fetchedLanguage = await fetchLanguage(fetchedExpression.language.id);
 		expect(fetchedLanguage).toEqual(fetchedExpression.language);
 	}
+
+	return responseIdea;
 }
 
 async function editValidIdeaAndTest(
@@ -138,53 +141,6 @@ describe('getting invalid ideas', () => {
 });
 
 describe('adding valid ideas', () => {
-	test('concurrent requests', async () => {
-		const l = await addLanguage('l');
-		const promises: Array<Promise<Idea>> = [];
-		for (let i = 0; i < 10; i++) {
-			promises.push(addIdea({ee: [{languageId: l.id, text: 'e'}]}));
-		}
-		const promises2 = await Promise.all(promises);
-		const uniqueIdeas = Array.from(new Set(promises2.map(i => i.id)));
-		expect(uniqueIdeas.length).toEqual(10);
-	});
-
-	test('one expression', async () => {
-		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}]};
-		await addValidIdeaAndTest(await makeIdeaForAdding(i));
-	});
-
-	test('one language', async () => {
-		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
-		await addValidIdeaAndTest(await makeIdeaForAdding(i));
-	});
-
-	test('simple test', async () => {
-		const i: IdeaForTesting = {ee: [
-			{language: 'l1', text: 'l1 e1', known: true},
-			{language: 'l1', text: 'l1 e2'},
-			{language: 'l2', text: 'l2 e1'},
-			{language: 'l3', text: 'l3 e1', known: true},
-			{language: 'l3', text: 'l3 e2'},
-		]};
-		await addValidIdeaAndTest(await makeIdeaForAdding(i));
-	});
-
-	test('ordering of expressions', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const l2: Language = await addLanguage('language 2');
-		const l3: Language = await addLanguage('language 3');
-		const l4: Language = await addLanguage('language 4');
-		const e4 = {languageId: l2.id, text: 'language 2 expression 1'};
-		const e5 = {languageId: l2.id, text: 'language 2 expression 2'};
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const e2 = {languageId: l1.id, text: 'language 1 expression 2'};
-		const e3 = {languageId: l1.id, text: 'language 1 expression 3'};
-		const e7 = {languageId: l4.id, text: 'language 4 expression 1'};
-		const e6 = {languageId: l3.id, text: 'language 3 expression 1'};
-		await addValidIdeaAndTest({ee: [e4, e5, e1, e2, e3, e7, e6]}, [e1, e2, e3, e4, e5, e6, e7]);
-	});
-
 	test('whitespace normalization', async () => {
 		const l1: Language = await addLanguage('language 1');
 		const ee = {ee:	[
@@ -280,44 +236,99 @@ describe('adding invalid ideas', () => {
 	});
 });
 
-describe('editing ideas', () => {
-	test('simple test', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const l2: Language = await addLanguage('language 2');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1', known: false};
-		const e2 = {languageId: l2.id, text: 'language 1 expression 2', known: true};
-		const ee = [e1, e2];
-		const idea = await addIdea({ee});
+describe('adding and editing', () => {
+	test('only one expression', async () => {
+		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}]};
+		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
 		const newIdea = getIdeaForAddingFromIdea(idea);
-		newIdea.ee[0].text = 'a new expression 1';
-		newIdea.ee[1].text = 'a new expression 2';
-		newIdea.ee[2] = {languageId: l2.id, text: 'a new expression 3', known: true};
-		newIdea.ee[3] = {languageId: l2.id, text: 'a new expression 4', known: false};
+		newIdea.ee[0].text = 'new';
 		await editValidIdeaAndTest(idea, newIdea);
 	});
 
-	test('reordering of expressions', async () => {
+	test('only one language', async () => {
+		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
+		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+		const newIdea = getIdeaForAddingFromIdea(idea);
+		newIdea.ee[0].text = 'new1';
+		newIdea.ee[1].text = 'new2';
+		await editValidIdeaAndTest(idea, newIdea);
+	});
+
+	test('basic test', async () => {
+		// Adding
+		const i: IdeaForTesting = {ee: [
+			{language: 'l1', text: 'l1 e1', known: true},
+			{language: 'l1', text: 'l1 e2'},
+			{language: 'l2', text: 'l2 e1'},
+			{language: 'l3', text: 'l3 e1', known: false},
+			{language: 'l3', text: 'l3 e2'},
+		]};
+		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+
+		// Editing
+		const newIdea = getIdeaForAddingFromIdea(idea);
+		newIdea.ee[0].text = 'a new expression 1';
+		newIdea.ee[1].text = 'a new expression 2';
+		newIdea.ee[2] = {languageId: newIdea.ee[0].languageId, text: 'a new expression 3', known: true};
+		newIdea.ee[3] = {languageId: newIdea.ee[2].languageId, text: 'a new expression 4', known: false};
+		await editValidIdeaAndTest(idea, newIdea);
+	});
+
+	test('ordering of expressions', async () => {
+		// Adding
 		const l1: Language = await addLanguage('language 1');
 		const l2: Language = await addLanguage('language 2');
 		const l3: Language = await addLanguage('language 3');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const e2 = {languageId: l2.id, text: 'language 2 expression 1'};
-		const e3 = {languageId: l2.id, text: 'language 2 expression 2'};
-		const e4 = {languageId: l3.id, text: 'language 3 expression 1'};
-		const idea = await addIdea({ee: [e1, e2, e3, e4]});
+		const l4: Language = await addLanguage('language 4');
+		const e1 = {languageId: l1.id, text: 'l1 e1'};
+		const e2 = {languageId: l1.id, text: 'l1 e2'};
+		const e3 = {languageId: l1.id, text: 'l1 e3'};
+		const e4 = {languageId: l2.id, text: 'l2 e1'};
+		const e5 = {languageId: l2.id, text: 'l2 e2'};
+		const e6 = {languageId: l3.id, text: 'l3 e1'};
+		const e7 = {languageId: l4.id, text: 'l4 e1'};
+		const idea = await addValidIdeaAndTest({ee: [e4, e5, e1, e2, e3, e7, e6]}, [e1, e2, e3, e4, e5, e6, e7]);
 
-		const newIdea = getIdeaForAddingFromIdea(idea);
-		newIdea.ee[0].languageId = l2.id;
-		newIdea.ee[1].languageId = l1.id;
-		newIdea.ee[2].languageId = l3.id;
-		newIdea.ee[3].languageId = l1.id;
+		// Editing
+		const ideaForAdding = getIdeaForAddingFromIdea(idea);
+		ideaForAdding.ee[0].languageId = l2.id;
+		ideaForAdding.ee[1].languageId = l1.id;
+		ideaForAdding.ee[2].languageId = l3.id;
+		ideaForAdding.ee[3].languageId = l1.id;
+		ideaForAdding.ee[4].languageId = l4.id;
+		ideaForAdding.ee[5].languageId = l1.id;
+		ideaForAdding.ee[6].languageId = l2.id;
 
-		await editValidIdeaAndTest(idea, newIdea, [
-			newIdea.ee[1],
-			newIdea.ee[3],
-			newIdea.ee[0],
-			newIdea.ee[2],
+		await editValidIdeaAndTest(idea, ideaForAdding, [
+			ideaForAdding.ee[1],
+			ideaForAdding.ee[3],
+			ideaForAdding.ee[5],
+			ideaForAdding.ee[0],
+			ideaForAdding.ee[6],
+			ideaForAdding.ee[2],
+			ideaForAdding.ee[4],
 		]);
+	});
+
+	test('concurrent requests - adding', async () => {
+		const l = await addLanguage('l');
+		const promises: Array<Promise<Idea>> = [];
+		for (let i = 0; i < 10; i++) {
+			promises.push(addIdea({ee: [{languageId: l.id, text: 'e'}]}));
+		}
+		const uniqueIdeas = Array.from(new Set((await Promise.all(promises)).map(i => i.id)));
+		expect(uniqueIdeas.length).toEqual(10);
+	});
+
+	test('concurrent requests - editing', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+		const idea = await addIdea(ideaForAdding);
+		const promises: Array<Promise<Idea>> = [];
+		for (let i = 0; i < 10; i++) {
+			promises.push(editIdea({ee: [{languageId: idea.id, text: `e${i}`}]}, idea.id));
+		}
+		const uniqueExpressions = Array.from(new Set((await Promise.all(promises)).map(i => i.ee[0].text)));
+		expect(uniqueExpressions.length).toEqual(10);
 	});
 
 	test('parentheses (context)', async () => {
