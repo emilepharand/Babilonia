@@ -5,7 +5,6 @@ import type {Language} from './model/languages/language';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 import {type Manager} from './model/manager';
-import AsyncLock from 'async-lock';
 
 const lm = DataServiceProvider.getLanguageManager();
 const im = DataServiceProvider.getIdeaManager();
@@ -14,8 +13,6 @@ const iv = DataServiceProvider.getInputValidator();
 const sm = DataServiceProvider.getSettingsManager();
 const statsCounter = DataServiceProvider.getStats();
 const sh = DataServiceProvider.getSearchHandler();
-
-const lock = new AsyncLock();
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -59,16 +56,14 @@ export async function deleteLanguage(req: Request, res: Response): Promise<void>
 }
 
 export async function addLanguage(req: Request, res: Response): Promise<void> {
-	await lock.acquire('addLanguage', async () => {
-		if (!(await iv.validateLanguageForAdding(req.body))) {
-			res.status(400);
-			res.end();
-			return;
-		}
-		const l: Language = await lm.addLanguage(req.body.name as string);
-		res.status(201);
-		res.send(JSON.stringify(l));
-	});
+	if (!(await iv.validateLanguageForAdding(req.body))) {
+		res.status(400);
+		res.end();
+		return;
+	}
+	const l: Language = await lm.addLanguage(req.body.name as string);
+	res.status(201);
+	res.send(JSON.stringify(l));
 }
 
 export async function editLanguages(req: Request, res: Response): Promise<void> {
@@ -88,18 +83,16 @@ export async function getLanguages(_: Request, res: Response): Promise<void> {
 }
 
 export async function addIdea(req: Request, res: Response): Promise<void> {
-	await lock.acquire('addIdea', async () => {
-		if (!(await iv.validateIdeaForAdding(req.body as IdeaForAdding))) {
-			res.status(400);
-			res.end();
-			return;
-		}
-		const ideaForAdding = req.body as IdeaForAdding;
-		normalizeIdea(ideaForAdding);
-		const returnIdea = await im.addIdea(ideaForAdding);
-		res.status(201);
-		res.send(JSON.stringify(returnIdea));
-	});
+	if (!(await iv.validateIdeaForAdding(req.body as IdeaForAdding))) {
+		res.status(400);
+		res.end();
+		return;
+	}
+	const ideaForAdding = req.body as IdeaForAdding;
+	normalizeIdea(ideaForAdding);
+	const returnIdea = await im.addIdea(ideaForAdding);
+	res.status(201);
+	res.send(JSON.stringify(returnIdea));
 }
 
 function normalizeIdea(ideaForAdding: IdeaForAdding) {

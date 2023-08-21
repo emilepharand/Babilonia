@@ -1,6 +1,10 @@
-import type {Express} from 'express';
+import type {Express, Request, Response, NextFunction} from 'express';
 import {Router} from 'express';
 import * as Controller from './controller';
+import AsyncLock from 'async-lock';
+
+const lock = new AsyncLock();
+const lockKey = 'lock';
 
 export default class Routes {
 	public router: Router;
@@ -23,26 +27,39 @@ export default class Routes {
 			});
 		}
 		// Languages
-		this.router.get('/languages', Controller.getLanguages);
-		this.router.post('/languages', Controller.addLanguage);
-		this.router.put('/languages', Controller.editLanguages);
-		this.router.delete('/languages', Controller.getLanguages);
-		this.router.get('/languages/:id', Controller.getLanguageById);
-		this.router.delete('/languages/:id', Controller.deleteLanguage);
+		this.route('get', '/languages', Controller.getLanguages);
+		this.route('post', '/languages', Controller.addLanguage);
+		this.route('put', '/languages', Controller.editLanguages);
+		this.route('delete', '/languages', Controller.getLanguages);
+		this.route('get', '/languages/:id', Controller.getLanguageById);
+		this.route('delete', '/languages/:id', Controller.deleteLanguage);
 		// Ideas
-		this.router.get('/ideas/:id', Controller.getIdeaById);
-		this.router.get('/ideas?:search', Controller.search);
-		this.router.post('/ideas', Controller.addIdea);
-		this.router.put('/ideas/:id', Controller.editIdea);
-		this.router.delete('/ideas/:id', Controller.deleteIdea);
+		this.route('get', '/ideas/:id', Controller.getIdeaById);
+		this.route('get', '/ideas?:search', Controller.search);
+		this.route('post', '/ideas', Controller.addIdea);
+		this.route('put', '/ideas/:id', Controller.editIdea);
+		this.route('delete', '/ideas/:id', Controller.deleteIdea);
 		// Practice
-		this.router.get('/practice-ideas/next', Controller.getNextPracticeIdea);
+		this.route('delete', '/everything', Controller.deleteAllData);
+		this.route('get', '/practice-ideas/next', Controller.getNextPracticeIdea);
 		// Stats
-		this.router.get('/stats', Controller.getStats);
+		this.route('get', '/stats', Controller.getStats);
 		// Settings
-		this.router.put('/settings', Controller.setSettings);
-		this.router.get('/settings', Controller.getSettings);
+		this.route('put', '/settings', Controller.setSettings);
+		this.route('get', '/settings', Controller.getSettings);
 		// Everything
-		this.router.delete('/everything', Controller.deleteAllData);
+		this.route('delete', '/everything', Controller.deleteAllData);
+	}
+
+	private wrapAsync(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): (req: Request, res: Response, next: NextFunction) => void {
+		return async (req, res, next) => {
+			await lock.acquire(lockKey, async () => {
+				await fn(req, res, next).catch(next);
+			});
+		};
+	}
+
+	private route(method: 'get' | 'post' | 'put' | 'delete', route: string, handler: (req: Request, res: Response, next: NextFunction) => Promise<void>): void {
+		this.router[method](route, this.wrapAsync(handler));
 	}
 }
