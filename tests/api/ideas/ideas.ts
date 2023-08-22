@@ -276,7 +276,7 @@ describe('invalid cases', () => {
 		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
 	});
 
-	test('invalid data - editing', async () => {
+	test('invalid data', async () => {
 		const l1: Language = await addLanguage('language');
 		const e1 = {languageId: l1.id, text: 'expression'};
 		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
