@@ -3,9 +3,14 @@ import {
 	ExpressionForAdding,
 	getExpressionForAddingFromExpression,
 } from '../../server/model/ideas/expression';
-import {Language} from '../../server/model/languages/language';
 import {Idea, validate} from '../../server/model/ideas/idea';
 import {
+	IdeaForAdding,
+	getIdeaForAddingFromIdea,
+} from '../../server/model/ideas/ideaForAdding';
+import {Language} from '../../server/model/languages/language';
+import {
+	FIRST_IDEA_ID,
 	addIdea,
 	addIdeaRawObjectAndGetResponse,
 	addLanguage,
@@ -19,46 +24,30 @@ import {
 	fetchIdeaAndGetResponse,
 	fetchLanguage,
 	fetchLanguageAndGetResponse,
-	FIRST_IDEA_ID,
 } from '../utils/utils';
-import {
-	getIdeaForAddingFromIdea,
-	IdeaForAdding,
-} from '../../server/model/ideas/ideaForAdding';
-
-type IdeaForTesting = {
-	ee: (Omit<ExpressionForAdding, 'languageId'> & {
-		language: string;
-	})[];
-};
-
-async function makeIdeaForAdding(i: IdeaForTesting): Promise<IdeaForAdding> {
-	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
-	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
-	const ll = await Promise.all(languagePromises);
-	const ee = i.ee.map(e => {
-		const l = ll.find(lang => lang.name === e.language)!;
-		return {languageId: l.id, text: e.text};
-	});
-	return {ee};
-}
 
 beforeEach(async () => {
 	await deleteEverything();
 });
 
-async function addMultipleInvalidIdeasAndTest(l: Language, expressions: String[]): Promise<void> {
-	const promises = expressions.map(e => addIdeaRawObjectAndGetResponse(JSON.stringify({ee: [{languageId: l.id, text: e}]})));
-	const responses = await Promise.all(promises);
-	responses.forEach(response => expect(response.status).toEqual(400));
+async function makeIdeaForAdding(i: {ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]}): Promise<IdeaForAdding> {
+	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
+	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
+	const ll = await Promise.all(languagePromises);
+	return {ee: i.ee.map(e => ({languageId: ll.find(lang => lang.name === e.language)!.id, text: e.text}))};
 }
 
-async function addInvalidIdeaAndTest(invalidIdea: any, expectIdeas?: boolean): Promise<void> {
+async function addIdeaHavingExpressions(ee: string[]): Promise<Idea> {
+	const l = await addLanguage('l');
+	const i: IdeaForAdding = {ee: []};
+	ee.forEach(e => i.ee.push({languageId: l.id, text: e}));
+	return addIdea(i);
+}
+
+async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
 	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
 	expect(r.status).toEqual(400);
-	if (!expectIdeas) {
-		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
-	}
+	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 }
 
 async function addValidIdeaAndTest(
@@ -128,104 +117,9 @@ async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number): Promi
 	expect(idea1).toEqual(idea2);
 }
 
-describe('getting invalid ideas', () => {
-	test('nonexistent idea returns 404', async () => {
-		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
-	});
-
-	test('id is not numeric returns 400', async () => {
-		const r = await fetch(`${apiUrl}/ideas/123letters`, {
-			method: 'GET',
-			headers: {'Content-Type': 'application/json'},
-		});
-		expect(r.status).toEqual(400);
-	});
-});
-
-describe('adding invalid ideas', () => {
-	test('language doesn\'t exist', async () => {
-		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id + 1, text: 'expression'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1]};
-		await addInvalidIdeaAndTest(ideaForAdding);
-	});
-
-	test('no expression', async () => {
-		const ideaForAdding: IdeaForAdding = {ee: []};
-		await addInvalidIdeaAndTest(ideaForAdding);
-	});
-
-	test('parentheses (context)', async () => {
-		const l1: Language = await addLanguage('language 1');
-		// Double parenthesis
-		await addMultipleInvalidIdeasAndTest(l1, ['to ((play sport))', 'to ( (play sport))', 'to ( (play sport)']);
-		// Opening parenthesis before the first one is closed
-		await addMultipleInvalidIdeasAndTest(l1, ['to ((play) sport', 'to (p(lay) sport', '(to (play)) sport', 'to (play (sport))', 'to (p(la)y) sport']);
-		// An expression that contains only context
-		await addMultipleInvalidIdeasAndTest(l1, ['(only context)', '  (only context) ', '(only) (context)', '()']);
-		// Unclosed opening parenthesis
-		await addMultipleInvalidIdeasAndTest(l1, ['to (play sport', 'to (', 'to ((play sport)', '(to play sport', 'to (play) (sport']);
-		// Unmatched closing parenthesis
-		await addMultipleInvalidIdeasAndTest(l1, ['to play) sport', 'to (play)) sport', 'to (play) sport)', ')(to play sport)']);
-		// Parentheses are not balanced
-		await addMultipleInvalidIdeasAndTest(l1, ['to )play( sport', 'to )play( (sport', 'to (play) )sport', ')(']);
-		// Empty context content
-		await addMultipleInvalidIdeasAndTest(l1, ['to () sport', 'to (  ) sport']);
-		// Context is trimmed
-		const idea = await addIdea({ee:	[{languageId: l1.id, text: 'to ( play ) sport'},
-			{languageId: l1.id, text: 'to (  play) sport'}]});
-		expect(idea.ee[0].text).toEqual('to (play) sport');
-		expect(idea.ee[1].text).toEqual('to (play) sport');
-	});
-
-	test('parentheses (context)', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		let idea = await addIdea({ee: [e1]});
-		// Unmatched opening parenthesis
-		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]}, idea.id);
-		// Context trimming
-		idea = await editValidIdeaAndTest(idea, {ee: [{languageId: l1.id, text: 'to ( play ) sport'}]});
-		expect(idea.ee[0].text).toEqual('to (play) sport');
-	});
-
-	test('duplicate expressions', async () => {
-		await addInvalidIdeaAndTest(makeIdeaForAdding({
-			ee: [{language: 'l', text: 'duplicate'}, {language: 'l', text: 'duplicate'}],
-		}));
-	});
-
-	test('idea: invalid shapes', async () => {
-		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id, text: 'expression'};
-		// Missing properties
-		await addInvalidIdeaAndTest({});
-		// Additional property
-		await addInvalidIdeaAndTest({id: 1, ee: [e1]});
-		// Property is of an invalid type
-		await addInvalidIdeaAndTest({ee: 'expression'});
-		// Array
-		await addInvalidIdeaAndTest([{ee: 'expression'}]);
-	});
-
-	test('expression: invalid shapes', async () => {
-		const l1: Language = await addLanguage('language');
-		// Additional property
-		await addInvalidIdeaAndTest({ee: [{id: 1, languageId: l1.id, text: 'expression'}]});
-		// Missing required properties (languageId)
-		await addInvalidIdeaAndTest({ee: [{text: 'a'}]});
-		// Missing required properties (text)
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id}]});
-		// Property is of an invalid type (languageId)
-		await addInvalidIdeaAndTest({ee: [{languageId: '1', text: 'a'}]});
-		// Property is of an invalid type (text)
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 256}]});
-	});
-});
-
-describe('adding and editing (valid cases)', () => {
+describe('valid cases', () => {
 	test('only one expression', async () => {
-		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}]};
+		const i = {ee: [{language: 'l', text: 'e'}]};
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new';
@@ -233,7 +127,7 @@ describe('adding and editing (valid cases)', () => {
 	});
 
 	test('only one language', async () => {
-		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
+		const i = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new1';
@@ -243,7 +137,7 @@ describe('adding and editing (valid cases)', () => {
 
 	test('basic test', async () => {
 		// Adding
-		const i: IdeaForTesting = {ee: [
+		const i = {ee: [
 			{language: 'l1', text: 'l1 e1', known: true},
 			{language: 'l1', text: 'l1 e2'},
 			{language: 'l2', text: 'l2 e1'},
@@ -337,39 +231,45 @@ describe('adding and editing (valid cases)', () => {
 
 		expect(idea1.ee[0].text).toEqual(idea2.ee[0].text);
 	});
+
+	test('context trimming', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [
+			{language: 'l', text: 'to ( play ) sport'},
+			{language: 'l', text: 'to (  play) sport'},
+		]});
+
+		const idea = await addIdea(ideaForAdding);
+		idea.ee.forEach(e => expect(e.text).toEqual('to (play) sport'));
+
+		const tempIdea = await addIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}));
+		const idea2 = await editValidIdeaAndTest(tempIdea, ideaForAdding);
+		idea2.ee.forEach(e => expect(e.text).toEqual('to (play) sport'));
+	});
+
+	test('deleting an idea', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [
+			{language: 'l', text: 'expression'}, {language: 'l2', text: 'e2'},
+		]});
+		const idea = await addIdea(ideaForAdding);
+		expect((await deleteIdea(idea.id)).status).toEqual(200);
+		expect((await fetchIdeaAndGetResponse(idea.id)).status).toEqual(404);
+		idea.ee.forEach(async e => expect((await fetchLanguageAndGetResponse(e.language.id)).status).toEqual(200));
+	});
 });
 
-describe('adding and editing (error cases)', () => {
-	test('language doesn\'t exist', async () => {
+describe('invalid cases', () => {
+	test('adding an idea having a non-existent language', async () => {
+		const l1: Language = await addLanguage('language');
+		const e1 = {languageId: l1.id + 1, text: 'expression'};
+		const ideaForAdding: IdeaForAdding = {ee: [e1]};
+		await addInvalidIdeaAndTest(ideaForAdding);
+	});
+
+	test('editing an idea with a non-existent language', async () => {
 		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
 		const idea = await addIdea(ideaForAdding);
 		ideaForAdding.ee[0].languageId += 1;
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-	});
-
-	test('no expression', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
-		const idea = await addIdea(ideaForAdding);
-		ideaForAdding.ee = [];
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-	});
-
-	test('empty expression text', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
-		const idea = await addIdea(ideaForAdding);
-
-		const promises: Array<Promise<void>> = [];
-		for (const emptyString of ['', ' ', '  ', '	']) {
-			ideaForAdding.ee[0].text = emptyString;
-			promises.push(editInvalidIdeaAndTest(ideaForAdding, idea.id));
-			promises.push(addInvalidIdeaAndTest(ideaForAdding, true));
-		}
-
-		ideaForAdding.ee.push({languageId: ideaForAdding.ee[0].languageId, text: 'e'});
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-		await addInvalidIdeaAndTest(ideaForAdding, true);
-
-		await Promise.all(promises);
 	});
 
 	test('id is not numeric', async () => {
@@ -383,6 +283,19 @@ describe('adding and editing (error cases)', () => {
 		expect(r.status).toEqual(400);
 	});
 
+	test('empty expression text', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+		const emptyStrings = ['', ' ', '  ', '	'];
+
+		await Promise.all(emptyStrings.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]})));
+		// Test with multiple expressions
+		await addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0]}, {...ideaForAdding.ee[0], text: 'e'}]});
+
+		const idea = await addIdea(ideaForAdding);
+		await Promise.all(emptyStrings.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
+		await editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0]}, {...ideaForAdding.ee[0], text: 'e'}]}, idea.id);
+	});
+
 	test('duplicate expressions', async () => {
 		const l1: Language = await addLanguage('language');
 		const e1 = {languageId: l1.id, text: 'duplicate expression'};
@@ -391,6 +304,83 @@ describe('adding and editing (error cases)', () => {
 		const idea = await addIdea(ideaForAdding);
 		ideaForAdding.ee[1].text = 'duplicate expression';
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
+	});
+
+	test('no expression', async () => {
+		const ideaForAdding: IdeaForAdding = {ee: []};
+		await addInvalidIdeaAndTest(ideaForAdding);
+	});
+
+	test('no expression', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+		const idea = await addIdea(ideaForAdding);
+		ideaForAdding.ee = [];
+		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
+	});
+
+	test('parentheses (context)', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+
+		const invalidExpressions = [
+			// Double parenthesis
+			'to ((play sport))',
+			'to ( (play sport))',
+			'to ( (play sport)',
+			// Opening parenthesis before the first one is closed
+			'to ((play) sport',
+			'to (p(lay) sport',
+			'(to (play)) sport',
+			'to (play (sport))',
+			'to (p(la)y) sport',
+			// An expression that contains only context
+			'(only context)',
+			'  (only context) ',
+			'(only) (context)',
+			'()',
+			// Unclosed opening parenthesis
+			'to (play sport',
+			'to (',
+			'to ((play sport)',
+			'(to play sport',
+			'to (play) (sport',
+			// Unmatched closing parenthesis
+			'to play) sport',
+			'to (play)) sport',
+			'to (play) sport)',
+			')(to play sport)',
+			// Parentheses are not balanced
+			'to )play( sport',
+			'to )play( (sport',
+			'to (play) )sport',
+			')(',
+			// Empty context content
+			'to () sport',
+			'to (  ) sport',
+		];
+
+		await Promise.all(invalidExpressions.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]})));
+
+		const idea = await addIdea(ideaForAdding);
+		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
+	});
+
+	test('duplicate expressions', async () => {
+		await addInvalidIdeaAndTest(makeIdeaForAdding({
+			ee: [{language: 'l', text: 'duplicate'}, {language: 'l', text: 'duplicate'}],
+		}));
+	});
+
+	test('idea: invalid shapes', async () => {
+		const l1: Language = await addLanguage('language');
+		const e1 = {languageId: l1.id, text: 'expression'};
+		// Missing properties
+		await addInvalidIdeaAndTest({});
+		// Additional property
+		await addInvalidIdeaAndTest({id: 1, ee: [e1]});
+		// Property is of an invalid type
+		await addInvalidIdeaAndTest({ee: 'expression'});
+		// Array
+		await addInvalidIdeaAndTest([{ee: 'expression'}]);
 	});
 
 	test('idea: invalid shapes', async () => {
@@ -406,6 +396,20 @@ describe('adding and editing (error cases)', () => {
 		await editInvalidIdeaAndTest({ee: 'expression'}, idea.id);
 		// Array
 		await editInvalidIdeaAndTest([ideaForAdding], idea.id);
+	});
+
+	test('expression: invalid shapes', async () => {
+		const l1: Language = await addLanguage('language');
+		// Additional property
+		await addInvalidIdeaAndTest({ee: [{id: 1, languageId: l1.id, text: 'expression'}]});
+		// Missing required properties (languageId)
+		await addInvalidIdeaAndTest({ee: [{text: 'a'}]});
+		// Missing required properties (text)
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id}]});
+		// Property is of an invalid type (languageId)
+		await addInvalidIdeaAndTest({ee: [{languageId: '1', text: 'a'}]});
+		// Property is of an invalid type (text)
+		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 256}]});
 	});
 
 	test('expression: invalid shapes', async () => {
@@ -434,32 +438,16 @@ describe('adding and editing (error cases)', () => {
 		// Property is of an invalid type (text)
 		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 256}]}, idea.id);
 	});
-});
 
-describe('deleting ideas', () => {
-	test('simple test', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const l2: Language = await addLanguage('language 2');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		const e2 = {languageId: l1.id, text: 'language 1 expression 2'};
-		const ideaForAdding: IdeaForAdding = {ee: [e1, e2]};
-		const idea = await addIdea(ideaForAdding);
-		expect((await deleteIdea(idea.id)).status).toEqual(200);
-		expect((await fetchIdeaAndGetResponse(idea.id)).status).toEqual(404);
-		expect((await fetchLanguageAndGetResponse(l1.id)).status).toEqual(200);
-		expect((await fetchLanguageAndGetResponse(l2.id)).status).toEqual(200);
-	});
-});
-
-describe('deleting invalid ideas', () => {
-	test('deleting nonexisting idea', async () => {
+	test('actions on nonexistent ideas return 404', async () => {
+		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
+		expect((await editIdeaAndGetResponse(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
 	});
 
-	test('id is not numeric', async () => {
-		const r = await fetch(`${apiUrl}/ideas/123letters`, {
-			method: 'DELETE',
-		});
-		expect(r.status).toEqual(400);
+	test('editing non-numerical id returns 400', async () => {
+		const promises = ['PUT', 'GET', 'DELETE']
+			.map(method => fetch(`${apiUrl}/ideas/123letters`, {method, headers: {'Content-Type': 'application/json'}}));
+		(await Promise.all(promises)).forEach(p => expect(p.status).toEqual(400));
 	});
 });
