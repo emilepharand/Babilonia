@@ -48,10 +48,7 @@ async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
 	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 }
 
-async function addValidIdeaAndTest(
-	ideaForAdding: IdeaForAdding,
-	expressionsInOrder?: ExpressionForAdding[],
-): Promise<Idea> {
+async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<Idea> {
 	let r = await addIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding));
 	expect(r.status).toEqual(201);
 	const responseIdea = (await r.json()) as Idea;
@@ -62,17 +59,21 @@ async function addValidIdeaAndTest(
 	expect(r.status).toEqual(200);
 	expect(validate(fetchedIdea)).toEqual(true);
 
+	const languagePromises = [];
 	for (let i = 0; i < ideaForAdding.ee.length; i += 1) {
-		const e: ExpressionForAdding = expressionsInOrder ? expressionsInOrder[i] : ideaForAdding.ee[i];
+		const e = expressionsInOrder ? expressionsInOrder[i] : ideaForAdding.ee[i];
 		const fetchedExpression = fetchedIdea.ee[i];
 		expect(fetchedExpression.text).toEqual(e.text);
 		expect(fetchedExpression.language.id).toEqual(e.languageId);
 		if (e.known) {
 			expect(fetchedExpression.known).toEqual(e.known);
 		}
-		// eslint-disable-next-line no-await-in-loop
-		const fetchedLanguage = await fetchLanguage(fetchedExpression.language.id);
-		expect(fetchedLanguage).toEqual(fetchedExpression.language);
+		languagePromises.push(fetchLanguage(fetchedExpression.language.id));
+	}
+
+	const languages = await Promise.all(languagePromises);
+	for (let i = 0; i < ideaForAdding.ee.length; i += 1) {
+		expect(languages[i]).toEqual(fetchedIdea.ee[i].language);
 	}
 
 	return responseIdea;
