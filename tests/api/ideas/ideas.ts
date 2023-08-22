@@ -23,8 +23,10 @@ beforeEach(async () => {
 describe('valid cases', () => {
 	test('only one expression', async () => {
 		const i = {ee: [{language: 'l', text: 'e'}]};
+
 		// Adding
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+
 		// Editing
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new';
@@ -33,8 +35,10 @@ describe('valid cases', () => {
 
 	test('only one language', async () => {
 		const i = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
+
 		// Adding
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+
 		// Editing
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new1';
@@ -52,6 +56,7 @@ describe('valid cases', () => {
 			{language: 'l3', text: 'l3 e2'},
 		]};
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+
 		// Editing
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'a new expression 1';
@@ -135,6 +140,7 @@ describe('valid cases', () => {
 		expect(addedIdea.ee[0].text).toEqual('an expression starting with whitespace');
 		expect(addedIdea.ee[1].text).toEqual('an expression with a tab');
 		expect(addedIdea.ee[2].text).toEqual('an expression with two spaces');
+
 		// Editing
 		expect(editedIdea.ee[0].text).toEqual(addedIdea.ee[0].text);
 		expect(editedIdea.ee[1].text).toEqual(addedIdea.ee[1].text);
@@ -214,6 +220,7 @@ describe('invalid cases', () => {
 	test('no expression', async () => {
 		// Adding
 		await addInvalidIdeaAndTest({ee: []});
+
 		// Editing
 		const idea = await addIdeaHavingExpressions(['e']);
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
