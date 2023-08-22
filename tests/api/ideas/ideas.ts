@@ -269,60 +269,27 @@ describe('invalid cases', () => {
 		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
 	});
 
-	test('invalid shapes - adding', async () => {
-		const l1: Language = await addLanguage('language');
-		const e1 = {languageId: l1.id, text: 'expression'};
-
-		// Idea
-		// Missing properties
-		await addInvalidIdeaAndTest({});
-		// Additional property
-		await addInvalidIdeaAndTest({id: 1, ee: [e1]});
-		// Property is of an invalid type
-		await addInvalidIdeaAndTest({ee: 'expression'});
-		// Array
-		await addInvalidIdeaAndTest([{ee: 'expression'}]);
-
-		// Expression
-		// Additional property
-		await addInvalidIdeaAndTest({ee: [{id: 1, languageId: l1.id, text: 'expression'}]});
-		// Missing required properties (languageId)
-		await addInvalidIdeaAndTest({ee: [{text: 'a'}]});
-		// Missing required properties (text)
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id}]});
-		// Property is of an invalid type (languageId)
-		await addInvalidIdeaAndTest({ee: [{languageId: '1', text: 'a'}]});
-		// Property is of an invalid type (text)
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 256}]});
-	});
-
-	test('invalid shapes - editing', async () => {
+	test('invalid data - editing', async () => {
 		const l1: Language = await addLanguage('language');
 		const e1 = {languageId: l1.id, text: 'expression'};
 		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
+		const invalidIdeas = [{}, {id: 1, ee: [e1]}, {ee: 'expression'}, [ideaForAdding]];
+		const invalidExpressions = [
+			{ee: [{id: 1, languageId: l1.id, text: 'expression'}]},
+			{ee: [{text: 'a'}]},
+			{ee: [{languageId: l1.id}]},
+			{ee: [{languageId: '1', text: 'a'}]},
+			{ee: [{languageId: l1.id, text: 256}]},
+		];
+
+		// Adding
+		await Promise.all(invalidIdeas.map(i => addInvalidIdeaAndTest(i)));
+		await Promise.all(invalidExpressions.map(e => addInvalidIdeaAndTest(e)));
+
+		// Editing
 		const idea = await addIdea(ideaForAdding);
-
-		// Idea
-		// Missing properties
-		await editInvalidIdeaAndTest({}, idea.id);
-		// Additional property
-		await editInvalidIdeaAndTest({id: 1, ee: [e1]}, idea.id);
-		// Property is of an invalid type
-		await editInvalidIdeaAndTest({ee: 'expression'}, idea.id);
-		// Array
-		await editInvalidIdeaAndTest([ideaForAdding], idea.id);
-
-		// Expression
-		// Additional property
-		await editInvalidIdeaAndTest({ee: [{id: 1, languageId: l1.id, text: 'expression'}]}, idea.id);
-		// Missing required properties (languageId)
-		await editInvalidIdeaAndTest({ee: [{text: 'a'}]}, idea.id);
-		// Missing required properties (text)
-		await editInvalidIdeaAndTest({ee: [{languageId: l1.id}]}, idea.id);
-		// Property is of an invalid type (languageId)
-		await editInvalidIdeaAndTest({ee: [{languageId: '1', text: 'a'}]}, idea.id);
-		// Property is of an invalid type (text)
-		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 256}]}, idea.id);
+		await Promise.all(invalidIdeas.map(i => editInvalidIdeaAndTest(i, idea.id)));
+		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest(e, idea.id)));
 	});
 
 	test('actions on nonexistent ideas return 404', async () => {
