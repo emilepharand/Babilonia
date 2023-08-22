@@ -53,10 +53,12 @@ async function addMultipleInvalidIdeasAndTest(l: Language, expressions: String[]
 	responses.forEach(response => expect(response.status).toEqual(400));
 }
 
-async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
+async function addInvalidIdeaAndTest(invalidIdea: any, expectIdeas?: boolean): Promise<void> {
 	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
 	expect(r.status).toEqual(400);
-	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
+	if (!expectIdeas) {
+		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
+	}
 }
 
 async function addValidIdeaAndTest(
@@ -151,17 +153,6 @@ describe('adding invalid ideas', () => {
 	test('no expression', async () => {
 		const ideaForAdding: IdeaForAdding = {ee: []};
 		await addInvalidIdeaAndTest(ideaForAdding);
-	});
-
-	test('empty expression text', async () => {
-		const l1: Language = await addLanguage('language 1');
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: ''}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: ' '}]});
-		await addInvalidIdeaAndTest({ee: [{languageId: l1.id, text: '  '}]});
-		await addInvalidIdeaAndTest({ee: [
-			{languageId: l1.id, text: 'not empty'},
-			{languageId: l1.id,	text: ''},
-		]});
 	});
 
 	test('parentheses (context)', async () => {
@@ -363,6 +354,24 @@ describe('adding and editing (error cases)', () => {
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
+	test('empty expression text', async () => {
+		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+		const idea = await addIdea(ideaForAdding);
+
+		const promises: Array<Promise<void>> = [];
+		for (const emptyString of ['', ' ', '  ', '	']) {
+			ideaForAdding.ee[0].text = emptyString;
+			promises.push(editInvalidIdeaAndTest(ideaForAdding, idea.id));
+			promises.push(addInvalidIdeaAndTest(ideaForAdding, true));
+		}
+
+		ideaForAdding.ee.push({languageId: ideaForAdding.ee[0].languageId, text: 'e'});
+		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
+		await addInvalidIdeaAndTest(ideaForAdding, true);
+
+		await Promise.all(promises);
+	});
+
 	test('id is not numeric', async () => {
 		const idea = await addIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}));
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
@@ -372,21 +381,6 @@ describe('adding and editing (error cases)', () => {
 			body: JSON.stringify(ideaForAdding),
 		});
 		expect(r.status).toEqual(400);
-	});
-
-	test('empty expression text', async () => {
-		const l1: Language = await addLanguage('language');
-		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'}]};
-		const idea = await addIdea(ideaForAdding);
-		ideaForAdding.ee[0].text = '';
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-		ideaForAdding.ee[0].text = ' ';
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-		ideaForAdding.ee[0].text = '  ';
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
-		ideaForAdding.ee[0].text = 'not empty';
-		ideaForAdding.ee.push({languageId: l1.id, text: ''});
-		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
 	test('duplicate expressions', async () => {
