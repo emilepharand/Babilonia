@@ -1,12 +1,12 @@
+import * as dotenv from 'dotenv';
 import fetch, {Response} from 'node-fetch';
 import {Idea} from '../../server/model/ideas/idea';
-import {Language} from '../../server/model/languages/language';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
+import {Language} from '../../server/model/languages/language';
 import {SearchContext} from '../../server/model/search/searchContext';
-import {AllStats} from '../../server/stats/statsCounter';
 import {Settings} from '../../server/model/settings/settings';
+import {AllStats} from '../../server/stats/statsCounter';
 import {paramsFromSearchContext} from '../../src/ts/api';
-import * as dotenv from 'dotenv';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
