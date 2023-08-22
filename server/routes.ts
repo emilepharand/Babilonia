@@ -6,6 +6,8 @@ import AsyncLock from 'async-lock';
 const lock = new AsyncLock();
 const lockKey = 'lock';
 
+type Method = 'get' | 'post' | 'put' | 'delete';
+
 export default class Routes {
 	public router: Router;
 
@@ -59,7 +61,7 @@ export default class Routes {
 		};
 	}
 
-	private route(method: 'get' | 'post' | 'put' | 'delete', route: string, handler: (req: Request, res: Response, next: NextFunction) => Promise<void>): void {
+	private route(method: Method, route: string, handler: (req: Request, res: Response, next: NextFunction) => Promise<void>): void {
 		this.router[method](route, this.wrapAsync(handler));
 	}
 }
