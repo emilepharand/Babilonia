@@ -140,21 +140,6 @@ describe('getting invalid ideas', () => {
 	});
 });
 
-describe('adding valid ideas', () => {
-	test('whitespace normalization', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const ee = {ee:	[
-			{languageId: l1.id, text: ' an expression starting with whitespace '},
-			{languageId: l1.id, text: 'an expression	with a tab'},
-			{languageId: l1.id, text: 'an  expression  with  two  spaces'},
-		]};
-		const idea = await addIdea(ee);
-		expect(idea.ee[0].text).toEqual('an expression starting with whitespace');
-		expect(idea.ee[1].text).toEqual('an expression with a tab');
-		expect(idea.ee[2].text).toEqual('an expression with two spaces');
-	});
-});
-
 describe('adding invalid ideas', () => {
 	test('language doesn\'t exist', async () => {
 		const l1: Language = await addLanguage('language');
@@ -202,6 +187,17 @@ describe('adding invalid ideas', () => {
 		expect(idea.ee[1].text).toEqual('to (play) sport');
 	});
 
+	test('parentheses (context)', async () => {
+		const l1: Language = await addLanguage('language 1');
+		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
+		let idea = await addIdea({ee: [e1]});
+		// Unmatched opening parenthesis
+		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]}, idea.id);
+		// Context trimming
+		idea = await editValidIdeaAndTest(idea, {ee: [{languageId: l1.id, text: 'to ( play ) sport'}]});
+		expect(idea.ee[0].text).toEqual('to (play) sport');
+	});
+
 	test('duplicate expressions', async () => {
 		await addInvalidIdeaAndTest(makeIdeaForAdding({
 			ee: [{language: 'l', text: 'duplicate'}, {language: 'l', text: 'duplicate'}],
@@ -236,7 +232,7 @@ describe('adding invalid ideas', () => {
 	});
 });
 
-describe('adding and editing', () => {
+describe('adding and editing (valid cases)', () => {
 	test('only one expression', async () => {
 		const i: IdeaForTesting = {ee: [{language: 'l1', text: 'l1 e1'}]};
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
@@ -331,34 +327,28 @@ describe('adding and editing', () => {
 		expect(uniqueExpressions.length).toEqual(10);
 	});
 
-	test('parentheses (context)', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		let idea = await addIdea({ee: [e1]});
-		// Unmatched opening parenthesis
-		await editInvalidIdeaAndTest({ee: [{languageId: l1.id, text: 'to (play sport'}]}, idea.id);
-		// Context trimming
-		idea = await editValidIdeaAndTest(idea, {ee: [{languageId: l1.id, text: 'to ( play ) sport'}]});
-		expect(idea.ee[0].text).toEqual('to (play) sport');
-	});
-
 	test('whitespace normalization', async () => {
-		const l1: Language = await addLanguage('language 1');
-		const e1 = {languageId: l1.id, text: 'language 1 expression 1'};
-		let idea = await addIdea({ee: [e1]});
-		// Context trimming
-		idea = await editValidIdeaAndTest(idea, {ee: [
-			{languageId: l1.id, text: ' an expression starting with whitespace '},
-			{languageId: l1.id, text: 'an expression	with a tab'},
-			{languageId: l1.id, text: 'an  expression  with  two  spaces'},
-		]});
-		expect(idea.ee[0].text).toEqual('an expression starting with whitespace');
-		expect(idea.ee[1].text).toEqual('an expression with a tab');
-		expect(idea.ee[2].text).toEqual('an expression with two spaces');
+		const ideaForAdding1 = await makeIdeaForAdding(
+			{ee:	[
+				{language: 'l', text: ' an expression starting with whitespace '},
+				{language: 'l', text: 'an expression	with a tab'},
+				{language: 'l', text: 'an  expression  with  two  spaces'},
+			]});
+		const ideaForAdding2 = {...ideaForAdding1};
+		const idea1 = await addIdea(ideaForAdding1);
+
+		const tempIdea = await addIdea(await makeIdeaForAdding({ee: [{language: 'l2', text: 'e'}]}));
+		const idea2 = await editValidIdeaAndTest(tempIdea, ideaForAdding2);
+
+		expect(idea1.ee[0].text).toEqual('an expression starting with whitespace');
+		expect(idea1.ee[1].text).toEqual('an expression with a tab');
+		expect(idea1.ee[2].text).toEqual('an expression with two spaces');
+
+		expect(idea1.ee[0].text).toEqual(idea2.ee[0].text);
 	});
 });
 
-describe('editing invalid ideas', () => {
+describe('adding and editing (error cases)', () => {
 	test('language doesn\'t exist', async () => {
 		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
 		const idea = await addIdea(ideaForAdding);
