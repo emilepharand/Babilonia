@@ -14,7 +14,7 @@ import {
 	fetchIdeaAndGetResponse,
 	fetchLanguageAndGetResponse,
 } from '../../utils/utils';
-import {addIdeaHavingExpressions, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding} from './utils';
+import {addAnyIdea, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding, testTransformExpressions} from './utils';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -113,8 +113,7 @@ describe('valid cases', () => {
 	});
 
 	test('concurrent requests - editing', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
-		const idea = await addIdea(ideaForAdding);
+		const idea = await addAnyIdea();
 		const promises: Array<Promise<Idea>> = [];
 		for (let i = 0; i < 10; i++) {
 			promises.push(editIdea({ee: [{languageId: idea.id, text: `e${i}`}]}, idea.id));
@@ -124,50 +123,21 @@ describe('valid cases', () => {
 	});
 
 	test('whitespace normalization', async () => {
-		const ideaForAdding1 = await makeIdeaForAdding(
-			{ee:	[
-				{language: 'l', text: ' an expression starting with whitespace '},
-				{language: 'l', text: 'an expression	with a tab'},
-				{language: 'l', text: 'an  expression  with  two  spaces'},
-			]});
-		const ideaForAdding2 = {...ideaForAdding1};
-		const addedIdea = await addIdea(ideaForAdding1);
-
-		const tempIdea = await addIdea(await makeIdeaForAdding({ee: [{language: 'l2', text: 'e'}]}));
-		const editedIdea = await editValidIdeaAndTest(tempIdea, ideaForAdding2);
-
-		// Adding
-		expect(addedIdea.ee[0].text).toEqual('an expression starting with whitespace');
-		expect(addedIdea.ee[1].text).toEqual('an expression with a tab');
-		expect(addedIdea.ee[2].text).toEqual('an expression with two spaces');
-
-		// Editing
-		expect(editedIdea.ee[0].text).toEqual(addedIdea.ee[0].text);
-		expect(editedIdea.ee[1].text).toEqual(addedIdea.ee[1].text);
-		expect(editedIdea.ee[2].text).toEqual(addedIdea.ee[2].text);
+		await testTransformExpressions(
+			[' trim whitespace ', 'two  spaces  between  words', ' trim,		tab  and multiple   spaces '],
+			['trim whitespace', 'two spaces between words', 'trim, tab and multiple spaces'],
+		);
 	});
 
 	test('context trimming', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [
-			{language: 'l', text: 'to ( play ) sport'},
-			{language: 'l', text: 'to (  play) sport'},
-		]});
-
-		// Adding
-		const idea = await addIdea(ideaForAdding);
-		idea.ee.forEach(e => expect(e.text).toEqual('to (play) sport'));
-
-		// Editing
-		const tempIdea = await addIdeaHavingExpressions(['e']);
-		const idea2 = await editValidIdeaAndTest(tempIdea, ideaForAdding);
-		idea2.ee.forEach(e => expect(e.text).toEqual('to (play) sport'));
+		await testTransformExpressions(
+			['to ( play ) sport', 'to (  play) (	sport)', 'to ( 	play   ) ( sport)'],
+			['to (play) sport', 'to (play) (sport)', 'to (play) (sport)'],
+		);
 	});
 
 	test('deleting an idea', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [
-			{language: 'l', text: 'expression'}, {language: 'l2', text: 'e2'},
-		]});
-		const idea = await addIdea(ideaForAdding);
+		const idea = await addAnyIdea();
 		expect((await deleteIdea(idea.id)).status).toEqual(200);
 		expect((await fetchIdeaAndGetResponse(idea.id)).status).toEqual(404);
 		idea.ee.forEach(async e => expect((await fetchLanguageAndGetResponse(e.language.id)).status).toEqual(200));
@@ -206,9 +176,9 @@ describe('invalid cases', () => {
 		}));
 
 		// Editing
-		const idea = await addIdeaHavingExpressions(['duplicate expression', 'not a duplicate expression']);
+		const idea = await addAnyIdea();
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
-		ideaForAdding.ee[1].text = 'duplicate expression';
+		ideaForAdding.ee[1] = ideaForAdding.ee[0];
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
@@ -217,7 +187,7 @@ describe('invalid cases', () => {
 		await addInvalidIdeaAndTest({ee: []});
 
 		// Editing
-		const idea = await addIdeaHavingExpressions(['e']);
+		const idea = await addAnyIdea();
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
 		ideaForAdding.ee = [];
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);

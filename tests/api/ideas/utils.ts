@@ -3,7 +3,9 @@ import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
 import {FIRST_IDEA_ID, addIdea, addIdeaRawObjectAndGetResponse, addLanguage, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
 
-export async function makeIdeaForAdding(i: {ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]}): Promise<IdeaForAdding> {
+export async function makeIdeaForAdding(i: {
+	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
+}): Promise<IdeaForAdding> {
 	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
 	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
 	const ll = await Promise.all(languagePromises);
@@ -11,8 +13,22 @@ export async function makeIdeaForAdding(i: {ee:(Omit<ExpressionForAdding, 'langu
 }
 
 export async function addIdeaHavingExpressions(ee: string[]): Promise<Idea> {
-	const l = await addLanguage('language ' + Math.random().toString(36).substring(10));
-	return addIdea({ee: ee.map(e => ({languageId: l.id, text: e}))});
+	const ll = await Promise.all(ee.map(_ => addLanguage('language ' + Math.random().toString(36).substring(10))));
+	return addIdea({ee: ee.map((e, i) => ({languageId: ll[i].id, text: e}))});
+}
+
+export async function addAnyIdea(): Promise<Idea> {
+	return addIdeaHavingExpressions(['e']);
+}
+
+export async function testTransformExpressions(inputExpressions: string[], expectedExpressions: string[]) {
+	// Adding
+	const addedIdea = await addIdeaHavingExpressions(inputExpressions);
+	expect(addedIdea.ee.map(e => e.text)).toEqual(expectedExpressions);
+
+	// Editing
+	const editedIdea = await editValidIdeaAndTest(await addAnyIdea(), getIdeaForAddingFromIdea(addedIdea));
+	editedIdea.ee.forEach((e, i) => expect(e.text).toEqual(addedIdea.ee[i].text));
 }
 
 export async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
