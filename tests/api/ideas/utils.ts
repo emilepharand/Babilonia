@@ -1,6 +1,6 @@
 import {ExpressionForAdding, getExpressionForAddingFromExpression} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
-import {IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
+import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
 import {FIRST_IDEA_ID, addIdea, addIdeaRawObjectAndGetResponse, addLanguage, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
 
 export async function makeIdeaForAdding(i: {ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]}): Promise<IdeaForAdding> {
@@ -81,4 +81,20 @@ export async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number)
 	expect((await editIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding), id)).status).toEqual(400);
 	const idea2 = await fetchIdea(id);
 	expect(idea1).toEqual(idea2);
+}
+
+export async function addMultipleInvalidIdeasAndTest(expressions: string[]) {
+	const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
+	Promise.all(expressions.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]})));
+	// Multipe expressions
+	Promise.all(expressions.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: 'e2'}, {...ideaForAdding.ee[0], text: e}]})));
+}
+
+export async function editMultipleInvalidIdeasAndTest(expressions: string[]) {
+	const idea = await addIdeaHavingExpressions(['e']);
+	const ideaForAdding = getIdeaForAddingFromIdea(idea);
+
+	await Promise.all(expressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
+	// Multipe expressions
+	await Promise.all(expressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: 'e2'}, {...ideaForAdding.ee[0], text: e}]}, idea.id)));
 }

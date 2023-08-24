@@ -14,7 +14,7 @@ import {
 	fetchIdeaAndGetResponse,
 	fetchLanguageAndGetResponse,
 } from '../../utils/utils';
-import {addIdeaHavingExpressions, addInvalidIdeaAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editValidIdeaAndTest, makeIdeaForAdding} from './utils';
+import {addIdeaHavingExpressions, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding} from './utils';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -190,18 +190,13 @@ describe('invalid cases', () => {
 	});
 
 	test('empty expression text', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
 		const emptyStrings = ['', ' ', '  ', '	'];
 
 		// Adding
-		await Promise.all(emptyStrings.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]})));
-		// Test with multiple expressions
-		await addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0]}, {...ideaForAdding.ee[0], text: 'e'}]});
+		await addMultipleInvalidIdeasAndTest(emptyStrings);
 
 		// Editing
-		const idea = await addIdea(ideaForAdding);
-		await Promise.all(emptyStrings.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
-		await editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0]}, {...ideaForAdding.ee[0], text: 'e'}]}, idea.id);
+		await editMultipleInvalidIdeasAndTest(emptyStrings);
 	});
 
 	test('duplicate expressions', async () => {
