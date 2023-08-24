@@ -224,8 +224,6 @@ describe('invalid cases', () => {
 	});
 
 	test('parentheses (context)', async () => {
-		const ideaForAdding = await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]});
-
 		const invalidExpressions = [
 			// Double parenthesis
 			'to ((play sport))',
@@ -264,11 +262,10 @@ describe('invalid cases', () => {
 		];
 
 		// Adding
-		await Promise.all(invalidExpressions.map(e => addInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]})));
+		await addMultipleInvalidIdeasAndTest(invalidExpressions);
 
 		// Editing
-		const idea = await addIdea(ideaForAdding);
-		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest({ee: [{...ideaForAdding.ee[0], text: e}]}, idea.id)));
+		await editMultipleInvalidIdeasAndTest(invalidExpressions);
 	});
 
 	test('invalid data', async () => {
