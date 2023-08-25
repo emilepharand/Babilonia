@@ -7,8 +7,7 @@ export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
 }): Promise<IdeaForAdding> {
 	const uniqueLanguages = Array.from(new Set(i.ee.map(e => e.language)));
-	const languagePromises = uniqueLanguages.map(language => addLanguage(language));
-	const ll = await Promise.all(languagePromises);
+	const ll = await Promise.all(uniqueLanguages.map(language => addLanguage(language)));
 	return {ee: i.ee.map(e => ({languageId: ll.find(lang => lang.name === e.language)!.id, text: e.text}))};
 }
 
