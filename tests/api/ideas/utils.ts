@@ -1,7 +1,7 @@
 import {ExpressionForAdding, getExpressionForAddingFromExpression} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
-import {FIRST_IDEA_ID, addIdea, addIdeaRawObjectAndGetResponse, addLanguage, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
+import {FIRST_IDEA_ID, addIdea, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
@@ -26,8 +26,12 @@ export async function testTransformExpressions(inputExpressions: string[], expec
 	expect(addedIdea.ee.map(e => e.text)).toEqual(expectedExpressions);
 
 	// Editing
-	const editedIdea = await editValidIdeaAndTest(await addAnyIdea(), getIdeaForAddingFromIdea(addedIdea));
-	editedIdea.ee.forEach((e, i) => expect(e.text).toEqual(addedIdea.ee[i].text));
+	const idea = {...addedIdea};
+	idea.ee.forEach((e, i) => {
+		e.text = inputExpressions[i];
+	});
+	const editedIdea = await editIdea(getIdeaForAddingFromIdea(idea), addedIdea.id);
+	expect(editedIdea.ee.map(e => e.text)).toEqual(expectedExpressions);
 }
 
 export async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
