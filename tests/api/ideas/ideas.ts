@@ -174,11 +174,18 @@ describe('invalid cases', () => {
 		await addInvalidIdeaAndTest(makeIdeaForAdding({
 			ee: [{language: 'l', text: 'duplicate'}, {language: 'l', text: 'duplicate'}],
 		}));
+		await addInvalidIdeaAndTest(makeIdeaForAdding({
+			ee: [{language: 'l2', text: 'to (play sport)'}, {language: 'l2', text: 'to ( play sport)'}],
+		}));
 
 		// Editing
 		const idea = await addAnyIdea();
 		const ideaForAdding = getIdeaForAddingFromIdea(idea);
 		ideaForAdding.ee[1] = ideaForAdding.ee[0];
+		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
+
+		ideaForAdding.ee[0].text = 'to (play sport)';
+		ideaForAdding.ee[1].text = 'to ( play sport)';
 		await editInvalidIdeaAndTest(ideaForAdding, idea.id);
 	});
 
@@ -261,7 +268,7 @@ describe('invalid cases', () => {
 		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest(e, idea.id)));
 	});
 
-	test('actions on nonexistent ideas return 404', async () => {
+	test('actions  on nonexistent ideas return 404', async () => {
 		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await editIdeaAndGetResponse(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
