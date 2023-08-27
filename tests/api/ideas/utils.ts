@@ -1,7 +1,7 @@
-import {ExpressionForAdding, getExpressionForAddingFromExpression} from '../../../server/model/ideas/expression';
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
-import {FIRST_IDEA_ID, addIdea, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
+import {FIRST_IDEA_ID, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
@@ -34,25 +34,34 @@ export async function testTransformExpressions(inputExpressions: string[], expec
 	expect(editedIdea.ee.map(e => e.text)).toEqual(expectedExpressions);
 }
 
-export async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
-	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
-	expect(r.status).toEqual(400);
-	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
+export async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<Idea> {
+	const responseIdea = await addIdeaAndGetResponse(ideaForAdding);
+	expect(responseIdea.status).toEqual(201);
+	const idea = await responseIdea.json() as Idea;
+	await validateIdea(idea, ideaForAdding, expressionsInOrder);
+	return idea;
 }
 
-export async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<Idea> {
-	let r = await addIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding));
-	expect(r.status).toEqual(201);
-	const responseIdea = (await r.json()) as Idea;
+export async function editValidIdeaAndTest(idea: Idea,	newIdea: IdeaForAdding,	expressionsInOrder?: ExpressionForAdding[]) {
+	const r = await editIdeaAndGetResponse(newIdea, idea.id);
+	expect(r.status).toEqual(200);
+	const responseIdea = await r.json() as Idea;
+	await validateIdea(responseIdea, newIdea, expressionsInOrder);
+	return responseIdea;
+}
+
+async function validateIdea(responseIdea: Idea, ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<void> {
 	expect(validate(responseIdea)).toEqual(true);
 
-	r = await fetchIdeaAndGetResponse(1);
+	const r = await fetchIdeaAndGetResponse(responseIdea.id);
 	const fetchedIdea = (await r.json()) as Idea;
 	expect(r.status).toEqual(200);
 	expect(validate(fetchedIdea)).toEqual(true);
 
+	expect(responseIdea.ee.length).toEqual(ideaForAdding.ee.length);
+
 	const languagePromises = [];
-	for (let i = 0; i < ideaForAdding.ee.length; i += 1) {
+	for (let i = 0; i < ideaForAdding.ee.length; i++) {
 		const e = expressionsInOrder ? expressionsInOrder[i] : ideaForAdding.ee[i];
 		const fetchedExpression = fetchedIdea.ee[i];
 		expect(fetchedExpression.text).toEqual(e.text);
@@ -64,35 +73,9 @@ export async function addValidIdeaAndTest(ideaForAdding: IdeaForAdding, expressi
 	}
 
 	const languages = await Promise.all(languagePromises);
-	for (let i = 0; i < ideaForAdding.ee.length; i += 1) {
+	for (let i = 0; i < ideaForAdding.ee.length; i++) {
 		expect(languages[i]).toEqual(fetchedIdea.ee[i].language);
 	}
-
-	return responseIdea;
-}
-
-export async function editValidIdeaAndTest(idea: Idea,	newIdea: IdeaForAdding,	expressionsInOrder?: ExpressionForAdding[]) {
-	let r = await editIdeaAndGetResponse(newIdea, idea.id);
-
-	expect(r.status).toEqual(200);
-	const responseIdea = (await r.json()) as Idea;
-	expect(validate(responseIdea)).toEqual(true);
-
-	r = await fetchIdeaAndGetResponse(idea.id);
-	const fetchedIdea = (await r.json()) as Idea;
-	expect(r.status).toEqual(200);
-	expect(validate(fetchedIdea)).toEqual(true);
-	expect(responseIdea.ee.length).toEqual(newIdea.ee.length);
-
-	for (let i = 0; i < responseIdea.ee.length; i += 1) {
-		const e: ExpressionForAdding = expressionsInOrder
-			? expressionsInOrder[i]
-			: getExpressionForAddingFromExpression(responseIdea.ee[i]);
-		expect(responseIdea.ee[i].text).toEqual(e.text);
-		expect(responseIdea.ee[i].language.id).toEqual(e.languageId);
-		expect(responseIdea.ee[i].known).toEqual(e.known);
-	}
-	return fetchedIdea;
 }
 
 export async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number): Promise<void> {
@@ -100,6 +83,12 @@ export async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number)
 	expect((await editIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding), id)).status).toEqual(400);
 	const idea2 = await fetchIdea(id);
 	expect(idea1).toEqual(idea2);
+}
+
+export async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
+	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
+	expect(r.status).toEqual(400);
+	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 }
 
 export async function addMultipleInvalidIdeasAndTest(expressions: string[]) {
