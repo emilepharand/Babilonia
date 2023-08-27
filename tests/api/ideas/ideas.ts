@@ -268,7 +268,7 @@ describe('invalid cases', () => {
 		await Promise.all(invalidExpressions.map(e => editInvalidIdeaAndTest(e, idea.id)));
 	});
 
-	test('actions  on nonexistent ideas return 404', async () => {
+	test('actions on nonexistent ideas return 404', async () => {
 		expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await editIdeaAndGetResponse(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
