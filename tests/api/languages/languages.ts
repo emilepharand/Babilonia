@@ -24,116 +24,29 @@ beforeEach(async () => {
 	await deleteEverything();
 });
 
-describe('getting languages', () => {
-	test('getting the list of languages', async () => {
-		const l1 = await (await addLanguageAndGetResponse('language 1')).json();
-		const l2 = await (await addLanguageAndGetResponse('language 2')).json();
-		const l3 = await (await addLanguageAndGetResponse('language 3')).json();
+describe('valid cases - adding and editing', () => {
+	test('two languages', async () => {
+		// Adding
+		const language1 = await addValidLanguageAndTest('first language', FIRST_LANGUAGE_ID, FIRST_ORDERING);
+		const language2 = await addValidLanguageAndTest('second language', FIRST_LANGUAGE_ID + 1, FIRST_ORDERING + 1);
 
-		const ll = [l1, l2, l3];
-		const r = await fetchLanguagesAndGetResponse();
-		expect(r.status).toEqual(200);
-		const responseLl = await r.json();
+		// Editing - no changes
+		await editAndTest(language1, language2, false);
 
-		expect(responseLl).toEqual(ll);
-	});
-
-	test('no languages = empty array', async () => {
-		const r = await fetchLanguagesAndGetResponse();
-		expect(r.status).toEqual(200);
-		expect(await r.json()).toEqual([]);
-	});
-
-	test('getting nonexistent language returns 404', async () => {
-		const r = await fetchLanguageAndGetResponse(1);
-		expect(r.status).toEqual(404);
-	});
-});
-
-describe('getting invalid languages', () => {
-	test('id is not numeric', async () => {
-		const r = await fetch(`${apiUrl}/languages/123letters`, {
-			method: 'GET',
-			headers: {'Content-Type': 'application/json'},
-		});
-		expect(r.status).toEqual(400);
-	});
-});
-
-describe('adding languages', () => {
-	test('concurrent requests', async () => {
-		const promises: Array<Promise<Language>> = [];
-		for (let i = 0; i < 10; i++) {
-			promises.push(addLanguage(`language ${i}`));
-		}
-		const promises2 = await Promise.all(promises);
-		const uniqueLanguages = Array.from(new Set(promises2.map(p => p.id)));
-		expect(uniqueLanguages.length).toEqual(10);
-	});
-
-	test('adding two languages', async () => {
-		await addValidLanguageAndTest('first language', FIRST_LANGUAGE_ID, FIRST_ORDERING);
-		await addValidLanguageAndTest('second language', FIRST_LANGUAGE_ID + 1, FIRST_ORDERING + 1);
+		// Editing - with changes
+		language1.name += ' edited';
+		language2.name += ' edited';
+		language1.isPractice = !language1.isPractice;
+		language2.isPractice = !language2.isPractice;
+		language1.ordering += 1;
+		language2.ordering -= 1;
+		await editAndTest(language1, language2, true);
 	});
 
 	test('language name is trimmed', async () => {
 		await addLanguage('     a name with trailing spaces    ');
 		const l = await fetchLanguage(1);
 		expect(l.name).toEqual('a name with trailing spaces');
-	});
-});
-
-describe('adding invalid languages', () => {
-	test('name already exists', async () => {
-		const name = 'duplicate language name';
-		expect((await addLanguageAndGetResponse(name)).status).toEqual(201);
-		expect((await addLanguageAndGetResponse(name)).status).toEqual(400);
-		expect((await fetchLanguageAndGetResponse(FIRST_LANGUAGE_ID + 1)).status).toEqual(404);
-		expect((await fetchLanguages()).length).toEqual(1);
-	});
-
-	test('empty or blank string name', async () => {
-		expect((await addLanguageAndGetResponse('')).status).toEqual(400);
-		expect((await addLanguageAndGetResponse(' ')).status).toEqual(400);
-		expect((await addLanguageAndGetResponse('  ')).status).toEqual(400);
-		expect((await fetchLanguages()).length).toEqual(0);
-	});
-
-	test('array', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify([{name: 'array'}]));
-	});
-
-	test('empty object', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify({}));
-	});
-
-	test('object without name key with other keys', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify({id: 1}));
-	});
-
-	test('object with name key and other possible keys', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify({id: 1, name: 'a language'}));
-	});
-
-	test('object with name key and other impossible keys', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify({name: 'a language', plus: 'something'}));
-	});
-
-	test('name is a number', async () => {
-		await addInvalidLanguageAndTest(JSON.stringify({name: 1}));
-	});
-
-	test('wrong JSON format', async () => {
-		await addInvalidLanguageAndTest('<');
-	});
-});
-
-describe('editing languages', () => {
-	test('editing languages with no changes', async () => {
-		const oldLanguage1 = await addLanguage('old language 1');
-		const oldLanguage2 = await addLanguage('old language 2');
-
-		await editAndTest(oldLanguage1, oldLanguage2, false);
 	});
 
 	test('language name is trimmed', async () => {
@@ -144,41 +57,49 @@ describe('editing languages', () => {
 		expect(l.name).toEqual('a name with trailing spaces');
 	});
 
-	test('editing languages with changes', async () => {
-		const oldLanguage1 = await addLanguage('old language 1');
-		const oldLanguage2 = await addLanguage('old language 2');
-
-		const newLanguage1 = copyLanguage(oldLanguage1);
-		const newLanguage2 = copyLanguage(oldLanguage2);
-
-		// Name
-		newLanguage1.name = 'edited language 1';
-		newLanguage2.name = 'edited language 2';
-		expect(newLanguage1.name).not.toEqual(oldLanguage1.name);
-		expect(newLanguage2.name).not.toEqual(oldLanguage2.name);
-
-		// IsPractice
-		newLanguage1.isPractice = !oldLanguage1.isPractice;
-		newLanguage2.isPractice = !oldLanguage2.isPractice;
-		expect(newLanguage1.isPractice).not.toEqual(oldLanguage1.isPractice);
-		expect(newLanguage2.isPractice).not.toEqual(oldLanguage2.isPractice);
-
-		// Ordering
-		newLanguage1.ordering = 1;
-		newLanguage2.ordering = 0;
-		expect(newLanguage1.ordering).not.toEqual(oldLanguage1.ordering);
-		expect(newLanguage2.ordering).not.toEqual(oldLanguage2.ordering);
-
-		await editAndTest(newLanguage1, newLanguage2, true);
+	test('concurrent requests', async () => {
+		const promises: Array<Promise<Language>> = [];
+		for (let i = 0; i < 10; i++) {
+			promises.push(addLanguage(`language ${i}`));
+		}
+		const promises2 = await Promise.all(promises);
+		const uniqueLanguages = Array.from(new Set(promises2.map(p => p.id)));
+		expect(uniqueLanguages.length).toEqual(10);
 	});
 
-	test('empty array when database is empty', async () => {
-		await expect((await editLanguagesAndGetResponse([])).status).toEqual(200);
+	test('editing empty array when database is empty', async () => {
+		expect((await editLanguagesAndGetResponse([])).status).toEqual(200);
+	});
+
+	test('no languages returns an empty array', async () => {
+		const r = await fetchLanguagesAndGetResponse();
+		expect(r.status).toEqual(200);
+		expect(await r.json()).toEqual([]);
 	});
 });
 
-describe('editing invalid languages', () => {
-	test('empty or blank name', async () => {
+describe('invalid cases - getting, adding and editing', () => {
+	test('getting nonexistent language returns 404', async () => {
+		const r = await fetchLanguageAndGetResponse(1);
+		expect(r.status).toEqual(404);
+	});
+
+	test('name already exists - adding', async () => {
+		const name = 'duplicate language name';
+		expect((await addLanguageAndGetResponse(name)).status).toEqual(201);
+		expect((await addLanguageAndGetResponse(name)).status).toEqual(400);
+		expect((await fetchLanguageAndGetResponse(FIRST_LANGUAGE_ID + 1)).status).toEqual(404);
+		expect((await fetchLanguages()).length).toEqual(1);
+	});
+
+	test('empty or blank string name - adding', async () => {
+		expect((await addLanguageAndGetResponse('')).status).toEqual(400);
+		expect((await addLanguageAndGetResponse(' ')).status).toEqual(400);
+		expect((await addLanguageAndGetResponse('  ')).status).toEqual(400);
+		expect((await fetchLanguages()).length).toEqual(0);
+	});
+
+	test('empty or blank name - editing', async () => {
 		const oldLanguage1 = (await (
 			await addLanguageAndGetResponse('old language 1')
 		).json()) as Language;
@@ -191,7 +112,7 @@ describe('editing invalid languages', () => {
 		await editInvalidLanguagesAndTest(JSON.stringify([newLanguage1]), oldLanguage1);
 	});
 
-	test('duplicate names', async () => {
+	test('duplicate names - editing', async () => {
 		const language1 = (await (
 			await addLanguageAndGetResponse('duplicate language name')
 		).json()) as Language;
@@ -205,35 +126,37 @@ describe('editing invalid languages', () => {
 		expect(await fetchLanguage(language2.id)).toEqual(language2);
 	});
 
-	test('empty array when database is not empty', async () => {
+	test('invalid shapes - adding', async () => {
+		// Array
+		await addInvalidLanguageAndTest(JSON.stringify([{name: 'array'}]));
+		// Empty object
+		await addInvalidLanguageAndTest(JSON.stringify({}));
+		// Object without name key with other keys
+		await addInvalidLanguageAndTest(JSON.stringify({id: 1}));
+		// Object with name key and other possible keys
+		await addInvalidLanguageAndTest(JSON.stringify({id: 1, name: 'a language'}));
+		// Object with name key and other impossible keys
+		await addInvalidLanguageAndTest(JSON.stringify({name: 'a language', plus: 'something'}));
+		// Name is a number
+		await addInvalidLanguageAndTest(JSON.stringify({name: 1}));
+		// Wrong JSON format
+		await addInvalidLanguageAndTest('<');
+	});
+
+	test('invalid shapes - editing', async () => {
+		// Empty array when database is not empty
 		const language = (await (await addLanguageAndGetResponse('language')).json()) as Language;
 		await editInvalidLanguagesAndTest(JSON.stringify([]), language);
-	});
-
-	test('array with empty object', async () => {
-		const language = (await (await addLanguageAndGetResponse('language')).json()) as Language;
+		// Array with empty object
 		await editInvalidLanguagesAndTest(JSON.stringify([{}]), language);
-	});
-
-	test('language instead of array', async () => {
-		const l1 = (await (await addLanguageAndGetResponse('a language')).json()) as Language;
-		const l2 = copyLanguage(l1);
-		await editInvalidLanguagesAndTest(JSON.stringify(l2), l1);
-	});
-
-	test('missing keys', async () => {
-		const l1 = (await (await addLanguageAndGetResponse('a language')).json()) as Language;
-		await editInvalidLanguagesAndTest(JSON.stringify([{id: l1.id, name: 'a new language'}]), l1);
-	});
-
-	test('missing id key', async () => {
-		const l1 = (await (await addLanguageAndGetResponse('a language')).json()) as Language;
-		await editInvalidLanguagesAndTest(JSON.stringify([{name: 'a new language'}]), l1);
-	});
-
-	test('object with additional keys', async () => {
-		const l1 = (await (await addLanguageAndGetResponse('a language')).json()) as Language;
-		await editInvalidLanguagesAndTest(JSON.stringify([{...l1, plus: 'something'}]), l1);
+		// Language instead of array
+		await editInvalidLanguagesAndTest(JSON.stringify(language), language);
+		// Missing keys
+		await editInvalidLanguagesAndTest(JSON.stringify([{id: language.id, name: 'a new language'}]), language);
+		// Missing id key
+		await editInvalidLanguagesAndTest(JSON.stringify([{name: 'a new language'}]), language);
+		// Object with additional keys
+		await editInvalidLanguagesAndTest(JSON.stringify([{...language, plus: 'something'}]), language);
 	});
 
 	test('doesn\'t include all languages', async () => {

@@ -21,7 +21,7 @@ export async function addValidLanguageAndTest(
 	name: string,
 	expectedId: number,
 	expectedOrdering: number,
-): Promise<void> {
+): Promise<Language> {
 	let r = await addLanguageAndGetResponse(name);
 	expect(r.status).toEqual(201);
 	const responseLanguage = (await r.json()) as Language;
@@ -36,6 +36,8 @@ export async function addValidLanguageAndTest(
 	expect(r.status).toEqual(200);
 	const fetchedLanguage = await r.json();
 	expect(responseLanguage).toEqual(fetchedLanguage);
+
+	return fetchedLanguage as Language;
 }
 
 export async function editAndTest(
