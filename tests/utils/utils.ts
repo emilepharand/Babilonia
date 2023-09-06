@@ -55,6 +55,10 @@ export async function addLanguage(name: string): Promise<Language> {
 	return (await (await addLanguageAndGetResponse(name)).json()) as Language;
 }
 
+export async function addAnyLanguage(): Promise<Language> {
+	return (await (await addLanguageAndGetResponse('language ' + Math.random().toString(36).substring(10))).json()) as Language;
+}
+
 export async function editLanguagesRawObjectAndGetResponse(object: any): Promise<Response> {
 	return fetch(`${apiUrl}/languages`, {
 		method: 'PUT',

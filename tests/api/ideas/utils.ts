@@ -1,7 +1,7 @@
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
-import {FIRST_IDEA_ID, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
+import {FIRST_IDEA_ID, addAnyLanguage, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
@@ -12,7 +12,7 @@ export async function makeIdeaForAdding(i: {
 }
 
 export async function addIdeaHavingExpressions(ee: string[]): Promise<Idea> {
-	const ll = await Promise.all(ee.map(_ => addLanguage('language ' + Math.random().toString(36).substring(10))));
+	const ll = await Promise.all(ee.map(_ => addAnyLanguage()));
 	return addIdea({ee: ee.map((e, i) => ({languageId: ll[i].id, text: e}))});
 }
 

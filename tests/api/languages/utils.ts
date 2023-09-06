@@ -1,4 +1,4 @@
-import {DEFAULT_IS_PRACTICE, addLanguageAndGetResponse, addLanguageRawObjectAndGetResponse, editLanguagesAndGetResponse, editLanguagesRawObjectAndGetResponse, fetchLanguage, fetchLanguageAndGetResponse, fetchLanguages} from '../../utils/utils';
+import {DEFAULT_IS_PRACTICE, FIRST_ORDERING, addLanguageAndGetResponse, addLanguageRawObjectAndGetResponse, editLanguagesAndGetResponse, editLanguagesRawObjectAndGetResponse, fetchLanguage, fetchLanguageAndGetResponse, fetchLanguages} from '../../utils/utils';
 import {Language, validate} from '../../../server/model/languages/language';
 
 export async function addInvalidLanguageAndTest(object: any): Promise<void> {
@@ -82,6 +82,20 @@ export async function editAndTest(
 		// Check values have not changed
 		expect(fetchedLanguage1).toEqual(oldLanguage1);
 		expect(fetchedLanguage2).toEqual(oldLanguage2);
+	}
+}
+
+export async function testLanguageOrder(ids: number[]) {
+	for (let i = 0; i < ids.length; i += 1) {
+		// eslint-disable-next-line no-await-in-loop
+		expect((await fetchLanguage(ids[i])).ordering).toEqual(FIRST_ORDERING + i);
+	}
+}
+
+export async function addNLanguages(n: number) {
+	for (let i = 0; i < n; i += 1) {
+		// eslint-disable-next-line no-await-in-loop
+		expect((await addLanguageAndGetResponse(`language ${i}`)).status).toEqual(201);
 	}
 }
 
