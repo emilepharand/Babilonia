@@ -56,7 +56,11 @@ export async function addLanguage(name: string): Promise<Language> {
 }
 
 export async function addAnyLanguage(): Promise<Language> {
-	return (await (await addLanguageAndGetResponse('language ' + Math.random().toString(36).substring(10))).json()) as Language;
+	return (await (await addLanguageAndGetResponse('language ' + getRandomString())).json()) as Language;
+}
+
+export function getRandomString(): string {
+	return Math.random().toString(36).substring(10);
 }
 
 export async function editLanguagesRawObjectAndGetResponse(object: any): Promise<Response> {
@@ -198,4 +202,20 @@ export function settingsFromPartial(partialSettings: Partial<Settings>) {
 		randomPractice: partialSettings.randomPractice ? partialSettings.randomPractice : false,
 		strictCharacters: partialSettings.strictCharacters ? partialSettings.strictCharacters : false,
 	};
+}
+
+export function areInSameOrder(arr1: any[], arr2: any[]) {
+	let i = 0;
+	let idsInSameOrder = true;
+	while (i < 10 && idsInSameOrder) {
+		if (!(arr1[i] === arr2[i])) {
+			idsInSameOrder = false;
+		}
+		i++;
+	}
+	return idsInSameOrder;
+}
+
+export async function executeNTimes(n: number, fn: () => void) {
+	await Promise.all(Array.from({length: n}, () => fn()));
 }
