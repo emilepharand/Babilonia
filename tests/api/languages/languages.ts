@@ -225,6 +225,13 @@ describe('invalid cases', () => {
 	});
 });
 
+async function testDeletingALanguageReordersLanguages(n: number, initialOrder: number[], idToDelete: number, expectedOrder: number[]) {
+	await addNLanguages(n);
+	await testLanguageOrder(initialOrder);
+	await deleteLanguage(idToDelete);
+	await testLanguageOrder(expectedOrder);
+}
+
 describe('deleting languages', () => {
 	test('deleting a language', async () => {
 		expect((await fetchLanguageAndGetResponse(FIRST_LANGUAGE_ID)).status).toEqual(404);
@@ -235,24 +242,15 @@ describe('deleting languages', () => {
 	});
 
 	test('deleting a language reorders languages: first', async () => {
-		await addNLanguages(5);
-		await testLanguageOrder([1, 2, 3, 4, 5]);
-		await deleteLanguage(1);
-		await testLanguageOrder([2, 3, 4, 5]);
+		await testDeletingALanguageReordersLanguages(5, [1, 2, 3, 4, 5], 1, [2, 3, 4, 5]);
 	});
 
 	test('deleting a language reorders languages: middle', async () => {
-		await addNLanguages(5);
-		await testLanguageOrder([1, 2, 3, 4, 5]);
-		await deleteLanguage(3);
-		await testLanguageOrder([1, 2, 4, 5]);
+		await testDeletingALanguageReordersLanguages(5, [1, 2, 3, 4, 5], 3, [1, 2, 4, 5]);
 	});
 
 	test('deleting a language reorders languages: last', async () => {
-		await addNLanguages(5);
-		await testLanguageOrder([1, 2, 3, 4, 5]);
-		await deleteLanguage(5);
-		await testLanguageOrder([1, 2, 3, 4]);
+		await testDeletingALanguageReordersLanguages(5, [1, 2, 3, 4, 5], 5, [1, 2, 3, 4]);
 	});
 
 	test('deleting should delete all expressions of that language', async () => {
