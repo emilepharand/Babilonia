@@ -6,6 +6,7 @@ import {
 	getStats,
 } from '../utils/utils';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
+import {LanguageStats} from '../../server/stats/statsCounter';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -74,58 +75,37 @@ describe('getting stats', () => {
 			switch (a.language.name) {
 				// Ideas: 0/2, expressions: 0/2
 				case 'français':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(2);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(3);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 2, knownExpressionsCount: 0, totalExpressionsCount: 3} as LanguageStats);
 					frCovered = true;
 					break;
 				// Ideas: 1/1, expressions: 2/2
 				case 'english':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(1);
-					expect(a.knownExpressionsCount).toEqual(2);
-					expect(a.totalExpressionsCount).toEqual(2);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2} as LanguageStats);
 					enCovered = true;
 					break;
 				// Ideas: 1/1, expressions: 2/2
 				case 'español':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(1);
-					expect(a.knownExpressionsCount).toEqual(2);
-					expect(a.totalExpressionsCount).toEqual(2);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2} as LanguageStats);
 					esCovered = true;
 					break;
 				// Ideas: 0/0, expressions: 0/0
 				case 'italiano':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(0);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(0);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
 					itCovered = true;
 					break;
 				// Ideas: 0/0, expressions: 0/0
 				case 'deutsch':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(0);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(0);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
 					deCovered = true;
 					break;
 				// Ideas: 0/0, expressions: 0/0
 				case 'português':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(0);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(0);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
 					ptCovered = true;
 					break;
 				// Ideas: 0/0, expressions: 0/0
 				case 'klingon':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(0);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(0);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
 					klCovered = true;
 					break;
 				default:
@@ -133,13 +113,13 @@ describe('getting stats', () => {
 			}
 		}
 
-		expect(frCovered).toBeTruthy();
-		expect(enCovered).toBeTruthy();
-		expect(esCovered).toBeTruthy();
-		expect(itCovered).toBeTruthy();
-		expect(deCovered).toBeTruthy();
-		expect(ptCovered).toBeTruthy();
-		expect(klCovered).toBeTruthy();
+		expect(frCovered).toEqual(true);
+		expect(enCovered).toEqual(true);
+		expect(esCovered).toEqual(true);
+		expect(itCovered).toEqual(true);
+		expect(deCovered).toEqual(true);
+		expect(ptCovered).toEqual(true);
+		expect(klCovered).toEqual(true);
 
 		// Idea 2: fr, en, es, de, it, pt
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id, known: true};
@@ -176,52 +156,31 @@ describe('getting stats', () => {
 		for (const a of stats.allLanguageStats) {
 			switch (a.language.name) {
 				case 'français':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(4);
-					expect(a.knownExpressionsCount).toEqual(1);
-					expect(a.totalExpressionsCount).toEqual(5);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 4, knownExpressionsCount: 1, totalExpressionsCount: 5} as LanguageStats);
 					frCovered = true;
 					break;
 				case 'english':
-					expect(a.knownIdeasCount).toEqual(2);
-					expect(a.totalIdeasCount).toEqual(3);
-					expect(a.knownExpressionsCount).toEqual(3);
-					expect(a.totalExpressionsCount).toEqual(4);
+					testStats(a, {knownIdeasCount: 2, totalIdeasCount: 3, knownExpressionsCount: 3, totalExpressionsCount: 4} as LanguageStats);
 					enCovered = true;
 					break;
 				case 'español':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(3);
-					expect(a.knownExpressionsCount).toEqual(2);
-					expect(a.totalExpressionsCount).toEqual(4);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 3, knownExpressionsCount: 2, totalExpressionsCount: 4} as LanguageStats);
 					esCovered = true;
 					break;
 				case 'italiano':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(1);
-					expect(a.knownExpressionsCount).toEqual(1);
-					expect(a.totalExpressionsCount).toEqual(1);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 1, totalExpressionsCount: 1} as LanguageStats);
 					itCovered = true;
 					break;
 				case 'deutsch':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(2);
-					expect(a.knownExpressionsCount).toEqual(1);
-					expect(a.totalExpressionsCount).toEqual(2);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2} as LanguageStats);
 					deCovered = true;
 					break;
 				case 'português':
-					expect(a.knownIdeasCount).toEqual(1);
-					expect(a.totalIdeasCount).toEqual(2);
-					expect(a.knownExpressionsCount).toEqual(1);
-					expect(a.totalExpressionsCount).toEqual(2);
+					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2} as LanguageStats);
 					ptCovered = true;
 					break;
 				case 'klingon':
-					expect(a.knownIdeasCount).toEqual(0);
-					expect(a.totalIdeasCount).toEqual(0);
-					expect(a.knownExpressionsCount).toEqual(0);
-					expect(a.totalExpressionsCount).toEqual(0);
+					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
 					klCovered = true;
 					break;
 				default:
@@ -229,12 +188,19 @@ describe('getting stats', () => {
 			}
 		}
 
-		expect(frCovered).toBeTruthy();
-		expect(enCovered).toBeTruthy();
-		expect(esCovered).toBeTruthy();
-		expect(itCovered).toBeTruthy();
-		expect(deCovered).toBeTruthy();
-		expect(ptCovered).toBeTruthy();
-		expect(klCovered).toBeTruthy();
+		expect(frCovered).toEqual(true);
+		expect(enCovered).toEqual(true);
+		expect(esCovered).toEqual(true);
+		expect(itCovered).toEqual(true);
+		expect(deCovered).toEqual(true);
+		expect(ptCovered).toEqual(true);
+		expect(klCovered).toEqual(true);
 	});
 });
+
+function testStats(actualStats: LanguageStats, expectedStats: LanguageStats) {
+	expect(actualStats.knownIdeasCount).toEqual(expectedStats.knownIdeasCount);
+	expect(actualStats.totalIdeasCount).toEqual(expectedStats.totalIdeasCount);
+	expect(actualStats.knownExpressionsCount).toEqual(expectedStats.knownExpressionsCount);
+	expect(actualStats.totalExpressionsCount).toEqual(expectedStats.totalExpressionsCount);
+}
