@@ -1,3 +1,4 @@
+import {Language} from '../../../server/model/languages/language';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
@@ -14,6 +15,11 @@ export async function makeIdeaForAdding(i: {
 export async function addIdeaHavingExpressions(ee: string[]): Promise<Idea> {
 	const ll = await Promise.all(ee.map(_ => addAnyLanguage()));
 	return addIdea({ee: ee.map((e, i) => ({languageId: ll[i].id, text: e}))});
+}
+
+export async function addIdeaHavingLanguages(...languages: Language[]): Promise<Idea> {
+	const ee = await Promise.all(languages.map(language => ({languageId: language.id, text: 'e'})));
+	return addIdea({ee});
 }
 
 export async function addAnyIdea(): Promise<Idea> {

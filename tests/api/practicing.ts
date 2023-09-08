@@ -12,7 +12,7 @@ import {
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {Idea, validate} from '../../server/model/ideas/idea';
-import {addIdeaHavingExpressions} from './ideas/utils';
+import {addIdeaHavingExpressions, addIdeaHavingLanguages} from './ideas/utils';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -33,14 +33,6 @@ describe('getting practice ideas when there are no practiceable ideas', () => {
 	});
 });
 
-async function addIdeaWithOnePracticeableLanguage() {
-	const addedIdea = await addIdeaHavingExpressions(['e1', 'e2']);
-	addedIdea.ee[0].language.isPractice = true;
-	addedIdea.ee[1].language.isPractice = false;
-	await editLanguages([addedIdea.ee[0].language, addedIdea.ee[1].language]);
-	return addedIdea;
-}
-
 describe('getting practice ideas', () => {
 	async function iterateNextPracticeIdeas(ideaIds: number[][], n: number) {
 		for (let i = 0; i < ideaIds.length; i++) {
@@ -55,7 +47,11 @@ describe('getting practice ideas', () => {
 	}
 
 	test('only one idea loops', async () => {
-		const addedIdea = await addIdeaWithOnePracticeableLanguage();
+		const addedIdea = await addIdeaHavingExpressions(['e1', 'e2']);
+		addedIdea.ee[0].language.isPractice = true;
+		addedIdea.ee[1].language.isPractice = false;
+		await editLanguages([addedIdea.ee[0].language, addedIdea.ee[1].language]);
+
 		const promises = [];
 		for (let i = 0; i < 10; i++) {
 			promises.push(rawNextPracticeIdea());
@@ -72,10 +68,8 @@ describe('getting practice ideas', () => {
 		const l2: Language = await addLanguage('l2');
 		l1.isPractice = true;
 		await editLanguages([l1, l2]);
-		const ideaForAdding: IdeaForAdding = {ee: [{languageId: l1.id, text: 'e1'},
-			{languageId: l2.id, text: 'e2'}]};
 
-		await executeNTimes(10, () => addIdea(ideaForAdding));
+		await executeNTimes(10, () => addIdeaHavingLanguages(l1, l2));
 
 		const promises = [];
 		for (let i = 0; i < 2; i++) {
@@ -95,9 +89,7 @@ describe('getting practice ideas', () => {
 		const l2 = await addLanguage('l2');
 
 		// Add ideas
-		await Promise.all(Array.from({length: 10}, () => addIdea(
-			{ee: [{languageId: l1.id, text: 'e1'}, {languageId: l2.id, text: 'e2'}]},
-		)));
+		await Promise.all(Array.from({length: 10}, () => addIdeaHavingLanguages(l1, l2)));
 
 		// Make sure there are practiceable ideas
 		l1.isPractice = true;
@@ -137,11 +129,11 @@ describe('getting practice ideas', () => {
 		await setSettings({randomPractice: false, practiceOnlyNotKnown: false});
 
 		// Only practice languages (not practiceable)
-		const i1 = await addIdea({ee: [{languageId: ll[0].id, text: 'e1'}, {languageId: ll[1].id, text: 'e2'}]});
+		const i1 = await addIdeaHavingLanguages(ll[0], ll[1]);
 		// Mixed (practiceable)
-		const i2 = await addIdea({ee: [{languageId: ll[1].id, text: 'e1'}, {languageId: ll[2].id, text: 'e2'}]});
+		const i2 = await addIdeaHavingLanguages(ll[1], ll[2]);
 		// No practice languages (not practiceable)
-		const i3 = await addIdea({ee: [{languageId: ll[2].id, text: 'e1'}, {languageId: ll[3].id, text: 'e2'}]});
+		const i3 = await addIdeaHavingLanguages(ll[2], ll[3]);
 
 		const ideaIds = [] as number[];
 		await iterateNextPracticeIdeas([ideaIds], 4);
@@ -207,20 +199,18 @@ describe('getting practice ideas', () => {
 
 		await setSettings({practiceOnlyNotKnown: false, randomPractice: false});
 
-		const fetchedIdea1 = await addIdea({ee: [{languageId: l1.id, text: 'expression'},
-			{languageId: l2.id, text: 'expression2'}]});
-		const fetchedIdea2 = await addIdea({ee: [{languageId: l1.id, text: 'expression'},
-			{languageId: l3.id, text: 'expression2'}]});
+		const idea1 = await addIdeaHavingLanguages(l1, l2);
+		const idea2 = await addIdeaHavingLanguages(l1, l3);
 
-		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea2.id);
-		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea2.id);
+		expect((await nextPracticeIdea()).id).toEqual(idea2.id);
+		expect((await nextPracticeIdea()).id).toEqual(idea2.id);
 
 		l2.isPractice = false;
 		l3.isPractice = true;
 		await editLanguages([l1, l2, l3]);
 
-		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea1.id);
-		expect((await nextPracticeIdea()).id).toEqual(fetchedIdea1.id);
+		expect((await nextPracticeIdea()).id).toEqual(idea1.id);
+		expect((await nextPracticeIdea()).id).toEqual(idea1.id);
 	});
 
 	test('changing which languages are practiceable resets loop', async () => {
@@ -234,13 +224,8 @@ describe('getting practice ideas', () => {
 
 		await setSettings({practiceOnlyNotKnown: false, randomPractice: true});
 
-		const idea1: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'},
-			{languageId: l2.id, text: 'expression2'}]};
-		const idea2: IdeaForAdding = {ee: [{languageId: l1.id, text: 'expression'},
-			{languageId: l3.id, text: 'expression2'}]};
-
-		await executeNTimes(20, () => addIdea(idea1));
-		await executeNTimes(20, () => addIdea(idea2));
+		await executeNTimes(20, () => addIdeaHavingLanguages(l1, l2));
+		await executeNTimes(20, () => addIdeaHavingLanguages(l1, l3));
 
 		const firstIdeaIds = [] as number[];
 		await iterateNextPracticeIdeas([firstIdeaIds], 10);
