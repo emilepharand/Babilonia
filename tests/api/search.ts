@@ -80,7 +80,7 @@ describe('searching expressions', () => {
 		await testSearch(sc, [i2], [['fr ipsum sed']], fr.id);
 	});
 
-	test('searching for ideas that contain specific languages but don\'t have another', async () => {
+	test('searching for ideas that contain specific languages and does not contain another', async () => {
 		const fr = await addLanguage('français');
 		const en = await addLanguage('anglais');
 		const es = await addLanguage('español');
@@ -130,8 +130,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = it.id;
 		await testSearch(sc,
 			[i2, i3],
-			[i2.ee.filter(e => e.language.id === es.id || e.language.id === fr.id).map(e => e.text),
-				i3.ee.filter(e => e.language.id === es.id || e.language.id === fr.id).map(e => e.text)],
+			[[fr2.text, es2.text], [fr3.text, fr4.text, es3.text, es4.text]],
 		);
 
 		// All ideas containing Spanish and German
@@ -139,8 +138,7 @@ describe('searching expressions', () => {
 		sc.ideaDoesNotHave = undefined;
 		await testSearch(sc,
 			[i1, i2],
-			[i1.ee.filter(e => e.language.id === es.id || e.language.id === de.id).map(e => e.text),
-				i2.ee.filter(e => e.language.id === es.id || e.language.id === de.id).map(e => e.text)],
+			[[es1.text, de1.text], [es2.text, de2.text]],
 		);
 
 		// All ideas containing Spanish and English but not German
@@ -261,30 +259,31 @@ describe('searching expressions', () => {
 		);
 	});
 
-	describe('searching for expressions erroneously', () => {
+	describe('invalid requests', () => {
 		test('no value set', async () => {
 			const r = await searchAndGetResponse({});
 			expect(r.status).toEqual(400);
 		});
 
 		test('language is not numeric', async () => {
-			const r = await searchRawParamsAndGetResponse('language=a');
-			expect(r.status).toEqual(400);
+			await testInvalidRequests('language=a');
 		});
 
 		test('ideaHas is not numeric', async () => {
-			const r = await searchRawParamsAndGetResponse('ideaHas=a');
-			expect(r.status).toEqual(400);
+			await testInvalidRequests('ideaHas=a');
 		});
 
 		test('ideaDoesNotHave is not numeric', async () => {
-			const r = await searchRawParamsAndGetResponse('ideaDoesNotHave=a');
-			expect(r.status).toEqual(400);
+			await testInvalidRequests('ideaDoesNotHave=a');
 		});
 
 		test('knownExpressions is not boolean', async () => {
-			const r = await searchRawParamsAndGetResponse('knownExpressions=invalid');
-			expect(r.status).toEqual(400);
+			await testInvalidRequests('knownExpressions=notBoolean');
 		});
 	});
 });
+
+async function testInvalidRequests(params: string) {
+	const r = await searchRawParamsAndGetResponse(params);
+	expect(r.status).toEqual(400);
+}
