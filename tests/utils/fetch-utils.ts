@@ -7,7 +7,7 @@ import {SearchContext} from '../../server/model/search/searchContext';
 import {Settings} from '../../server/model/settings/settings';
 import {AllStats} from '../../server/stats/statsCounter';
 import {paramsFromSearchContext} from '../../src/ts/api';
-import {settingsFromPartial} from './utils';
+import {getRandomString, settingsFromPartial} from './utils';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -22,6 +22,54 @@ function doFetch(url: string, method: 'GET'|'PUT'|'POST'|'DELETE', body?: any) {
 	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
 }
 
+async function fetchResourceAndGetResponse(resource: string, id: number): Promise<Response> {
+	return doFetch(`${apiUrl}/${resource}/${id}`, 'GET');
+}
+
+async function fetchResourcesAndGetResponse(resource: string): Promise<Response> {
+	return doFetch(`${apiUrl}/${resource}`, 'GET');
+}
+
+export async function fetchIdeaAndGetResponse(id: number): Promise<Response> {
+	return fetchResourceAndGetResponse('ideas', id);
+}
+
+export async function fetchLanguageAndGetResponse(id: number): Promise<Response> {
+	return fetchResourceAndGetResponse('languages', id);
+}
+
+export async function fetchLanguagesAndGetResponse(): Promise<Response> {
+	return fetchResourcesAndGetResponse('languages');
+}
+
+export async function fetchSettingsAndGetResponse(): Promise<Response> {
+	return fetchResourcesAndGetResponse('settings');
+}
+
+export async function fetchStatsAndGetResponse(): Promise<Response> {
+	return fetchResourcesAndGetResponse('stats');
+}
+
+export async function fetchSettings(): Promise<Settings> {
+	return await (await fetchSettingsAndGetResponse()).json() as Settings;
+}
+
+export async function getStats(): Promise<AllStats> {
+	return await (await fetchStatsAndGetResponse()).json() as AllStats;
+}
+
+export async function fetchLanguage(id: number): Promise<Language> {
+	return (await (await fetchLanguageAndGetResponse(id)).json()) as Language;
+}
+
+export async function fetchLanguages(): Promise<Language[]> {
+	return (await (await fetchLanguagesAndGetResponse()).json()) as Language[];
+}
+
+export async function fetchIdea(id: number): Promise<Idea> {
+	return (await (await fetchIdeaAndGetResponse(id)).json()) as Idea;
+}
+
 export async function setSettingsRawObjectAndGetResponse(object: any) {
 	return doFetch(`${apiUrl}/settings`, 'PUT', object);
 }
@@ -32,10 +80,6 @@ export async function setSettingsAndGetResponse(settings: Settings) {
 
 export async function setSettings(settings: Partial<Settings>) {
 	await setSettingsRawObjectAndGetResponse(JSON.stringify(settingsFromPartial(settings)));
-}
-
-export async function fetchSettings(): Promise<Settings> {
-	return await (await doFetch(`${apiUrl}/settings`, 'GET')).json() as Settings;
 }
 
 export async function addLanguageRawObjectAndGetResponse(object: any): Promise<Response> {
@@ -54,10 +98,6 @@ export async function addAnyLanguage(): Promise<Language> {
 	return (await (await addLanguageAndGetResponse('language ' + getRandomString())).json()) as Language;
 }
 
-export function getRandomString(): string {
-	return Math.random().toString(36).substring(10);
-}
-
 export async function editLanguagesRawObjectAndGetResponse(object: any): Promise<Response> {
 	return doFetch(`${apiUrl}/languages`, 'PUT', object);
 }
@@ -68,22 +108,6 @@ export async function editLanguagesAndGetResponse(newLanguages: Language[]): Pro
 
 export async function editLanguages(newLanguages: Language[]): Promise<Language[]> {
 	return (await (await editLanguagesRawObjectAndGetResponse(JSON.stringify(newLanguages))).json()) as Language[];
-}
-
-export async function fetchLanguageAndGetResponse(id: number): Promise<Response> {
-	return doFetch(`${apiUrl}/languages/${id}`, 'GET');
-}
-
-export async function fetchLanguage(id: number): Promise<Language> {
-	return (await (await fetchLanguageAndGetResponse(id)).json()) as Language;
-}
-
-export async function fetchLanguagesAndGetResponse(): Promise<Response> {
-	return doFetch(`${apiUrl}/languages`, 'GET');
-}
-
-export async function fetchLanguages(): Promise<Language[]> {
-	return (await (await fetchLanguagesAndGetResponse()).json()) as Language[];
 }
 
 export async function deleteLanguage(id: number): Promise<Response> {
@@ -118,14 +142,6 @@ export async function deleteIdea(id: number): Promise<Response> {
 	return doFetch(`${apiUrl}/ideas/${id}`, 'DELETE');
 }
 
-export async function fetchIdeaAndGetResponse(id: number): Promise<Response> {
-	return doFetch(`${apiUrl}/ideas/${id}`, 'GET');
-}
-
-export async function fetchIdea(id: number): Promise<Idea> {
-	return (await (await fetchIdeaAndGetResponse(id)).json()) as Idea;
-}
-
 export async function searchRawParamsAndGetResponse(params: string): Promise<Response> {
 	const url = encodeURI(`${apiUrl}/ideas?${params}`);
 	return doFetch(url, 'GET');
@@ -147,10 +163,6 @@ export async function rawNextPracticeIdea(): Promise<Response> {
 
 export async function nextPracticeIdea(): Promise<Idea> {
 	return (await (await rawNextPracticeIdea()).json()) as Idea;
-}
-
-export async function getStats(): Promise<AllStats> {
-	return await (await doFetch(`${apiUrl}/stats`, 'GET')).json() as AllStats;
 }
 
 export async function deleteEverything(): Promise<Response> {

@@ -24,3 +24,7 @@ export function areInSameOrder(arr1: any[], arr2: any[]) {
 export async function executeNTimes(n: number, fn: () => void) {
 	await Promise.all(Array.from({length: n}, () => fn()));
 }
+
+export function getRandomString(): string {
+	return Math.random().toString(36).substring(10);
+}
