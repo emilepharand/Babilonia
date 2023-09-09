@@ -4,7 +4,7 @@ import {
 	deleteEverything,
 	editLanguagesAndGetResponse,
 	getStats,
-} from '../utils/utils';
+} from '../utils/fetch-utils';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {LanguageStats} from '../../server/stats/statsCounter';
 

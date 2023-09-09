@@ -1,18 +1,17 @@
 import {
 	addIdea,
 	addLanguage,
-	areInSameOrder,
 	deleteEverything,
 	editLanguages,
-	executeNTimes,
 	nextPracticeIdea,
 	rawNextPracticeIdea,
 	setSettings,
-} from '../utils/utils';
+} from '../utils/fetch-utils';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {Idea, validate} from '../../server/model/ideas/idea';
 import {addIdeaHavingExpressions, addIdeaHavingLanguages} from './ideas/utils';
+import {areInSameOrder, executeNTimes} from '../utils/utils';
 
 beforeEach(async () => {
 	await deleteEverything();

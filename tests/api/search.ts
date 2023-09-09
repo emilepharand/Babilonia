@@ -8,7 +8,7 @@ import {
 	search,
 	searchAndGetResponse,
 	searchRawParamsAndGetResponse,
-} from '../utils/utils';
+} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await deleteEverything();

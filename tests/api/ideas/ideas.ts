@@ -13,7 +13,7 @@ import {
 	editIdeaAndGetResponse,
 	fetchIdeaAndGetResponse,
 	fetchLanguageAndGetResponse,
-} from '../../utils/utils';
+} from '../../utils/fetch-utils';
 import {addAnyIdea, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding, testTransformExpressions} from './utils';
 
 beforeEach(async () => {

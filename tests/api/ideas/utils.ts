@@ -2,7 +2,7 @@ import {Language} from '../../../server/model/languages/language';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
-import {FIRST_IDEA_ID, addAnyLanguage, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/utils';
+import {FIRST_IDEA_ID, addAnyLanguage, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/fetch-utils';
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]

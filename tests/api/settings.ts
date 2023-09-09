@@ -4,7 +4,7 @@ import {
 	setSettings,
 	setSettingsAndGetResponse,
 	setSettingsRawObjectAndGetResponse,
-} from '../utils/utils';
+} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await deleteEverything();
