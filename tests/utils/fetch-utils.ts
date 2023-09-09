@@ -18,12 +18,12 @@ dotenv.config({path: '.env.test'});
 
 export const apiUrl = `${process.env.VITE_API_URL}`;
 
+function doFetch(url: string, method: 'GET'|'PUT'|'POST'|'DELETE', body?: any) {
+	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
+}
+
 export async function setSettingsRawObjectAndGetResponse(object: any) {
-	return fetch(`${apiUrl}/settings`, {
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: object,
-	});
+	return doFetch(`${apiUrl}/settings`, 'PUT', object);
 }
 
 export async function setSettingsAndGetResponse(settings: Settings) {
@@ -35,17 +35,11 @@ export async function setSettings(settings: Partial<Settings>) {
 }
 
 export async function fetchSettings(): Promise<Settings> {
-	return await (await fetch(`${apiUrl}/settings`, {
-		method: 'GET',
-	})).json() as Settings;
+	return await (await doFetch(`${apiUrl}/settings`, 'GET')).json() as Settings;
 }
 
 export async function addLanguageRawObjectAndGetResponse(object: any): Promise<Response> {
-	return fetch(`${apiUrl}/languages`, {
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: object,
-	});
+	return doFetch(`${apiUrl}/languages`, 'POST', object);
 }
 
 export async function addLanguageAndGetResponse(name: string): Promise<Response> {
@@ -65,11 +59,7 @@ export function getRandomString(): string {
 }
 
 export async function editLanguagesRawObjectAndGetResponse(object: any): Promise<Response> {
-	return fetch(`${apiUrl}/languages`, {
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: object,
-	});
+	return doFetch(`${apiUrl}/languages`, 'PUT', object);
 }
 
 export async function editLanguagesAndGetResponse(newLanguages: Language[]): Promise<Response> {
@@ -77,16 +67,11 @@ export async function editLanguagesAndGetResponse(newLanguages: Language[]): Pro
 }
 
 export async function editLanguages(newLanguages: Language[]): Promise<Language[]> {
-	return (await (
-		await editLanguagesRawObjectAndGetResponse(JSON.stringify(newLanguages))
-	).json()) as Language[];
+	return (await (await editLanguagesRawObjectAndGetResponse(JSON.stringify(newLanguages))).json()) as Language[];
 }
 
 export async function fetchLanguageAndGetResponse(id: number): Promise<Response> {
-	return fetch(`${apiUrl}/languages/${id}`, {
-		method: 'GET',
-		headers: {'Content-Type': 'application/json'},
-	});
+	return doFetch(`${apiUrl}/languages/${id}`, 'GET');
 }
 
 export async function fetchLanguage(id: number): Promise<Language> {
@@ -94,9 +79,7 @@ export async function fetchLanguage(id: number): Promise<Language> {
 }
 
 export async function fetchLanguagesAndGetResponse(): Promise<Response> {
-	return fetch(`${apiUrl}/languages`, {
-		method: 'GET',
-	});
+	return doFetch(`${apiUrl}/languages`, 'GET');
 }
 
 export async function fetchLanguages(): Promise<Language[]> {
@@ -104,17 +87,11 @@ export async function fetchLanguages(): Promise<Language[]> {
 }
 
 export async function deleteLanguage(id: number): Promise<Response> {
-	return fetch(`${apiUrl}/languages/${id}`, {
-		method: 'DELETE',
-	});
+	return doFetch(`${apiUrl}/languages/${id}`, 'DELETE');
 }
 
 export async function addIdeaRawObjectAndGetResponse(obj: any): Promise<Response> {
-	return fetch(`${apiUrl}/ideas`, {
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: obj,
-	});
+	return doFetch(`${apiUrl}/ideas`, 'POST', obj);
 }
 
 export async function addIdeaAndGetResponse(idea: IdeaForAdding): Promise<Response> {
@@ -126,11 +103,7 @@ export async function addIdea(idea: IdeaForAdding): Promise<Idea> {
 }
 
 export async function editIdeaRawObjectAndGetResponse(idea: any, id: number): Promise<Response> {
-	return fetch(`${apiUrl}/ideas/${id}`, {
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: idea,
-	});
+	return doFetch(`${apiUrl}/ideas/${id}`, 'PUT', idea);
 }
 
 export async function editIdeaAndGetResponse(object: any, id: number): Promise<Response> {
@@ -142,15 +115,11 @@ export async function editIdea(object: any, id: number): Promise<Idea> {
 }
 
 export async function deleteIdea(id: number): Promise<Response> {
-	return fetch(`${apiUrl}/ideas/${id}`, {
-		method: 'DELETE',
-	});
+	return doFetch(`${apiUrl}/ideas/${id}`, 'DELETE');
 }
 
 export async function fetchIdeaAndGetResponse(id: number): Promise<Response> {
-	return fetch(`${apiUrl}/ideas/${id}`, {
-		method: 'GET',
-	});
+	return doFetch(`${apiUrl}/ideas/${id}`, 'GET');
 }
 
 export async function fetchIdea(id: number): Promise<Idea> {
@@ -159,17 +128,13 @@ export async function fetchIdea(id: number): Promise<Idea> {
 
 export async function searchRawParamsAndGetResponse(params: string): Promise<Response> {
 	const url = encodeURI(`${apiUrl}/ideas?${params}`);
-	return fetch(url, {
-		method: 'GET',
-	});
+	return doFetch(url, 'GET');
 }
 
 export async function searchAndGetResponse(sc: SearchContext): Promise<Response> {
 	const params = paramsFromSearchContext(sc);
 	const url = encodeURI(`${apiUrl}/ideas?${params}`);
-	return fetch(url, {
-		method: 'GET',
-	});
+	return doFetch(url, 'GET');
 }
 
 export async function search(sc: SearchContext): Promise<Idea[]> {
@@ -177,9 +142,7 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 }
 
 export async function rawNextPracticeIdea(): Promise<Response> {
-	return fetch(`${apiUrl}/practice-ideas/next`, {
-		method: 'GET',
-	});
+	return doFetch(`${apiUrl}/practice-ideas/next`, 'GET');
 }
 
 export async function nextPracticeIdea(): Promise<Idea> {
@@ -187,11 +150,9 @@ export async function nextPracticeIdea(): Promise<Idea> {
 }
 
 export async function getStats(): Promise<AllStats> {
-	return await (await fetch(`${apiUrl}/stats`, {
-		method: 'GET',
-	})).json() as AllStats;
+	return await (await doFetch(`${apiUrl}/stats`, 'GET')).json() as AllStats;
 }
 
 export async function deleteEverything(): Promise<Response> {
-	return fetch(`${apiUrl}/everything`, {method: 'DELETE'});
+	return doFetch(`${apiUrl}/everything`, 'DELETE');
 }
