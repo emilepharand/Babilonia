@@ -1,4 +1,3 @@
-
 export function getRow(rowNbr: number) {
 	return cy.get('#practice-table')
 		.find('.practice-row')
