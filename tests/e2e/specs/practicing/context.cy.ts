@@ -10,7 +10,7 @@ import {assertIsTyped, assertRowMatchIsFullMatch, assertRowMatchIsPartialMatch, 
 
 context('Context', () => {
 	specify('Context', () => {
-		addLanguages();
+		const languages = addLanguages();
 		const e1: ExpressionForAdding = {languageId: 1, text: '(bien le) bonjour (à vous)'};
 		const e2: ExpressionForAdding = {languageId: 1, text: 'salut (mon) cher'};
 		const e3: ExpressionForAdding = {languageId: 1, text: 'salut (mon) (bel) ami'};
@@ -22,13 +22,10 @@ context('Context', () => {
 		cyRequestPost(`${apiUrl}/ideas`, i1);
 
 		// Make some languages practiceable
-		const languages
-			= [{id: 1, name: 'français', ordering: 0, isPractice: true},
-				{id: 2, name: 'english', ordering: 1, isPractice: false},
-				{id: 3, name: 'español', ordering: 2, isPractice: true},
-				{id: 4, name: 'italiano', ordering: 3, isPractice: true},
-				{id: 5, name: 'deutsch', ordering: 4, isPractice: true},
-				{id: 6, name: 'português', ordering: 5, isPractice: true}];
+		languages.forEach(l => {
+			l.isPractice = true;
+		});
+		languages[1].isPractice = false;
 		cyRequestPut(`${apiUrl}/languages`, languages);
 
 		cy.get('#practice-link').click();
