@@ -2,10 +2,29 @@ import * as dotenv from 'dotenv';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Settings} from '../../server/model/settings/settings';
+import {Language} from 'server/model/languages/language';
+import {settingsFromPartial} from '../utils/utils';
 
 dotenv.config();
 
 export const apiUrl = Cypress.env('VITE_API_URL');
+
+export function cyRequestPut(url: string, body: any) {
+	cyRequest(url, 'PUT', body);
+}
+
+export function cyRequestPost(url: string, body: any) {
+	cyRequest(url, 'POST', body);
+}
+
+function cyRequest(url: string, method:'PUT'|'POST', body: any) {
+	cy.request({
+		url: `${url}`,
+		method,
+		headers: {'Content-Type': 'application/json'},
+		body: `${JSON.stringify(body)}`,
+	});
+}
 
 export function addLanguages() {
 	const languageNames = [
@@ -17,13 +36,19 @@ export function addLanguages() {
 		'português',
 	];
 	for (const languageName of languageNames) {
-		cy.request({
-			url: `${apiUrl}/languages`,
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: `{"name":"${languageName}"}`,
-		});
+		cyRequestPost(`${apiUrl}/languages`, {name: languageName});
 	}
+	// Make some languages practiceable
+	const ll: Language[] = [
+		{id: 1, name: 'français', ordering: 0, isPractice: false},
+		{id: 2, name: 'english', ordering: 1, isPractice: true},
+		{id: 3, name: 'español', ordering: 2, isPractice: true},
+		{id: 4, name: 'italiano', ordering: 3, isPractice: true},
+		{id: 5, name: 'deutsch', ordering: 4, isPractice: true},
+		{id: 6, name: 'português', ordering: 5, isPractice: true},
+	];
+	cyRequestPut(`${apiUrl}/languages`, ll);
+	return ll;
 }
 
 export function addIdeasDifferentSet() {
@@ -53,24 +78,9 @@ export function addIdeasDifferentSet() {
 	const es3: ExpressionForAdding = {text: 'buenas noches', languageId: 3};
 	const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: 3};
 	const i3: IdeaForAdding = {ee: [fr3, fr4, en3, en4, es3, es4]};
-	cy.request({
-		url: `${apiUrl}/ideas`,
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(i1)}`,
-	});
-	cy.request({
-		url: `${apiUrl}/ideas`,
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(i2)}`,
-	});
-	cy.request({
-		url: `${apiUrl}/ideas`,
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(i3)}`,
-	});
+	cyRequestPost(`${apiUrl}/ideas`, i1);
+	cyRequestPost(`${apiUrl}/ideas`, i2);
+	cyRequestPost(`${apiUrl}/ideas`, i3);
 }
 
 export function addIdeas() {
@@ -90,32 +100,8 @@ export function addIdeas() {
 	const e12: ExpressionForAdding = {languageId: 4, text: 'salve'};
 	const e13: ExpressionForAdding = {languageId: 5, text: 'Hallo'};
 	const i2: IdeaForAdding = {ee: [e6, e7, e8, e9, e10, e11, e12, e13]};
-	cy.request({
-		url: `${apiUrl}/ideas`,
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(i1)}`,
-	});
-	cy.request({
-		url: `${apiUrl}/ideas`,
-		method: 'POST',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(i2)}`,
-	});
-	// Make some languages practiceable
-	const json
-    = '[{"id":1,"name":"français","ordering":0,"isPractice":false},'
-    + '{"id":2,"name":"english","ordering":1,"isPractice":true},'
-    + '{"id":3,"name":"español","ordering":2,"isPractice":true},'
-    + '{"id":4,"name":"italiano","ordering":3,"isPractice":true},'
-    + '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
-    + '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
-	cy.request({
-		url: `${apiUrl}/languages`,
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: `${json}`,
-	});
+	cyRequestPost(`${apiUrl}/ideas`, i1);
+	cyRequestPost(`${apiUrl}/ideas`, i2);
 }
 
 export function assertFetchIdeaReturnsStatus(id: number, status: number, contains?: string[]) {
@@ -210,19 +196,5 @@ export function assertExpressionHasValues(rowNbr: number, languageName: string, 
 }
 
 export async function setSettings(partialSettings: Partial<Settings>) {
-	cy.request({
-		url: `${apiUrl}/settings`,
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(settingsFromPartial(partialSettings))}`,
-	});
-}
-
-export function settingsFromPartial(partialSettings: Partial<Settings>) {
-	return {
-		passiveMode: partialSettings.passiveMode ? partialSettings.passiveMode : false,
-		practiceOnlyNotKnown: partialSettings.practiceOnlyNotKnown ? partialSettings.practiceOnlyNotKnown : false,
-		randomPractice: partialSettings.randomPractice ? partialSettings.randomPractice : false,
-		strictCharacters: partialSettings.strictCharacters ? partialSettings.strictCharacters : false,
-	};
+	cyRequestPut(`${apiUrl}/settings`, settingsFromPartial(partialSettings));
 }

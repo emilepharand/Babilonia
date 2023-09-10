@@ -97,8 +97,8 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 
 function normalizeIdea(ideaForAdding: IdeaForAdding) {
 	trimExpressions(ideaForAdding);
-	trimContext(ideaForAdding);
 	normalizeWhitespace(ideaForAdding);
+	trimContext(ideaForAdding);
 }
 
 function trimExpressions(ideaForAdding: IdeaForAdding) {
@@ -110,7 +110,7 @@ function trimExpressions(ideaForAdding: IdeaForAdding) {
 
 function trimContext(ideaForAdding: IdeaForAdding) {
 	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s+(?=\))|(?<=\()\s+/g, '');
+		e.text = e.text.replaceAll(/\s(?=\))|(?<=\()\s/g, '');
 	});
 	return ideaForAdding;
 }

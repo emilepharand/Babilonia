@@ -103,13 +103,13 @@ export default class InputValidator {
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
 	for (const e of ee) {
-		const contexts = e.text.match(/\([^)]*\)/g) ?? [];
+		const contexts = e.text.match(/\([^)(]*\)/g) ?? [];
 		// No context is empty
 		if (contexts.some(x => x.substring(1, x.length - 1).trim().length === 0)) {
 			return false;
 		}
 		// Expression is not only made of context
-		const expressionWithoutContexts = e.text.replaceAll(/\([^)]*\)/g, '');
+		const expressionWithoutContexts = e.text.replaceAll(/\([^)(]*\)/g, '');
 		if (expressionWithoutContexts.trim().length === 0) {
 			return false;
 		}

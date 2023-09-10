@@ -1,12 +1,6 @@
 import {ExpressionForAdding} from 'server/model/ideas/expression';
 import {IdeaForAdding} from 'server/model/ideas/ideaForAdding';
-import {addIdeasDifferentSet, addLanguages, apiUrl} from '../cy-utils';
-
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
+import {addIdeasDifferentSet, addLanguages, apiUrl, cyRequestPost} from '../cy-utils';
 
 // This test should focus on whether the buttons and filters are correctly taken into account
 // and whether results are correctly displayed
@@ -99,12 +93,7 @@ context('Search', () => {
 			const it1: ExpressionForAdding = {text: 'buongiorno', languageId: 4, known: true};
 			const i1: IdeaForAdding = {ee: [fr1, en1, es1, de1, pt1, it1]};
 
-			cy.request({
-				url: `${apiUrl}/ideas`,
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: `${JSON.stringify(i1)}`,
-			});
+			cyRequestPost(`${apiUrl}/ideas`, i1);
 		}
 
 		cy.get('#search-ideas-link').click();

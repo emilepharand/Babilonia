@@ -14,14 +14,10 @@ import {
 	toggleExpressionKnown,
 } from '../cy-utils';
 
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	addLanguages();
-	cy.visit('/');
-});
-
 context('The idea page', () => {
+	beforeEach(() => {
+		addLanguages();
+	});
 	specify('Adding ideas', () => {
 		// Idea 1 doesn't exist
 		assertFetchIdeaReturnsStatus(1, 404);

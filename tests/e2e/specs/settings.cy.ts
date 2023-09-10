@@ -2,12 +2,6 @@ import {Settings} from '../../../server/model/settings/settings';
 
 import {apiUrl, setSettings} from '../cy-utils';
 
-before(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
-
 describe('The settings page', () => {
 	it('Works correctly', () => {
 		setSettings({randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false});
