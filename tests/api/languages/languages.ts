@@ -3,7 +3,7 @@ import {Language} from '../../../server/model/languages/language';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {
 	addAnyLanguage,
-	addIdeaRawObjectAndGetResponse,
+	addIdeaAndGetResponse,
 	addLanguage,
 	addLanguageAndGetResponse,
 	apiUrl,
@@ -262,13 +262,13 @@ describe('deleting languages', () => {
 		const e2: ExpressionForAdding = {text: 'e2', languageId: l2.id};
 		const e3: ExpressionForAdding = {text: 'e3', languageId: l3.id};
 		const e4: ExpressionForAdding = {text: 'e4', languageId: l3.id};
-		await addIdeaRawObjectAndGetResponse(JSON.stringify({ee: [e1, e2, e3, e4]}));
+		await addIdeaAndGetResponse({ee: [e1, e2, e3, e4]});
 
 		const e5: ExpressionForAdding = {text: 'e5', languageId: l1.id};
 		const e6: ExpressionForAdding = {text: 'e6', languageId: l2.id};
 		const e7: ExpressionForAdding = {text: 'e7', languageId: l2.id};
 		const e8: ExpressionForAdding = {text: 'e8', languageId: l3.id};
-		await addIdeaRawObjectAndGetResponse(JSON.stringify({ee: [e5, e6, e7, e8]}));
+		await addIdeaAndGetResponse({ee: [e5, e6, e7, e8]});
 
 		await deleteLanguage(l3.id);
 

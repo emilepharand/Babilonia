@@ -2,7 +2,7 @@ import {Language} from '../../../server/model/languages/language';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
 import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
-import {FIRST_IDEA_ID, addAnyLanguage, addIdea, addIdeaAndGetResponse, addIdeaRawObjectAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, editIdeaRawObjectAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/fetch-utils';
+import {FIRST_IDEA_ID, addAnyLanguage, addIdea, addIdeaAndGetResponse, addLanguage, editIdea, editIdeaAndGetResponse, fetchIdea, fetchIdeaAndGetResponse, fetchLanguage} from '../../utils/fetch-utils';
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
@@ -86,13 +86,13 @@ async function validateIdea(responseIdea: Idea, ideaForAdding: IdeaForAdding, ex
 
 export async function editInvalidIdeaAndTest(ideaForAdding: unknown, id: number): Promise<void> {
 	const idea1 = await fetchIdea(id);
-	expect((await editIdeaRawObjectAndGetResponse(JSON.stringify(ideaForAdding), id)).status).toEqual(400);
+	expect((await editIdeaAndGetResponse(ideaForAdding, id)).status).toEqual(400);
 	const idea2 = await fetchIdea(id);
 	expect(idea1).toEqual(idea2);
 }
 
 export async function addInvalidIdeaAndTest(invalidIdea: any): Promise<void> {
-	const r = await addIdeaRawObjectAndGetResponse(JSON.stringify(invalidIdea));
+	const r = await addIdeaAndGetResponse(invalidIdea);
 	expect(r.status).toEqual(400);
 	expect((await fetchIdeaAndGetResponse(FIRST_IDEA_ID)).status).toEqual(404);
 }
