@@ -7,14 +7,13 @@ import type {AllStats} from '../../server/stats/statsCounter';
 
 const apiUrl = `${process.env.VITE_API_URL}`;
 
+async function doFetch(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE', body?: string) {
+	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
+}
+
 export async function getIdea(ideaId: number): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
-	const response = await fetch(url, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	});
+	const response = await doFetch(url, 'GET');
 	if (response.status === 404) {
 		return Promise.reject();
 	}
@@ -26,56 +25,38 @@ export async function editIdea(
 	id: number,
 ): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${id}`;
-	const response = await fetch(url, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(ideaForAdding),
-	});
+	const response = await doFetch(url, 'PUT', JSON.stringify(ideaForAdding));
 	return (await response.json()) as Idea;
 }
 
 export async function deleteIdea(ideaId: number): Promise<void> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
-	await fetch(url, {method: 'DELETE'});
+	await doFetch(url, 'DELETE');
 }
 
 export async function deleteLanguage(languageId: number): Promise<void> {
 	const url = `${apiUrl}/languages/${languageId}`;
-	await fetch(url, {method: 'DELETE'});
+	await doFetch(url, 'DELETE');
 }
 
 export async function addIdea(ifa: IdeaForAdding): Promise<Idea> {
 	const url = `${apiUrl}/ideas`;
-	const response = await fetch(url, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(ifa),
-	});
+	const response = await doFetch(url, 'POST', JSON.stringify(ifa));
 	return (await response.json()) as Idea;
 }
 
 export async function getNextIdea(): Promise<Idea> {
 	const url = `${apiUrl}/practice-ideas/next`;
-	const res = await fetch(url);
-	if (res.status === 404) {
+	const response = await doFetch(url, 'GET');
+	if (response.status === 404) {
 		return Promise.reject();
 	}
-	return (await res.json()) as Idea;
+	return (await response.json()) as Idea;
 }
 
 export async function addLanguage(name: string): Promise<Language> {
 	const url = `${apiUrl}/languages`;
-	const response = await fetch(url, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({name}),
-	});
+	const response = await doFetch(url, 'POST', JSON.stringify({name}));
 	return (await response.json()) as Language;
 }
 
@@ -83,65 +64,43 @@ export async function editLanguages(
 	languages: Language[],
 ): Promise<Language[]> {
 	const url = `${apiUrl}/languages`;
-	const response = await fetch(url, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(languages),
-	});
+	const response = await doFetch(url, 'PUT', JSON.stringify(languages));
 	return (await response.json()) as Language[];
 }
 
 export async function getLanguage(id: number): Promise<Language> {
 	const url = `${apiUrl}/languages/${id}`;
-	const response = await fetch(url, {
-		method: 'GET',
-	});
+	const response = await doFetch(url, 'GET');
 	return (await response.json()) as Language;
 }
 
 export async function getStats(): Promise<AllStats> {
 	const url = `${apiUrl}/stats`;
-	const response = await fetch(url, {
-		method: 'GET',
-	});
+	const response = await doFetch(url, 'GET');
 	return (await response.json()) as AllStats;
 }
 
 export async function getLanguages(): Promise<Language[]> {
 	const url = `${apiUrl}/languages`;
-	const response = await fetch(url, {
-		method: 'GET',
-	});
+	const response = await doFetch(url, 'GET');
 	return (await response.json()) as Language[];
 }
 
 export async function getSettings(): Promise<Settings> {
 	const url = `${apiUrl}/settings`;
-	const response = await fetch(url, {
-		method: 'GET',
-	});
+	const response = await doFetch(url, 'GET');
 	return (await response.json()) as Settings;
 }
 
 export async function setSettings(settings: Settings): Promise<void> {
 	const url = `${apiUrl}/settings`;
-	await fetch(url, {
-		method: 'PUT',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(settings),
-	});
+	await doFetch(url, 'PUT', JSON.stringify(settings));
 }
 
 export async function searchIdeas(sc: SearchContext): Promise<Idea[]> {
 	const params = paramsFromSearchContext(sc);
 	const url = `${apiUrl}/ideas?${params}`;
-	const response = await fetch(url, {
-		method: 'GET',
-	});
+	const response = await doFetch(url, 'GET');
 	return (await response.json()) as Idea[];
 }
 
