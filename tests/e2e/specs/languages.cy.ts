@@ -1,11 +1,3 @@
-import {apiUrl} from '../cy-utils';
-
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
-
 function clickSave() {
 	cy.get('#save-languages-button').click();
 }

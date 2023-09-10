@@ -1,16 +1,9 @@
 import {
 	addIdeas,
-	apiUrl,
 	assertFetchIdeaReturnsStatus,
 	setSettings,
 } from '../../cy-utils';
 import {assertIsTyped, assertLanguageName, assertRowInputHasFocus, assertRowInputIsNotPracticeable, assertRowMatchIsFullMatch, assertRowMatchIsNeutral, assertRowMatchIsNoMatch, assertRowMatchIsPartialMatch, getEditButton, getNextButton, getResetButton, getRowHintButton, getRowInput, getRowKnownButton, getRowShowButton, hint, show, typeInRow, waitForTableToLoad} from './utils';
-
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
 
 context('Interation on the practice page', () => {
 	specify('Typing, hinting, showing, and navigating', () => {

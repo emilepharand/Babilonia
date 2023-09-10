@@ -8,12 +8,6 @@ import {
 import {assertRowInputHasFocus, assertRowInputIsNotPracticeable, assertRowMatchIsFullMatch,
 	assertRowMatchIsNeutral, getNextButton, typeInRow, waitForTableToLoad} from './utils';
 
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
-
 context('Specific cases', () => {
 	specify('Settings to practice only not known expressions', () => {
 		addLanguages();

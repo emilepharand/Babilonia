@@ -6,12 +6,6 @@ import {
 } from '../../cy-utils';
 import {assertIsTyped, assertRowMatchIsFullMatch, assertRowMatchIsPartialMatch, getResetButton, getRowHintButton, getRowShowButton, typeInRow, waitForTableToLoad} from './utils';
 
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
-
 context('Context', () => {
 	specify('Context', () => {
 		addLanguages();

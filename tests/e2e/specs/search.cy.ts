@@ -2,12 +2,6 @@ import {ExpressionForAdding} from 'server/model/ideas/expression';
 import {IdeaForAdding} from 'server/model/ideas/ideaForAdding';
 import {addIdeasDifferentSet, addLanguages, apiUrl} from '../cy-utils';
 
-beforeEach(() => {
-	cy.request('DELETE', `${apiUrl}/everything`);
-	// This is important to go to the webpage but also to register spy to fail on console errors
-	cy.visit('/');
-});
-
 // This test should focus on whether the buttons and filters are correctly taken into account
 // and whether results are correctly displayed
 // It should not test whether the search itself is correctly implemented, as that should already be
