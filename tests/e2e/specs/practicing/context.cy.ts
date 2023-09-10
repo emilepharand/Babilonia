@@ -3,6 +3,8 @@ import {IdeaForAdding} from '../../../../server/model/ideas/ideaForAdding';
 import {
 	addLanguages,
 	apiUrl,
+	cyRequestPost,
+	cyRequestPut,
 } from '../../cy-utils';
 import {assertIsTyped, assertRowMatchIsFullMatch, assertRowMatchIsPartialMatch, getResetButton, getRowHintButton, getRowShowButton, typeInRow, waitForTableToLoad} from './utils';
 
@@ -17,27 +19,17 @@ context('Context', () => {
 		const e6: ExpressionForAdding = {languageId: 4, text: 'buongiorno'};
 		const e7: ExpressionForAdding = {languageId: 5, text: 'guten Tag'};
 		const i1: IdeaForAdding = {ee: [e1, e2, e3, e4, e5, e6, e7]};
-		cy.request({
-			url: `${apiUrl}/ideas`,
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: `${JSON.stringify(i1)}`,
-		});
+		cyRequestPost(`${apiUrl}/ideas`, i1);
 
 		// Make some languages practiceable
-		const json
-			= '[{"id":1,"name":"français","ordering":0,"isPractice":true},'
-			+ '{"id":2,"name":"english","ordering":1,"isPractice":false},'
-			+ '{"id":3,"name":"español","ordering":2,"isPractice":true},'
-			+ '{"id":4,"name":"italiano","ordering":3,"isPractice":true},'
-			+ '{"id":5,"name":"deutsch","ordering":4,"isPractice":true},'
-			+ '{"id":6,"name":"português","ordering":5,"isPractice":true}]';
-		cy.request({
-			url: `${apiUrl}/languages`,
-			method: 'PUT',
-			headers: {'Content-Type': 'application/json'},
-			body: `${json}`,
-		});
+		const languages
+			= [{id: 1, name: 'français', ordering: 0, isPractice: true},
+				{id: 2, name: 'english', ordering: 1, isPractice: false},
+				{id: 3, name: 'español', ordering: 2, isPractice: true},
+				{id: 4, name: 'italiano', ordering: 3, isPractice: true},
+				{id: 5, name: 'deutsch', ordering: 4, isPractice: true},
+				{id: 6, name: 'português', ordering: 5, isPractice: true}];
+		cyRequestPut(`${apiUrl}/languages`, languages);
 
 		cy.get('#practice-link').click();
 

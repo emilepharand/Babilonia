@@ -9,10 +9,18 @@ dotenv.config();
 
 export const apiUrl = Cypress.env('VITE_API_URL');
 
-function cyRequestPost(url: string, body: any) {
+export function cyRequestPut(url: string, body: any) {
+	cyRequest(url, 'PUT', body);
+}
+
+export function cyRequestPost(url: string, body: any) {
+	cyRequest(url, 'POST', body);
+}
+
+function cyRequest(url: string, method:'PUT'|'POST', body: any) {
 	cy.request({
 		url: `${url}`,
-		method: 'POST',
+		method,
 		headers: {'Content-Type': 'application/json'},
 		body: `${JSON.stringify(body)}`,
 	});

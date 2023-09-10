@@ -8,6 +8,7 @@ import {
 	assertExpressionIsKnown,
 	assertFetchIdeaDoesNotContain,
 	assertFetchIdeaReturnsStatus,
+	cyRequestPost,
 	getAddRowsButton,
 	getDeleteButton,
 	getEditButton,
@@ -110,12 +111,7 @@ context('The idea page', () => {
 		const e1: ExpressionForAdding = {languageId: 1, text: 'bonjour'};
 		const i1: IdeaForAdding = {ee: [e1]};
 
-		cy.request({
-			url: `${apiUrl}/ideas`,
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: `${JSON.stringify(i1)}`,
-		});
+		cyRequestPost(`${apiUrl}/ideas`, i1);
 
 		cy.visit('/ideas/1');
 
