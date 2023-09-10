@@ -52,7 +52,7 @@ context('Valid inputs in the language page', () => {
 			.click();
 
 		// Delete languages one by one
-		deleteLanguageButCancel(1);
+		deleteLanguage(1, true);
 		cy.get('.languages-table').find('.language-row').should('have.length', 3);
 		deleteLanguage(1);
 		cy.get('.languages-table').find('.language-row').should('have.length', 2);
@@ -159,23 +159,13 @@ function addLanguage(name: string) {
 	cy.get('#add-language-button').click();
 }
 
-function deleteLanguage(rowNbr: number) {
+function deleteLanguage(rowNbr: number, cancel: boolean = false) {
 	cy.get('#confirm-delete-modal').should('not.be.visible');
 	cy.get('.languages-table').find('.language-row').eq(rowNbr)
 		.find('.delete-language-button').click();
 	cy.get('#confirm-delete-modal').should('be.visible');
 	// eslint-disable-next-line cypress/no-unnecessary-waiting
-	cy.wait(500).get('#modal-delete-button').click();
-	cy.get('#confirm-delete-modal').should('not.be.visible');
-}
-
-function deleteLanguageButCancel(rowNbr: number) {
-	cy.get('#confirm-delete-modal').should('not.be.visible');
-	cy.get('.languages-table').find('.language-row').eq(rowNbr)
-		.find('.delete-language-button').click();
-	cy.get('#confirm-delete-modal').should('be.visible');
-	// eslint-disable-next-line cypress/no-unnecessary-waiting
-	cy.wait(500).get('#modal-cancel-button').click();
+	cy.wait(500).get(cancel ? '#modal-cancel-button' : '#modal-delete-button').click();
 	cy.get('#confirm-delete-modal').should('not.be.visible');
 }
 
