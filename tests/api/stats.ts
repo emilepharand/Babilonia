@@ -14,11 +14,11 @@ beforeEach(async () => {
 
 describe('getting stats', () => {
 	test('getting stats', async () => {
-		let stats = await getStats();
+		let actualStats = await getStats();
 
-		expect(stats.allLanguageStats).toHaveLength(0);
-		expect(stats.globalStats.totalExpressionsCount).toBe(0);
-		expect(stats.globalStats.totalIdeasCount).toBe(0);
+		expect(actualStats.allLanguageStats).toHaveLength(0);
+		expect(actualStats.globalStats.totalExpressionsCount).toBe(0);
+		expect(actualStats.globalStats.totalIdeasCount).toBe(0);
 
 		const fr = await addLanguage('français');
 		const en = await addLanguage('english');
@@ -28,22 +28,22 @@ describe('getting stats', () => {
 		const pt = await addLanguage('português');
 		const kl = await addLanguage('klingon');
 
-		stats = await getStats();
-		expect(stats.allLanguageStats).toHaveLength(7);
-		expect(stats.globalStats.totalExpressionsCount).toBe(0);
-		expect(stats.globalStats.totalIdeasCount).toBe(0);
-		expect(stats.globalStats.totalKnownIdeas).toBe(0);
-		expect(stats.globalStats.totalKnownExpressions).toBe(0);
+		actualStats = await getStats();
+		expect(actualStats.allLanguageStats).toHaveLength(7);
+		expect(actualStats.globalStats.totalExpressionsCount).toBe(0);
+		expect(actualStats.globalStats.totalIdeasCount).toBe(0);
+		expect(actualStats.globalStats.totalKnownIdeas).toBe(0);
+		expect(actualStats.globalStats.totalKnownExpressions).toBe(0);
 
 		// Ordering
-		expect(stats.allLanguageStats[0].language.id).toEqual(fr.id);
-		expect(stats.allLanguageStats[6].language.id).toEqual(kl.id);
+		expect(actualStats.allLanguageStats[0].language.id).toEqual(fr.id);
+		expect(actualStats.allLanguageStats[6].language.id).toEqual(kl.id);
 		kl.ordering = 0;
 		fr.ordering = 6;
 		await editLanguagesAndGetResponse([kl, en, es, it, de, pt, fr]);
-		stats = await getStats();
-		expect(stats.allLanguageStats[0].language.id).toEqual(kl.id);
-		expect(stats.allLanguageStats[6].language.id).toEqual(fr.id);
+		actualStats = await getStats();
+		expect(actualStats.allLanguageStats[0].language.id).toEqual(kl.id);
+		expect(actualStats.allLanguageStats[6].language.id).toEqual(fr.id);
 
 		// Idea 1: fr, en, es
 		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
@@ -56,70 +56,31 @@ describe('getting stats', () => {
 
 		await addIdea({ee: [fr3]});
 
-		stats = await getStats();
-		expect(stats.allLanguageStats).toHaveLength(7);
-		expect(stats.globalStats.totalExpressionsCount).toBe(7);
-		expect(stats.globalStats.totalIdeasCount).toBe(2);
-		expect(stats.globalStats.totalKnownIdeas).toBe(1);
-		expect(stats.globalStats.totalKnownExpressions).toBe(4);
+		actualStats = await getStats();
+		expect(actualStats.allLanguageStats).toHaveLength(7);
+		expect(actualStats.globalStats.totalExpressionsCount).toBe(7);
+		expect(actualStats.globalStats.totalIdeasCount).toBe(2);
+		expect(actualStats.globalStats.totalKnownIdeas).toBe(1);
+		expect(actualStats.globalStats.totalKnownExpressions).toBe(4);
 
-		let frCovered = false;
-		let enCovered = false;
-		let esCovered = false;
-		let itCovered = false;
-		let deCovered = false;
-		let ptCovered = false;
-		let klCovered = false;
+		let expectedStats: Array<LanguageStats & {covered: boolean}> = [
+			// Ideas: 0/2, expressions: 0/2
+			{language: fr, knownIdeasCount: 0, totalIdeasCount: 2, knownExpressionsCount: 0, totalExpressionsCount: 3, covered: false},
+			// Ideas: 1/1, expressions: 2/2
+			{language: en, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false},
+			// Ideas: 1/1, expressions: 2/2
+			{language: es, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false},
+			// Ideas: 0/0, expressions: 0/0
+			{language: it, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			// Ideas: 0/0, expressions: 0/0
+			{language: de, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			// Ideas: 0/0, expressions: 0/0
+			{language: pt, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			// Ideas: 0/0, expressions: 0/0
+			{language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+		];
 
-		for (const a of stats.allLanguageStats) {
-			switch (a.language.name) {
-				// Ideas: 0/2, expressions: 0/2
-				case 'français':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 2, knownExpressionsCount: 0, totalExpressionsCount: 3} as LanguageStats);
-					frCovered = true;
-					break;
-				// Ideas: 1/1, expressions: 2/2
-				case 'english':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2} as LanguageStats);
-					enCovered = true;
-					break;
-				// Ideas: 1/1, expressions: 2/2
-				case 'español':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2} as LanguageStats);
-					esCovered = true;
-					break;
-				// Ideas: 0/0, expressions: 0/0
-				case 'italiano':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
-					itCovered = true;
-					break;
-				// Ideas: 0/0, expressions: 0/0
-				case 'deutsch':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
-					deCovered = true;
-					break;
-				// Ideas: 0/0, expressions: 0/0
-				case 'português':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
-					ptCovered = true;
-					break;
-				// Ideas: 0/0, expressions: 0/0
-				case 'klingon':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
-					klCovered = true;
-					break;
-				default:
-					throw new Error('invalid language');
-			}
-		}
-
-		expect(frCovered).toEqual(true);
-		expect(enCovered).toEqual(true);
-		expect(esCovered).toEqual(true);
-		expect(itCovered).toEqual(true);
-		expect(deCovered).toEqual(true);
-		expect(ptCovered).toEqual(true);
-		expect(klCovered).toEqual(true);
+		testStats(actualStats.allLanguageStats, expectedStats);
 
 		// Idea 2: fr, en, es, de, it, pt
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id, known: true};
@@ -138,69 +99,39 @@ describe('getting stats', () => {
 		const de2: ExpressionForAdding = {text: 'gute Natch', languageId: de.id};
 		await addIdea({ee: [fr2, en2, es2, pt2, de2]});
 
-		stats = await getStats();
-		expect(stats.allLanguageStats).toHaveLength(7);
-		expect(stats.globalStats.totalExpressionsCount).toBe(18);
-		expect(stats.globalStats.totalIdeasCount).toBe(4);
-		expect(stats.globalStats.totalKnownIdeas).toBe(3);
-		expect(stats.globalStats.totalKnownExpressions).toBe(9);
+		actualStats = await getStats();
+		expect(actualStats.allLanguageStats).toHaveLength(7);
+		expect(actualStats.globalStats.totalExpressionsCount).toBe(18);
+		expect(actualStats.globalStats.totalIdeasCount).toBe(4);
+		expect(actualStats.globalStats.totalKnownIdeas).toBe(3);
+		expect(actualStats.globalStats.totalKnownExpressions).toBe(9);
 
-		frCovered = false;
-		enCovered = false;
-		esCovered = false;
-		itCovered = false;
-		deCovered = false;
-		ptCovered = false;
-		klCovered = false;
+		expectedStats = [
+			{language: fr, knownIdeasCount: 1, totalIdeasCount: 4, knownExpressionsCount: 1, totalExpressionsCount: 5, covered: false},
+			{language: en, knownIdeasCount: 2, totalIdeasCount: 3, knownExpressionsCount: 3, totalExpressionsCount: 4, covered: false},
+			{language: es, knownIdeasCount: 1, totalIdeasCount: 3, knownExpressionsCount: 2, totalExpressionsCount: 4, covered: false},
+			{language: it, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 1, totalExpressionsCount: 1, covered: false},
+			{language: de, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false},
+			{language: pt, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false},
+			{language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+		];
 
-		for (const a of stats.allLanguageStats) {
-			switch (a.language.name) {
-				case 'français':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 4, knownExpressionsCount: 1, totalExpressionsCount: 5} as LanguageStats);
-					frCovered = true;
-					break;
-				case 'english':
-					testStats(a, {knownIdeasCount: 2, totalIdeasCount: 3, knownExpressionsCount: 3, totalExpressionsCount: 4} as LanguageStats);
-					enCovered = true;
-					break;
-				case 'español':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 3, knownExpressionsCount: 2, totalExpressionsCount: 4} as LanguageStats);
-					esCovered = true;
-					break;
-				case 'italiano':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 1, totalExpressionsCount: 1} as LanguageStats);
-					itCovered = true;
-					break;
-				case 'deutsch':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2} as LanguageStats);
-					deCovered = true;
-					break;
-				case 'português':
-					testStats(a, {knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2} as LanguageStats);
-					ptCovered = true;
-					break;
-				case 'klingon':
-					testStats(a, {knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0} as LanguageStats);
-					klCovered = true;
-					break;
-				default:
-					throw new Error('invalid language');
-			}
-		}
-
-		expect(frCovered).toEqual(true);
-		expect(enCovered).toEqual(true);
-		expect(esCovered).toEqual(true);
-		expect(itCovered).toEqual(true);
-		expect(deCovered).toEqual(true);
-		expect(ptCovered).toEqual(true);
-		expect(klCovered).toEqual(true);
+		testStats(actualStats.allLanguageStats, expectedStats);
 	});
 });
 
-function testStats(actualStats: LanguageStats, expectedStats: LanguageStats) {
-	expect(actualStats.knownIdeasCount).toEqual(expectedStats.knownIdeasCount);
-	expect(actualStats.totalIdeasCount).toEqual(expectedStats.totalIdeasCount);
-	expect(actualStats.knownExpressionsCount).toEqual(expectedStats.knownExpressionsCount);
-	expect(actualStats.totalExpressionsCount).toEqual(expectedStats.totalExpressionsCount);
+function testStats(actualStats: LanguageStats[], expectedStats: Array<LanguageStats & {covered: boolean}>) {
+	for (const actualStatsItem of actualStats) {
+		const expectedStatsItem = expectedStats.find(i => i.language.id === actualStatsItem.language.id);
+		if (expectedStatsItem === undefined) {
+			throw new Error(`Invalid language: ${actualStatsItem.language.name}`);
+		} else {
+			expect(actualStatsItem.knownIdeasCount).toEqual(expectedStatsItem.knownIdeasCount);
+			expect(actualStatsItem.totalIdeasCount).toEqual(expectedStatsItem.totalIdeasCount);
+			expect(actualStatsItem.knownExpressionsCount).toEqual(expectedStatsItem.knownExpressionsCount);
+			expect(actualStatsItem.totalExpressionsCount).toEqual(expectedStatsItem.totalExpressionsCount);
+			expectedStatsItem.covered = true;
+		}
+	}
+	expectedStats.forEach(s => expect(s.covered).toEqual(true));
 }
