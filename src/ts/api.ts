@@ -105,24 +105,12 @@ export async function searchIdeas(sc: SearchContext): Promise<Idea[]> {
 }
 
 export function paramsFromSearchContext(sc: SearchContext): string {
-	let params = '';
-	if (sc.pattern) {
-		params = `pattern=${sc.pattern}`;
-	}
-	if (sc.strict) {
-		params += '&strict=true';
-	}
-	if (sc.language) {
-		params += `&language=${sc.language}`;
-	}
-	if (sc.ideaHas) {
-		params += `&ideaHas=${sc.ideaHas.join(',')}`;
-	}
-	if (sc.ideaDoesNotHave) {
-		params += `&ideaDoesNotHave=${sc.ideaDoesNotHave}`;
-	}
-	if (sc.knownExpressions !== undefined) {
-		params += `&knownExpressions=${sc.knownExpressions ? 'true' : 'false'}`;
-	}
-	return params;
+	return [
+		sc.pattern && `pattern=${sc.pattern}`,
+		sc.strict && 'strict=true',
+		sc.language && `language=${sc.language}`,
+		sc.ideaHas && `ideaHas=${sc.ideaHas.join(',')}`,
+		sc.ideaDoesNotHave && `ideaDoesNotHave=${sc.ideaDoesNotHave}`,
+		sc.knownExpressions !== undefined && `knownExpressions=${sc.knownExpressions ? 'true' : 'false'}`,
+	].filter(Boolean).join('&');
 }
