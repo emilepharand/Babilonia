@@ -47,12 +47,8 @@ export function addLanguages() {
 		{id: 5, name: 'deutsch', ordering: 4, isPractice: true},
 		{id: 6, name: 'português', ordering: 5, isPractice: true},
 	];
-	cy.request({
-		url: `${apiUrl}/languages`,
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(ll)}`,
-	});
+	cyRequestPut(`${apiUrl}/languages`, ll);
+	return ll;
 }
 
 export function addIdeasDifferentSet() {
@@ -200,10 +196,5 @@ export function assertExpressionHasValues(rowNbr: number, languageName: string, 
 }
 
 export async function setSettings(partialSettings: Partial<Settings>) {
-	cy.request({
-		url: `${apiUrl}/settings`,
-		method: 'PUT',
-		headers: {'Content-Type': 'application/json'},
-		body: `${JSON.stringify(settingsFromPartial(partialSettings))}`,
-	});
+	cyRequestPut(`${apiUrl}/settings`, settingsFromPartial(partialSettings));
 }
