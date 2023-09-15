@@ -6,9 +6,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    ignore:
-      - dependency-name: "vite-plugin-istanbul"
-      
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
