@@ -45,7 +45,7 @@
     "@types/async-lock": "^1.4.0",
     "@types/bootstrap": "^5.2.7",
     "@types/cors": "^2.8.14",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.5",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
     "@vitejs/plugin-vue": "^4.3.4",
