@@ -37,7 +37,7 @@
     "sqlite": "^5.0.1",
     "sqlite3": "^5.1.6",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.4"
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.11.0",
