@@ -41,7 +41,7 @@
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.11.0",
+    "@cypress/code-coverage": "^3.12.4",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/async-lock": "^1.4.0",
     "@types/bootstrap": "^5.2.7",
