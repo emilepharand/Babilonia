@@ -1,8 +1,4 @@
-import * as fs from 'fs';
 import type {Database} from 'sqlite';
-import {open} from 'sqlite';
-import sqlite3 from 'sqlite3';
-import {databasePath} from '../options';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
 import IdeaManager from './ideas/ideaManager';
@@ -10,22 +6,11 @@ import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
+import {databasePath} from '../options';
+import {databaseNeedsToBeInitialized, initDatabase} from './databaseOpener';
 
-let dbExists = true;
-
-async function initDb(): Promise<Database> {
-	if (databasePath === ':memory:' || !fs.existsSync(databasePath)) {
-		dbExists = false;
-	}
-	const localDb = await open({
-		filename: databasePath,
-		driver: sqlite3.Database,
-	});
-	console.log(`Database ${databasePath} was opened.`);
-	return localDb;
-}
-
-export const db: Database = await initDb();
+export const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(databasePath);
+export const db: Database = await initDatabase(databasePath);
 export const settingsManager = new SettingsManager(db);
 export const languageManager = new LanguageManager(db);
 export const ideaManager = new IdeaManager(db, languageManager);
@@ -100,6 +85,6 @@ export function getSettingsManager(): SettingsManager {
 	return settingsManager;
 }
 
-if (!dbExists) {
+if (appDatabaseNeedsToBeInitialized) {
 	await clearDatabaseAndCreateSchema();
 }
