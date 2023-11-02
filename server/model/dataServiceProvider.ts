@@ -1,4 +1,4 @@
-import type {Database} from 'sqlite';
+import {type Database} from 'sqlite';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
 import IdeaManager from './ideas/ideaManager';
@@ -9,17 +9,16 @@ import SettingsManager from './settings/settingsManager';
 import {databasePath} from '../options';
 import {databaseNeedsToBeInitialized, initDatabase} from './databaseOpener';
 
-export const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(databasePath);
-export const db: Database = await initDatabase(databasePath);
-export const settingsManager = new SettingsManager(db);
-export const languageManager = new LanguageManager(db);
-export const ideaManager = new IdeaManager(db, languageManager);
-export const practiceManager = new PracticeManager(db, settingsManager);
-export const inputValidator = new InputValidator(languageManager);
-export const searchHandler = new SearchHandler(db, ideaManager);
-export const stats = new StatsCounter(db, languageManager);
+export let settingsManager: SettingsManager;
+export let languageManager: LanguageManager;
+export let ideaManager: IdeaManager;
+export let practiceManager: PracticeManager;
+export let inputValidator: InputValidator;
+export let searchHandler: SearchHandler;
+export let stats: StatsCounter;
+export const db: Database = await changeDatabase(databasePath);
 
-export async function clearDatabaseAndCreateSchema(): Promise<void> {
+export async function clearDatabaseAndCreateSchema(db: Database): Promise<void> {
 	await db.run('drop table if exists expressions');
 	await db.run('drop table if exists ideas');
 	await db.run('drop table if exists languages');
@@ -85,6 +84,18 @@ export function getSettingsManager(): SettingsManager {
 	return settingsManager;
 }
 
-if (appDatabaseNeedsToBeInitialized) {
-	await clearDatabaseAndCreateSchema();
+export async function changeDatabase(path: string): Promise<Database> {
+	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
+	const database = await initDatabase(path);
+	settingsManager = new SettingsManager(database);
+	languageManager = new LanguageManager(database);
+	ideaManager = new IdeaManager(database, languageManager);
+	practiceManager = new PracticeManager(database, settingsManager);
+	inputValidator = new InputValidator(languageManager);
+	searchHandler = new SearchHandler(database, ideaManager);
+	stats = new StatsCounter(database, languageManager);
+	if (appDatabaseNeedsToBeInitialized) {
+		await clearDatabaseAndCreateSchema(database);
+	}
+	return database;
 }

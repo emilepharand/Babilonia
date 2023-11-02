@@ -219,8 +219,15 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 	res.send(JSON.stringify(await sm.getSettings()));
 }
 
+export async function changeDatabase(req: Request, res: Response): Promise<void> {
+	// eslint-disable-next-line no-warning-comments
+	// TODO validation
+	const idea = await im.getIdea(parseInt(req.params.id, 10));
+	res.send(idea);
+}
+
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
-	await DataServiceProvider.clearDatabaseAndCreateSchema();
+	await DataServiceProvider.clearDatabaseAndCreateSchema(DataServiceProvider.db);
 	res.end();
 }
 
