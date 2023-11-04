@@ -6,7 +6,6 @@ import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
-import {databasePath} from '../options';
 import {databaseNeedsToBeInitialized, initDatabase} from './databaseOpener';
 
 export let settingsManager: SettingsManager;
@@ -16,9 +15,29 @@ export let practiceManager: PracticeManager;
 export let inputValidator: InputValidator;
 export let searchHandler: SearchHandler;
 export let stats: StatsCounter;
-export const db: Database = await changeDatabase(databasePath);
+let db: Database;
 
-export async function clearDatabaseAndCreateSchema(db: Database): Promise<void> {
+export async function initDb(path: string) {
+	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
+	const database = await initDatabase(path);
+	db = database;
+	settingsManager = new SettingsManager(database);
+	languageManager = new LanguageManager(database);
+	ideaManager = new IdeaManager(database, languageManager);
+	practiceManager = new PracticeManager(database, settingsManager);
+	inputValidator = new InputValidator(languageManager);
+	searchHandler = new SearchHandler(database, ideaManager);
+	stats = new StatsCounter(database, languageManager);
+	if (appDatabaseNeedsToBeInitialized) {
+		console.log(`Initializing database ${path}...`);
+		await clearDatabaseAndCreateSchema();
+	} else {
+		console.log(`Database ${path} was not initialized.`);
+		console.log(await languageManager.countLanguages());
+	}
+}
+
+export async function clearDatabaseAndCreateSchema() {
 	await db.run('drop table if exists expressions');
 	await db.run('drop table if exists ideas');
 	await db.run('drop table if exists languages');
@@ -54,48 +73,4 @@ export async function clearDatabaseAndCreateSchema(db: Database): Promise<void> 
       + ')',
 	);
 	practiceManager.clear();
-}
-
-export function getIdeaManager(): IdeaManager {
-	return ideaManager;
-}
-
-export function getLanguageManager(): LanguageManager {
-	return languageManager;
-}
-
-export function getPracticeManager(): PracticeManager {
-	return practiceManager;
-}
-
-export function getInputValidator(): InputValidator {
-	return inputValidator;
-}
-
-export function getSearchHandler(): SearchHandler {
-	return searchHandler;
-}
-
-export function getStats(): StatsCounter {
-	return stats;
-}
-
-export function getSettingsManager(): SettingsManager {
-	return settingsManager;
-}
-
-export async function changeDatabase(path: string): Promise<Database> {
-	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
-	const database = await initDatabase(path);
-	settingsManager = new SettingsManager(database);
-	languageManager = new LanguageManager(database);
-	ideaManager = new IdeaManager(database, languageManager);
-	practiceManager = new PracticeManager(database, settingsManager);
-	inputValidator = new InputValidator(languageManager);
-	searchHandler = new SearchHandler(database, ideaManager);
-	stats = new StatsCounter(database, languageManager);
-	if (appDatabaseNeedsToBeInitialized) {
-		await clearDatabaseAndCreateSchema(database);
-	}
-	return database;
 }
