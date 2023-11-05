@@ -5,7 +5,6 @@ node_modules
 /tests/e2e/videos/
 /tests/e2e/screenshots/
 
-
 # local env files
 .env.local
 .env.*.local
@@ -31,6 +30,7 @@ src/**/*.js
 
 *.db
 !db/base.db
+!tests/db/*.db
 db.db-journal
 
 tests/coverage
