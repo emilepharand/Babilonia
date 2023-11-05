@@ -153,6 +153,10 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 	return (await (await searchAndGetResponse(sc)).json()) as Idea[];
 }
 
+export async function changeDatabase(path: string): Promise<Response> {
+	return doFetch(`${apiUrl}/database`, 'PUT', JSON.stringify({path}));
+}
+
 export async function rawNextPracticeIdea(): Promise<Response> {
 	return doFetch(`${apiUrl}/practice-ideas/next`, 'GET');
 }
