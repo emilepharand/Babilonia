@@ -4,14 +4,14 @@ import {SearchContext} from '../../server/model/search/searchContext';
 import {
 	addIdea,
 	addLanguage,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	search,
 	searchAndGetResponse,
 	searchRawParamsAndGetResponse,
 } from '../utils/fetch-utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 async function testSearch(

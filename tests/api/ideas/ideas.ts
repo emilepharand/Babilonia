@@ -7,7 +7,7 @@ import {
 	addIdea,
 	addLanguage,
 	apiUrl,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	deleteIdea,
 	editIdea,
 	editIdeaAndGetResponse,
@@ -17,7 +17,7 @@ import {
 import {addAnyIdea, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding, testTransformExpressions} from './utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('valid cases', () => {

@@ -1,5 +1,5 @@
 import {
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	fetchSettings,
 	setSettings,
 	setSettingsAndGetResponse,
@@ -7,7 +7,7 @@ import {
 } from '../utils/fetch-utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 // Valid settings are tested in tests for each feature that uses them

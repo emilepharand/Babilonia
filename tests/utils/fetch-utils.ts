@@ -168,3 +168,8 @@ export async function nextPracticeIdea(): Promise<Idea> {
 export async function deleteEverything(): Promise<Response> {
 	return doFetch(`${apiUrl}/everything`, 'DELETE');
 }
+
+export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
+	await changeDatabase(':memory:');
+	return deleteEverything();
+}
