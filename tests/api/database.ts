@@ -1,4 +1,8 @@
-import {changeDatabase, fetchLanguages} from '../utils/fetch-utils';
+import {changeDatabase, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages} from '../utils/fetch-utils';
+
+beforeEach(async () => {
+	await changeDatabaseToMemoryAndDeleteEverything();
+});
 
 describe('2.0', () => {
 	test('change database', async () => {
