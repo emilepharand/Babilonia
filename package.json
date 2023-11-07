@@ -43,7 +43,7 @@
   "devDependencies": {
     "@cypress/code-coverage": "^3.12.7",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@types/async-lock": "^1.4.1",
+    "@types/async-lock": "^1.4.2",
     "@types/bootstrap": "^5.2.8",
     "@types/cors": "^2.8.15",
     "@types/jest": "^29.5.7",
