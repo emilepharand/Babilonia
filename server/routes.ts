@@ -53,6 +53,7 @@ export default class Routes {
 		this.route('delete', '/everything', Controller.deleteAllData);
 		// Database
 		this.route('put', '/database', Controller.changeDatabase);
+		this.route('get', '/database/path', Controller.getDatabasePath);
 		this.route('post', '/database/update', Controller.updateDatabase);
 	}
 

@@ -215,6 +215,10 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 	res.send(JSON.stringify(await settingsManager.getSettings()));
 }
 
+export async function getDatabasePath(_: Request, res: Response): Promise<void> {
+	res.send(JSON.stringify(getDb().config.filename));
+}
+
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
 	// eslint-disable-next-line no-warning-comments
 	// TODO validation
