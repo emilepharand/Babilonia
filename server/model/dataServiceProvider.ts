@@ -29,11 +29,12 @@ export async function initDb(path: string) {
 	searchHandler = new SearchHandler(database, ideaManager);
 	stats = new StatsCounter(database, languageManager);
 	if (appDatabaseNeedsToBeInitialized) {
-		console.log(`Initializing database ${path}...`);
+		if (path !== ':memory:') {
+			console.log(`Initializing database ${path}...`);
+		}
 		await clearDatabaseAndCreateSchema();
-	} else {
-		console.log(`Database ${path} was not initialized.`);
-		console.log(await languageManager.countLanguages());
+	} else if (path !== ':memory:') {
+		console.log(`Database ${path} did not need to be initialized.`);
 	}
 	return db;
 }
