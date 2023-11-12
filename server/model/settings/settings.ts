@@ -5,6 +5,7 @@ export type Settings = {
 	strictCharacters: boolean;
 	practiceOnlyNotKnown: boolean;
 	passiveMode: boolean;
+	version: string;
 };
 
 export function getEmptySettingsNoAsync(): Settings {
@@ -13,19 +14,21 @@ export function getEmptySettingsNoAsync(): Settings {
 		strictCharacters: false,
 		practiceOnlyNotKnown: false,
 		passiveMode: false,
+		version: '2.0',
 	};
 }
 
 const ajv = new Ajv();
 
-const settingsSchema = {
+export const settingsSchema = {
 	type: 'object',
 	properties: {randomPractice: {type: 'boolean'},
 		strictCharacters: {type: 'boolean'},
 		practiceOnlyNotKnown: {type: 'boolean'},
 		passiveMode: {type: 'boolean'},
+		version: {type: 'string'},
 	},
-	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode'],
+	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode', 'version'],
 	additionalProperties: false,
 };
 
