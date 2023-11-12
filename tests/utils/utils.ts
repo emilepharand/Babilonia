@@ -10,16 +10,8 @@ export function settingsFromPartial(partialSettings: Partial<Settings>) {
 	};
 }
 
-export function areInSameOrder(arr1: any[], arr2: any[]) {
-	let i = 0;
-	let idsInSameOrder = true;
-	while (i < 10 && idsInSameOrder) {
-		if (!(arr1[i] === arr2[i])) {
-			idsInSameOrder = false;
-		}
-		i++;
-	}
-	return idsInSameOrder;
+export function areInSameOrder(arr1: any[], arr2: any[]): boolean {
+	return arr1.length === arr2.length && arr1.every((item, index) => item === arr2[index]);
 }
 
 export async function executeNTimes(n: number, fn: () => void) {
