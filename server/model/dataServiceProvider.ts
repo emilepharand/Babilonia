@@ -15,7 +15,7 @@ export let practiceManager: PracticeManager;
 export let inputValidator: InputValidator;
 export let searchHandler: SearchHandler;
 export let stats: StatsCounter;
-let db: Database;
+export let db: Database;
 
 export async function initDb(path: string) {
 	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
@@ -35,6 +35,11 @@ export async function initDb(path: string) {
 		console.log(`Database ${path} was not initialized.`);
 		console.log(await languageManager.countLanguages());
 	}
+	return db;
+}
+
+export function getDb(): Database {
+	return db;
 }
 
 export async function clearDatabaseAndCreateSchema() {

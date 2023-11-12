@@ -53,6 +53,7 @@ export default class Routes {
 		this.route('delete', '/everything', Controller.deleteAllData);
 		// Database
 		this.route('put', '/database', Controller.changeDatabase);
+		this.route('post', '/database/update', Controller.updateDatabase);
 	}
 
 	private wrapAsync(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): (req: Request, res: Response, next: NextFunction) => void {
