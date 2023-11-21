@@ -220,8 +220,11 @@ export async function getDatabasePath(_: Request, res: Response): Promise<void> 
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
-	// eslint-disable-next-line no-warning-comments
-	// TODO validation
+	if (!inputValidator.validateChangeDatabase(req.body)) {
+		res.status(400);
+		res.end();
+		return;
+	}
 	await initDb(req.body.path as string);
 	res.end();
 }

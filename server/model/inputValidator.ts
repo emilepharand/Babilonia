@@ -5,6 +5,8 @@ import type {Language} from './languages/language';
 import {validate as validateLanguage, validateForAdding} from './languages/language';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 import type {ExpressionForAdding} from './ideas/expression';
+import Ajv from 'ajv';
+import fs from 'fs';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -98,6 +100,37 @@ export default class InputValidator {
 
 	public validateSettings(settings: unknown): boolean {
 		return validateSettingsSchema(settings);
+	}
+
+	public validateChangeDatabase(pathObject: unknown): boolean {
+		const ajv = new Ajv();
+		const schema = {
+			type: 'object',
+			properties: {
+				path: {type: 'string'},
+			},
+			required: ['path'],
+			additionalProperties: false,
+		};
+		if (!ajv.compile(schema)(pathObject)) {
+			return false;
+		}
+		const path = pathObject.path as string;
+
+		// :memory: is valid but not a file
+		if (path !== ':memory:') {
+			try {
+				fs.accessSync(path);
+			} catch (err) {
+				return false;
+			}
+		}
+
+		if (path.trim() === '') {
+			return false;
+		}
+
+		return true;
 	}
 }
 
