@@ -11,7 +11,7 @@
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
     "check": "npx vue-tsc --noEmit && npm run lint",
     "lint": "eslint . --ext .ts --max-warnings=0 && eslint . --ext .vue --max-warnings=0 && eslint . --ext .js --max-warnings=0",
-    "pretest": "npm run check && npm run test:build",
+    "pretest": "npm run check && npm run test:build && mkdir -p dist/tests/db && cp tests/db/* dist/tests/db",
     "fix-coverage": "echo 'Temporary hack for iFaxity/vite-plugin-istanbul issue #96' && sed -E -i 's/instrumentSync\\(srcCode, filename/instrumentSync(srcCode, id/g' node_modules/vite-plugin-istanbul/dist/index.mjs",
     "test:build": "npm run fix-coverage && export $(xargs < .env.test) && npm run build && mkdir -p tests/coverage/merged",
     "test": "npm run test:bash && npm run test:api && npm run test:e2e",
