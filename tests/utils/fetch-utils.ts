@@ -153,8 +153,16 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 	return (await (await searchAndGetResponse(sc)).json()) as Idea[];
 }
 
-export async function changeDatabase(path: string): Promise<Response> {
-	return doFetch(`${apiUrl}/database`, 'PUT', JSON.stringify({path}));
+export async function changeDatabase(path: string) {
+	return changeDatabaseRawObjectAndGetResponse(JSON.stringify({path}));
+}
+
+export async function getDatabasePath() {
+	return (await getResources('database/path')).json();
+}
+
+export async function changeDatabaseRawObjectAndGetResponse(object: any) {
+	return doFetch(`${apiUrl}/database`, 'PUT', object);
 }
 
 export async function rawNextPracticeIdea(): Promise<Response> {
