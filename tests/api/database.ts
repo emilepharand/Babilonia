@@ -14,6 +14,10 @@ describe('valid cases', () => {
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
 		expect(ll[0]).toEqual({id: 1, name: '2.0-l1', ordering: 0, isPractice: true});
+
+		await changeDatabase(':memory:');
+		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await fetchLanguages()).toHaveLength(0);
 	});
 });
 
