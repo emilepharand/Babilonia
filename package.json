@@ -44,7 +44,7 @@
     "@cypress/code-coverage": "^3.12.10",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/async-lock": "^1.4.2",
-    "@types/bootstrap": "^5.2.9",
+    "@types/bootstrap": "^5.2.10",
     "@types/cors": "^2.8.16",
     "@types/jest": "^29.5.8",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
