@@ -3,7 +3,7 @@ import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
 import type {Database} from 'sqlite';
 
-export async function initDatabase(path: string): Promise<Database> {
+export async function openDatabase(path: string): Promise<Database> {
 	if (path !== ':memory:' && !fs.existsSync(path)) {
 		console.log(`Database ${path} does not exist, it will be created.`);
 	}

@@ -6,7 +6,7 @@ import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
-import {databaseNeedsToBeInitialized, initDatabase} from './databaseOpener';
+import {databaseNeedsToBeInitialized, openDatabase} from './databaseOpener';
 
 export let settingsManager: SettingsManager;
 export let languageManager: LanguageManager;
@@ -19,7 +19,7 @@ export let db: Database;
 
 export async function initDb(path: string) {
 	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
-	const database = await initDatabase(path);
+	const database = await openDatabase(path);
 	db = database;
 	settingsManager = new SettingsManager(database);
 	languageManager = new LanguageManager(database);
