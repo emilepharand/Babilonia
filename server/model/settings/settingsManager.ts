@@ -16,7 +16,8 @@ export default class SettingsManager {
 			name,
 		))!;
 		if (setting === undefined) {
-			return '';
+			// Version 2.0 does not have a version number in the database
+			return '2.0';
 		}
 		return setting.value;
 	}

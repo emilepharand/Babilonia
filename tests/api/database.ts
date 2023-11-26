@@ -1,4 +1,4 @@
-import {changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, getDatabasePath} from '../utils/fetch-utils';
+import {changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
@@ -11,6 +11,7 @@ describe('valid cases', () => {
 
 		await changeDatabase('tests/db/2.0-simple.db');
 		expect(await getDatabasePath()).toEqual('tests/db/2.0-simple.db');
+		expect((await fetchSettings()).version).toEqual('2.0');
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
 		expect(ll[0]).toEqual({id: 1, name: '2.0-l1', ordering: 0, isPractice: true});
