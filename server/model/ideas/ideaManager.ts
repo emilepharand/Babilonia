@@ -38,6 +38,10 @@ export default class IdeaManager implements Manager {
 		return {id: ideaId, ee};
 	}
 
+	public async getIdeas(): Promise<Idea[]> {
+		return this.db.all('select * from ideas');
+	}
+
 	public async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
 	}
