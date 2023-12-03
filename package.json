@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf .nyc_output* tests/coverage dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
-    "build": "npm run clean && vite build && webpack",
+    "build": "npm run clean && export $(xargs < .env.test) && vite build && webpack",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
     "dev:serve:api": "nodemon server/index.ts --dev-mode",
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
