@@ -96,9 +96,11 @@ Keep in mind that ideas and expressions that Babilonia comes with can change at 
 is the single most important aspect of learning languages, which unlocks a world of possibilities.
 
 ## How to use
-All you need is `node` and `Chromium` or `Firefox`. Download the most recent release, unzip it, `cd` into the folder and run `node index.cjs`. It should work on most `Windows` and `Linux` environments.
+All you need is `node`, `npm` and a browser.
 
-Alternatively, you can clone the repository, run `npm install`, `npm run build`, `cd dist` and `node index.cjs`. That will create an empty database, but you can replace the `db.db` file with the one from the release to get all ideas and expressions.
+Clone the repository or download the most recent release, run `npm install`, `npm run build`, `cd dist` and `node index.cjs`. By default the application will be available at `http://localhost:8000`. You can change the ports used by the application inside the `.env` file.
+
+The database is a SQLite file called `db.db`. It is created automatically if it does not exist. If you want to start with a fresh database, simply delete the `db.db` file and restart the application.
 
 ## License
 
