@@ -89,7 +89,7 @@ As of version 2.0, the application comes with a set of **2751 expressions** and 
 
 You can also easily **add your own** expressions, ideas and languages.
 
-Keep in mind that ideas and expressions that Babilonia comes with can change at any time in a future update. That includes any change you make to them. However, any new ideas that you add will never be modified.
+Keep in mind that ideas and expressions that Babilonia comes with can change at any time in a future update. That includes any change you make to them. If you make changes to the included vocabulary, future updates may not be compatible with your changes.
 
 ## An important caveat
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
