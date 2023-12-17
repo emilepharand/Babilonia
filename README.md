@@ -96,9 +96,27 @@ Keep in mind that ideas and expressions that Babilonia comes with can change at 
 is the single most important aspect of learning languages, which unlocks a world of possibilities.
 
 ## How to use
-All you need is `node`, `npm` and a browser.
 
-Clone the repository or download the most recent release, run `npm install`, `npm run build`, `cd dist` and `node index.cjs`. By default the application will be available at `http://localhost:8000`. You can change the ports used by the application inside the `.env` file.
+### Prerequisites
+
+Before using Babilonia, ensure that you have `Node.js` installed on your machine. Visit the [Node.js website](https://nodejs.org/) to download and install the latest version.
+
+### Installation steps
+
+1. Install `Node.js` if you haven't already.
+2. Download the [latest release](https://github.com/emilepharand/Babilonia/releases) of Babilonia.
+3. Extract the archive.
+4. Open a terminal and navigate to the extracted folder.
+5. Run `npm install`.
+
+### Running Babilonia
+
+Once you have installed Babilonia, you can run it by following these steps:
+
+1. Start the application by running `npm start`.
+2. Open your web browser and navigate to localhost:8000.
+
+That's it! You're now ready to use Babilonia. If you encounter any issues, make sure to check the project's documentation or report them on GitHub.
 
 The database is a SQLite file called `db.db`. It is created automatically if it does not exist. If you want to start with a fresh database, simply delete the `db.db` file and restart the application.
 
