@@ -30,6 +30,7 @@ src/**/*.js
 *.js.map
 
 *.db
+!db/*.db
 db.db-journal
 
 tests/coverage
