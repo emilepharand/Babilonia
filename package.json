@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf .nyc_output* tests/coverage dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
-    "build": "npm run clean && vite build && webpack",
+    "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
     "dev:serve:api": "nodemon server/index.ts --dev-mode",
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .ts --max-warnings=0 && eslint . --ext .vue --max-warnings=0 && eslint . --ext .js --max-warnings=0",
     "pretest": "npm run check && npm run test:build",
     "fix-coverage": "echo 'Temporary hack for iFaxity/vite-plugin-istanbul issue #96' && sed -E -i 's/instrumentSync\\(srcCode, filename/instrumentSync(srcCode, id/g' node_modules/vite-plugin-istanbul/dist/index.mjs",
-    "test:build": "npm run fix-coverage && export $(xargs < .env.test) && npm run build && mkdir -p tests/coverage/merged",
+    "test:build": "npm run fix-coverage && NODE_ENV=test npm run build && mkdir -p tests/coverage/merged",
     "test": "npm run test:bash && npm run test:api && npm run test:e2e",
     "test:serve": "cd dist && node index.cjs --db=:memory: 2>/dev/null",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
