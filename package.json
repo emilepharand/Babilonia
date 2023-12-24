@@ -6,7 +6,7 @@
     "scripts": {
         "clean": "rm -rf .nyc_output* tests/coverage dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs",
         "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack && cp db/base.db dist/db.db",
-        "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\")'\"}}' > dist/package.json",
+        "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}}' > dist/package.json",
         "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
         "dev:serve:api": "nodemon server/index.ts --dev-mode",
         "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
