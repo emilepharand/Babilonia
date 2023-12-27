@@ -7,7 +7,7 @@
     "clean": "rimraf .nyc_output* tests/coverage dist/node_modules dist/*.{assets,css,img,js,ico,html,cjs,png,txt,json}",
     "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack && cp db/base.db dist/db.db",
     "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}}' > dist/package.json",
-    "release": "rm -rf node_modules && npm i && npm run build && mkdir release && tar -czf release/\"$(node -p \"require('./package.json').version\")\".tar.gz dist && rm -rf dist",
+    "release": "rm -rf node_modules && npm i && npm run build && mkdir -p release && tar -czf release/\"$(node -p \"require('./package.json').version\")\".tar.gz dist && rm -rf dist",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
     "dev:serve:api": "nodemon server/index.ts --dev-mode",
     "dev:serve:vue": "vite --port=$VITE_BASE_PORT",
