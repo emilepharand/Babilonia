@@ -8,6 +8,9 @@ cleanup() {
   dir=$(basename "$PWD" | grep -q "dist" && dirname "$PWD" || echo "$PWD")
   sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$dir/index.html"
   sed -i 's@API server started!@API server started.@' "$dir/server/index.ts"
+  if [ -d "$dir/node_modules.bak" ]; then
+    mv "$dir/node_modules.bak" "$dir/node_modules"
+  fi
 }
 
 # Cleanup previous run
@@ -177,6 +180,39 @@ fi
 if ! grep -Fq "[nodemon] restarting due to changes..." "temp.txt" || ! grep -Fq "API server started!" "temp.txt"; then
   echo "--> Result: failure!"
   echo "API server did not restart."
+  cleanup && exit 1
+fi
+
+after_success
+
+echo "------------------------------------------------------"
+echo " Test 5                                               "
+echo "------------------------------------------------------"
+echo " sqlite3 is not included in production build          "
+echo " and package.json in dist includes sqlite3            "
+echo "------------------------------------------------------"
+
+mv node_modules node_modules.bak
+cd dist
+node index.cjs >temp.txt 2>&1 &
+
+sleep 2
+
+if ! grep -Fq "Error: Cannot find module 'sqlite3'" "temp.txt"; then
+  echo "--> Result: failure!"
+  echo "sqlite3 error not found."
+  cleanup && exit 1
+fi
+
+npm i
+
+node index.cjs >temp.txt 2>&1 &
+
+sleep 2
+
+if ! grep -Fq "API server started." "temp.txt" || ! grep -Fq "App started." "temp.txt"; then
+  echo "--> Result: failure!"
+  echo "Could not start application after installing sqlite3."
   cleanup && exit 1
 fi
 
