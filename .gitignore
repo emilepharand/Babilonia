@@ -5,6 +5,9 @@ dist/*
 # Used in Bash tests
 temp.txt
 
+# Used in npm script release
+release/
+
 /tests/e2e/videos/
 /tests/e2e/screenshots/
 
