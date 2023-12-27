@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "clean": "rm -rf .nyc_output* tests/coverage dist/assets dist/css dist/img dist/js dist/*.ico dist/*.html dist/*.cjs dist/*.png dist/*.txt dist/*.json dist/node_modules",
+        "clean": "rimraf .nyc_output* tests/coverage dist/node_modules dist/*.{assets,css,img,js,ico,html,cjs,png,txt,json}",
         "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack && cp db/base.db dist/db.db",
         "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}}' > dist/package.json",
         "release": "rm -rf node_modules && npm i && npm run build && mkdir release && tar -czf release/\"$(node -p \"require('./package.json').version\")\".tar.gz dist && rm -rf dist",
