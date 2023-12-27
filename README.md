@@ -115,7 +115,7 @@ Make sure you have `Node.js` installed on your machine. Visit the [Node.js websi
 Once you have installed Babilonia, you can run it by following these steps:
 
 1. Start the application by running `node index.cjs` or `npm start`.
-2. Open your web browser and navigate to localhost:8000.
+2. Open your web browser and navigate to `localhost:8000`.
 
 That's it! You're now ready to use Babilonia. If you encounter any issues, make sure to check the project's documentation or report them on GitHub.
 
