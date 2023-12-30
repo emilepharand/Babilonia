@@ -4,8 +4,7 @@ import type {Language} from '../../server/model/languages/language';
 import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
-
-const apiUrl = `${process.env.VITE_API_URL}`;
+import {apiUrl} from './const';
 
 async function doFetch(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE', body?: string) {
 	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
