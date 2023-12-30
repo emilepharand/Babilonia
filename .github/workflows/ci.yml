@@ -25,6 +25,16 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: tests/coverage/merged/cobertura-coverage.xml
           verbose: true
+test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: test-release
+        run: npm run release:test
   lint-and-typecheck:
     runs-on: ubuntu-latest
     steps:
