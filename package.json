@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf -g tests/coverage release 'dist/!(*.db)'",
     "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack && cp db/base.db dist/db.db",
-    "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}}' > dist/package.json",
+    "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}, \"scripts\":{\"start\": \"node index.cjs\"}}' > dist/package.json",
     "release": "rm -rf node_modules release && npm i && npm run build && mkdir -p release && export VERSION=$(node -p \"require('./package.json').version\") && cd dist && zip -r \"$VERSION.zip\" * && mv \"$VERSION.zip\" ../release",
     "release:test": "npm run release && rm -rf dist && unzip -o release/*.zip -d dist && tests/bash/tests.sh sqlite3",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
@@ -18,7 +18,7 @@
     "fix-coverage": "echo 'Temporary hack for iFaxity/vite-plugin-istanbul issue #96' && sed -E -i 's/instrumentSync\\(srcCode, filename/instrumentSync(srcCode, id/g' node_modules/vite-plugin-istanbul/dist/index.mjs",
     "test:build": "npm run fix-coverage && NODE_ENV=test npm run build && mkdir -p tests/coverage/merged",
     "test": "npm run test:bash && npm run test:api && npm run test:e2e",
-    "test:serve": "cd dist && node index.cjs --db=:memory: 2>/dev/null",
+    "test:serve": "cd dist && npm start --db=:memory: 2>/dev/null",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
     "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_API_PORT test:api:run",
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand && npm run test:api:coverage",
