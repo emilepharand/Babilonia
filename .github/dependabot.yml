@@ -9,10 +9,10 @@ updates:
     groups:
       minor:
         update-types:
-        - "minor"
+          - "minor"
       patch:
         update-types:
-        - "patch"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
