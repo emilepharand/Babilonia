@@ -12,19 +12,20 @@ cleanup_no_db() {
   pkill -f "server/index.ts"
   pkill -f "index.cjs"
   pkill -f "node_modules/.bin/vite"
-  rm -f temp.txt
   root_dir=$(get_root_dir)
   dist_dir=$(get_dist_dir)
-  # Test 3
-  sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$root_dir/index.html"
-  sed -i 's@API server started!@API server started.@' "$root_dir/server/index.ts"
-  # Test 4
+  rm -f "$root_dir/temp.txt"
+  rm -f "$dist_dir/temp.txt"
+  # Test 1
   if [ -d "$dist_dir/node_modules" ]; then
     rm -rf "$dist_dir/node_modules"
   fi
   if [ -d "$root_dir/node_modules.bak" ]; then
     mv "$root_dir/node_modules.bak" "$root_dir/node_modules"
   fi
+  # Test 4
+  sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$root_dir/index.html"
+  sed -i 's@API server started!@API server started.@' "$root_dir/server/index.ts"
 }
 
 get_root_dir() {
@@ -67,8 +68,50 @@ write_coverage() {
   curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' >"../tests/coverage/merged/${output_file}"
 }
 
+echo "------------------------------------------------------"
+echo " Test 1                                               "
+echo "------------------------------------------------------"
+echo " sqlite3 is not included in production build          "
+echo " and package.json in dist includes sqlite3            "
+echo "------------------------------------------------------"
+
+cleanup
+go_to_root
+
+# Make sure project's node_modules is not used
+mv node_modules node_modules.bak
+
+go_to_dist
+
+node index.cjs >temp.txt 2>&1 &
+
+sleep 2
+
+if ! grep -Fq "Error: Cannot find module 'sqlite3'" "temp.txt"; then
+  echo "sqlite3 error not found."
+  after_failure
+fi
+
+# Should install sqlite3
+npm i
+
+node index.cjs >temp.txt 2>&1 &
+
+sleep 2
+
+if ! grep -Fq "API server started." "temp.txt" || ! grep -Fq "App started." "temp.txt"; then
+  echo "Could not start application after installing sqlite3."
+  after_failure
+fi
+
+after_success
+
+if [ "$1" == "sqlite3" ]; then
+  exit 0
+fi
+
 echo "-------------------------------------------------------"
-echo " Test 1                                                "
+echo " Test 2                                                "
 echo "-------------------------------------------------------"
 echo " --db=db, file does not exist, file is created         "
 echo " when file exists, it is not overwritten, it is loaded "
@@ -113,7 +156,7 @@ fi
 after_success
 
 echo "------------------------------------------------------"
-echo " Test 2                                               "
+echo " Test 3                                               "
 echo "------------------------------------------------------"
 echo " --dev-mode does not start API server                 "
 echo "------------------------------------------------------"
@@ -177,44 +220,6 @@ fi
 
 if ! grep -Fq "[nodemon] restarting due to changes..." "temp.txt" || ! grep -Fq "API server started!" "temp.txt"; then
   echo "API server did not restart."
-  after_failure
-fi
-
-after_success
-
-echo "------------------------------------------------------"
-echo " Test 5                                               "
-echo "------------------------------------------------------"
-echo " sqlite3 is not included in production build          "
-echo " and package.json in dist includes sqlite3            "
-echo "------------------------------------------------------"
-
-cleanup
-go_to_root
-
-# Make sure project's node_modules is not used
-mv node_modules node_modules.bak
-
-go_to_dist
-
-node index.cjs >temp.txt 2>&1 &
-
-sleep 2
-
-if ! grep -Fq "Error: Cannot find module 'sqlite3'" "temp.txt"; then
-  echo "sqlite3 error not found."
-  after_failure
-fi
-
-# Should install sqlite3
-npm i
-
-node index.cjs >temp.txt 2>&1 &
-
-sleep 2
-
-if ! grep -Fq "API server started." "temp.txt" || ! grep -Fq "App started." "temp.txt"; then
-  echo "Could not start application after installing sqlite3."
   after_failure
 fi
 
