@@ -30,7 +30,11 @@ cleanup_no_db() {
 
 get_root_dir() {
   # If the current directory is dist, go to the parent directory
-  echo $(basename "$PWD" | grep -q "dist" && dirname "$PWD" || echo "$PWD")
+  if basename "$PWD" | grep -q "dist"; then
+    dirname "$PWD"
+  else
+    echo "$PWD"
+  fi
 }
 
 get_dist_dir() {
