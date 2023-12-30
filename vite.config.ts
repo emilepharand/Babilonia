@@ -1,5 +1,5 @@
-import {defineConfig} from 'vite';
 import vue from '@vitejs/plugin-vue';
+import {defineConfig} from 'vite';
 import istanbul from 'vite-plugin-istanbul';
 
 export default defineConfig({
@@ -17,5 +17,7 @@ export default defineConfig({
 	define: {
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		'process.env': process.env,
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true',
 	},
 });
