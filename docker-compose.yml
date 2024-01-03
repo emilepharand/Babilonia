@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   babilonia:
@@ -6,6 +6,6 @@ services:
     ports:
       - "8000:8000"
       - "5000:5000"
-#    volumes:
-#      - ./db.db:/usr/src/babilonia/dist/db.db
+    #    volumes:
+    #      - ./db.db:/usr/src/babilonia/dist/db.db
     container_name: babilonia
