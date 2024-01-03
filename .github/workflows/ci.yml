@@ -47,6 +47,7 @@ jobs:
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_TYPESCRIPT_STANDARD: false
+          FILTER_REGEX_EXCLUDE: "codeql.yml"
           # Re-enable when #33 is fixed
           VALIDATE_JSCPD: false
           DEFAULT_BRANCH: main
