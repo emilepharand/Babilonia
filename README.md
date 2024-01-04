@@ -108,7 +108,7 @@ Make sure you have `Node.js` installed on your machine. Go to [nodejs.org](https
 3. Extract the archive.
 4. Open a terminal and navigate to the extracted folder.
 5. Run `npm install`.
-6. After that, you can start using the application!
+6. You can now use the application!
 
 ### Running Babilonia
 
