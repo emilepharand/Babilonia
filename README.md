@@ -99,7 +99,7 @@ is the single most important aspect of learning languages, which unlocks a world
 
 ### Prerequisites
 
-Make sure you have `Node.js` installed on your machine. Visit the [Node.js website](https://nodejs.org/) to download and install the latest version.
+Make sure you have `Node.js` installed on your machine. Go to [nodejs.org](https://nodejs.org/) to download and install the latest version.
 
 ### Installation steps
 
