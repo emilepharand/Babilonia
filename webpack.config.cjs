@@ -1,7 +1,4 @@
-// Config to compile API server
-
 const path = require('path');
-const nodeExternals = require('webpack-node-externals');
 const webpack = require('webpack');
 require('dotenv').config()
 
@@ -24,10 +21,11 @@ module.exports = {
 		]
 	},
 	target: 'node',
-	externalsPresets: { node: true }, // in order to ignore built-in modules like path, fs, etc.
-	externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+	externals: {
+		sqlite3: "commonjs sqlite3",
+	},
 	resolve: {
-		extensions: ['.ts'],
+		extensions: ['.js', '.ts'],
 	},
 	output: {
 		filename: 'index.cjs',
