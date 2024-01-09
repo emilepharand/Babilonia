@@ -1,12 +1,12 @@
-import type {IdeaForAdding} from './ideas/ideaForAdding';
-import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
-import type LanguageManager from './languages/languageManager';
-import type {Language} from './languages/language';
-import {validate as validateLanguage, validateForAdding} from './languages/language';
-import {validateSchema as validateSettingsSchema} from './settings/settings';
-import type {ExpressionForAdding} from './ideas/expression';
 import Ajv from 'ajv';
 import fs from 'fs';
+import type {ExpressionForAdding} from './ideas/expression';
+import type {IdeaForAdding} from './ideas/ideaForAdding';
+import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
+import type {Language} from './languages/language';
+import {validateForAdding, validate as validateLanguage} from './languages/language';
+import type LanguageManager from './languages/languageManager';
+import {validateSchema as validateSettingsSchema} from './settings/settings';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -122,6 +122,8 @@ export default class InputValidator {
 			try {
 				fs.accessSync(path);
 			} catch (err) {
+				console.error(err);
+				console.error(`Unable to access database file ${path}. Current working directory is ${process.cwd()}.`);
 				return false;
 			}
 		}
