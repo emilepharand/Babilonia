@@ -1,6 +1,12 @@
 .DS_Store
-node_modules
-/dist
+node_modules*
+dist/*
+
+# Used in Bash tests
+temp.txt
+
+# Used in npm script release
+release/
 
 /tests/e2e/videos/
 /tests/e2e/screenshots/
@@ -29,8 +35,7 @@ src/**/*.js
 *.js.map
 
 *.db
-!db/base.db
-!tests/db/*.db
+!db/*.db
 db.db-journal
 
 tests/coverage

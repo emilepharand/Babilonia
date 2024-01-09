@@ -3,20 +3,20 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees:
       - "emilepharand"
     groups:
       minor:
         update-types:
-        - "minor"
+          - "minor"
       patch:
         update-types:
-        - "patch"
+          - "patch"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     assignees:
       - "emilepharand"
