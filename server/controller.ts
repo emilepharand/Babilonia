@@ -1,12 +1,11 @@
 import type {Request, Response} from 'express';
-import {initDb, clearDatabaseAndCreateSchema, stats as sc, ideaManager, practiceManager, languageManager, inputValidator, settingsManager, searchHandler, getDb} from './model/dataServiceProvider';
+import {clearDatabaseAndCreateSchema, getDb, ideaManager, initDb, inputValidator, languageManager, practiceManager, stats as sc, searchHandler, settingsManager} from './model/dataServiceProvider';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
+import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import {type Manager} from './model/manager';
 import {databasePath} from './options';
-import {migrateDatabase} from './migration/migrator-schema';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -226,13 +225,6 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		return;
 	}
 	await initDb(req.body.path as string);
-	res.end();
-}
-
-export async function updateDatabase(_: Request, res: Response): Promise<void> {
-	// eslint-disable-next-line no-warning-comments
-	// TODO validation
-	await migrateDatabase(getDb());
 	res.end();
 }
 

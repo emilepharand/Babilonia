@@ -6,7 +6,6 @@ export function getEmptyLanguageNoAsync(): Language {
 		name: '',
 		ordering: 0,
 		isPractice: false,
-		guid: '',
 	};
 }
 
@@ -15,7 +14,6 @@ export type Language = {
 	name: string;
 	ordering: number;
 	isPractice: boolean;
-	guid: string;
 };
 
 export function getEmptyLanguagesNoAsync(): Language[] {
@@ -24,7 +22,6 @@ export function getEmptyLanguagesNoAsync(): Language[] {
 		name: '',
 		ordering: 0,
 		isPractice: false,
-		guid: '',
 	}];
 }
 

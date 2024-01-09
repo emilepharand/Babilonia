@@ -1,7 +1,7 @@
-import type {Express, Request, Response, NextFunction} from 'express';
+import AsyncLock from 'async-lock';
+import type {Express, NextFunction, Request, Response} from 'express';
 import {Router} from 'express';
 import * as Controller from './controller';
-import AsyncLock from 'async-lock';
 
 const lock = new AsyncLock();
 const lockKey = 'lock';
@@ -54,7 +54,6 @@ export default class Routes {
 		// Database
 		this.route('put', '/database', Controller.changeDatabase);
 		this.route('get', '/database/path', Controller.getDatabasePath);
-		this.route('post', '/database/update', Controller.updateDatabase);
 	}
 
 	private wrapAsync(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): (req: Request, res: Response, next: NextFunction) => void {

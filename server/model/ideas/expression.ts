@@ -4,7 +4,6 @@ export type ExpressionForAdding = {
 	text: string;
 	languageId: number;
 	known?: boolean;
-	guid: string;
 };
 
 export type Expression = {
@@ -12,7 +11,6 @@ export type Expression = {
 	text: string;
 	language: Language;
 	known: boolean;
-	guid: string;
 	// This is used for search results
 	matched?: boolean;
 };
@@ -25,7 +23,6 @@ export function getEmptyNexpressions(n: number, startId: number, l: Language): E
 			text: '',
 			language: l,
 			known: false,
-			guid: '',
 		};
 		ee.push(e);
 	}
@@ -37,6 +34,5 @@ export function getExpressionForAddingFromExpression(e: Expression): ExpressionF
 		languageId: e.language.id,
 		text: e.text,
 		known: e.known,
-		guid: e.guid,
 	};
 }
