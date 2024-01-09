@@ -46,3 +46,5 @@ if (!isDevMode) {
 		console.log(`App started. Listening on port ${appPort!}.`);
 	});
 }
+
+console.log('Working directory:', process.cwd());
