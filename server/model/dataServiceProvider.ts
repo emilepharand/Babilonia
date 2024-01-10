@@ -1,12 +1,12 @@
 import {type Database} from 'sqlite';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
+import {databaseNeedsToBeInitialized, openDatabase} from './databaseOpener';
 import IdeaManager from './ideas/ideaManager';
 import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
-import {databaseNeedsToBeInitialized, openDatabase} from './databaseOpener';
 
 export let settingsManager: SettingsManager;
 export let languageManager: LanguageManager;
@@ -34,7 +34,7 @@ export async function initDb(path: string) {
 		}
 		await clearDatabaseAndCreateSchema();
 	} else if (path !== ':memory:') {
-		console.log(`Database ${path} did not need to be initialized.`);
+		console.log(`Database ${path} does not need to be initialized.`);
 	}
 	return db;
 }
