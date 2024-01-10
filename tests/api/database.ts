@@ -39,4 +39,9 @@ describe('nvalid cases', () => {
 		expect((await changeDatabase(' ')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
+
+	test('change database to another version than the current version', async () => {
+		expect((await changeDatabase('tests/db/unsupported-version.db')).status).toEqual(400);
+		expect(await getDatabasePath()).toEqual(':memory:');
+	});
 });
