@@ -22,16 +22,21 @@ describe('valid cases', () => {
 	});
 });
 
-describe('invalid cases', () => {
+describe('nvalid cases', () => {
+	test('change database without an object with path key', async () => {
+		expect((await changeDatabaseRawObjectAndGetResponse('tests/db/2.0-simple.db')).status).toEqual(400);
+		expect(await getDatabasePath()).toEqual(':memory:');
+	});
+
 	test('change database to a nonexistent path', async () => {
-		expect((await changeDatabaseRawObjectAndGetResponse('/doesnotexist/db.db')).status).toEqual(400);
+		expect((await changeDatabase('/doesnotexist/db.db')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 
 	test('change database to an empty path', async () => {
-		expect((await changeDatabaseRawObjectAndGetResponse('')).status).toEqual(400);
+		expect((await changeDatabase('')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
-		expect((await changeDatabaseRawObjectAndGetResponse(' ')).status).toEqual(400);
+		expect((await changeDatabase(' ')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 });
