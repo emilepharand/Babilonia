@@ -1,7 +1,6 @@
 import cors from 'cors';
 import type {ErrorRequestHandler} from 'express';
 import express from 'express';
-import fs from 'fs';
 import {apiPort, appPort, isDevMode} from './options';
 import Routes from './routes';
 
@@ -47,6 +46,3 @@ if (!isDevMode) {
 		console.log(`App started. Listening on port ${appPort!}.`);
 	});
 }
-
-console.log('Working directory:', process.cwd());
-console.log('Files in working directory:', fs.readdirSync(process.cwd()));
