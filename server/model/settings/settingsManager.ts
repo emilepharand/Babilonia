@@ -1,4 +1,5 @@
 import type {Database} from 'sqlite';
+import {currentVersion} from '../../const';
 import type {Settings} from './settings';
 
 const practiceRandom = 'PRACTICE_RANDOM';
@@ -16,8 +17,7 @@ export default class SettingsManager {
 			name,
 		))!;
 		if (setting === undefined) {
-			// Version 2.0 does not have a version number in the database
-			return '2.0';
+			return currentVersion;
 		}
 		return setting.value;
 	}
