@@ -22,7 +22,7 @@ describe('valid cases', () => {
 	});
 });
 
-describe('nvalid cases', () => {
+describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
 		expect((await changeDatabaseRawObjectAndGetResponse('tests/db/2.0-simple.db')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
@@ -41,7 +41,9 @@ describe('nvalid cases', () => {
 	});
 
 	test('change database to another version than the current version', async () => {
-		expect((await changeDatabase('tests/db/unsupported-version.db')).status).toEqual(400);
+		const res = await changeDatabase('tests/db/unsupported-version.db');
+		expect(res.status).toEqual(400);
+		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 });
