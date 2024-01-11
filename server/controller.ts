@@ -1,10 +1,13 @@
 import type {Request, Response} from 'express';
+import {currentVersion} from './const';
 import {clearDatabaseAndCreateSchema, getDb, ideaManager, initDb, inputValidator, languageManager, practiceManager, stats as sc, searchHandler, settingsManager} from './model/dataServiceProvider';
+import {databaseNeedsToBeInitialized, openDatabase} from './model/databaseOpener';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
+import SettingsManager from './model/settings/settingsManager';
 import {databasePath} from './options';
 
 // This is the contact point for the front-end and the back-end
@@ -221,11 +224,24 @@ export async function getDatabasePath(_: Request, res: Response): Promise<void> 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
 	if (!inputValidator.validateChangeDatabase(req.body)) {
 		res.status(400);
-		res.end();
+		return;
+	}
+	if (!await isValidVersion(req.body.path as string)) {
+		res.status(400);
+		res.send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
 	await initDb(req.body.path as string);
 	res.end();
+}
+
+async function isValidVersion(dbPath: string) {
+	if (databaseNeedsToBeInitialized(dbPath)) {
+		return true;
+	}
+	const db = await openDatabase(dbPath);
+	const sm = new SettingsManager(db);
+	return await sm.getVersion() === currentVersion;
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
