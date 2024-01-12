@@ -4,13 +4,15 @@ beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
+const databaseSamplePath = 'tests/db/2.0-simple.db';
+
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
 		expect(await getDatabasePath()).toEqual(':memory:');
 		expect(await fetchLanguages()).toHaveLength(0);
 
-		await changeDatabase('tests/db/2.0-simple.db');
-		expect(await getDatabasePath()).toEqual('tests/db/2.0-simple.db');
+		await changeDatabase(databaseSamplePath);
+		expect(await getDatabasePath()).toEqual(databaseSamplePath);
 		expect((await fetchSettings()).version).toEqual('2.0');
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
@@ -24,7 +26,7 @@ describe('valid cases', () => {
 
 describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
-		expect((await changeDatabaseRawObjectAndGetResponse('tests/db/2.0-simple.db')).status).toEqual(400);
+		expect((await changeDatabaseRawObjectAndGetResponse(databaseSamplePath)).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 
