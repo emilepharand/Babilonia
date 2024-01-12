@@ -162,7 +162,7 @@ export async function getDatabasePath() {
 }
 
 export async function changeDatabaseRawObjectAndGetResponse(object: any) {
-	return doFetch(`${apiUrl}/database`, 'PUT', object);
+	return doFetch(`${apiUrl}/database/path`, 'PUT', object);
 }
 
 export async function rawNextPracticeIdea(): Promise<Response> {

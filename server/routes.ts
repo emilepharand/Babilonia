@@ -52,7 +52,7 @@ export default class Routes {
 		// Everything
 		this.route('delete', '/everything', Controller.deleteAllData);
 		// Database
-		this.route('put', '/database', Controller.changeDatabase);
+		this.route('put', '/database/path', Controller.changeDatabase);
 		this.route('get', '/database/path', Controller.getDatabasePath);
 	}
 
