@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import {currentVersion} from '../../const';
 
 export type Settings = {
 	randomPractice: boolean;
@@ -14,7 +15,7 @@ export function getEmptySettingsNoAsync(): Settings {
 		strictCharacters: false,
 		practiceOnlyNotKnown: false,
 		passiveMode: false,
-		version: '2.0',
+		version: currentVersion,
 	};
 }
 
