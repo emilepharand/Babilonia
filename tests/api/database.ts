@@ -1,3 +1,4 @@
+import {currentVersion} from '../../server/const';
 import {changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
 
 beforeEach(async () => {
@@ -13,7 +14,7 @@ describe('valid cases', () => {
 
 		await changeDatabase(databaseSamplePath);
 		expect(await getDatabasePath()).toEqual(databaseSamplePath);
-		expect((await fetchSettings()).version).toEqual('2.0');
+		expect((await fetchSettings()).version).toEqual(currentVersion);
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
 		expect(ll[0]).toEqual({id: 1, name: '2.0-l1', ordering: 0, isPractice: true});
