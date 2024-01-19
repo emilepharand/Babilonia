@@ -91,6 +91,17 @@ export async function getSettings(): Promise<Settings> {
 	return (await response.json()) as Settings;
 }
 
+export async function getDatabasePath(): Promise<string> {
+	const url = `${apiUrl}/database/path`;
+	const response = await doFetch(url, 'GET');
+	return (await response.json()) as string;
+}
+
+export async function changeDatabase(path: string): Promise<void> {
+	const url = `${apiUrl}/database/path`;
+	await doFetch(url, 'PUT', JSON.stringify({path}));
+}
+
 export async function setSettings(settings: Settings): Promise<void> {
 	const url = `${apiUrl}/settings`;
 	await doFetch(url, 'PUT', JSON.stringify(settings));

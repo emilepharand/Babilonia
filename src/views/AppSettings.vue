@@ -65,7 +65,7 @@
         class="fa-solid fa-circle-question"
       />
     </div>
-    <div class="form-check">
+    <div class="form-check mb-2">
       <input
         id="passiveMode"
         v-model="settings.passiveMode"
@@ -86,9 +86,23 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <div>
+      <label
+        class="form-label"
+        for="databasePath"
+      >
+        Path to database
+      </label>
+      <input
+        id="databasePath"
+        v-model="databasePath"
+        class="form-control"
+        type="text"
+      >
+    </div>
     <button
       id="saveButton"
-      class="btn btn-primary w-100"
+      class="btn btn-primary w-100 mt-2"
       @click="save()"
     >
       Save
@@ -104,20 +118,27 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue';
-import * as Api from '../ts/api';
-import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as bootstrap from 'bootstrap';
+import {nextTick, ref} from 'vue';
+import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
+import * as Api from '../ts/api';
 
 const settings = ref(getEmptySettingsNoAsync());
 const showSettingsSavedMessage = ref(false);
+const databasePath = ref('');
+let previousDatabasePath = '';
 
 (async () => {
 	settings.value = await Api.getSettings();
+	databasePath.value = await Api.getDatabasePath();
+	previousDatabasePath = databasePath.value;
 })();
 
 async function save() {
 	await Api.setSettings(settings.value);
+	if (databasePath.value !== previousDatabasePath) {
+		await Api.changeDatabase(databasePath.value);
+	}
 	showSettingsSavedMessage.value = true;
 }
 
