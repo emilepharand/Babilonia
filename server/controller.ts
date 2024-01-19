@@ -224,6 +224,7 @@ export async function getDatabasePath(_: Request, res: Response): Promise<void> 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
 	if (!inputValidator.validateChangeDatabase(req.body)) {
 		res.status(400);
+		res.send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		res.end();
 		return;
 	}

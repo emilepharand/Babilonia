@@ -97,9 +97,9 @@ export async function getDatabasePath(): Promise<string> {
 	return (await response.json()) as string;
 }
 
-export async function changeDatabase(path: string): Promise<void> {
+export async function changeDatabase(path: string): Promise<Response> {
 	const url = `${apiUrl}/database/path`;
-	await doFetch(url, 'PUT', JSON.stringify({path}));
+	return doFetch(url, 'PUT', JSON.stringify({path}));
 }
 
 export async function setSettings(settings: Settings): Promise<void> {

@@ -108,11 +108,18 @@
       Save
     </button>
     <p
-      v-if="showSettingsSavedMessage"
+      v-if="!errorMessage"
       id="settingsSavedText"
       class="text-success"
     >
       Settings saved.
+    </p>
+    <p
+      v-if="errorMessage"
+      id="settingsErrorText"
+      class="text-danger"
+    >
+      {{ errorMessage }}
     </p>
   </div>
 </template>
@@ -124,8 +131,8 @@ import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
 
 const settings = ref(getEmptySettingsNoAsync());
-const showSettingsSavedMessage = ref(false);
 const databasePath = ref('');
+const errorMessage = ref('');
 let previousDatabasePath = '';
 
 (async () => {
@@ -135,11 +142,25 @@ let previousDatabasePath = '';
 })();
 
 async function save() {
-	await Api.setSettings(settings.value);
-	if (databasePath.value !== previousDatabasePath) {
-		await Api.changeDatabase(databasePath.value);
+	const success = await changeDatabase();
+	if (success) {
+		await Api.setSettings(settings.value);
 	}
-	showSettingsSavedMessage.value = true;
+}
+
+async function changeDatabase() {
+	if (databasePath.value !== previousDatabasePath || errorMessage.value) {
+		previousDatabasePath = databasePath.value;
+		const res = await Api.changeDatabase(databasePath.value);
+		if (res.status === 200) {
+			errorMessage.value = '';
+		} else if (((await res.json()).error) === 'UNSUPPORTED_DATABASE_VERSION') {
+			errorMessage.value = 'The version of the database is not supported.';
+		} else {
+			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
+		}
+	}
+	return errorMessage.value === '';
 }
 
 void nextTick(() => {
