@@ -143,11 +143,11 @@ let previousDatabasePath = '';
 })();
 
 async function save() {
-	submitted.value = true;
 	const success = await changeDatabase();
 	if (success) {
 		await Api.setSettings(settings.value);
 	}
+	submitted.value = true;
 }
 
 async function changeDatabase() {
