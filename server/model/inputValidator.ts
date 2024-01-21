@@ -117,19 +117,22 @@ export default class InputValidator {
 		}
 		const path = pathObject.path as string;
 
-		// :memory: is valid but not a file
-		if (path !== ':memory:') {
-			try {
-				fs.accessSync(path);
-			} catch (err) {
-				console.error(err);
-				console.error(`Unable to access database file ${path}. Current working directory is ${process.cwd()}.`);
-				return false;
-			}
-		}
-
 		if (path.trim() === '') {
 			return false;
+		}
+
+		// :memory: is valid but not a file
+		if (path !== ':memory:' && !fs.existsSync(path)) {
+			try {
+				fs.writeFileSync(path, '');
+				// File was successfully created, delete it
+				fs.unlinkSync(path);
+			} catch (err) {
+				console.error(err);
+				console.error(`Unable to access or create database file '${path}'.`);
+				console.error(`Current working directory is '${process.cwd()}'.`);
+				return false;
+			}
 		}
 
 		return true;
