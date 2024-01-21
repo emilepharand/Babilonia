@@ -108,7 +108,7 @@
       Save
     </button>
     <p
-      v-if="!errorMessage"
+      v-if="submitted && !errorMessage"
       id="settingsSavedText"
       class="text-success"
     >
@@ -133,6 +133,7 @@ import * as Api from '../ts/api';
 const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
+const submitted = ref(false);
 let previousDatabasePath = '';
 
 (async () => {
@@ -142,6 +143,7 @@ let previousDatabasePath = '';
 })();
 
 async function save() {
+	submitted.value = true;
 	const success = await changeDatabase();
 	if (success) {
 		await Api.setSettings(settings.value);
