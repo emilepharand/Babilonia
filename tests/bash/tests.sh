@@ -154,6 +154,8 @@ res=$(curl -sf "$VITE_API_URL/languages/1" -H "Content-Type: application/json")
 
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
   echo "Database was overwritten."
+  echo "Expected: {\"id\":1,\"isPractice\":false,\"name\":\"newLanguage\",\"ordering\":0}"
+  echo "Actual: $res"
   after_failure
 fi
 
