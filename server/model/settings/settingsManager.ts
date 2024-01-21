@@ -1,5 +1,4 @@
 import type {Database} from 'sqlite';
-import {currentVersion} from '../../const';
 import type {Settings} from './settings';
 
 const practiceRandom = 'PRACTICE_RANDOM';
@@ -16,10 +15,7 @@ export default class SettingsManager {
 			'select value from settings where name=?',
 			name,
 		))!;
-		if (setting === undefined) {
-			return currentVersion;
-		}
-		return setting.value;
+		return setting?.value;
 	}
 
 	async getBooleanSetting(name: string) {
@@ -66,8 +62,17 @@ export default class SettingsManager {
 		return this.getBooleanSetting(passiveMode);
 	}
 
+	async setVersion(versionValue: string) {
+		await this.setSetting(version, versionValue);
+	}
+
 	async getVersion() {
-		return this.getSetting(version);
+		const versionValue = this.getSetting(version);
+		if (versionValue === undefined) {
+			// 2.0 did not have a version setting
+			return '2.0';
+		}
+		return versionValue;
 	}
 
 	async isStrictCharacters() {
