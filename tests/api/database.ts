@@ -1,5 +1,5 @@
 import {currentVersion} from '../../server/const';
-import {changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
+import {addAnyLanguage, changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
@@ -23,6 +23,15 @@ describe('valid cases', () => {
 		await changeDatabase(':memory:');
 		expect(await getDatabasePath()).toEqual(':memory:');
 		expect(await fetchLanguages()).toHaveLength(0);
+	});
+
+	test('change database to a db to be created', async () => {
+		const newDbPath = 'tests/db/new.db';
+		await changeDatabase(newDbPath);
+		expect(await getDatabasePath()).toEqual(newDbPath);
+		expect(await fetchLanguages()).toHaveLength(0);
+		await addAnyLanguage();
+		expect(await fetchLanguages()).toHaveLength(1);
 	});
 });
 
