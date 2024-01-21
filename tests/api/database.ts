@@ -5,19 +5,20 @@ beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
-const databaseSamplePath = 'tests/db/2.0-simple.db';
+const db20 = 'tests/db/2.0-simple.db';
+const db21 = 'tests/db/2.1-simple.db';
 
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
 		expect(await getDatabasePath()).toEqual(':memory:');
 		expect(await fetchLanguages()).toHaveLength(0);
 
-		await changeDatabase(databaseSamplePath);
-		expect(await getDatabasePath()).toEqual(databaseSamplePath);
+		await changeDatabase(db21);
+		expect(await getDatabasePath()).toEqual(db21);
 		expect((await fetchSettings()).version).toEqual(currentVersion);
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
-		expect(ll[0]).toEqual({id: 1, name: '2.0-l1', ordering: 0, isPractice: true});
+		expect(ll[0]).toEqual({id: 1, name: '2.1-l1', ordering: 0, isPractice: true});
 
 		await changeDatabase(':memory:');
 		expect(await getDatabasePath()).toEqual(':memory:');
@@ -27,7 +28,7 @@ describe('valid cases', () => {
 
 describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
-		expect((await changeDatabaseRawObjectAndGetResponse(databaseSamplePath)).status).toEqual(400);
+		expect((await changeDatabaseRawObjectAndGetResponse(db21)).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 
@@ -44,7 +45,12 @@ describe('invalid cases', () => {
 	});
 
 	test('change database to another version than the current version', async () => {
-		const res = await changeDatabase('tests/db/unsupported-version.db');
+		let res = await changeDatabase('tests/db/unsupported-version.db');
+		expect(res.status).toEqual(400);
+		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect(await getDatabasePath()).toEqual(':memory:');
+
+		res = await changeDatabase(db20);
 		expect(res.status).toEqual(400);
 		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(':memory:');
