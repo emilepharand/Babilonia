@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
+import {Language} from 'server/model/languages/language';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Settings} from '../../server/model/settings/settings';
-import {Language} from 'server/model/languages/language';
 import {settingsFromPartial} from '../utils/utils';
 
 dotenv.config();
@@ -197,4 +197,8 @@ export function assertExpressionHasValues(rowNbr: number, languageName: string, 
 
 export async function setSettings(partialSettings: Partial<Settings>) {
 	cyRequestPut(`${apiUrl}/settings`, settingsFromPartial(partialSettings));
+}
+
+export function changeDatabase(path: string) {
+	cyRequestPut(`${apiUrl}/database/path`, {path});
 }
