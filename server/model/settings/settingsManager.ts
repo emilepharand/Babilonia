@@ -2,7 +2,7 @@ import type {Database} from 'sqlite';
 import type {Settings} from './settings';
 
 const practiceRandom = 'PRACTICE_RANDOM';
-const mapCharacters = 'MAP_CHARACTERS';
+const strictCharacters = 'STRICT_CHARACTERS';
 const practiceOnlyNotKnown = 'PRACTICE_ONLY_NOT_KNOWN';
 const passiveMode = 'PASSIVE_MODE';
 const version = 'VERSION';
@@ -28,7 +28,7 @@ export default class SettingsManager {
 
 	async setSettings(settings: Settings) {
 		await this.setBooleanSetting(practiceRandom, settings.randomPractice);
-		await this.setBooleanSetting(mapCharacters, settings.strictCharacters);
+		await this.setBooleanSetting(strictCharacters, settings.strictCharacters);
 		await this.setBooleanSetting(
 			practiceOnlyNotKnown,
 			settings.practiceOnlyNotKnown,
@@ -76,7 +76,7 @@ export default class SettingsManager {
 	}
 
 	async isStrictCharacters() {
-		return this.getBooleanSetting(mapCharacters);
+		return this.getBooleanSetting(strictCharacters);
 	}
 
 	async getSettings() {

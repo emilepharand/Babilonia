@@ -137,8 +137,10 @@ const submitted = ref(false);
 let previousDatabasePath = '';
 
 (async () => {
-	settings.value = await Api.getSettings();
-	databasePath.value = await Api.getDatabasePath();
+	const fetchedSettings = await Api.getSettings();
+	const fetchedDatabasePath = await Api.getDatabasePath();
+	settings.value = fetchedSettings;
+	databasePath.value = fetchedDatabasePath;
 	previousDatabasePath = databasePath.value;
 })();
 
