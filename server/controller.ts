@@ -222,19 +222,23 @@ export async function getDatabasePath(_: Request, res: Response): Promise<void> 
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
+	console.log('--- change database called with path: ' + req.body.path);
 	if (!inputValidator.validateChangeDatabase(req.body)) {
-		res.status(400);
-		res.send(JSON.stringify({error: 'INVALID_REQUEST'}));
-		res.end();
+		console.log('--- invalid changeDatabase request');
+		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+		console.log('--- after reply to invalid changeDatabase request');
 		return;
 	}
 	if (!await isValidVersion(req.body.path as string)) {
-		res.status(400);
-		res.send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
+		console.log('--- invalid changeDatabase version');
+		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
+		console.log('--- after reply to invalid changeDatabase version');
 		return;
 	}
+	console.log('--- changeDatabase is valid');
 	await initDb(req.body.path as string);
 	res.end();
+	console.log('--- after reply to valid changeDatabase');
 }
 
 async function isValidVersion(dbPath: string) {
