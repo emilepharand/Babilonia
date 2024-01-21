@@ -1,5 +1,5 @@
 import {currentVersion} from '../../server/const';
-import {addAnyLanguage, changeDatabase, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
+import {addAnyLanguage, changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
@@ -36,6 +36,11 @@ describe('valid cases', () => {
 });
 
 describe('invalid cases', () => {
+	test('change database without an object with path key', async () => {
+		expect((await changeDatabaseRawObjectAndGetResponse({file: db21})).status).toEqual(400);
+		expect(await getDatabasePath()).toEqual(':memory:');
+	});
+
 	test('change database to a nonexistent path', async () => {
 		expect((await changeDatabase('/doesnotexist/db.db')).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
