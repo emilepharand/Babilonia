@@ -37,7 +37,7 @@ describe('valid cases', () => {
 
 describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
-		expect((await changeDatabaseRawObjectAndGetResponse({file: db21})).status).toEqual(400);
+		expect((await changeDatabaseRawObjectAndGetResponse(JSON.stringify({file: db21}))).status).toEqual(400);
 		expect(await getDatabasePath()).toEqual(':memory:');
 	});
 
