@@ -1,4 +1,5 @@
 import {type Database} from 'sqlite';
+import {currentVersion} from '../../server/const';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
 import {databaseNeedsToBeInitialized, openDatabase} from './databaseOpener';
@@ -79,4 +80,5 @@ export async function clearDatabaseAndCreateSchema() {
       + ')',
 	);
 	practiceManager.clear();
+	await settingsManager.setVersion(currentVersion);
 }
