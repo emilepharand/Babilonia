@@ -1,9 +1,9 @@
 import type {Database} from 'sqlite';
+import type LanguageManager from '../languages/languageManager';
+import {type Manager} from '../manager';
 import type {Expression, ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
-import type LanguageManager from '../languages/languageManager';
 import type {IdeaForAdding} from './ideaForAdding';
-import {type Manager} from '../manager';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
@@ -36,10 +36,6 @@ export default class IdeaManager implements Manager {
 		const ee: Expression[] = await this.getExpressions(ideaId);
 		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
 		return {id: ideaId, ee};
-	}
-
-	public async getIdeas(): Promise<Idea[]> {
-		return this.db.all('select * from ideas');
 	}
 
 	public async idExists(id: number): Promise<boolean> {

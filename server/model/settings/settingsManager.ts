@@ -20,9 +20,6 @@ export default class SettingsManager {
 
 	async getBooleanSetting(name: string) {
 		const setting = await this.getSetting(name);
-		if (setting === '') {
-			return false;
-		}
 		return setting === '1';
 	}
 
@@ -67,12 +64,7 @@ export default class SettingsManager {
 	}
 
 	async getVersion() {
-		const versionValue = this.getSetting(version);
-		if (versionValue === undefined) {
-			// 2.0 did not have a version setting
-			return '2.0';
-		}
-		return versionValue;
+		return this.getSetting(version);
 	}
 
 	async isStrictCharacters() {
