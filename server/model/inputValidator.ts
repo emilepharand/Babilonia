@@ -1,5 +1,6 @@
 import Ajv from 'ajv';
 import fs from 'fs';
+import sanitize from 'sanitize-filename';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
@@ -102,7 +103,7 @@ export default class InputValidator {
 		return validateSettingsSchema(settings);
 	}
 
-	public validateChangeDatabase(pathObject: unknown): boolean {
+	public validateChangeDatabase(pathObject: unknown): string | undefined {
 		const ajv = new Ajv();
 		const schema = {
 			type: 'object',
@@ -113,16 +114,32 @@ export default class InputValidator {
 			additionalProperties: false,
 		};
 		if (!ajv.compile(schema)(pathObject)) {
-			return false;
+			return undefined;
 		}
-		const path = pathObject.path as string;
+		const unsafePath = pathObject.path as string;
+
+		if (unsafePath === ':memory:') {
+			return ':memory:';
+		}
+
+		const sanitizedPath = sanitize(unsafePath);
+
+		// '/' is allowed, but the sanitize function removes it
+		const pathWithoutSlashes = unsafePath.replaceAll('/', '');
+		// This means that the unsafe path contains invalid characters other than '/'
+		if (sanitizedPath !== pathWithoutSlashes) {
+			return undefined;
+		}
+
+		// The path is safe
+		const path = unsafePath;
 
 		if (path.trim() === '') {
-			return false;
+			return undefined;
 		}
 
 		// :memory: is valid but not a file
-		if (path !== ':memory:' && !fs.existsSync(path)) {
+		if (!fs.existsSync(path)) {
 			try {
 				fs.writeFileSync(path, '');
 				// File was successfully created, delete it
@@ -131,11 +148,11 @@ export default class InputValidator {
 				console.error(err);
 				console.error(`Unable to access or create database file '${path}'.`);
 				console.error(`Current working directory is '${process.cwd()}'.`);
-				return false;
+				return undefined;
 			}
 		}
 
-		return true;
+		return path;
 	}
 }
 
