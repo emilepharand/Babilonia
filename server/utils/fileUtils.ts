@@ -9,6 +9,10 @@ export function validatePathForWritingTo(unsafePath: string): boolean {
 
 	const resolvedPath = path.resolve(process.cwd(), unsafePath);
 
+	if (!isPathUnderWorkingDirectory(resolvedPath)) {
+		return false;
+	}
+
 	if (!fileExists(resolvedPath)) {
 		return canCreateFile(resolvedPath);
 	}
