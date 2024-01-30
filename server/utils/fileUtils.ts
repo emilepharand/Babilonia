@@ -7,7 +7,7 @@ export function validatePathForWritingTo(unsafePath: string): boolean {
 		return false;
 	}
 
-	const resolvedPath = path.resolve(unsafePath);
+	const resolvedPath = path.resolve(process.cwd(), unsafePath);
 
 	if (!fileExists(resolvedPath)) {
 		return canCreateFile(resolvedPath);
@@ -32,7 +32,7 @@ function canCreateFile(resolvedPath: string) {
 	}
 
 	const fileName = path.basename(resolvedPath);
-	const realPathFull = path.resolve(realPathParent, fileName);
+	const realPathFull = path.resolve(process.cwd(), realPathParent, fileName);
 	if (!isFileCreatable(realPathFull)) {
 		console.error(`Cannot write to '${realPathFull}'.`);
 		return false;
