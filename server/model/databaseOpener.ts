@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import type {Database} from 'sqlite';
 import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
+import {isMemoryDatabasePath} from './inputValidator';
 
 export async function openDatabase(path: string): Promise<Database> {
 	if (path !== ':memory:' && !fs.existsSync(path)) {
@@ -30,8 +31,4 @@ export function validateDatabasePath(path: string) {
 	}
 
 	return true;
-}
-
-function isMemoryDatabasePath(path: string) {
-	return path === ':memory:';
 }

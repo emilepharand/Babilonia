@@ -1,6 +1,5 @@
 import Ajv from 'ajv';
 import {validatePathForWritingTo} from '../utils/fileUtils';
-import {validateDatabasePath} from './databaseOpener';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
@@ -108,7 +107,7 @@ export default class InputValidator {
 		const schema = {
 			type: 'object',
 			properties: {
-				path: {type: 'string'},
+				path2: {type: 'string'},
 			},
 			required: ['path'],
 			additionalProperties: false,
@@ -120,6 +119,23 @@ export default class InputValidator {
 
 		return validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath);
 	}
+}
+
+export function validateDatabasePath(path: string) {
+	if (isMemoryDatabasePath(path)) {
+		return true;
+	}
+
+	if (!path.endsWith('.db')) {
+		console.log(`'${path}' does not have extension .db.`);
+		return false;
+	}
+
+	return true;
+}
+
+export function isMemoryDatabasePath(path: string) {
+	return path === ':memory:';
 }
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
