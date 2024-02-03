@@ -178,6 +178,9 @@ export async function deleteEverything(): Promise<Response> {
 }
 
 export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
-	await changeDatabase(':memory:');
+	const res = await changeDatabase(':memory:');
+	if (res.status !== 200) {
+		throw new Error('Failed to change database to memory.');
+	}
 	return deleteEverything();
 }
