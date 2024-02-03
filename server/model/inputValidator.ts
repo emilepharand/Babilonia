@@ -107,7 +107,7 @@ export default class InputValidator {
 		const schema = {
 			type: 'object',
 			properties: {
-				path2: {type: 'string'},
+				path: {type: 'string'},
 			},
 			required: ['path'],
 			additionalProperties: false,
