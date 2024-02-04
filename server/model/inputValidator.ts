@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import path from 'path';
 import {validatePathForWritingTo} from '../utils/fileUtils';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
@@ -118,7 +119,7 @@ export default class InputValidator {
 		const unsafePath = pathObject.path as string;
 
 		if (validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath)) {
-			return unsafePath;
+			return path.normalize(unsafePath);
 		}
 
 		return false;
