@@ -102,7 +102,7 @@ export default class InputValidator {
 		return validateSettingsSchema(settings);
 	}
 
-	public validateChangeDatabase(pathObject: unknown): boolean {
+	public validateChangeDatabase(pathObject: unknown): string | false {
 		const ajv = new Ajv();
 		const schema = {
 			type: 'object',
@@ -117,7 +117,11 @@ export default class InputValidator {
 		}
 		const unsafePath = pathObject.path as string;
 
-		return validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath);
+		if (validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath)) {
+			return unsafePath;
+		}
+
+		return false;
 	}
 }
 
