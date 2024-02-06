@@ -104,19 +104,11 @@ export default class InputValidator {
 	}
 
 	public validateChangeDatabase(pathObject: unknown): string | false {
-		const ajv = new Ajv();
-		const schema = {
-			type: 'object',
-			properties: {
-				path: {type: 'string'},
-			},
-			required: ['path'],
-			additionalProperties: false,
-		};
-		if (!ajv.compile(schema)(pathObject)) {
+		if (!validateDatabaseSchema(pathObject)) {
 			return false;
 		}
-		const unsafePath = pathObject.path as string;
+
+		const unsafePath = (pathObject as {path: string}).path;
 
 		if (validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath)) {
 			return path.normalize(unsafePath);
@@ -124,6 +116,19 @@ export default class InputValidator {
 
 		return false;
 	}
+}
+
+export function validateDatabaseSchema(pathObject: unknown) {
+	const ajv = new Ajv();
+	const schema = {
+		type: 'object',
+		properties: {
+			path: {type: 'string'},
+		},
+		required: ['path'],
+		additionalProperties: false,
+	};
+	return ajv.compile(schema)(pathObject);
 }
 
 export function validateDatabasePath(path: string) {

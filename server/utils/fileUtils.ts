@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export function validatePathForWritingTo(unsafePath: string): boolean {
+export function validatePathForWritingTo(unsafePath: string) {
 	if (unsafePath.trim() === '') {
 		console.log('Empty path.');
 		return false;
@@ -24,7 +24,7 @@ function canCreateFile(resolvedPath: string) {
 	const parentDir = path.dirname(resolvedPath);
 
 	if (!fs.existsSync(parentDir)) {
-		console.error(`'${resolvedPath}' cannot be created.`);
+		console.error(`'${resolvedPath}' cannot be created. The parent directory does not exist.`);
 		return false;
 	}
 
@@ -42,7 +42,7 @@ function canCreateFile(resolvedPath: string) {
 		return false;
 	}
 
-	return true;
+	return realPathFull;
 }
 
 export function isPathValid(path: string) {
@@ -63,7 +63,7 @@ export function isPathValid(path: string) {
 		return false;
 	}
 
-	return true;
+	return realAbsolutePath;
 }
 
 function isPathFile(path: string) {
