@@ -1,11 +1,10 @@
 import Ajv from 'ajv';
-import path from 'path';
 import {validatePathForWritingTo} from '../utils/fileUtils';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
 import type {Language} from './languages/language';
-import {validateForAdding, validate as validateLanguage} from './languages/language';
+import {validate as validateLanguage, validateForAdding} from './languages/language';
 import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 
@@ -110,8 +109,8 @@ export default class InputValidator {
 
 		const unsafePath = (pathObject as {path: string}).path;
 
-		if (validateDatabasePath(unsafePath) && validatePathForWritingTo(unsafePath)) {
-			return path.normalize(unsafePath);
+		if (validateDatabasePath(unsafePath)) {
+			return validatePathForWritingTo(unsafePath);
 		}
 
 		return false;
