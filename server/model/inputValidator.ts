@@ -110,6 +110,9 @@ export default class InputValidator {
 		const unsafePath = (pathObject as {path: string}).path;
 
 		if (validateDatabasePath(unsafePath)) {
+			if (isMemoryDatabasePath(unsafePath)) {
+				return ':memory:';
+			}
 			return validatePathForWritingTo(unsafePath);
 		}
 
