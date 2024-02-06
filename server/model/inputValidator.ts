@@ -25,7 +25,7 @@ export default class InputValidator {
 
 	public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
 		// Object is an array
-		if (!(toValidate instanceof Array)) {
+		if (!Array.isArray(toValidate)) {
 			return false;
 		}
 		const ll = toValidate as Language[];
