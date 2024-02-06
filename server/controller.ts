@@ -20,6 +20,7 @@ import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 import SettingsManager from './model/settings/settingsManager';
 import {databasePath} from './options';
+import {escape} from 'entities';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -229,7 +230,7 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 }
 
 export async function getDatabasePath(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(dbPath));
+	res.send(JSON.stringify(escape(dbPath)));
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
