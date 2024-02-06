@@ -46,7 +46,7 @@
     },
     {
       "files": [
-        "**/*.vue"
+        "src/**/*.vue"
       ],
       "parser": "vue-eslint-parser",
       "parserOptions": {
