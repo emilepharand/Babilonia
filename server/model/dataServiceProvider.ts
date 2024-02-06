@@ -17,11 +17,13 @@ export let inputValidator: InputValidator;
 export let searchHandler: SearchHandler;
 export let stats: StatsCounter;
 export let db: Database;
+export let dbPath: string;
 
-export async function initDb(path: string) {
+export async function initDb(inputPath: string, path: string) {
 	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
 	const database = await openDatabase(path);
 	db = database;
+	dbPath = inputPath;
 	settingsManager = new SettingsManager(database);
 	languageManager = new LanguageManager(database);
 	ideaManager = new IdeaManager(database, languageManager);

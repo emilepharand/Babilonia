@@ -1,6 +1,17 @@
 import type {Request, Response} from 'express';
 import {currentVersion} from './const';
-import {clearDatabaseAndCreateSchema, getDb, ideaManager, initDb, inputValidator, languageManager, practiceManager, stats as sc, searchHandler, settingsManager} from './model/dataServiceProvider';
+import {
+	clearDatabaseAndCreateSchema,
+	dbPath,
+	ideaManager,
+	initDb,
+	inputValidator,
+	languageManager,
+	practiceManager,
+	searchHandler,
+	settingsManager,
+	stats as sc,
+} from './model/dataServiceProvider';
 import {databaseNeedsToBeInitialized, openDatabase} from './model/databaseOpener';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
@@ -14,7 +25,7 @@ import {databasePath} from './options';
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-await initDb(databasePath);
+await initDb(databasePath, databasePath);
 
 export async function getStats(_: Request, res: Response): Promise<void> {
 	const stats = await sc.getStats();
@@ -218,21 +229,21 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 }
 
 export async function getDatabasePath(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(getDb().config.filename));
+	res.send(JSON.stringify(dbPath));
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
-	const path = inputValidator.validateChangeDatabase(req.body);
-	if (!path) {
+	const realAbsolutePath = inputValidator.validateChangeDatabase(req.body);
+	if (!realAbsolutePath) {
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	if (!await isValidVersion(path)) {
+	if (!await isValidVersion(realAbsolutePath)) {
 		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
-	console.log('Changing database to ' + path);
-	await initDb(path);
+	console.log('Changing database to ' + realAbsolutePath);
+	await initDb((req.body as {path: string}).path, realAbsolutePath);
 	res.end();
 }
 
