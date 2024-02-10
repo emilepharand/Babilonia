@@ -1,5 +1,13 @@
 import {currentVersion} from '../../server/const';
-import {addAnyLanguage, changeDatabase, changeDatabaseRawObjectAndGetResponse, changeDatabaseToMemoryAndDeleteEverything, fetchLanguages, fetchSettings, getDatabasePath} from '../utils/fetch-utils';
+import {
+	addAnyLanguage,
+	changeDatabase,
+	changeDatabaseRawObjectAndGetResponse,
+	changeDatabaseToMemoryAndDeleteEverything,
+	fetchLanguages,
+	fetchSettings,
+	getDatabasePath,
+} from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
@@ -63,5 +71,20 @@ describe('invalid cases', () => {
 		expect(res.status).toEqual(400);
 		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(':memory:');
+	});
+
+	test('change database to a file that cannot be written to', async () => {
+		const res = await changeDatabase('tests/db/unwriteable.db');
+		expect(res.status).toEqual(400);
+	});
+
+	test('change database to a file in a directory that doesn\'t exist', async () => {
+		const res = await changeDatabase('doesnotexist/db.db');
+		expect(res.status).toEqual(400);
+	});
+
+	test('change database to a directory', async () => {
+		const res = await changeDatabase('tests/dir.db');
+		expect(res.status).toEqual(400);
 	});
 });

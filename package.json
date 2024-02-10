@@ -16,7 +16,7 @@
     "lint": "eslint . --ext .ts --max-warnings=0 && eslint . --ext .vue --max-warnings=0 && eslint . --ext .js --max-warnings=0",
     "test:build": "npm run fix-coverage && NODE_ENV=test npm run build && npm run prepare-test-files",
     "fix-coverage": "echo 'Temporary hack for iFaxity/vite-plugin-istanbul issue #96' && sed -E -i 's/instrumentSync\\(srcCode, filename/instrumentSync(srcCode, id/g' node_modules/vite-plugin-istanbul/dist/index.mjs",
-    "prepare-test-files": "mkdir -p tests/coverage/merged dist/tests/db && cp tests/db/* dist/tests/db",
+    "prepare-test-files": "mkdir -p tests/coverage/merged dist/tests/db && cp tests/db/* dist/tests/db && mkdir -p dist/tests/dir.db && cp dist/tests/db/2.1-simple.db dist/tests/db/unwriteable.db && chmod 000 dist/tests/db/unwriteable.db",
     "test": "npm run check && npm run test:build && npm run test:bash && npm run test:api && npm run test:e2e",
     "test:serve": "cd dist && npm start --db=:memory: 2>/dev/null",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
