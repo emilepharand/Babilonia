@@ -2,11 +2,6 @@ import fs from 'fs';
 import path from 'path';
 
 export function validatePathForWritingTo(unsafePath: string) {
-	if (unsafePath.trim() === '') {
-		console.log('Empty path.');
-		return false;
-	}
-
 	const resolvedPath = path.resolve(process.cwd(), unsafePath);
 
 	if (!isPathUnderWorkingDirectory(resolvedPath)) {
