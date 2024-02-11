@@ -252,7 +252,12 @@ async function isValidVersion(dbPath: string) {
 	if (databaseNeedsToBeInitialized(dbPath)) {
 		return true;
 	}
-	const db = await openDatabase(dbPath);
+	let db;
+	try {
+		db = await openDatabase(dbPath);
+	} catch (e) {
+		return false;
+	}
 	const sm = new SettingsManager(db);
 	return await sm.getVersion() === currentVersion;
 }

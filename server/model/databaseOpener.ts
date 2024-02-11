@@ -2,7 +2,6 @@ import * as fs from 'fs';
 import type {Database} from 'sqlite';
 import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
-import {isMemoryDatabasePath} from './inputValidator';
 
 export async function openDatabase(path: string): Promise<Database> {
 	if (path !== ':memory:' && !fs.existsSync(path)) {
@@ -18,17 +17,4 @@ export async function openDatabase(path: string): Promise<Database> {
 
 export function databaseNeedsToBeInitialized(databasePath: string): boolean {
 	return databasePath === ':memory:' || !fs.existsSync(databasePath);
-}
-
-export function validateDatabasePath(path: string) {
-	if (isMemoryDatabasePath(path)) {
-		return true;
-	}
-
-	if (!path.endsWith('.db')) {
-		console.log(`'${path}' does not have extension .db.`);
-		return false;
-	}
-
-	return true;
 }

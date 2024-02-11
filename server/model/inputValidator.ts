@@ -1,5 +1,4 @@
 import Ajv from 'ajv';
-import {validatePathForWritingTo} from '../utils/fileUtils';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
@@ -7,6 +6,8 @@ import type {Language} from './languages/language';
 import {validate as validateLanguage, validateForAdding} from './languages/language';
 import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
+import path from 'path';
+import fs from 'fs';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -113,9 +114,32 @@ export default class InputValidator {
 			if (isMemoryDatabasePath(unsafePath)) {
 				return ':memory:';
 			}
-			return validatePathForWritingTo(unsafePath);
+			return resolveAndNormalizePathUnderWorkingDirectory(unsafePath);
 		}
 
+		return false;
+	}
+}
+
+function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
+	try {
+		const resolvedPath = path.resolve(process.cwd(), unsafePath);
+
+		if (!resolvedPath.startsWith(process.cwd())) {
+			return false;
+		}
+
+		if (!fs.existsSync(resolvedPath)) {
+			const parentDir = path.dirname(resolvedPath);
+			const realPathParent = fs.realpathSync(parentDir);
+			const fileName = path.basename(resolvedPath);
+			return path.resolve(process.cwd(), realPathParent, fileName);
+		}
+
+		return fs.realpathSync(resolvedPath);
+	} catch (e) {
+		// Path is invalid
+		console.log(e);
 		return false;
 	}
 }
