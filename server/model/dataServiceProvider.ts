@@ -1,8 +1,7 @@
 import {type Database} from 'sqlite';
-import {currentVersion} from '../../server/const';
+import {currentVersion} from '../const';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
-import {databaseNeedsToBeInitialized, openDatabase} from './databaseOpener';
 import IdeaManager from './ideas/ideaManager';
 import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
@@ -19,9 +18,7 @@ export let stats: StatsCounter;
 export let db: Database;
 export let dbPath: string;
 
-export async function initDb(inputPath: string, path: string) {
-	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
-	const database = await openDatabase(path);
+export async function initDb(inputPath: string, database: Database) {
 	db = database;
 	dbPath = inputPath;
 	settingsManager = new SettingsManager(database);
@@ -31,14 +28,6 @@ export async function initDb(inputPath: string, path: string) {
 	inputValidator = new InputValidator(languageManager);
 	searchHandler = new SearchHandler(database, ideaManager);
 	stats = new StatsCounter(database, languageManager);
-	if (appDatabaseNeedsToBeInitialized) {
-		if (path !== ':memory:') {
-			console.log(`Initializing database ${path}...`);
-		}
-		await clearDatabaseAndCreateSchema();
-	} else if (path !== ':memory:') {
-		console.log(`Database ${path} does not need to be initialized.`);
-	}
 	return db;
 }
 
@@ -46,7 +35,7 @@ export function getDb(): Database {
 	return db;
 }
 
-export async function clearDatabaseAndCreateSchema() {
+export async function clearDatabaseAndCreateSchema(db: Database) {
 	await db.run('drop table if exists expressions');
 	await db.run('drop table if exists ideas');
 	await db.run('drop table if exists languages');
@@ -81,6 +70,10 @@ export async function clearDatabaseAndCreateSchema() {
       + '"value"\tTEXT\n'
       + ')',
 	);
-	practiceManager.clear();
-	await settingsManager.setVersion(currentVersion);
+	if (practiceManager) {
+		practiceManager.clear();
+	}
+	if (settingsManager) {
+		await settingsManager.setVersion(currentVersion);
+	}
 }

@@ -131,6 +131,9 @@ function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
 
 		if (!fs.existsSync(resolvedPath)) {
 			const parentDir = path.dirname(resolvedPath);
+			if (!fs.existsSync(parentDir)) {
+				return false;
+			}
 			const realPathParent = fs.realpathSync(parentDir);
 			const fileName = path.basename(resolvedPath);
 			return path.resolve(process.cwd(), realPathParent, fileName);

@@ -3,6 +3,7 @@ import {currentVersion} from './const';
 import {
 	clearDatabaseAndCreateSchema,
 	dbPath,
+	getDb,
 	ideaManager,
 	initDb,
 	inputValidator,
@@ -21,12 +22,15 @@ import type {Settings} from './model/settings/settings';
 import SettingsManager from './model/settings/settingsManager';
 import {databasePath} from './options';
 import {escape} from 'entities';
+import type {Database} from 'sqlite';
+import fs from 'fs';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-await initDb(databasePath, databasePath);
+const database = await openDatabase(databasePath);
+await initDb(databasePath, database);
 
 export async function getStats(_: Request, res: Response): Promise<void> {
 	const stats = await sc.getStats();
@@ -239,31 +243,34 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	if (!await isValidVersion(realAbsolutePath)) {
+	const fileExists = fs.existsSync(realAbsolutePath);
+	let database;
+	try {
+		database = await openDatabase(realAbsolutePath);
+	} catch {
+		// The path is invalid
+		res.status(400).send(JSON.stringify({error: 'INVALID_DATABASE_PATH'}));
+		return;
+	}
+	if (fileExists && !await isValidVersion(realAbsolutePath, database)) {
 		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
 	console.log('Changing database to ' + realAbsolutePath);
-	await initDb((req.body as {path: string}).path, realAbsolutePath);
+	await initDb((req.body as {path: string}).path, database);
 	res.end();
 }
 
-async function isValidVersion(dbPath: string) {
+async function isValidVersion(dbPath: string, db: Database) {
 	if (databaseNeedsToBeInitialized(dbPath)) {
 		return true;
-	}
-	let db;
-	try {
-		db = await openDatabase(dbPath);
-	} catch (e) {
-		return false;
 	}
 	const sm = new SettingsManager(db);
 	return await sm.getVersion() === currentVersion;
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
-	await clearDatabaseAndCreateSchema();
+	await clearDatabaseAndCreateSchema(getDb());
 	res.end();
 }
 
