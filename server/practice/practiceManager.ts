@@ -1,7 +1,7 @@
 import type {Database} from 'sqlite';
 import type {Idea} from '../model/ideas/idea';
-import {ideaManager, settingsManager} from '../model/dataServiceProvider';
 import type SettingsManager from '../model/settings/settingsManager';
+import type IdeaManager from '../model/ideas/ideaManager';
 
 // Knows which ideas need to be provided to the user to practice
 // Handles the logic for providing ideas to practice
@@ -9,7 +9,9 @@ import type SettingsManager from '../model/settings/settingsManager';
 export default class PracticeManager {
 	private readonly ideasAlreadyGiven = new Set<number>();
 
-	constructor(private readonly db: Database, private readonly settingsManager: SettingsManager) {}
+	constructor(private readonly db: Database,
+		private readonly ideaManager: IdeaManager,
+		private readonly settingsManager: SettingsManager) {}
 
 	public async getNextIdea(): Promise<Idea> {
 		let idea: Idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
@@ -21,7 +23,7 @@ export default class PracticeManager {
 			idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
 		}
 		this.ideasAlreadyGiven.add(idea.id);
-		return ideaManager.getIdea(idea.id);
+		return this.ideaManager.getIdea(idea.id);
 	}
 
 	public clear(): void {
@@ -36,7 +38,7 @@ export default class PracticeManager {
     and id in
     (select ideaId from expressions
     join languages on expressions.languageId = languages.id
-    ${await settingsManager.isPracticeOnlyNotKnown() ? 'and expressions.known = "0"' : ''}
+    ${await this.settingsManager.isPracticeOnlyNotKnown() ? 'and expressions.known = "0"' : ''}
     where isPractice = true)
     and id not in
     (${Array.from(this.ideasAlreadyGiven).join(',')})`;

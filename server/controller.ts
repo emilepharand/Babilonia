@@ -1,49 +1,42 @@
 import type {Request, Response} from 'express';
 import {currentVersion} from './const';
-import {
-	clearDatabaseAndCreateSchema,
-	dbPath,
-	getDb,
-	ideaManager,
-	initDb,
-	inputValidator,
-	languageManager,
-	practiceManager,
-	searchHandler,
-	settingsManager,
-	stats as sc,
-} from './model/dataServiceProvider';
-import {databaseNeedsToBeInitialized, openDatabase} from './model/databaseOpener';
+import DatabaseOpener from './model/databaseOpener';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import SettingsManager from './model/settings/settingsManager';
 import {databasePath} from './options';
 import {escape} from 'entities';
-import type {Database} from 'sqlite';
-import fs from 'fs';
+import DataServiceProvider from './model/dataServiceProvider';
+import SettingsManager from './model/settings/settingsManager';
+import {clearDatabaseAndCreateSchema} from './model/databaseInitializer';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-const database = await openDatabase(databasePath);
-await initDb(databasePath, database);
+console.log('Before opening database');
+const dbOpener = new DatabaseOpener(databasePath, databasePath);
+await dbOpener.tryOpenElseThrow();
+if (dbOpener.needsToBeInitialized) {
+	await clearDatabaseAndCreateSchema(dbOpener.db);
+}
+let dataServiceProvider = new DataServiceProvider(dbOpener.db, databasePath);
+console.log('Database opened');
 
 export async function getStats(_: Request, res: Response): Promise<void> {
-	const stats = await sc.getStats();
+	const stats = await dataServiceProvider.statsCounter.getStats();
 	res.send(JSON.stringify(stats));
 }
 
 export async function getNextPracticeIdea(_: Request, res: Response): Promise<void> {
-	if ((await ideaManager.countIdeas()) === 0) {
+	if ((await dataServiceProvider.ideaManager.countIdeas()) === 0) {
 		res.status(404);
 		res.end();
 	}
 	try {
-		res.send(JSON.stringify(await practiceManager.getNextIdea()));
+		res.send(JSON.stringify(await dataServiceProvider.practiceManager.getNextIdea()));
 	} catch {
 		// There are no practiceable ideas
 		res.status(404);
@@ -56,7 +49,7 @@ export async function getLanguageById(req: Request, res: Response): Promise<void
 		return;
 	}
 	const languageId = parseInt(req.params.id, 10);
-	const language = await languageManager.getLanguage(languageId);
+	const language = await dataServiceProvider.languageManager.getLanguage(languageId);
 	res.send(language);
 }
 
@@ -65,46 +58,46 @@ export async function deleteLanguage(req: Request, res: Response): Promise<void>
 		return;
 	}
 	const languageId = parseInt(req.params.id, 10);
-	await languageManager.deleteLanguage(languageId);
+	await dataServiceProvider.languageManager.deleteLanguage(languageId);
 	res.end();
 }
 
 export async function addLanguage(req: Request, res: Response): Promise<void> {
-	if (!(await inputValidator.validateLanguageForAdding(req.body))) {
+	if (!(await dataServiceProvider.inputValidator.validateLanguageForAdding(req.body))) {
 		res.status(400);
 		res.end();
 		return;
 	}
-	const l: Language = await languageManager.addLanguage(req.body.name as string);
+	const l: Language = await dataServiceProvider.languageManager.addLanguage(req.body.name as string);
 	res.status(201);
 	res.send(JSON.stringify(l));
 }
 
 export async function editLanguages(req: Request, res: Response): Promise<void> {
-	if (!(await inputValidator.validateLanguagesForEditing(req.body))) {
+	if (!(await dataServiceProvider.inputValidator.validateLanguagesForEditing(req.body))) {
 		res.status(400);
 		res.end();
 		return;
 	}
-	const ll = await languageManager.editLanguages(req.body as Language[]);
+	const ll = await dataServiceProvider.languageManager.editLanguages(req.body as Language[]);
 	// Reset practice manager because practiceable ideas may change after editing languages
-	practiceManager.clear();
+	dataServiceProvider.practiceManager.clear();
 	res.send(JSON.stringify(ll));
 }
 
 export async function getLanguages(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(await languageManager.getLanguages()));
+	res.send(JSON.stringify(await dataServiceProvider.languageManager.getLanguages()));
 }
 
 export async function addIdea(req: Request, res: Response): Promise<void> {
-	if (!(await inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
+	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
 		res.status(400);
 		res.end();
 		return;
 	}
 	const ideaForAdding = req.body as IdeaForAdding;
 	normalizeIdea(ideaForAdding);
-	const returnIdea = await ideaManager.addIdea(ideaForAdding);
+	const returnIdea = await dataServiceProvider.ideaManager.addIdea(ideaForAdding);
 	res.status(201);
 	res.send(JSON.stringify(returnIdea));
 }
@@ -140,7 +133,7 @@ export async function getIdeaById(req: Request, res: Response): Promise<void> {
 	if (!await validateIdeaIdInRequest(req, res)) {
 		return;
 	}
-	const idea = await ideaManager.getIdea(parseInt(req.params.id, 10));
+	const idea = await dataServiceProvider.ideaManager.getIdea(parseInt(req.params.id, 10));
 	res.send(idea);
 }
 
@@ -186,7 +179,7 @@ export async function search(req: Request, res: Response): Promise<void> {
 		res.end();
 		return;
 	}
-	const ideas = await searchHandler.executeSearch(sc);
+	const ideas = await dataServiceProvider.searchHandler.executeSearch(sc);
 	res.send(ideas);
 }
 
@@ -194,7 +187,7 @@ export async function deleteIdea(req: Request, res: Response): Promise<void> {
 	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
-	await ideaManager.deleteIdea(parseInt(req.params.id, 10));
+	await dataServiceProvider.ideaManager.deleteIdea(parseInt(req.params.id, 10));
 	res.end();
 }
 
@@ -202,75 +195,76 @@ export async function editIdea(req: Request, res: Response): Promise<void> {
 	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
-	if (!(await inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
+	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
 		res.status(400);
 		res.end();
 		return;
 	}
 	const idea = req.body as IdeaForAdding;
 	normalizeIdea(idea);
-	await ideaManager.editIdea(idea, parseInt(req.params.id, 10));
-	res.send(await ideaManager.getIdea(parseInt(req.params.id, 10)));
+	await dataServiceProvider.ideaManager.editIdea(idea, parseInt(req.params.id, 10));
+	res.send(await dataServiceProvider.ideaManager.getIdea(parseInt(req.params.id, 10)));
 }
 
 export async function setSettings(req: Request, res: Response): Promise<void> {
-	if (!inputValidator.validateSettings(req.body as Settings)) {
+	if (!dataServiceProvider.inputValidator.validateSettings(req.body as Settings)) {
 		res.status(400);
 		res.end();
 		return;
 	}
 	const settings = req.body as Settings;
-	if (await settingsManager.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
+	if (await dataServiceProvider.settingsManager.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
 		// Reset practice manager because practiceable ideas may change after changing this setting
-		practiceManager.clear();
+		dataServiceProvider.practiceManager.clear();
 	}
-	await settingsManager.setSettings(settings);
+	await dataServiceProvider.settingsManager.setSettings(settings);
 	res.status(200);
 	res.end();
 }
 
 export async function getSettings(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(await settingsManager.getSettings()));
+	res.send(JSON.stringify(await dataServiceProvider.settingsManager.getSettings()));
 }
 
 export async function getDatabasePath(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(escape(dbPath)));
+	res.send(JSON.stringify(escape(dataServiceProvider.dbPath)));
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
-	const realAbsolutePath = inputValidator.validateChangeDatabase(req.body);
+	const realAbsolutePath = dataServiceProvider.inputValidator.validateChangeDatabase(req.body);
 	if (!realAbsolutePath) {
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	const fileExists = fs.existsSync(realAbsolutePath);
-	let database;
+	const databaseOpener = new DatabaseOpener(databasePath, realAbsolutePath);
 	try {
-		database = await openDatabase(realAbsolutePath);
+		await databaseOpener.tryOpenElseThrow();
 	} catch {
-		// The path is invalid
 		res.status(400).send(JSON.stringify({error: 'INVALID_DATABASE_PATH'}));
 		return;
 	}
-	if (fileExists && !await isValidVersion(realAbsolutePath, database)) {
+	if (!await isValidVersion(databaseOpener)) {
 		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
+	if (databaseOpener.needsToBeInitialized) {
+		await clearDatabaseAndCreateSchema(databaseOpener.db);
+	}
 	console.log('Changing database to ' + realAbsolutePath);
-	await initDb((req.body as {path: string}).path, database);
+	dataServiceProvider = new DataServiceProvider(databaseOpener.db, (req.body as {path: string}).path);
 	res.end();
 }
 
-async function isValidVersion(dbPath: string, db: Database) {
-	if (databaseNeedsToBeInitialized(dbPath)) {
+async function isValidVersion(databaseOpener: DatabaseOpener) {
+	if (databaseOpener.needsToBeInitialized) {
 		return true;
 	}
-	const sm = new SettingsManager(db);
+	const sm = new SettingsManager(databaseOpener.db);
 	return await sm.getVersion() === currentVersion;
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
-	await clearDatabaseAndCreateSchema(getDb());
+	await dataServiceProvider.reset();
 	res.end();
 }
 
@@ -288,11 +282,11 @@ async function validateIdInRequest(req: Request, res: Response, manager: Manager
 }
 
 async function validateLanguageIdInRequest(req: Request, res: Response): Promise<boolean> {
-	return validateIdInRequest(req, res, languageManager);
+	return validateIdInRequest(req, res, dataServiceProvider.languageManager);
 }
 
 async function validateIdeaIdInRequest(req: Request, res: Response): Promise<boolean> {
-	return validateIdInRequest(req, res, ideaManager);
+	return validateIdInRequest(req, res, dataServiceProvider.ideaManager);
 }
 
 function validateNumberInRequest(expectedNumber: string, res: Response): boolean {

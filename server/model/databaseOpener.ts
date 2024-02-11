@@ -1,30 +1,40 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import type {Database} from 'sqlite';
 import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
-import {clearDatabaseAndCreateSchema} from './dataServiceProvider';
+import * as console from 'console';
 
-export async function openDatabase(path: string): Promise<Database> {
-	const appDatabaseNeedsToBeInitialized = databaseNeedsToBeInitialized(path);
-	if (path !== ':memory:' && !fs.existsSync(path)) {
-		console.log(`Database ${path} does not exist, it will be created.`);
+export default class DatabaseOpener {
+	private _db!: Database;
+	private readonly _needsToBeInitialized;
+	constructor(private readonly _inputPath: string, private readonly _realAbsolutePath: string) {
+		this._needsToBeInitialized = this._realAbsolutePath === ':memory:' || !fs.existsSync(this._realAbsolutePath);
 	}
-	const db = await open({
-		filename: path,
-		driver: sqlite3.Database,
-	});
-	console.log(`Database ${path} was opened.`);
-	if (appDatabaseNeedsToBeInitialized) {
-		if (path !== ':memory:') {
-			console.log(`Initializing database ${path}...`);
+
+	async tryOpenElseThrow() {
+		console.log(`Trying to open database '${this._inputPath}' ('${this._realAbsolutePath}')...`);
+		if (this._realAbsolutePath !== ':memory:') {
+			if (!fs.existsSync(this._realAbsolutePath)) {
+				console.log(`Database '${this._inputPath}' does not exist, it will be created.`);
+			}
 		}
-		await clearDatabaseAndCreateSchema(db);
-	} else if (path !== ':memory:') {
-		console.log(`Database ${path} does not need to be initialized.`);
+		this._db = await open({
+			filename: this._realAbsolutePath,
+			driver: sqlite3.Database,
+		});
+		// No error was thrown, so the database was successfully opened
+		console.log(`Database '${this._inputPath}' was successfully opened.`);
 	}
-	return db;
-}
 
-export function databaseNeedsToBeInitialized(databasePath: string): boolean {
-	return databasePath === ':memory:' || !fs.existsSync(databasePath);
+	get db(): Database {
+		return this._db;
+	}
+
+	get inputPath(): string {
+		return this._inputPath;
+	}
+
+	get needsToBeInitialized() {
+		return this._needsToBeInitialized;
+	}
 }
