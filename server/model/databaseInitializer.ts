@@ -1,6 +1,7 @@
 import {type Database} from 'sqlite';
 
 export async function clearDatabaseAndCreateSchema(db: Database) {
+	console.log('WARNING: The database is about to be cleared and reinitialized.');
 	await db.run('drop table if exists expressions');
 	await db.run('drop table if exists ideas');
 	await db.run('drop table if exists languages');

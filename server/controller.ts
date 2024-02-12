@@ -4,18 +4,25 @@ import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import {databasePath} from './options';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
+import {databasePath} from './options';
+import {currentVersion} from './const';
+import console from 'console';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-const dbCoordinator = new DatabaseCoordinator(databasePath, databasePath);
+let dbCoordinator = new DatabaseCoordinator(databasePath);
 await dbCoordinator.init();
 if (!dbCoordinator.isValid) {
 	console.error('Fatal error: database could not be opened.');
+	if (dbCoordinator.isValidVersion) {
+		console.error(`Invalid database path provided for --db option ('${databasePath}').`);
+	} else {
+		console.error(`Unsupported database version. Current version is ${currentVersion}.`);
+	}
 	process.exit(1);
 }
 let {dataServiceProvider} = dbCoordinator;
@@ -222,26 +229,26 @@ export async function getSettings(_: Request, res: Response): Promise<void> {
 }
 
 export async function getDatabasePath(_: Request, res: Response): Promise<void> {
-	res.send(JSON.stringify(escape(dataServiceProvider.dbPath)));
+	res.send(JSON.stringify(escape(dbCoordinator.inputPath)));
 }
 
 export async function changeDatabase(req: Request, res: Response): Promise<void> {
-	const realAbsolutePath = dataServiceProvider.inputValidator.validateChangeDatabase(req.body);
-	if (!realAbsolutePath) {
-		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+		res.status(400).end();
 		return;
 	}
-	const dbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path, realAbsolutePath);
-	await dbCoordinator.init();
-	if (!dbCoordinator.isValidVersion) {
+	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
+	await newDbCoordinator.init();
+	if (!newDbCoordinator.isValidVersion) {
 		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
-	if (!dbCoordinator.isValid) {
+	if (!newDbCoordinator.isValid) {
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	dataServiceProvider = dbCoordinator.dataServiceProvider;
+	dataServiceProvider = newDbCoordinator.dataServiceProvider;
+	dbCoordinator = newDbCoordinator;
 	res.end();
 }
 

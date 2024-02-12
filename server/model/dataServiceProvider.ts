@@ -17,7 +17,7 @@ export default class DataServiceProvider {
 	private readonly _inputValidator: InputValidator;
 	private readonly _searchHandler: SearchHandler;
 	private readonly _statsCounter: StatsCounter;
-	constructor(private readonly _db: Database, private readonly _dbPath: string) {
+	constructor(private readonly _db: Database) {
 		this._settingsManager = new SettingsManager(this._db);
 		this._languageManager = new LanguageManager(this._db);
 		this._ideaManager = new IdeaManager(this._db, this._languageManager);
@@ -53,14 +53,6 @@ export default class DataServiceProvider {
 
 	get statsCounter(): StatsCounter {
 		return this._statsCounter;
-	}
-
-	get db(): Database {
-		return this._db;
-	}
-
-	get dbPath(): string {
-		return this._dbPath;
 	}
 
 	async reset() {

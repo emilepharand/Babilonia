@@ -8,6 +8,7 @@ import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 import path from 'path';
 import fs from 'fs';
+import console from 'console';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -103,25 +104,25 @@ export default class InputValidator {
 		return validateSettingsSchema(settings);
 	}
 
-	public validateChangeDatabase(pathObject: unknown): string | false {
-		if (!validateDatabaseSchema(pathObject)) {
-			return false;
-		}
-
-		const unsafePath = (pathObject as {path: string}).path;
-
-		if (validateDatabasePath(unsafePath)) {
-			if (isMemoryDatabasePath(unsafePath)) {
-				return ':memory:';
-			}
-			return resolveAndNormalizePathUnderWorkingDirectory(unsafePath);
-		}
-
-		return false;
+	public validateChangeDatabase(pathObject: unknown) {
+		return validateDatabaseSchema(pathObject);
 	}
 }
 
-function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
+export function validateDatabaseSchema(pathObject: unknown) {
+	const ajv = new Ajv();
+	const schema = {
+		type: 'object',
+		properties: {
+			path: {type: 'string'},
+		},
+		required: ['path'],
+		additionalProperties: false,
+	};
+	return ajv.compile(schema)(pathObject);
+}
+
+export function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
 	try {
 		const resolvedPath = path.resolve(process.cwd(), unsafePath);
 
@@ -142,35 +143,9 @@ function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
 		return fs.realpathSync(resolvedPath);
 	} catch (e) {
 		// Path is invalid
-		console.log(e);
+		console.error(e);
 		return false;
 	}
-}
-
-export function validateDatabaseSchema(pathObject: unknown) {
-	const ajv = new Ajv();
-	const schema = {
-		type: 'object',
-		properties: {
-			path: {type: 'string'},
-		},
-		required: ['path'],
-		additionalProperties: false,
-	};
-	return ajv.compile(schema)(pathObject);
-}
-
-export function validateDatabasePath(path: string) {
-	if (isMemoryDatabasePath(path)) {
-		return true;
-	}
-
-	if (!path.endsWith('.db')) {
-		console.log(`'${path}' does not have extension .db.`);
-		return false;
-	}
-
-	return true;
 }
 
 export function isMemoryDatabasePath(path: string) {

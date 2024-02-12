@@ -6,29 +6,25 @@ import * as console from 'console';
 
 export default class DatabaseOpener {
 	private _db!: Database;
-	constructor(private readonly _inputPath: string, private readonly _realAbsolutePath: string) {
+	constructor(private readonly _path: string) {
 	}
 
 	async tryOpenElseThrow() {
-		if (this._realAbsolutePath !== ':memory:') {
-			console.log(`Trying to open database '${this._inputPath}' ('${this._realAbsolutePath}')...`);
-			if (!fs.existsSync(this._realAbsolutePath)) {
-				console.log(`Database '${this._inputPath}' does not exist, it will be created.`);
+		if (this._path !== ':memory:') {
+			console.log(`Opening database '${this._path}'...`);
+			if (!fs.existsSync(this._path)) {
+				console.log('Database does not exist, it will be created.');
 			}
 		}
 		this._db = await open({
-			filename: this._realAbsolutePath,
+			filename: this._path,
 			driver: sqlite3.Database,
 		});
 		// No error was thrown, so the database was successfully opened
-		console.log(`Database '${this._inputPath}' was successfully opened.`);
+		console.log('Database was successfully opened.');
 	}
 
 	get db(): Database {
 		return this._db;
-	}
-
-	get inputPath(): string {
-		return this._inputPath;
 	}
 }
