@@ -1,6 +1,4 @@
 import type {Request, Response} from 'express';
-import {currentVersion} from './const';
-import DatabaseOpener from './model/databaseOpener';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
@@ -8,22 +6,19 @@ import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 import {databasePath} from './options';
 import {escape} from 'entities';
-import DataServiceProvider from './model/dataServiceProvider';
-import SettingsManager from './model/settings/settingsManager';
-import {clearDatabaseAndCreateSchema} from './model/databaseInitializer';
+import DatabaseCoordinator from './model/databaseCoordinator';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-console.log('Before opening database');
-const dbOpener = new DatabaseOpener(databasePath, databasePath);
-await dbOpener.tryOpenElseThrow();
-if (dbOpener.needsToBeInitialized) {
-	await clearDatabaseAndCreateSchema(dbOpener.db);
+const dbCoordinator = new DatabaseCoordinator(databasePath, databasePath);
+await dbCoordinator.init();
+if (!dbCoordinator.isValid) {
+	console.error('Fatal error: database could not be opened.');
+	process.exit(1);
 }
-let dataServiceProvider = new DataServiceProvider(dbOpener.db, databasePath);
-console.log('Database opened');
+let {dataServiceProvider} = dbCoordinator;
 
 export async function getStats(_: Request, res: Response): Promise<void> {
 	const stats = await dataServiceProvider.statsCounter.getStats();
@@ -236,31 +231,18 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	const databaseOpener = new DatabaseOpener(databasePath, realAbsolutePath);
-	try {
-		await databaseOpener.tryOpenElseThrow();
-	} catch {
-		res.status(400).send(JSON.stringify({error: 'INVALID_DATABASE_PATH'}));
-		return;
-	}
-	if (!await isValidVersion(databaseOpener)) {
+	const dbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path, realAbsolutePath);
+	await dbCoordinator.init();
+	if (!dbCoordinator.isValidVersion) {
 		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
 		return;
 	}
-	if (databaseOpener.needsToBeInitialized) {
-		await clearDatabaseAndCreateSchema(databaseOpener.db);
+	if (!dbCoordinator.isValid) {
+		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+		return;
 	}
-	console.log('Changing database to ' + realAbsolutePath);
-	dataServiceProvider = new DataServiceProvider(databaseOpener.db, (req.body as {path: string}).path);
+	dataServiceProvider = dbCoordinator.dataServiceProvider;
 	res.end();
-}
-
-async function isValidVersion(databaseOpener: DatabaseOpener) {
-	if (databaseOpener.needsToBeInitialized) {
-		return true;
-	}
-	const sm = new SettingsManager(databaseOpener.db);
-	return await sm.getVersion() === currentVersion;
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
