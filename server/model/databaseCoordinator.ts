@@ -2,8 +2,8 @@ import DatabaseOpener from './databaseOpener';
 import DataServiceProvider from './dataServiceProvider';
 import fs from 'fs';
 import SettingsManager from './settings/settingsManager';
-import {currentVersion} from '../const';
-import {isMemoryDatabasePath, resolveAndNormalizePathUnderWorkingDirectory} from './inputValidator';
+import {currentVersion, memoryDatabasePath} from '../const';
+import {resolveAndNormalizePathUnderWorkingDirectory} from './inputValidator';
 import console from 'console';
 
 export default class DatabaseCoordinator {
@@ -42,7 +42,7 @@ export default class DatabaseCoordinator {
 	}
 
 	private computeNeedsInitialization() {
-		return this._realAbsolutePath === ':memory:'
+		return this._inputPath === memoryDatabasePath
 			|| !fs.existsSync(this._realAbsolutePath as string);
 	}
 
@@ -50,8 +50,8 @@ export default class DatabaseCoordinator {
 		if (this._inputPath.trim() === '') {
 			return false;
 		}
-		if (isMemoryDatabasePath(this._inputPath)) {
-			this._realAbsolutePath = ':memory:';
+		if (this._inputPath === memoryDatabasePath) {
+			this._realAbsolutePath = memoryDatabasePath;
 			return true;
 		}
 		this._realAbsolutePath = resolveAndNormalizePathUnderWorkingDirectory(this._inputPath);

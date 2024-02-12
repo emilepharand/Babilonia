@@ -8,6 +8,7 @@ import {Settings} from '../../server/model/settings/settings';
 import {AllStats} from '../../server/stats/statsCounter';
 import {paramsFromSearchContext} from '../../src/ts/api';
 import {getRandomString, settingsFromPartial} from './utils';
+import {memoryDatabasePath} from '../../server/const';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -178,7 +179,7 @@ export async function deleteEverything(): Promise<Response> {
 }
 
 export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
-	const res = await changeDatabase(':memory:');
+	const res = await changeDatabase(memoryDatabasePath);
 	if (res.status !== 200) {
 		throw new Error('Failed to change database to memory.');
 	}

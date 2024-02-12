@@ -1,6 +1,7 @@
 import {Settings} from '../../../server/model/settings/settings';
 
 import {apiUrl, setSettings} from '../cy-utils';
+import {memoryDatabasePath} from '../../../server/const';
 
 const db21 = 'tests/db/2.1-simple.db';
 
@@ -14,7 +15,7 @@ describe('The settings page', () => {
 		cy.get('#strictCharacters').should('be.checked');
 		cy.get('#practiceOnlyNotKnown').should('not.be.checked');
 		cy.get('#passiveMode').should('not.be.checked');
-		cy.get('#databasePath').should('be.visible').should('have.value', ':memory:');
+		cy.get('#databasePath').should('be.visible').should('have.value', memoryDatabasePath);
 
 		cy.get('#databasePath').clear();
 		cy.get('#databasePath').type(db21);
@@ -50,7 +51,7 @@ describe('The settings page', () => {
 		assertSettingsEquals({randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1'});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(':memory:');
+		cy.get('#databasePath').type(memoryDatabasePath);
 		cy.get('#saveButton').click();
 		cy.get('#settingsSavedText').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
@@ -58,7 +59,7 @@ describe('The settings page', () => {
 		assertSettingsEquals({randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1'});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(':memory:');
+		cy.get('#databasePath').type(memoryDatabasePath);
 		cy.get('#saveButton').click();
 		cy.get('#settingsSavedText').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');

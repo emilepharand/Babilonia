@@ -148,10 +148,6 @@ export function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string)
 	}
 }
 
-export function isMemoryDatabasePath(path: string) {
-	return path === ':memory:';
-}
-
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
 	for (const e of ee) {
 		const contexts = e.text.match(/\([^)(]*\)/g) ?? [];

@@ -1,4 +1,4 @@
-import {currentVersion} from '../../server/const';
+import {currentVersion, memoryDatabasePath} from '../../server/const';
 import {
 	addAnyLanguage,
 	changeDatabase,
@@ -18,7 +18,7 @@ const db21 = 'tests/db/2.1-simple.db';
 
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 		expect(await fetchLanguages()).toHaveLength(0);
 
 		await changeDatabase(db21);
@@ -28,8 +28,8 @@ describe('valid cases', () => {
 		expect(ll).toHaveLength(1);
 		expect(ll[0]).toEqual({id: 1, name: '2.1-l1', ordering: 0, isPractice: true});
 
-		await changeDatabase(':memory:');
-		expect(await getDatabasePath()).toEqual(':memory:');
+		await changeDatabase(memoryDatabasePath);
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 		expect(await fetchLanguages()).toHaveLength(0);
 	});
 
@@ -46,31 +46,31 @@ describe('valid cases', () => {
 describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
 		expect((await changeDatabaseRawObjectAndGetResponse(JSON.stringify({file: db21}))).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to a nonexistent path', async () => {
 		expect((await changeDatabase('/doesnotexist/db.db')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to an empty path', async () => {
 		expect((await changeDatabase('')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 		expect((await changeDatabase(' ')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to another version than the current version', async () => {
 		let res = await changeDatabase('tests/db/unsupported-version.db');
 		expect(res.status).toEqual(400);
 		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await changeDatabase(db20);
 		expect(res.status).toEqual(400);
 		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
-		expect(await getDatabasePath()).toEqual(':memory:');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to a file that cannot be written to', async () => {

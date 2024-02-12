@@ -3,6 +3,7 @@ import type {Database} from 'sqlite';
 import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
 import * as console from 'console';
+import {memoryDatabasePath} from '../const';
 
 export default class DatabaseOpener {
 	private _db!: Database;
@@ -10,11 +11,9 @@ export default class DatabaseOpener {
 	}
 
 	async tryOpenElseThrow() {
-		if (this._path !== ':memory:') {
-			console.log(`Opening database '${this._path}'...`);
-			if (!fs.existsSync(this._path)) {
-				console.log('Database does not exist, it will be created.');
-			}
+		console.log(`Opening database '${this._path}'...`);
+		if (this._path !== memoryDatabasePath && !fs.existsSync(this._path)) {
+			console.log('Database does not exist, it will be created.');
 		}
 		this._db = await open({
 			filename: this._path,
