@@ -1,4 +1,6 @@
-import type {Express, Request, Response, NextFunction} from 'express';
+import type {
+	Express, NextFunction, Request, Response,
+} from 'express';
 import {Router} from 'express';
 import * as Controller from './controller';
 import AsyncLock from 'async-lock';

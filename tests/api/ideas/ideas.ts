@@ -1,9 +1,8 @@
 import fetch from 'node-fetch';
 import {Idea} from '../../../server/model/ideas/idea';
-import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
+import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {Language} from '../../../server/model/languages/language';
 import {
-	FIRST_IDEA_ID,
 	addIdea,
 	addLanguage,
 	apiUrl,
@@ -13,8 +12,19 @@ import {
 	editIdeaAndGetResponse,
 	fetchIdeaAndGetResponse,
 	fetchLanguageAndGetResponse,
+	FIRST_IDEA_ID,
 } from '../../utils/fetch-utils';
-import {addAnyIdea, addInvalidIdeaAndTest, addMultipleInvalidIdeasAndTest, addValidIdeaAndTest, editInvalidIdeaAndTest, editMultipleInvalidIdeasAndTest, editValidIdeaAndTest, makeIdeaForAdding, testTransformExpressions} from './utils';
+import {
+	addAnyIdea,
+	addInvalidIdeaAndTest,
+	addMultipleInvalidIdeasAndTest,
+	addValidIdeaAndTest,
+	editInvalidIdeaAndTest,
+	editMultipleInvalidIdeasAndTest,
+	editValidIdeaAndTest,
+	makeIdeaForAdding,
+	testTransformExpressions,
+} from './utils';
 
 beforeEach(async () => {
 	await deleteEverything();
@@ -48,13 +58,15 @@ describe('valid cases', () => {
 
 	test('basic test', async () => {
 		// Adding
-		const i = {ee: [
-			{language: 'l1', text: 'l1 e1', known: true},
-			{language: 'l1', text: 'l1 e2'},
-			{language: 'l2', text: 'l2 e1'},
-			{language: 'l3', text: 'l3 e1', known: false},
-			{language: 'l3', text: 'l3 e2'},
-		]};
+		const i = {
+			ee: [
+				{language: 'l1', text: 'l1 e1', known: true},
+				{language: 'l1', text: 'l1 e2'},
+				{language: 'l2', text: 'l2 e1'},
+				{language: 'l3', text: 'l3 e1', known: false},
+				{language: 'l3', text: 'l3 e2'},
+			],
+		};
 		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
 
 		// Editing

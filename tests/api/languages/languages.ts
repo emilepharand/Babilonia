@@ -19,7 +19,15 @@ import {
 	FIRST_LANGUAGE_ID,
 	FIRST_ORDERING,
 } from '../../utils/fetch-utils';
-import {addInvalidLanguageAndTest, addNLanguages, addValidLanguageAndTest, copyLanguage, editAndTest, editInvalidLanguagesAndTest, testLanguageOrder} from './utils';
+import {
+	addInvalidLanguageAndTest,
+	addNLanguages,
+	addValidLanguageAndTest,
+	copyLanguage,
+	editAndTest,
+	editInvalidLanguagesAndTest,
+	testLanguageOrder,
+} from './utils';
 
 beforeEach(async () => {
 	await deleteEverything();

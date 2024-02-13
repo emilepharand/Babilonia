@@ -78,7 +78,9 @@
 
 <script lang="ts" setup>
 import * as bootstrap from 'bootstrap';
-import {nextTick, onMounted, ref, watch} from 'vue';
+import {
+	nextTick, onMounted, ref, watch,
+} from 'vue';
 import type {Expression} from '../../../server/model/ideas/expression';
 import type {Settings} from '../../../server/model/settings/settings';
 import {focusEndOfInput} from '../../ts/domHelper';
