@@ -1,12 +1,18 @@
 import {ExpressionForAdding} from '../../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../../server/model/ideas/ideaForAdding';
 import {
-	addLanguages,
-	apiUrl,
-	cyRequestPost,
-	cyRequestPut,
+	addLanguages, apiUrl, cyRequestPost, cyRequestPut,
 } from '../../cy-utils';
-import {assertIsTyped, assertRowMatchIsFullMatch, assertRowMatchIsPartialMatch, getResetButton, getRowHintButton, getRowShowButton, typeInRow, waitForTableToLoad} from './utils';
+import {
+	assertIsTyped,
+	assertRowMatchIsFullMatch,
+	assertRowMatchIsPartialMatch,
+	getResetButton,
+	getRowHintButton,
+	getRowShowButton,
+	typeInRow,
+	waitForTableToLoad,
+} from './utils';
 
 context('Context', () => {
 	specify('Context', () => {

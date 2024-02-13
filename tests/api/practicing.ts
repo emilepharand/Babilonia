@@ -175,8 +175,10 @@ describe('getting practice ideas', () => {
 		practiceLanguage.isPractice = true;
 		await editLanguages([practiceLanguage, nonPracticeLanguage]);
 
-		const idea = await addIdea({ee: [{languageId: practiceLanguage.id, text: 'e1'},
-			{languageId: nonPracticeLanguage.id, text: 'e2', known: true}]});
+		const idea = await addIdea({
+			ee: [{languageId: practiceLanguage.id, text: 'e1'},
+				{languageId: nonPracticeLanguage.id, text: 'e2', known: true}],
+		});
 
 		// Practice only known is false
 		await setSettings({practiceOnlyNotKnown: false, randomPractice: false});

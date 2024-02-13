@@ -1,9 +1,25 @@
+import {addIdeas, assertFetchIdeaReturnsStatus, setSettings} from '../../cy-utils';
 import {
-	addIdeas,
-	assertFetchIdeaReturnsStatus,
-	setSettings,
-} from '../../cy-utils';
-import {assertIsTyped, assertLanguageName, assertRowInputHasFocus, assertRowInputIsNotPracticeable, assertRowMatchIsFullMatch, assertRowMatchIsNeutral, assertRowMatchIsNoMatch, assertRowMatchIsPartialMatch, getEditButton, getNextButton, getResetButton, getRowHintButton, getRowInput, getRowKnownButton, getRowShowButton, hint, show, typeInRow, waitForTableToLoad} from './utils';
+	assertIsTyped,
+	assertLanguageName,
+	assertRowInputHasFocus,
+	assertRowInputIsNotPracticeable,
+	assertRowMatchIsFullMatch,
+	assertRowMatchIsNeutral,
+	assertRowMatchIsNoMatch,
+	assertRowMatchIsPartialMatch,
+	getEditButton,
+	getNextButton,
+	getResetButton,
+	getRowHintButton,
+	getRowInput,
+	getRowKnownButton,
+	getRowShowButton,
+	hint,
+	show,
+	typeInRow,
+	waitForTableToLoad,
+} from './utils';
 
 context('Interation on the practice page', () => {
 	specify('Typing, hinting, showing, and navigating', () => {

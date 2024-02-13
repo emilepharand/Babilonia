@@ -7,6 +7,12 @@ const db21 = 'tests/db/2.1-simple.db';
 
 describe('The settings page', () => {
 	it('Works correctly', () => {
+		setSettings({
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false,
+		});
+		assertSettingsEquals({
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false,
+		});
 		setSettings({randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1'});
 		assertSettingsEquals({randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1'});
 		cy.get('#settings-link').click();
@@ -54,6 +60,9 @@ describe('The settings page', () => {
 		cy.get('#databasePath').type(memoryDatabasePath);
 		cy.get('#saveButton').click();
 		cy.get('#settingsSavedText').should('be.visible');
+		assertSettingsEquals({
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false,
+		});
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#strictCharacters').uncheck();
 		assertSettingsEquals({randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1'});

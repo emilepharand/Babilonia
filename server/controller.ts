@@ -37,13 +37,12 @@ export async function getNextPracticeIdea(_: Request, res: Response): Promise<vo
 		res.status(404);
 		res.end();
 	}
-	try {
-		res.send(JSON.stringify(await dataServiceProvider.practiceManager.getNextIdea()));
-	} catch {
+	const idea = await dataServiceProvider.practiceManager.getNextIdea();
+	if (idea === undefined) {
 		// There are no practiceable ideas
-		res.status(404);
-		res.end();
+		res.status(404).end();
 	}
+	res.send(JSON.stringify(idea));
 }
 
 export async function getLanguageById(req: Request, res: Response): Promise<void> {

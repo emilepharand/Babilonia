@@ -13,11 +13,11 @@ export default class PracticeManager {
 		private readonly ideaManager: IdeaManager,
 		private readonly settingsManager: SettingsManager) {}
 
-	public async getNextIdea(): Promise<Idea> {
+	public async getNextIdea(): Promise<Idea | undefined> {
 		let idea: Idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;
 		if (idea === undefined) {
 			if (this.ideasAlreadyGiven.size === 0) {
-				return Promise.reject();
+				return undefined;
 			}
 			this.ideasAlreadyGiven.clear();
 			idea = (await this.db.get(await this.buildNextIdeaIdQuery()))!;

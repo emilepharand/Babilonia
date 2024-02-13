@@ -14,7 +14,7 @@ export async function getIdea(ideaId: number): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
 	const response = await doFetch(url, 'GET');
 	if (response.status === 404) {
-		return Promise.reject();
+		return Promise.reject(new Error('Idea not found'));
 	}
 	return (await response.json()) as Idea;
 }
@@ -44,11 +44,11 @@ export async function addIdea(ifa: IdeaForAdding): Promise<Idea> {
 	return (await response.json()) as Idea;
 }
 
-export async function getNextIdea(): Promise<Idea> {
+export async function getNextIdea(): Promise<Idea | undefined> {
 	const url = `${apiUrl}/practice-ideas/next`;
 	const response = await doFetch(url, 'GET');
 	if (response.status === 404) {
-		return Promise.reject();
+		return undefined;
 	}
 	return (await response.json()) as Idea;
 }
