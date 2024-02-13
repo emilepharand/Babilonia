@@ -1,6 +1,8 @@
 import {ExpressionForAdding} from 'server/model/ideas/expression';
 import {IdeaForAdding} from 'server/model/ideas/ideaForAdding';
-import {addIdeasDifferentSet, addLanguages, apiUrl, cyRequestPost} from '../cy-utils';
+import {
+	addIdeasDifferentSet, addLanguages, apiUrl, cyRequestPost,
+} from '../cy-utils';
 
 // This test should focus on whether the buttons and filters are correctly taken into account
 // and whether results are correctly displayed

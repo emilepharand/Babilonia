@@ -20,7 +20,8 @@ const ajv = new Ajv();
 
 const settingsSchema = {
 	type: 'object',
-	properties: {randomPractice: {type: 'boolean'},
+	properties: {
+		randomPractice: {type: 'boolean'},
 		strictCharacters: {type: 'boolean'},
 		practiceOnlyNotKnown: {type: 'boolean'},
 		passiveMode: {type: 'boolean'},

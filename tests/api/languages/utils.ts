@@ -1,4 +1,14 @@
-import {DEFAULT_IS_PRACTICE, FIRST_ORDERING, addLanguageAndGetResponse, addLanguageRawObjectAndGetResponse, editLanguagesAndGetResponse, editLanguagesRawObjectAndGetResponse, fetchLanguage, fetchLanguageAndGetResponse, fetchLanguages} from '../../utils/fetch-utils';
+import {
+	addLanguageAndGetResponse,
+	addLanguageRawObjectAndGetResponse,
+	DEFAULT_IS_PRACTICE,
+	editLanguagesAndGetResponse,
+	editLanguagesRawObjectAndGetResponse,
+	fetchLanguage,
+	fetchLanguageAndGetResponse,
+	fetchLanguages,
+	FIRST_ORDERING,
+} from '../../utils/fetch-utils';
 import {Language, validate} from '../../../server/model/languages/language';
 
 export async function addInvalidLanguageAndTest(object: any): Promise<void> {
