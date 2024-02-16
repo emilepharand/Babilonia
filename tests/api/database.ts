@@ -26,7 +26,9 @@ describe('valid cases', () => {
 		expect((await fetchSettings()).version).toEqual(currentVersion);
 		const ll = await fetchLanguages();
 		expect(ll).toHaveLength(1);
-		expect(ll[0]).toEqual({id: 1, name: '2.1-l1', ordering: 0, isPractice: true});
+		expect(ll[0]).toEqual({
+			id: 1, name: '2.1-l1', ordering: 0, isPractice: true,
+		});
 
 		await changeDatabase(memoryDatabasePath);
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);

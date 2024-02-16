@@ -94,11 +94,11 @@
         Path to database
       </label>
       <i
-          title="The path to the database file. It should be a SQLite file located inside the application folder. The version must match the current application version. The database will be created if it does not exist."
-          data-bs-html="true"
-          data-bs-toggle="tooltip"
-          data-bs-placement="right"
-          class="fa-solid fa-circle-question"
+        title="The path to the database file. It should be a SQLite file located inside the application folder. The version must match the current application version. The database will be created if it does not exist."
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        class="fa-solid fa-circle-question"
       />
       <input
         id="databasePath"
