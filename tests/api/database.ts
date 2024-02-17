@@ -52,41 +52,42 @@ describe('invalid cases', () => {
 	});
 
 	test('change database to a nonexistent path', async () => {
-		expect((await changeDatabase('/doesnotexist/db.db')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
+		await testChangeToInvalidDatabase('/doesnotexist/db.db');
 	});
 
 	test('change database to an empty path', async () => {
-		expect((await changeDatabase('')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
-		expect((await changeDatabase(' ')).status).toEqual(400);
-		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
+		await testChangeToInvalidDatabase('');
+		await testChangeToInvalidDatabase(' ');
 	});
 
 	test('change database to another version than the current version', async () => {
 		let res = await changeDatabase('tests/db/unsupported-version.db');
 		expect(res.status).toEqual(400);
-		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await changeDatabase(db20);
 		expect(res.status).toEqual(400);
-		expect((await (res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to a file that cannot be written to', async () => {
-		const res = await changeDatabase('tests/db/unwriteable.db');
-		expect(res.status).toEqual(400);
+		await testChangeToInvalidDatabase('tests/db/unwriteable.db');
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
 	test('change database to a file in a directory that doesn\'t exist', async () => {
-		const res = await changeDatabase('doesnotexist/db.db');
-		expect(res.status).toEqual(400);
+		await testChangeToInvalidDatabase('tests/doesnotexist/db.db');
 	});
 
 	test('change database to a directory', async () => {
-		const res = await changeDatabase('tests/dir.db');
-		expect(res.status).toEqual(400);
+		await testChangeToInvalidDatabase('tests/dir.db');
 	});
 });
+
+async function testChangeToInvalidDatabase(path: string) {
+	const res = await changeDatabase(path);
+	expect(res.status).toEqual(400);
+	expect(await getDatabasePath()).toEqual(memoryDatabasePath);
+}
