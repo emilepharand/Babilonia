@@ -159,6 +159,62 @@ fi
 
 after_success
 
+echo "-------------------------------------------------------"
+echo " --db=db, file is invalid                              "
+echo "-------------------------------------------------------"
+
+cleanup
+go_to_dist
+
+node index.cjs --db="/tmp/wrong.db" >temp.txt 2>&1 &
+
+sleep 1
+
+write_coverage
+
+if ! grep -Fq "Invalid database path provided" "temp.txt"; then
+  echo "Invalid database path error not found."
+  after_failure
+fi
+
+res=$(curl -sf "$VITE_API_URL/database/path" -H "Content-Type: application/json")
+
+if [ "$res" != '":memory:"' ]; then
+  echo "Database was not set to memory."
+  echo "Database path: $res"
+  after_failure
+fi
+
+after_success
+
+echo "-------------------------------------------------------"
+echo " --db=db, unsupported version                          "
+echo "-------------------------------------------------------"
+
+cleanup
+go_to_dist
+
+node index.cjs --db="tests/db/unsupported-version.db" >temp.txt 2>&1 &
+
+sleep 1
+
+write_coverage
+
+if ! grep -Fq "Unsupported database version" "temp.txt"; then
+  echo "Unsupported database version error not found."
+  after_failure
+fi
+
+res=$(curl -sf "$VITE_API_URL/database/path" -H "Content-Type: application/json")
+
+if [ "$res" != '":memory:"' ]; then
+  echo "Database was not set to memory."
+  echo "Database path: $res"
+  after_failure
+fi
+
+after_success
+
 echo "------------------------------------------------------"
 echo " --dev-mode does not start API server                 "
 echo "------------------------------------------------------"
