@@ -1,8 +1,4 @@
-import * as fs from 'fs';
-import type {Database} from 'sqlite';
-import {open} from 'sqlite';
-import sqlite3 from 'sqlite3';
-import {databasePath} from '../options';
+import {type Database} from 'sqlite';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
 import IdeaManager from './ideas/ideaManager';
@@ -10,96 +6,58 @@ import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
+import {clearDatabaseAndCreateSchema} from './databaseInitializer';
+import {currentVersion} from '../const';
 
-let dbExists = true;
-
-async function initDb(): Promise<Database> {
-	if (databasePath === ':memory:' || !fs.existsSync(databasePath)) {
-		dbExists = false;
+export default class DataServiceProvider {
+	private readonly _settingsManager: SettingsManager;
+	private readonly _languageManager: LanguageManager;
+	private readonly _ideaManager: IdeaManager;
+	private readonly _practiceManager: PracticeManager;
+	private readonly _inputValidator: InputValidator;
+	private readonly _searchHandler: SearchHandler;
+	private readonly _statsCounter: StatsCounter;
+	constructor(private readonly _db: Database) {
+		this._settingsManager = new SettingsManager(this._db);
+		this._languageManager = new LanguageManager(this._db);
+		this._ideaManager = new IdeaManager(this._db, this._languageManager);
+		this._practiceManager = new PracticeManager(this._db, this.ideaManager, this._settingsManager);
+		this._inputValidator = new InputValidator(this._languageManager);
+		this._searchHandler = new SearchHandler(this._db, this._ideaManager);
+		this._statsCounter = new StatsCounter(this._db, this._languageManager);
 	}
-	const localDb = await open({
-		filename: databasePath,
-		driver: sqlite3.Database,
-	});
-	console.log(`Database ${databasePath} was opened.`);
-	return localDb;
-}
 
-export const db: Database = await initDb();
-export const settingsManager = new SettingsManager(db);
-export const languageManager = new LanguageManager(db);
-export const ideaManager = new IdeaManager(db, languageManager);
-export const practiceManager = new PracticeManager(db, settingsManager);
-export const inputValidator = new InputValidator(languageManager);
-export const searchHandler = new SearchHandler(db, ideaManager);
-export const stats = new StatsCounter(db, languageManager);
+	get settingsManager(): SettingsManager {
+		return this._settingsManager;
+	}
 
-export async function clearDatabaseAndCreateSchema(): Promise<void> {
-	await db.run('drop table if exists expressions');
-	await db.run('drop table if exists ideas');
-	await db.run('drop table if exists languages');
-	await db.run('drop table if exists settings');
-	await db.run(
-		'CREATE TABLE "languages" (\n'
-        + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
-        + '\t"name"\tTEXT NOT NULL,\n'
-        + '\t"ordering"\tINTEGER NOT NULL,\n'
-        + '\t"isPractice"\tTEXT NOT NULL\n'
-        + ')',
-	);
-	await db.run(
-		'CREATE TABLE "ideas" (\n'
-        + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE\n'
-        + ')',
-	);
-	await db.run(
-		'CREATE TABLE "expressions" (\n'
-        + '\t"id"\tINTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,\n'
-        + '\t"ideaId"\tINTEGER NOT NULL,\n'
-        + '\t"languageId"\tINTEGER NOT NULL,\n'
-        + '\t"text"\tTEXT NOT NULL,\n'
-				+ '\t"known"\tTEXT DEFAULT 0,\n'
-        + '\tFOREIGN KEY("languageId") REFERENCES "languages"("id"),\n'
-        + '\tFOREIGN KEY("ideaId") REFERENCES "ideas"("id")\n'
-        + ')',
-	);
-	await db.run(
-		'CREATE TABLE "settings" (\n'
-      + '"name"\tTEXT NOT NULL UNIQUE,\n'
-      + '"value"\tTEXT\n'
-      + ')',
-	);
-	practiceManager.clear();
-}
+	get languageManager(): LanguageManager {
+		return this._languageManager;
+	}
 
-export function getIdeaManager(): IdeaManager {
-	return ideaManager;
-}
+	get ideaManager(): IdeaManager {
+		return this._ideaManager;
+	}
 
-export function getLanguageManager(): LanguageManager {
-	return languageManager;
-}
+	get practiceManager(): PracticeManager {
+		return this._practiceManager;
+	}
 
-export function getPracticeManager(): PracticeManager {
-	return practiceManager;
-}
+	get inputValidator(): InputValidator {
+		return this._inputValidator;
+	}
 
-export function getInputValidator(): InputValidator {
-	return inputValidator;
-}
+	get searchHandler(): SearchHandler {
+		return this._searchHandler;
+	}
 
-export function getSearchHandler(): SearchHandler {
-	return searchHandler;
-}
+	get statsCounter(): StatsCounter {
+		return this._statsCounter;
+	}
 
-export function getStats(): StatsCounter {
-	return stats;
-}
-
-export function getSettingsManager(): SettingsManager {
-	return settingsManager;
-}
-
-if (!dbExists) {
-	await clearDatabaseAndCreateSchema();
+	async reset() {
+		await clearDatabaseAndCreateSchema(this._db);
+		this._practiceManager.clear();
+		await this._settingsManager.setVersion(currentVersion);
+	}
 }

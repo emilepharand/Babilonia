@@ -7,7 +7,7 @@ import {
 	addLanguage,
 	addLanguageAndGetResponse,
 	apiUrl,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	deleteLanguage,
 	editLanguages,
 	editLanguagesAndGetResponse,
@@ -30,7 +30,7 @@ import {
 } from './utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('valid cases', () => {

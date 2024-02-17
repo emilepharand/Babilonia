@@ -1,8 +1,8 @@
 import Ajv from 'ajv';
-import type {Expression} from './expression';
-import {getEmptyNexpressions} from './expression';
 import type {Language} from '../languages/language';
 import {getEmptyLanguageNoAsync} from '../languages/language';
+import type {Expression} from './expression';
+import {getEmptyNexpressions} from './expression';
 
 export type Idea = {
 	id: number;

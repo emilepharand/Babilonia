@@ -8,6 +8,7 @@ import {Settings} from '../../server/model/settings/settings';
 import {AllStats} from '../../server/stats/statsCounter';
 import {paramsFromSearchContext} from '../../src/ts/api';
 import {getRandomString, settingsFromPartial} from './utils';
+import {memoryDatabasePath} from '../../server/const';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -153,6 +154,18 @@ export async function search(sc: SearchContext): Promise<Idea[]> {
 	return (await (await searchAndGetResponse(sc)).json()) as Idea[];
 }
 
+export async function changeDatabase(path: string) {
+	return changeDatabaseRawObjectAndGetResponse(JSON.stringify({path}));
+}
+
+export async function getDatabasePath() {
+	return (await getResources('database/path')).json();
+}
+
+export async function changeDatabaseRawObjectAndGetResponse(object: any) {
+	return doFetch(`${apiUrl}/database/path`, 'PUT', object);
+}
+
 export async function rawNextPracticeIdea(): Promise<Response> {
 	return doFetch(`${apiUrl}/practice-ideas/next`, 'GET');
 }
@@ -163,4 +176,12 @@ export async function nextPracticeIdea(): Promise<Idea> {
 
 export async function deleteEverything(): Promise<Response> {
 	return doFetch(`${apiUrl}/everything`, 'DELETE');
+}
+
+export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
+	const res = await changeDatabase(memoryDatabasePath);
+	if (res.status !== 200) {
+		throw new Error('Failed to change database to memory.');
+	}
+	return deleteEverything();
 }

@@ -1,10 +1,13 @@
+import Ajv from 'ajv';
+import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
-import type LanguageManager from './languages/languageManager';
 import type {Language} from './languages/language';
 import {validate as validateLanguage, validateForAdding} from './languages/language';
+import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
-import type {ExpressionForAdding} from './ideas/expression';
+import path from 'path';
+import fs from 'fs';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -23,7 +26,7 @@ export default class InputValidator {
 
 	public async validateLanguagesForEditing(toValidate: unknown): Promise<boolean> {
 		// Object is an array
-		if (!(toValidate instanceof Array)) {
+		if (!Array.isArray(toValidate)) {
 			return false;
 		}
 		const ll = toValidate as Language[];
@@ -99,6 +102,43 @@ export default class InputValidator {
 	public validateSettings(settings: unknown): boolean {
 		return validateSettingsSchema(settings);
 	}
+
+	public validateChangeDatabase(pathObject: unknown) {
+		return validateDatabaseSchema(pathObject);
+	}
+}
+
+export function validateDatabaseSchema(pathObject: unknown) {
+	const ajv = new Ajv();
+	const schema = {
+		type: 'object',
+		properties: {
+			path: {type: 'string'},
+		},
+		required: ['path'],
+		additionalProperties: false,
+	};
+	return ajv.compile(schema)(pathObject);
+}
+
+export function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
+	const resolvedPath = path.resolve(process.cwd(), unsafePath);
+
+	if (!resolvedPath.startsWith(process.cwd())) {
+		return false;
+	}
+
+	if (!fs.existsSync(resolvedPath)) {
+		const parentDir = path.dirname(resolvedPath);
+		if (!fs.existsSync(parentDir)) {
+			return false;
+		}
+		const realPathParent = fs.realpathSync(parentDir);
+		const fileName = path.basename(resolvedPath);
+		return path.resolve(process.cwd(), realPathParent, fileName);
+	}
+
+	return fs.realpathSync(resolvedPath);
 }
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {

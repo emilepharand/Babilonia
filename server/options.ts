@@ -9,7 +9,8 @@ export const appPort = process.env.VITE_BASE_PORT;
 for (const arg of process.argv) {
 	if (arg.startsWith('--db=')) {
 		databasePath = arg.substring(5, arg.length);
-	} else if (arg === '--dev-mode') {
+	}
+	if (arg === '--dev-mode') {
 		isDevMode = true;
 	}
 }

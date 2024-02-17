@@ -1,11 +1,15 @@
 import {
-	addIdea, addLanguage, deleteEverything, editLanguagesAndGetResponse, getStats,
+	addIdea,
+	addLanguage,
+	changeDatabaseToMemoryAndDeleteEverything,
+	editLanguagesAndGetResponse,
+	getStats,
 } from '../utils/fetch-utils';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {LanguageStats} from '../../server/stats/statsCounter';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('getting stats', () => {

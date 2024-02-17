@@ -1,9 +1,9 @@
 import type {Database} from 'sqlite';
+import type LanguageManager from '../languages/languageManager';
+import {type Manager} from '../manager';
 import type {Expression, ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
-import type LanguageManager from '../languages/languageManager';
 import type {IdeaForAdding} from './ideaForAdding';
-import {type Manager} from '../manager';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid

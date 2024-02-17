@@ -20,4 +20,9 @@ export default defineConfig({
 		// eslint-disable-next-line @typescript-eslint/naming-convention
 		__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'true',
 	},
+	server: {
+		watch: {
+			ignored: ['**/coverage/**'],
+		},
+	},
 });

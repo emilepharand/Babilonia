@@ -1,7 +1,7 @@
 import {
 	addIdea,
 	addLanguage,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	editLanguages,
 	nextPracticeIdea,
 	rawNextPracticeIdea,
@@ -14,7 +14,7 @@ import {addIdeaHavingExpressions, addIdeaHavingLanguages} from './ideas/utils';
 import {areInSameOrder, executeNTimes} from '../utils/utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('getting practice ideas when there are no practiceable ideas', () => {

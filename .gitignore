@@ -35,6 +35,7 @@ src/**/*.js
 *.js.map
 
 *.db
+!tests/db/*.db
 !db/*.db
 db.db-journal
 
