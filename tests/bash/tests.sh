@@ -67,13 +67,13 @@ after_failure() {
   cleanup && exit 1
 }
 
+coverage_file_nbr=0
 write_coverage() {
-  local output_file="$1"
+  output_file="coverage-bash-${coverage_file_nbr}.json"
+  ((coverage_file_nbr++))
   curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' >"../tests/coverage/merged/${output_file}"
 }
 
-echo "------------------------------------------------------"
-echo " Test 1                                               "
 echo "------------------------------------------------------"
 echo " sqlite3 is not included in production build          "
 echo " and package.json in dist includes sqlite3            "
@@ -115,8 +115,6 @@ if [ "$1" == "sqlite3" ]; then
 fi
 
 echo "-------------------------------------------------------"
-echo " Test 2                                                "
-echo "-------------------------------------------------------"
 echo " --db=db, file does not exist, file is created         "
 echo " when file exists, it is not overwritten, it is loaded "
 echo "-------------------------------------------------------"
@@ -128,7 +126,7 @@ node index.cjs --db="$DB_NEW_FILENAME" &
 
 sleep 1
 
-write_coverage "coverage-bash.json"
+write_coverage
 
 # Create data for later in the test
 curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' >/dev/null
@@ -148,7 +146,7 @@ node index.cjs --db="$DB_NEW_FILENAME" &
 
 sleep 1
 
-write_coverage "coverage-bash-2.json"
+write_coverage
 
 res=$(curl -sf "$VITE_API_URL/languages/1" -H "Content-Type: application/json")
 
@@ -162,8 +160,6 @@ fi
 after_success
 
 echo "------------------------------------------------------"
-echo " Test 3                                               "
-echo "------------------------------------------------------"
 echo " --dev-mode does not start API server                 "
 echo "------------------------------------------------------"
 
@@ -174,7 +170,7 @@ node index.cjs --dev-mode &
 
 sleep 1
 
-write_coverage "coverage-bash-3.json"
+write_coverage
 
 if curl -sf --output /dev/null --silent --head --fail "$VITE_BASE_URL"; then
   echo "URL exists: $VITE_BASE_URL"
@@ -183,8 +179,6 @@ fi
 
 after_success
 
-echo "------------------------------------------------------"
-echo " Test 4                                               "
 echo "------------------------------------------------------"
 echo " Hot reload works                                     "
 echo "------------------------------------------------------"
