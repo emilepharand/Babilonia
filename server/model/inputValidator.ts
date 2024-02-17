@@ -8,7 +8,6 @@ import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
 import path from 'path';
 import fs from 'fs';
-import console from 'console';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -123,29 +122,23 @@ export function validateDatabaseSchema(pathObject: unknown) {
 }
 
 export function resolveAndNormalizePathUnderWorkingDirectory(unsafePath: string) {
-	try {
-		const resolvedPath = path.resolve(process.cwd(), unsafePath);
+	const resolvedPath = path.resolve(process.cwd(), unsafePath);
 
-		if (!resolvedPath.startsWith(process.cwd())) {
-			return false;
-		}
-
-		if (!fs.existsSync(resolvedPath)) {
-			const parentDir = path.dirname(resolvedPath);
-			if (!fs.existsSync(parentDir)) {
-				return false;
-			}
-			const realPathParent = fs.realpathSync(parentDir);
-			const fileName = path.basename(resolvedPath);
-			return path.resolve(process.cwd(), realPathParent, fileName);
-		}
-
-		return fs.realpathSync(resolvedPath);
-	} catch (e) {
-		// Path is invalid
-		console.error(e);
+	if (!resolvedPath.startsWith(process.cwd())) {
 		return false;
 	}
+
+	if (!fs.existsSync(resolvedPath)) {
+		const parentDir = path.dirname(resolvedPath);
+		if (!fs.existsSync(parentDir)) {
+			return false;
+		}
+		const realPathParent = fs.realpathSync(parentDir);
+		const fileName = path.basename(resolvedPath);
+		return path.resolve(process.cwd(), realPathParent, fileName);
+	}
+
+	return fs.realpathSync(resolvedPath);
 }
 
 export function validateContextParentheses(ee: ExpressionForAdding[]) {
