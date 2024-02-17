@@ -26,8 +26,7 @@ export default class Routes {
 		if (process.env.TEST_MODE) {
 			// Signals that the server is running in tests
 			this.router.get('/', (_, res) => {
-				res.status(200);
-				res.end();
+				res.status(200).end();
 			});
 		}
 		// Languages
