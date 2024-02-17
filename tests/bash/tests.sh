@@ -64,6 +64,8 @@ after_success() {
 
 after_failure() {
   echo -e "\n--> Result: failure!\n"
+  echo "Content of temp.txt:"
+  cat temp.txt
   cleanup && exit 1
 }
 
