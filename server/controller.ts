@@ -7,7 +7,7 @@ import type {Settings} from './model/settings/settings';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {currentVersion} from './const';
+import {currentVersion, memoryDatabasePath} from './const';
 import console from 'console';
 
 // This is the contact point for the front-end and the back-end
@@ -17,13 +17,13 @@ import console from 'console';
 let dbCoordinator = new DatabaseCoordinator(databasePath);
 await dbCoordinator.init();
 if (!dbCoordinator.isValid) {
-	console.error('Fatal error: database could not be opened.');
 	if (dbCoordinator.isValidVersion) {
-		console.error(`Invalid database path provided for --db option ('${databasePath}').`);
+		console.error(`Invalid database path provided for --db option ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
 	} else {
 		console.error(`Unsupported database version. Current version is ${currentVersion}.`);
 	}
-	process.exit(1);
+	dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
+	await dbCoordinator.init();
 }
 let {dataServiceProvider} = dbCoordinator;
 
