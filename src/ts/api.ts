@@ -102,6 +102,11 @@ export async function changeDatabase(path: string): Promise<Response> {
 	return doFetch(url, 'PUT', JSON.stringify({path}));
 }
 
+export async function migrateDatabase(path: string): Promise<Response> {
+	const url = `${apiUrl}/database/migrate`;
+	return doFetch(url, 'PUT', JSON.stringify({path}));
+}
+
 export async function setSettings(settings: Settings): Promise<void> {
 	const url = `${apiUrl}/settings`;
 	await doFetch(url, 'PUT', JSON.stringify(settings));

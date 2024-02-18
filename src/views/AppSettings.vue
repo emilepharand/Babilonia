@@ -114,6 +114,13 @@
     >
       Save
     </button>
+    <button
+      id="migrateButton"
+      class="btn btn-primary w-100 mt-2"
+      @click="migrate()"
+    >
+      Migrate
+    </button>
     <p
       v-if="submitted && !errorMessage"
       id="settingsSavedText"
@@ -156,6 +163,14 @@ async function save() {
 	if (success) {
 		await Api.setSettings(settings.value);
 	}
+	submitted.value = true;
+}
+
+async function migrate() {
+	await Api.migrateDatabase(databasePath.value);
+	// If (success) {
+	//   await Api.setSettings(settings.value);
+	// }
 	submitted.value = true;
 }
 
