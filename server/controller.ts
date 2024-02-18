@@ -9,6 +9,7 @@ import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
 import {currentVersion, memoryDatabasePath} from './const';
 import console from 'console';
+import DatabaseMigrator from './model/databaseMigrator';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -249,6 +250,25 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 	dataServiceProvider = newDbCoordinator.dataServiceProvider;
 	dbCoordinator = newDbCoordinator;
 	res.end();
+}
+
+export async function migrateDatabase(req: Request, res: Response): Promise<void> {
+	// TODO validation
+
+	// Database to migrate
+	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
+	await dbCoordinatorForToMigrate.init();
+
+	// Base database
+	const dbCoordinatorForBaseDb = new DatabaseCoordinator('db/base.db');
+	await dbCoordinatorForBaseDb.init();
+
+	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
+		dbCoordinatorForBaseDb.dataServiceProvider);
+
+	await databaseMigrator.migrate();
+
+	res.status(200).end();
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {

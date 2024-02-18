@@ -55,6 +55,7 @@ export default class Routes {
 		// Database
 		this.route('put', '/database/path', Controller.changeDatabase);
 		this.route('get', '/database/path', Controller.getDatabasePath);
+		this.route('put', '/database/migrate', Controller.migrateDatabase);
 	}
 
 	private wrapAsync(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): (req: Request, res: Response, next: NextFunction) => void {

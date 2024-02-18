@@ -84,6 +84,10 @@ export default class DatabaseCoordinator {
 		return this._dataServiceProvider;
 	}
 
+	get databaseOpener(): DatabaseOpener {
+		return this._databaseOpener;
+	}
+
 	get inputPath(): string {
 		return this._inputPath;
 	}
