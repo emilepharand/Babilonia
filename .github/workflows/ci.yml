@@ -48,7 +48,7 @@ jobs:
       - name: eslint
         run: npm run lint
       - name: super-linter
-        uses: super-linter/super-linter/slim@v5
+        uses: super-linter/super-linter/slim@v6
         env:
           VALIDATE_ALL_CODEBASE: true
           # JS and TS are already linted in another job
