@@ -91,17 +91,18 @@ describe('invalid cases', () => {
 	});
 
 	test('migrating 2.0 database to 2.1', async () => {
-		let res = await changeDatabase('tests/db/unsupported-version-to-migrate.db');
+		const dbToMigratePath = 'tests/db/unsupported-version-to-migrate.db';
+		let res = await changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(400);
 		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 
-		res = await migrateDatabase('tests/db/unsupported-version-to-migrate.db');
+		res = await migrateDatabase(dbToMigratePath);
 		expect(res.status).toEqual(200);
 
-		res = await changeDatabase('tests/db/unsupported-version-to-migrate.db');
+		res = await changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(200);
-		expect(await getDatabasePath()).toEqual('tests/db/unsupported-version-to-migrate.db');
+		expect(await getDatabasePath()).toEqual(dbToMigratePath);
 	});
 });
 
