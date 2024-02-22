@@ -158,12 +158,20 @@ export async function changeDatabase(path: string) {
 	return changeDatabaseRawObjectAndGetResponse(JSON.stringify({path}));
 }
 
+export async function migrateDatabase(path: string) {
+	return migrateDatabaseRawObjectAndGetResponse(JSON.stringify({path}));
+}
+
 export async function getDatabasePath() {
 	return (await getResources('database/path')).json();
 }
 
 export async function changeDatabaseRawObjectAndGetResponse(object: any) {
 	return doFetch(`${apiUrl}/database/path`, 'PUT', object);
+}
+
+export async function migrateDatabaseRawObjectAndGetResponse(object: any) {
+	return doFetch(`${apiUrl}/database/migrate`, 'PUT', object);
 }
 
 export async function rawNextPracticeIdea(): Promise<Response> {
