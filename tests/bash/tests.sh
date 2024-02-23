@@ -1,142 +1,248 @@
 #!/bin/bash
 
+DB_NEW_FILENAME="newDbFile.db"
+
 cleanup() {
+  cleanup_no_db
+  # Test 1
+  rm -f "$(get_root_dir)/dist/$DB_NEW_FILENAME"
+}
+
+cleanup_no_db() {
   pkill -f "server/index.ts"
   pkill -f "index.cjs"
   pkill -f "node_modules/.bin/vite"
-  rm -f temp.txt
-  dir=$(basename "$PWD" | grep -q "dist" && dirname "$PWD" || echo "$PWD")
-  sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$dir/index.html"
-  sed -i 's@API server started!@API server started.@' "$dir/server/index.ts"
+  root_dir=$(get_root_dir)
+  dist_dir=$(get_dist_dir)
+  rm -f "$root_dir/temp.txt"
+  rm -f "$dist_dir/temp.txt"
+  # Test 1
+  if [ -d "$dist_dir/node_modules" ]; then
+    rm -rf "$dist_dir/node_modules"
+  fi
+  if [ -d "$root_dir/node_modules.bak" ]; then
+    mv "$root_dir/node_modules.bak" "$root_dir/node_modules"
+  fi
+  # Test 4
+  sed -i 's@<title>Babilonius</title>@<title>Babilonia</title>@' "$root_dir/index.html"
+  sed -i 's@API server started!@API server started.@' "$root_dir/server/index.ts"
 }
 
-# Cleanup previous run
-cleanup
+get_root_dir() {
+  # If the current directory is dist, go to the parent directory
+  if basename "$PWD" | grep -q "dist"; then
+    dirname "$PWD"
+  else
+    echo "$PWD"
+  fi
+}
+
+get_dist_dir() {
+  echo "$(get_root_dir)/dist"
+}
+
+go_to_root() {
+  root_dir=$(get_root_dir)
+  cd "$root_dir" || {
+    echo "cd \"$root_dir\" failed"
+    exit 1
+  }
+}
+
+go_to_dist() {
+  dist_dir=$(get_dist_dir)
+  cd "$dist_dir" || {
+    echo "cd \"$dist_dir\" failed"
+    exit 1
+  }
+}
 
 after_success() {
   echo -e "\n--> Result: success!\n"
   cleanup
 }
 
+after_failure() {
+  echo -e "\n--> Result: failure!\n"
+  echo "Content of temp.txt:"
+  cat temp.txt
+  cleanup && exit 1
+}
+
+coverage_file_nbr=0
 write_coverage() {
-  local output_file="$1"
+  output_file="coverage-bash-${coverage_file_nbr}.json"
+  ((coverage_file_nbr++))
   curl -sf "$VITE_API_URL/__coverage__" | cut -c13- | sed 's/.$//' >"../tests/coverage/merged/${output_file}"
 }
 
-dbFileName="newDbFile.db"
-
-cd dist || {
-  echo "cd dist failed"
-  exit 1
-}
-
-####################################################
-# Test 1
-####################################################
-
 echo "------------------------------------------------------"
-echo " Test 1                                               "
-echo "------------------------------------------------------"
-echo " --db=db, file does not exist, file is created        "
+echo " sqlite3 is not included in production build          "
+echo " and package.json in dist includes sqlite3            "
 echo "------------------------------------------------------"
 
-# Previous test may have left a file
-if [ -f "$dbFileName" ]; then
-  echo "File $dbFileName already exists. Deleting."
-  rm $dbFileName
+cleanup
+go_to_root
+
+# Make sure project's node_modules is not used
+mv node_modules node_modules.bak
+
+go_to_dist
+
+node index.cjs >temp.txt 2>&1 &
+
+sleep 2
+
+if ! grep -Fq "Error: Cannot find module 'sqlite3'" "temp.txt"; then
+  echo "sqlite3 error not found."
+  after_failure
 fi
 
-# Run
-node index.cjs --db="$dbFileName" &
+# Should install sqlite3
+npm i
 
-sleep 1
+node index.cjs >temp.txt 2>&1 &
 
-# Coverage
-write_coverage "coverage-bash.json"
+sleep 2
 
-# Create data for the next test
-curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' >/dev/null
-
-# Test that database file has been created and is not empty
-if [ ! -f "$dbFileName" ]; then
-  echo "--> Result: failure!"
-  echo "File $dbFileName was not created."
-  cleanup && exit 1
-elif [ ! -s "$dbFileName" ]; then
-  echo "--> Result: failure!"
-  echo "File $dbFileName was created but is empty."
-  cleanup && exit 1
+if ! grep -Fq "API server started." "temp.txt" || ! grep -Fq "App started." "temp.txt"; then
+  echo "Could not start application after installing sqlite3."
+  after_failure
 fi
 
 after_success
 
-####################################################
-# Test 2
-####################################################
+if [ "$1" == "sqlite3" ]; then
+  exit 0
+fi
 
-echo "------------------------------------------------------"
-echo " Test 2                                               "
-echo "--------------------------------------------------------"
-echo " --db=db, file exists, file is not overwritten, is used "
-echo "--------------------------------------------------------"
+echo "-------------------------------------------------------"
+echo " --db=db, file does not exist, file is created         "
+echo " when file exists, it is not overwritten, it is loaded "
+echo "-------------------------------------------------------"
 
-# Run
-node index.cjs --db="$dbFileName" &
+cleanup
+go_to_dist
+
+node index.cjs --db="$DB_NEW_FILENAME" &
 
 sleep 1
 
-# Coverage
-write_coverage "coverage-bash-2.json"
+write_coverage
+
+# Create data for later in the test
+curl -sfq "$VITE_API_URL/languages" -H "Content-Type: application/json" -d '{"name":"newLanguage"}' >/dev/null
+
+# The database file was created and is not empty
+if [ ! -f "$DB_NEW_FILENAME" ]; then
+  echo "File $DB_NEW_FILENAME was not created."
+  after_failure
+elif [ ! -s "$DB_NEW_FILENAME" ]; then
+  echo "File $DB_NEW_FILENAME was created but is empty."
+  after_failure
+fi
+
+cleanup_no_db
+
+node index.cjs --db="$DB_NEW_FILENAME" &
+
+sleep 1
+
+write_coverage
 
 res=$(curl -sf "$VITE_API_URL/languages/1" -H "Content-Type: application/json")
 
 if [ "$res" != '{"id":1,"isPractice":false,"name":"newLanguage","ordering":0}' ]; then
-  echo "Result: failure!"
   echo "Database was overwritten."
-  cleanup && exit 1
+  echo "Expected: {\"id\":1,\"isPractice\":false,\"name\":\"newLanguage\",\"ordering\":0}"
+  echo "Actual: $res"
+  after_failure
 fi
 
 after_success
 
-######################################
-# Test 3
-######################################
+echo "-------------------------------------------------------"
+echo " --db=db, file is invalid                              "
+echo "-------------------------------------------------------"
+
+cleanup
+go_to_dist
+
+node index.cjs --db="/tmp/wrong.db" >temp.txt 2>&1 &
+
+sleep 1
+
+write_coverage
+
+if ! grep -Fq "Invalid database path provided" "temp.txt"; then
+  echo "Invalid database path error not found."
+  after_failure
+fi
+
+res=$(curl -sf "$VITE_API_URL/database/path" -H "Content-Type: application/json")
+
+if [ "$res" != '":memory:"' ]; then
+  echo "Database was not set to memory."
+  echo "Database path: $res"
+  after_failure
+fi
+
+after_success
+
+echo "-------------------------------------------------------"
+echo " --db=db, unsupported version                          "
+echo "-------------------------------------------------------"
+
+cleanup
+go_to_dist
+
+node index.cjs --db="tests/db/unsupported-version.db" >temp.txt 2>&1 &
+
+sleep 1
+
+write_coverage
+
+if ! grep -Fq "Unsupported database version" "temp.txt"; then
+  echo "Unsupported database version error not found."
+  after_failure
+fi
+
+res=$(curl -sf "$VITE_API_URL/database/path" -H "Content-Type: application/json")
+
+if [ "$res" != '":memory:"' ]; then
+  echo "Database was not set to memory."
+  echo "Database path: $res"
+  after_failure
+fi
+
+after_success
 
 echo "------------------------------------------------------"
-echo " Test 3                                               "
+echo " --dev-mode does not start API server                 "
 echo "------------------------------------------------------"
-echo " --dev-mode does not start webserver                  "
-echo "------------------------------------------------------"
+
+cleanup
+go_to_dist
 
 node index.cjs --dev-mode &
 
 sleep 1
 
-# Coverage
-write_coverage "coverage-bash-3.json"
+write_coverage
 
 if curl -sf --output /dev/null --silent --head --fail "$VITE_BASE_URL"; then
-  echo "--> Result: failure!"
   echo "URL exists: $VITE_BASE_URL"
-  cleanup && exit 1
+  after_failure
 fi
 
 after_success
 
-######################################
-# Test 4
-######################################
-
-cd .. || {
-  echo "cd .. failed"
-  exit 1
-}
-
-echo "------------------------------------------------------"
-echo " Test 4                                               "
 echo "------------------------------------------------------"
 echo " Hot reload works                                     "
 echo "------------------------------------------------------"
+
+cleanup
+go_to_root
 
 npm run dev >temp.txt &
 
@@ -145,13 +251,11 @@ sleep 8
 indexContent=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [ -z "$indexContent" ]; then
-  echo "--> Result: failure!"
   echo "Vue did not start."
-  cleanup && exit 1
+  after_failure
 elif ! curl -sf -o /dev/null "$VITE_API_URL_DEV/languages"; then
-  echo "--> Result: failure!"
   echo "API server did not start."
-  cleanup && exit 1
+  after_failure
 fi
 
 # Trigger hot reload
@@ -163,21 +267,18 @@ sleep 8
 indexContent2=$(curl -sf "$VITE_BASE_URL_DEV")
 
 if [[ "$indexContent" == *"Babilonius"* ]]; then
-  echo "--> Result: failure!"
   echo "Index already has the new content."
-  cleanup && exit 1
+  after_failure
 fi
 
 if [[ "$indexContent2" != *"Babilonius"* || "$indexContent2" == *"Babilonia"* ]]; then
-  echo "--> Result: failure!"
   echo "Vue server did not restart properly."
-  cleanup && exit 1
+  after_failure
 fi
 
 if ! grep -Fq "[nodemon] restarting due to changes..." "temp.txt" || ! grep -Fq "API server started!" "temp.txt"; then
-  echo "--> Result: failure!"
   echo "API server did not restart."
-  cleanup && exit 1
+  after_failure
 fi
 
 after_success

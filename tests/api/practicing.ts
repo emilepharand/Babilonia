@@ -1,7 +1,7 @@
 import {
 	addIdea,
 	addLanguage,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	editLanguages,
 	nextPracticeIdea,
 	rawNextPracticeIdea,
@@ -14,7 +14,7 @@ import {addIdeaHavingExpressions, addIdeaHavingLanguages} from './ideas/utils';
 import {areInSameOrder, executeNTimes} from '../utils/utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('getting practice ideas when there are no practiceable ideas', () => {
@@ -175,8 +175,10 @@ describe('getting practice ideas', () => {
 		practiceLanguage.isPractice = true;
 		await editLanguages([practiceLanguage, nonPracticeLanguage]);
 
-		const idea = await addIdea({ee: [{languageId: practiceLanguage.id, text: 'e1'},
-			{languageId: nonPracticeLanguage.id, text: 'e2', known: true}]});
+		const idea = await addIdea({
+			ee: [{languageId: practiceLanguage.id, text: 'e1'},
+				{languageId: nonPracticeLanguage.id, text: 'e2', known: true}],
+		});
 
 		// Practice only known is false
 		await setSettings({practiceOnlyNotKnown: false, randomPractice: false});

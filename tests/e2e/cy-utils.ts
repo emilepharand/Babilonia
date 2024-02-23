@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
+import {Language} from 'server/model/languages/language';
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Settings} from '../../server/model/settings/settings';
-import {Language} from 'server/model/languages/language';
 import {settingsFromPartial} from '../utils/utils';
 
 dotenv.config();
@@ -40,12 +40,24 @@ export function addLanguages() {
 	}
 	// Make some languages practiceable
 	const ll: Language[] = [
-		{id: 1, name: 'français', ordering: 0, isPractice: false},
-		{id: 2, name: 'english', ordering: 1, isPractice: true},
-		{id: 3, name: 'español', ordering: 2, isPractice: true},
-		{id: 4, name: 'italiano', ordering: 3, isPractice: true},
-		{id: 5, name: 'deutsch', ordering: 4, isPractice: true},
-		{id: 6, name: 'português', ordering: 5, isPractice: true},
+		{
+			id: 1, name: 'français', ordering: 0, isPractice: false,
+		},
+		{
+			id: 2, name: 'english', ordering: 1, isPractice: true,
+		},
+		{
+			id: 3, name: 'español', ordering: 2, isPractice: true,
+		},
+		{
+			id: 4, name: 'italiano', ordering: 3, isPractice: true,
+		},
+		{
+			id: 5, name: 'deutsch', ordering: 4, isPractice: true,
+		},
+		{
+			id: 6, name: 'português', ordering: 5, isPractice: true,
+		},
 	];
 	cyRequestPut(`${apiUrl}/languages`, ll);
 	return ll;
@@ -197,4 +209,8 @@ export function assertExpressionHasValues(rowNbr: number, languageName: string, 
 
 export async function setSettings(partialSettings: Partial<Settings>) {
 	cyRequestPut(`${apiUrl}/settings`, settingsFromPartial(partialSettings));
+}
+
+export function changeDatabase(path: string) {
+	cyRequestPut(`${apiUrl}/database/path`, {path});
 }

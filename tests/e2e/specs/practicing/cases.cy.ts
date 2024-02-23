@@ -1,14 +1,17 @@
 import {ExpressionForAdding} from '../../../../server/model/ideas/expression';
 import {IdeaForAdding} from '../../../../server/model/ideas/ideaForAdding';
 import {
-	addLanguages,
-	apiUrl,
-	cyRequestPost,
-	cyRequestPut,
-	setSettings,
+	addLanguages, apiUrl, cyRequestPost, cyRequestPut, setSettings,
 } from '../../cy-utils';
-import {assertRowInputHasFocus, assertRowInputIsNotPracticeable, assertRowMatchIsFullMatch,
-	assertRowMatchIsNeutral, getNextButton, typeInRow, waitForTableToLoad} from './utils';
+import {
+	assertRowInputHasFocus,
+	assertRowInputIsNotPracticeable,
+	assertRowMatchIsFullMatch,
+	assertRowMatchIsNeutral,
+	getNextButton,
+	typeInRow,
+	waitForTableToLoad,
+} from './utils';
 
 context('Specific cases', () => {
 	specify('Settings to practice only not known expressions', () => {
@@ -101,7 +104,11 @@ context('Specific cases', () => {
 		cyRequestPost(`${apiUrl}/ideas`, i1);
 
 		// Make some languages practiceable
-		cyRequestPut(`${apiUrl}/languages`, [{id: 1, name: 'français', ordering: 0, isPractice: true}, {id: 2, name: 'english', ordering: 1, isPractice: false}]);
+		cyRequestPut(`${apiUrl}/languages`, [{
+			id: 1, name: 'français', ordering: 0, isPractice: true,
+		}, {
+			id: 2, name: 'english', ordering: 1, isPractice: false,
+		}]);
 
 		cy.get('#practice-link').click();
 

@@ -7,7 +7,7 @@ import {
 	addLanguage,
 	addLanguageAndGetResponse,
 	apiUrl,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	deleteLanguage,
 	editLanguages,
 	editLanguagesAndGetResponse,
@@ -19,10 +19,18 @@ import {
 	FIRST_LANGUAGE_ID,
 	FIRST_ORDERING,
 } from '../../utils/fetch-utils';
-import {addInvalidLanguageAndTest, addNLanguages, addValidLanguageAndTest, copyLanguage, editAndTest, editInvalidLanguagesAndTest, testLanguageOrder} from './utils';
+import {
+	addInvalidLanguageAndTest,
+	addNLanguages,
+	addValidLanguageAndTest,
+	copyLanguage,
+	editAndTest,
+	editInvalidLanguagesAndTest,
+	testLanguageOrder,
+} from './utils';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('valid cases', () => {

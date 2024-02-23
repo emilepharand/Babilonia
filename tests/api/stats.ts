@@ -1,7 +1,7 @@
 import {
 	addIdea,
 	addLanguage,
-	deleteEverything,
+	changeDatabaseToMemoryAndDeleteEverything,
 	editLanguagesAndGetResponse,
 	getStats,
 } from '../utils/fetch-utils';
@@ -9,7 +9,7 @@ import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {LanguageStats} from '../../server/stats/statsCounter';
 
 beforeEach(async () => {
-	await deleteEverything();
+	await changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('getting stats', () => {
@@ -65,19 +65,33 @@ describe('getting stats', () => {
 
 		let expectedStats: Array<LanguageStats & {covered: boolean}> = [
 			// Ideas: 0/2, expressions: 0/2
-			{language: fr, knownIdeasCount: 0, totalIdeasCount: 2, knownExpressionsCount: 0, totalExpressionsCount: 3, covered: false},
+			{
+				language: fr, knownIdeasCount: 0, totalIdeasCount: 2, knownExpressionsCount: 0, totalExpressionsCount: 3, covered: false,
+			},
 			// Ideas: 1/1, expressions: 2/2
-			{language: en, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false},
+			{
+				language: en, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false,
+			},
 			// Ideas: 1/1, expressions: 2/2
-			{language: es, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false},
+			{
+				language: es, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 2, totalExpressionsCount: 2, covered: false,
+			},
 			// Ideas: 0/0, expressions: 0/0
-			{language: it, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			{
+				language: it, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false,
+			},
 			// Ideas: 0/0, expressions: 0/0
-			{language: de, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			{
+				language: de, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false,
+			},
 			// Ideas: 0/0, expressions: 0/0
-			{language: pt, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			{
+				language: pt, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false,
+			},
 			// Ideas: 0/0, expressions: 0/0
-			{language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			{
+				language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false,
+			},
 		];
 
 		testStats(actualStats.allLanguageStats, expectedStats);
@@ -107,13 +121,27 @@ describe('getting stats', () => {
 		expect(actualStats.globalStats.totalKnownExpressions).toBe(9);
 
 		expectedStats = [
-			{language: fr, knownIdeasCount: 1, totalIdeasCount: 4, knownExpressionsCount: 1, totalExpressionsCount: 5, covered: false},
-			{language: en, knownIdeasCount: 2, totalIdeasCount: 3, knownExpressionsCount: 3, totalExpressionsCount: 4, covered: false},
-			{language: es, knownIdeasCount: 1, totalIdeasCount: 3, knownExpressionsCount: 2, totalExpressionsCount: 4, covered: false},
-			{language: it, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 1, totalExpressionsCount: 1, covered: false},
-			{language: de, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false},
-			{language: pt, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false},
-			{language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false},
+			{
+				language: fr, knownIdeasCount: 1, totalIdeasCount: 4, knownExpressionsCount: 1, totalExpressionsCount: 5, covered: false,
+			},
+			{
+				language: en, knownIdeasCount: 2, totalIdeasCount: 3, knownExpressionsCount: 3, totalExpressionsCount: 4, covered: false,
+			},
+			{
+				language: es, knownIdeasCount: 1, totalIdeasCount: 3, knownExpressionsCount: 2, totalExpressionsCount: 4, covered: false,
+			},
+			{
+				language: it, knownIdeasCount: 1, totalIdeasCount: 1, knownExpressionsCount: 1, totalExpressionsCount: 1, covered: false,
+			},
+			{
+				language: de, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false,
+			},
+			{
+				language: pt, knownIdeasCount: 1, totalIdeasCount: 2, knownExpressionsCount: 1, totalExpressionsCount: 2, covered: false,
+			},
+			{
+				language: kl, knownIdeasCount: 0, totalIdeasCount: 0, knownExpressionsCount: 0, totalExpressionsCount: 0, covered: false,
+			},
 		];
 
 		testStats(actualStats.allLanguageStats, expectedStats);

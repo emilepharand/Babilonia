@@ -14,7 +14,7 @@ export async function getIdea(ideaId: number): Promise<Idea> {
 	const url = `${apiUrl}/ideas/${ideaId}`;
 	const response = await doFetch(url, 'GET');
 	if (response.status === 404) {
-		return Promise.reject();
+		return Promise.reject(new Error('Idea not found'));
 	}
 	return (await response.json()) as Idea;
 }
@@ -44,11 +44,11 @@ export async function addIdea(ifa: IdeaForAdding): Promise<Idea> {
 	return (await response.json()) as Idea;
 }
 
-export async function getNextIdea(): Promise<Idea> {
+export async function getNextIdea(): Promise<Idea | undefined> {
 	const url = `${apiUrl}/practice-ideas/next`;
 	const response = await doFetch(url, 'GET');
 	if (response.status === 404) {
-		return Promise.reject();
+		return undefined;
 	}
 	return (await response.json()) as Idea;
 }
@@ -89,6 +89,17 @@ export async function getSettings(): Promise<Settings> {
 	const url = `${apiUrl}/settings`;
 	const response = await doFetch(url, 'GET');
 	return (await response.json()) as Settings;
+}
+
+export async function getDatabasePath(): Promise<string> {
+	const url = `${apiUrl}/database/path`;
+	const response = await doFetch(url, 'GET');
+	return (await response.json()) as string;
+}
+
+export async function changeDatabase(path: string): Promise<Response> {
+	const url = `${apiUrl}/database/path`;
+	return doFetch(url, 'PUT', JSON.stringify({path}));
 }
 
 export async function setSettings(settings: Settings): Promise<void> {

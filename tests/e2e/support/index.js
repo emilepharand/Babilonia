@@ -13,7 +13,7 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 import {
-	apiUrl,
+	apiUrl, changeDatabase,
 } from '../cy-utils';
 
 import '@cypress/code-coverage/support';
@@ -32,6 +32,7 @@ const config = {
 failOnConsoleError(config);
 
 beforeEach(() => {
+	changeDatabase(':memory:');
 	cy.request('DELETE', `${apiUrl}/everything`);
 	// This is important to go to the webpage but also to register spy to fail on console errors
 	cy.visit('/');

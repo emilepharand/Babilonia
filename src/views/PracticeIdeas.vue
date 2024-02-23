@@ -92,9 +92,7 @@ const resetButton = ref(document.createElement('button'));
 const editIdeaButton = ref(document.createElement('button'));
 
 (async () => {
-	try {
-		await displayNextIdea();
-	} catch {
+	if (!await displayNextIdea()) {
 		noIdeas.value = true;
 	}
 })();
@@ -109,7 +107,12 @@ const nextButtonClass = computed(() => {
 
 async function displayNextIdea() {
 	resetRows();
-	const nextIdea = await Api.getNextIdea();
+	const nextIdeaOrUndefined = await Api.getNextIdea();
+	if (nextIdeaOrUndefined === undefined) {
+		noIdeas.value = true;
+		return false;
+	}
+	const nextIdea = nextIdeaOrUndefined;
 	settings.value = await Api.getSettings();
 	nextIdea.ee = reorderExpressions(nextIdea.ee);
 	idea.value = nextIdea;
@@ -118,6 +121,7 @@ async function displayNextIdea() {
 	currentlyFocusedRow.value = 0;
 	nbrRowsToMatch.value = idea.value.ee.filter(e => e.language.isPractice).length;
 	startInteractive.value = true;
+	return true;
 }
 
 // Put visible expressions first

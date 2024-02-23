@@ -65,7 +65,7 @@
         class="fa-solid fa-circle-question"
       />
     </div>
-    <div class="form-check">
+    <div class="form-check mb-2">
       <input
         id="passiveMode"
         v-model="settings.passiveMode"
@@ -86,39 +86,92 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <div>
+      <label
+        class="form-label"
+        for="databasePath"
+      >
+        Path to database
+      </label>
+      <i
+        title="The path to the database file. It should be a SQLite file located inside the application folder. The version must match the current application version. The database will be created if it does not exist."
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        class="fa-solid fa-circle-question"
+      />
+      <input
+        id="databasePath"
+        v-model="databasePath"
+        class="form-control"
+        type="text"
+      >
+    </div>
     <button
       id="saveButton"
-      class="btn btn-primary w-100"
+      class="btn btn-primary w-100 mt-2"
       @click="save()"
     >
       Save
     </button>
     <p
-      v-if="showSettingsSavedMessage"
+      v-if="submitted && !errorMessage"
       id="settingsSavedText"
       class="text-success"
     >
       Settings saved.
     </p>
+    <p
+      v-if="errorMessage"
+      id="settingsErrorText"
+      class="text-danger"
+    >
+      {{ errorMessage }}
+    </p>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {nextTick, ref} from 'vue';
-import * as Api from '../ts/api';
-import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as bootstrap from 'bootstrap';
+import {nextTick, ref} from 'vue';
+import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
+import * as Api from '../ts/api';
 
 const settings = ref(getEmptySettingsNoAsync());
-const showSettingsSavedMessage = ref(false);
+const databasePath = ref('');
+const errorMessage = ref('');
+const submitted = ref(false);
+let previousDatabasePath = '';
 
 (async () => {
-	settings.value = await Api.getSettings();
+	const fetchedSettings = await Api.getSettings();
+	const fetchedDatabasePath = await Api.getDatabasePath();
+	settings.value = fetchedSettings;
+	databasePath.value = fetchedDatabasePath;
+	previousDatabasePath = databasePath.value;
 })();
 
 async function save() {
-	await Api.setSettings(settings.value);
-	showSettingsSavedMessage.value = true;
+	const success = await changeDatabase();
+	if (success) {
+		await Api.setSettings(settings.value);
+	}
+	submitted.value = true;
+}
+
+async function changeDatabase() {
+	if (databasePath.value !== previousDatabasePath || errorMessage.value) {
+		previousDatabasePath = databasePath.value;
+		const res = await Api.changeDatabase(databasePath.value);
+		if (res.status === 200) {
+			errorMessage.value = '';
+		} else if (((await res.json()).error) === 'UNSUPPORTED_DATABASE_VERSION') {
+			errorMessage.value = 'The version of the database is not supported.';
+		} else {
+			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
+		}
+	}
+	return errorMessage.value === '';
 }
 
 void nextTick(() => {

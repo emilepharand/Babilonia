@@ -1,7 +1,9 @@
-import type {Express, Request, Response, NextFunction} from 'express';
+import AsyncLock from 'async-lock';
+import type {
+	Express, NextFunction, Request, Response,
+} from 'express';
 import {Router} from 'express';
 import * as Controller from './controller';
-import AsyncLock from 'async-lock';
 
 const lock = new AsyncLock();
 const lockKey = 'lock';
@@ -24,8 +26,7 @@ export default class Routes {
 		if (process.env.TEST_MODE) {
 			// Signals that the server is running in tests
 			this.router.get('/', (_, res) => {
-				res.status(200);
-				res.end();
+				res.status(200).end();
 			});
 		}
 		// Languages
@@ -51,6 +52,9 @@ export default class Routes {
 		this.route('get', '/settings', Controller.getSettings);
 		// Everything
 		this.route('delete', '/everything', Controller.deleteAllData);
+		// Database
+		this.route('put', '/database/path', Controller.changeDatabase);
+		this.route('get', '/database/path', Controller.getDatabasePath);
 	}
 
 	private wrapAsync(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>): (req: Request, res: Response, next: NextFunction) => void {
