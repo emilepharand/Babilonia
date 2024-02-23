@@ -114,19 +114,12 @@
     >
       Save
     </button>
-    <button
-      id="migrateButton"
-      class="btn btn-primary w-100 mt-2"
-      @click="migrate()"
-    >
-      Migrate
-    </button>
     <p
-      v-if="submitted && !errorMessage"
+      v-if="successMessage && !errorMessage"
       id="settingsSavedText"
       class="text-success"
     >
-      Settings saved.
+      {{ successMessage }}
     </p>
     <p
       v-if="errorMessage"
@@ -135,6 +128,59 @@
     >
       {{ errorMessage }}
     </p>
+    <div
+      id="confirm-migrate-modal"
+      ref="confirmMigrateModal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="confirm-migrate-modal-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              id="confirm-migrate-modal-label"
+              class="modal-title"
+            >
+              Confirm
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            />
+          </div>
+          <div class="modal-body">
+            The database version does not match the application version.<br><br>
+            Do you want to migrate the database?<br><br>
+            <span class="alert-danger">WARNING: This may cause data loss. Please make a backup of the database before proceeding.</span>
+          </div>
+          <div class="modal-footer">
+            <button
+              id="modal-cancel-button"
+              ref="modalCancelButton"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="modal-migrate-button"
+              ref="modalMigrateButton"
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              @click="migrate()"
+            >
+              Migrate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -144,10 +190,11 @@ import {nextTick, ref} from 'vue';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
 
+const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
-const submitted = ref(false);
+const successMessage = ref('');
 let previousDatabasePath = '';
 
 (async () => {
@@ -162,16 +209,14 @@ async function save() {
 	const success = await changeDatabase();
 	if (success) {
 		await Api.setSettings(settings.value);
+		successMessage.value = 'Settings saved.';
 	}
-	submitted.value = true;
 }
 
 async function migrate() {
 	await Api.migrateDatabase(databasePath.value);
-	// If (success) {
-	//   await Api.setSettings(settings.value);
-	// }
-	submitted.value = true;
+	errorMessage.value = '';
+	successMessage.value = 'Database migrated.';
 }
 
 async function changeDatabase() {
@@ -181,7 +226,8 @@ async function changeDatabase() {
 		if (res.status === 200) {
 			errorMessage.value = '';
 		} else if (((await res.json()).error) === 'UNSUPPORTED_DATABASE_VERSION') {
-			errorMessage.value = 'The version of the database is not supported.';
+			successMessage.value = '';
+			new bootstrap.Modal(confirmMigrateModal.value).show();
 		} else {
 			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
 		}
