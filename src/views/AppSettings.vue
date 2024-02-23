@@ -189,6 +189,7 @@ import * as bootstrap from 'bootstrap';
 import {nextTick, ref} from 'vue';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
+import {databaseVersionErrorCode} from '../../server/const';
 
 const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
@@ -225,7 +226,7 @@ async function changeDatabase() {
 		const res = await Api.changeDatabase(databasePath.value);
 		if (res.status === 200) {
 			errorMessage.value = '';
-		} else if (((await res.json()).error) === 'UNSUPPORTED_DATABASE_VERSION') {
+		} else if (((await res.json()).error) === databaseVersionErrorCode) {
 			successMessage.value = '';
 			new bootstrap.Modal(confirmMigrateModal.value).show();
 		} else {

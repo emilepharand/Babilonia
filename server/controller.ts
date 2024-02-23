@@ -7,7 +7,7 @@ import type {Settings} from './model/settings/settings';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {currentVersion, memoryDatabasePath} from './const';
+import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from './const';
 import console from 'console';
 import DatabaseMigrator from './model/databaseMigrator';
 
@@ -240,7 +240,7 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
 	await newDbCoordinator.init();
 	if (!newDbCoordinator.isValidVersion) {
-		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
+		res.status(400).send(JSON.stringify({error: databaseVersionErrorCode}));
 		return;
 	}
 	if (!newDbCoordinator.isValid) {

@@ -1,4 +1,4 @@
-import {currentVersion, memoryDatabasePath} from '../../server/const';
+import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
 import {
 	addAnyLanguage,
 	changeDatabase,
@@ -68,12 +68,12 @@ describe('invalid cases', () => {
 	test('change database to another version than the current version', async () => {
 		let res = await changeDatabase('tests/db/unsupported-version.db');
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await changeDatabase(db20);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
@@ -94,7 +94,7 @@ describe('invalid cases', () => {
 		const dbToMigratePath = 'tests/db/unsupported-version-to-migrate.db';
 		let res = await changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await migrateDatabase(dbToMigratePath);
