@@ -114,13 +114,18 @@
     >
       Save
     </button>
-    <p
-      v-if="successMessage && !errorMessage"
-      id="settingsSavedText"
-      class="text-success"
+    <div
+      v-if="successMessages.length > 0 && !errorMessage"
+      id="successMessage"
     >
-      {{ successMessage }}
-    </p>
+      <p
+        v-for="successMessage in successMessages"
+        :key="successMessage"
+        class="text-success"
+      >
+        {{ successMessage }}
+      </p>
+    </div>
     <p
       v-if="errorMessage"
       id="settingsErrorText"
@@ -195,7 +200,7 @@ const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
-const successMessage = ref('');
+const successMessages = ref(['']);
 let previousDatabasePath = '';
 
 (async () => {
@@ -207,27 +212,28 @@ let previousDatabasePath = '';
 })();
 
 async function save() {
+	successMessages.value = [];
 	const success = await changeDatabase();
 	if (success) {
 		await Api.setSettings(settings.value);
-		successMessage.value = 'Settings saved.';
+		successMessages.value.push('Settings saved.');
 	}
 }
 
 async function migrate() {
 	await Api.migrateDatabase(databasePath.value);
 	errorMessage.value = '';
-	successMessage.value = 'Database migrated.';
+	successMessages.value.push('Database migrated.');
 }
 
 async function changeDatabase() {
 	if (databasePath.value !== previousDatabasePath || errorMessage.value) {
-		previousDatabasePath = databasePath.value;
 		const res = await Api.changeDatabase(databasePath.value);
 		if (res.status === 200) {
 			errorMessage.value = '';
+			previousDatabasePath = databasePath.value;
 		} else if (((await res.json()).error) === databaseVersionErrorCode) {
-			successMessage.value = '';
+			successMessages.value = [];
 			new bootstrap.Modal(confirmMigrateModal.value).show();
 		} else {
 			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
