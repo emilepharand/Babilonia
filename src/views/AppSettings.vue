@@ -235,6 +235,9 @@ async function changeDatabase() {
 		} else if (((await res.json()).error) === databaseVersionErrorCode) {
 			successMessages.value = [];
 			new bootstrap.Modal(confirmMigrateModal.value).show();
+			await new Promise(resolve => {
+				confirmMigrateModal.value.addEventListener('hidden.bs.modal', resolve);
+			});
 		} else {
 			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
 		}
