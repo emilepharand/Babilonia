@@ -239,7 +239,7 @@ async function changeDatabase() {
 				confirmMigrateModal.value.addEventListener('hidden.bs.modal', resolve);
 			});
 		} else {
-			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
+			errorMessage.value = 'Invalid database path.';
 		}
 	}
 	return errorMessage.value === '';
