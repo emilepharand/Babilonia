@@ -253,11 +253,19 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 }
 
 export async function migrateDatabase(req: Request, res: Response): Promise<void> {
-	// TODO validation
+	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+		res.status(400).end();
+		return;
+	}
 
 	// Database to migrate
 	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
 	await dbCoordinatorForToMigrate.init();
+
+	if (!dbCoordinatorForToMigrate.isValidPath) {
+		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+		return;
+	}
 
 	// Base database
 	const dbCoordinatorForBaseDb = new DatabaseCoordinator('db/base.db');

@@ -11,6 +11,7 @@ export default class DatabaseCoordinator {
 	private _databaseOpener!: DatabaseOpener;
 	private _needsToBeInitialized!: boolean;
 	private _isValid = false;
+	private _isValidPath = false;
 	private _isValidVersion = true;
 	private _realAbsolutePath!: string | false;
 
@@ -59,6 +60,7 @@ export default class DatabaseCoordinator {
 	}
 
 	private async setValidFlags() {
+		this._isValidPath = true;
 		this._isValidVersion = await this.computeIsValidVersion();
 		this._isValid = this._isValidVersion;
 		return this._isValid;
@@ -90,5 +92,9 @@ export default class DatabaseCoordinator {
 
 	get inputPath(): string {
 		return this._inputPath;
+	}
+
+	get isValidPath(): boolean {
+		return this._isValidPath;
 	}
 }
