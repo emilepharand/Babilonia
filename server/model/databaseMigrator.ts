@@ -9,14 +9,11 @@ export default class DatabaseMigrator {
 
 	async migrate(): Promise<void> {
 		await this._databaseToMigrate.exec('BEGIN TRANSACTION;');
-		try {
-			console.log('Migrating database to version', await this._baseDataServiceProvider.settingsManager.getVersion());
-			const sql = 'INSERT OR REPLACE INTO settings (name, value) VALUES (?, ?);';
-			await this._databaseToMigrate.run(sql, [version, await this._baseDataServiceProvider.settingsManager.getVersion()]);
-			await this._databaseToMigrate.exec('COMMIT;');
-		} catch (error) {
-			await this._databaseToMigrate.exec('ROLLBACK;');
-			throw error;
-		}
+		const currentVersion = await this._baseDataServiceProvider.settingsManager.getVersion();
+		console.log(`Migrating database to version ${currentVersion}...`);
+		const sql = 'INSERT OR REPLACE INTO settings (name, value) VALUES (?, ?);';
+		await this._databaseToMigrate.run(sql, [version, currentVersion]);
+		await this._databaseToMigrate.exec('COMMIT;');
+		console.log('Migration complete.');
 	}
 }
