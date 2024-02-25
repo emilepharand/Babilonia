@@ -8,6 +8,7 @@ import {
 	fetchSettings,
 	getDatabasePath,
 	migrateDatabase,
+	migrateDatabaseRawObjectAndGetResponse,
 } from '../utils/fetch-utils';
 
 beforeEach(async () => {
@@ -45,8 +46,19 @@ describe('valid cases', () => {
 		expect(await fetchLanguages()).toHaveLength(1);
 	});
 
-	test('migrating database with invalid path', async () => {
-		await testMigrateInvalidDatabase('/tmp/invalid.db');
+	test('migrating 2.0 database to 2.1', async () => {
+		const dbToMigratePath = 'tests/db/unsupported-version-to-migrate.db';
+		let res = await changeDatabase(dbToMigratePath);
+		expect(res.status).toEqual(400);
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
+		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
+
+		res = await migrateDatabase(dbToMigratePath);
+		expect(res.status).toEqual(200);
+
+		res = await changeDatabase(dbToMigratePath);
+		expect(res.status).toEqual(200);
+		expect(await getDatabasePath()).toEqual(dbToMigratePath);
 	});
 });
 
@@ -90,19 +102,12 @@ describe('invalid cases', () => {
 		await testChangeToInvalidDatabase('tests/dir.db');
 	});
 
-	test('migrating 2.0 database to 2.1', async () => {
-		const dbToMigratePath = 'tests/db/unsupported-version-to-migrate.db';
-		let res = await changeDatabase(dbToMigratePath);
-		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
-		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
+	test('migrating database with invalid path', async () => {
+		await testMigrateInvalidDatabase('/tmp/invalid.db');
+	});
 
-		res = await migrateDatabase(dbToMigratePath);
-		expect(res.status).toEqual(200);
-
-		res = await changeDatabase(dbToMigratePath);
-		expect(res.status).toEqual(200);
-		expect(await getDatabasePath()).toEqual(dbToMigratePath);
+	test('migrating database with wrong object', async () => {
+		expect((await migrateDatabaseRawObjectAndGetResponse(JSON.stringify({file: db21}))).status).toEqual(400);
 	});
 });
 
