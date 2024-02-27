@@ -190,20 +190,20 @@ fi
 after_success
 
 echo "-------------------------------------------------------"
-echo " --db=db, unsupported version                          "
+echo " --db=db, old version                          "
 echo "-------------------------------------------------------"
 
 cleanup
 go_to_dist
 
-node index.cjs --db="tests/db/unsupported-version.db" >temp.txt 2>&1 &
+node index.cjs --db="tests/db/old-version.db" >temp.txt 2>&1 &
 
 sleep 1
 
 write_coverage
 
-if ! grep -Fq "Unsupported database version" "temp.txt"; then
-  echo "Unsupported database version error not found."
+if ! grep -Fq "Old database version" "temp.txt"; then
+  echo "Old database version error not found."
   after_failure
 fi
 

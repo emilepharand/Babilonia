@@ -7,7 +7,7 @@ import type {Settings} from './model/settings/settings';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from './const';
+import {databaseVersionErrorCode, memoryDatabasePath} from './const';
 import console from 'console';
 import DatabaseMigrator from './model/databaseMigrator';
 
@@ -21,7 +21,7 @@ if (!dbCoordinator.isValid) {
 	if (dbCoordinator.isValidVersion) {
 		console.error(`Invalid database path provided for --db option ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
 	} else {
-		console.error(`Unsupported database version. Current version is ${currentVersion}.`);
+		console.error(`Old database version. Defaulting to '${memoryDatabasePath}'. You can migrate the database through the API or UI.`);
 	}
 	dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
 	await dbCoordinator.init();

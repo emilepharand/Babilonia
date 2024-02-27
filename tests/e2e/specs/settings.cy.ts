@@ -2,6 +2,7 @@ import {Settings} from '../../../server/model/settings/settings';
 
 import {apiUrl, setSettings} from '../cy-utils';
 import {memoryDatabasePath} from '../../../server/const';
+import {oldVersionDatabasePath} from '../../utils/const';
 
 const db21 = 'tests/db/2.1-simple.db';
 
@@ -67,7 +68,7 @@ describe('The settings page', () => {
 		});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type('tests/db/unsupported-version.db');
+		cy.get('#databasePath').type(oldVersionDatabasePath);
 		cy.get('#saveButton').click();
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#confirm-migrate-modal').should('be.visible');

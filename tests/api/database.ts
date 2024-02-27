@@ -10,6 +10,7 @@ import {
 	migrateDatabase,
 	migrateDatabaseRawObjectAndGetResponse,
 } from '../utils/fetch-utils';
+import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
 
 beforeEach(async () => {
 	await changeDatabaseToMemoryAndDeleteEverything();
@@ -47,7 +48,7 @@ describe('valid cases', () => {
 	});
 
 	test('migrating 2.0 database to 2.1', async () => {
-		const dbToMigratePath = 'tests/db/unsupported-version-to-migrate.db';
+		const dbToMigratePath = oldVersionDatabaseToMigratePath;
 		let res = await changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(400);
 		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
@@ -78,7 +79,7 @@ describe('invalid cases', () => {
 	});
 
 	test('change database to another version than the current version', async () => {
-		let res = await changeDatabase('tests/db/unsupported-version.db');
+		let res = await changeDatabase(oldVersionDatabasePath);
 		expect(res.status).toEqual(400);
 		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await getDatabasePath()).toEqual(memoryDatabasePath);
