@@ -9,8 +9,13 @@ import {AllStats} from '../../server/stats/statsCounter';
 import {Response} from 'node-fetch';
 import {memoryDatabasePath} from '../../server/const';
 
+async function fetchAndConvert<T>(fetchMethod: (..._args: any[]) => Promise<Response>, ..._args: any[]): Promise<T> {
+	const response = await fetchMethod(..._args);
+	return await response.json() as Promise<T>;
+}
+
 export async function addLanguage(name: string): Promise<Language> {
-	return fetchUtils.addLanguage(name).then(r => r.json() as Promise<Language>);
+	return fetchAndConvert<Language>(fetchUtils.addLanguage, name);
 }
 
 export async function addAnyLanguage(): Promise<Language> {
@@ -18,15 +23,11 @@ export async function addAnyLanguage(): Promise<Language> {
 }
 
 export async function addIdea(ideaForAdding: IdeaForAdding) : Promise<Idea> {
-	return fetchUtils.addIdea(ideaForAdding).then(r => r.json() as Promise<Idea>);
+	return fetchAndConvert<Idea>(fetchUtils.addIdea, ideaForAdding);
 }
 
 export async function changeDatabase(path: string) {
 	return fetchUtils.changeDatabase(path);
-}
-
-export async function getDatabasePath():Promise<{path:string}> {
-	return fetchUtils.getDatabasePath().then(r => r.json() as Promise<{path:string}>);
 }
 
 export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
@@ -37,24 +38,28 @@ export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Respo
 	return deleteEverything();
 }
 
+export async function getDatabasePath():Promise<{path:string}> {
+	return fetchAndConvert<{path:string}>(fetchUtils.getDatabasePath);
+}
+
 export async function editIdea(object: any, id: number): Promise<Idea> {
-	return fetchUtils.editIdea(object, id).then(r => r.json() as Promise<Idea>);
+	return fetchAndConvert<Idea>(fetchUtils.editIdea, object, id);
 }
 
 export async function fetchLanguages(): Promise<Language[]> {
-	return fetchUtils.fetchLanguages().then(r => r.json() as Promise<Language[]>);
+	return fetchAndConvert<Language[]>(fetchUtils.fetchLanguages);
 }
 
 export async function fetchLanguage(id: number): Promise<Language> {
-	return fetchUtils.fetchLanguage(id).then(r => r.json() as Promise<Language>);
+	return fetchAndConvert<Language>(fetchUtils.fetchLanguage, id);
 }
 
 export async function fetchIdea(id: number):Promise<Idea> {
-	return fetchUtils.fetchIdea(id).then(r => r.json() as Promise<Idea>);
+	return fetchAndConvert<Idea>(fetchUtils.fetchIdea, id);
 }
 
 export async function editLanguages(newLanguages: Language[]): Promise<Language[]> {
-	return fetchUtils.editLanguages(newLanguages).then(r => r.json() as Promise<Language[]>);
+	return fetchAndConvert<Language[]>(fetchUtils.editLanguages, newLanguages);
 }
 
 export async function deleteLanguage(id: number) {
@@ -62,11 +67,11 @@ export async function deleteLanguage(id: number) {
 }
 
 export async function fetchSettings(): Promise<Settings> {
-	return fetchUtils.fetchSettings().then(r => r.json() as Promise<Settings>);
+	return fetchAndConvert<Settings>(fetchUtils.fetchSettings);
 }
 
 export async function getStats(): Promise<AllStats> {
-	return fetchUtils.getStats().then(r => r.json() as Promise<AllStats>);
+	return fetchAndConvert<AllStats>(fetchUtils.getStats);
 }
 
 export async function setSettings(settings: Partial<Settings>) {
@@ -74,11 +79,11 @@ export async function setSettings(settings: Partial<Settings>) {
 }
 
 export async function search(sc: SearchContext): Promise<Idea[]> {
-	return fetchUtils.search(sc).then(r => r.json() as Promise<Idea[]>);
+	return fetchAndConvert<Idea[]>(fetchUtils.search, sc);
 }
 
 export async function nextPracticeIdea(): Promise<Idea> {
-	return fetchUtils.nextPracticeIdea().then(r => r.json() as Promise<Idea>);
+	return fetchAndConvert<Idea>(fetchUtils.nextPracticeIdea);
 }
 
 export async function deleteEverything() {
