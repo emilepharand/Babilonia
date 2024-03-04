@@ -1,13 +1,8 @@
-import {
-	changeDatabaseToMemoryAndDeleteEverything,
-	fetchSettings,
-	setSettings,
-	setSettingsAndGetResponse,
-	setSettingsRawObjectAndGetResponse,
-} from '../utils/fetch-utils';
+import * as ApiUtils from '../utils/api-utils';
+import * as FetchUtils from '../utils/fetch-utils';
 
 beforeEach(async () => {
-	await changeDatabaseToMemoryAndDeleteEverything();
+	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
 // Valid settings are tested in tests for each feature that uses them
@@ -16,9 +11,9 @@ describe('settings API', () => {
 		const settings = {
 			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: true, passiveMode: true, version: '2.0',
 		};
-		const r = await setSettingsAndGetResponse(settings);
+		const r = await FetchUtils.setSettings(settings);
 		expect(r.status).toEqual(200);
-		const fetchedSettings = await fetchSettings();
+		const fetchedSettings = await ApiUtils.fetchSettings();
 		expect(fetchedSettings.strictCharacters).toEqual(true);
 		expect(fetchedSettings.randomPractice).toEqual(true);
 	});
@@ -27,8 +22,8 @@ describe('settings API', () => {
 		const settings = {
 			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: true, passiveMode: true, version: '2.0',
 		};
-		await setSettings(settings);
-		let fetchedSettings = await fetchSettings();
+		await ApiUtils.setSettings(settings);
+		let fetchedSettings = await ApiUtils.fetchSettings();
 		expect(fetchedSettings.strictCharacters).toEqual(true);
 		expect(fetchedSettings.randomPractice).toEqual(true);
 		expect(fetchedSettings.practiceOnlyNotKnown).toEqual(true);
@@ -39,8 +34,8 @@ describe('settings API', () => {
 		settings.practiceOnlyNotKnown = false;
 		settings.passiveMode = false;
 		settings.version = '2.1';
-		await setSettings(settings);
-		fetchedSettings = await fetchSettings();
+		await ApiUtils.setSettings(settings);
+		fetchedSettings = await ApiUtils.fetchSettings();
 		expect(fetchedSettings.strictCharacters).toEqual(false);
 		expect(fetchedSettings.randomPractice).toEqual(false);
 		expect(fetchedSettings.practiceOnlyNotKnown).toEqual(false);
@@ -53,19 +48,19 @@ describe('settings API', () => {
 			randomPractice: false, passiveMode: false, strictCharacters: false,
 			practiceOnlyNotKnown: false, version: '2.0', invalidSetting: 'invalid',
 		};
-		const r = await setSettingsAndGetResponse(settings);
+		const r = await FetchUtils.setSettings(settings);
 		expect(r.status).toEqual(400);
 	});
 
 	test('setting with wrong type', async () => {
 		const settings = {randomPractice: 'no'};
-		const r = await setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
+		const r = await FetchUtils.setSettings(JSON.stringify(settings));
 		expect(r.status).toEqual(400);
 	});
 
 	test('missing settings', async () => {
 		const settings = {};
-		const r = await setSettingsRawObjectAndGetResponse(JSON.stringify(settings));
+		const r = await FetchUtils.setSettings(JSON.stringify(settings));
 		expect(r.status).toEqual(400);
 	});
 });
