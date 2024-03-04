@@ -7,7 +7,7 @@ import type {Settings} from './model/settings/settings';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {databaseVersionErrorCode, memoryDatabasePath} from './const';
+import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
 import console from 'console';
 import DatabaseMigrator from './model/databaseMigrator';
 
@@ -268,7 +268,7 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 	}
 
 	// Base database
-	const dbCoordinatorForBaseDb = new DatabaseCoordinator('db/base.db');
+	const dbCoordinatorForBaseDb = new DatabaseCoordinator(baseDatabasePath);
 	await dbCoordinatorForBaseDb.init();
 
 	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
