@@ -89,6 +89,8 @@ describe('The settings page', () => {
 		assertSettingsEquals({
 			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
 		});
+		cy.reload();
+		cy.get('#databasePath').should('have.value', oldVersionDatabasePath);
 	});
 });
 

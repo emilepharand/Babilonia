@@ -224,6 +224,7 @@ async function migrate() {
 	await Api.migrateDatabase(databasePath.value);
 	errorMessage.value = '';
 	successMessages.value.push('Database migrated.');
+	await Api.changeDatabase(databasePath.value);
 }
 
 async function changeDatabase() {
