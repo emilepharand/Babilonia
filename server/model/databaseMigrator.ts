@@ -8,9 +8,9 @@ export default class DatabaseMigrator {
 	}
 
 	async migrate(): Promise<void> {
-		await this._databaseToMigrate.exec('BEGIN TRANSACTION;');
 		const currentVersion = await this._baseDataServiceProvider.settingsManager.getVersion();
 		console.log(`Migrating database to version ${currentVersion}...`);
+		await this._databaseToMigrate.exec('BEGIN TRANSACTION;');
 		const sql = 'INSERT OR REPLACE INTO settings (name, value) VALUES (?, ?);';
 		await this._databaseToMigrate.run(sql, [version, currentVersion]);
 		await this._databaseToMigrate.exec('COMMIT;');
