@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import fetch, {Response} from 'node-fetch';
 import {paramsFromSearchContext} from '../../src/ts/api';
+import {SearchContext} from '../../server/model/search/searchContext';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
@@ -72,14 +73,22 @@ export async function setSettings(object: any) {
 	return fetchResource('settings', undefined, 'PUT', JSON.stringify(object));
 }
 
-export async function search(sc: any): Promise<Response> {
+export async function search(sc: SearchContext): Promise<Response> {
 	const params = paramsFromSearchContext(sc);
+	return searchRaw(params);
+}
+
+export async function searchRaw(params: string): Promise<Response> {
 	const url = encodeURI(`${apiUrl}/ideas?${params}`);
 	return doFetch(url, 'GET');
 }
 
 export async function changeDatabase(path: string) {
-	return fetchResource('database/path', undefined, 'PUT', JSON.stringify({path}));
+	return changeDatabaseRaw({path});
+}
+
+export async function changeDatabaseRaw(object: any): Promise<Response> {
+	return fetchResource('database/path', undefined, 'PUT', JSON.stringify(object));
 }
 
 export async function getDatabasePath(): Promise<Response> {

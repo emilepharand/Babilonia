@@ -80,7 +80,7 @@ describe('invalid cases', () => {
 });
 
 async function testChangeToInvalidDatabase(path: string) {
-	const res = await FetchUtils.changeDatabase(path);
+	const res = await FetchUtils.changeDatabaseRaw(path);
 	expect(res.status).toEqual(400);
 	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 }

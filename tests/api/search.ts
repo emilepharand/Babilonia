@@ -278,6 +278,6 @@ describe('searching expressions', () => {
 });
 
 async function testInvalidRequests(params: string) {
-	const r = await FetchUtils.search(params);
+	const r = await FetchUtils.searchRaw(params);
 	expect(r.status).toEqual(400);
 }
