@@ -37,11 +37,11 @@
     "async-lock": "^1.4.1",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "rimraf": "^5.0.5",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "vue": "^3.4.20",
+    "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
@@ -69,7 +69,7 @@
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-config-xo": "^0.44.0",
-    "eslint-config-xo-typescript": "^2.0.0",
+    "eslint-config-xo-typescript": "^2.1.1",
     "eslint-plugin": "^1.0.1",
     "eslint-plugin-cypress": "^2.15.1",
     "eslint-plugin-import": "^2.29.1",
