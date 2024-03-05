@@ -40,7 +40,7 @@ describe('valid cases', () => {
 
 describe('invalid cases', () => {
 	test('change database without an object with path key', async () => {
-		expect((await FetchUtils.changeDatabase(JSON.stringify({file: db21}))).status).toEqual(400);
+		expect((await FetchUtils.changeDatabaseRaw(JSON.stringify({file: db21}))).status).toEqual(400);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
@@ -80,7 +80,7 @@ describe('invalid cases', () => {
 });
 
 async function testChangeToInvalidDatabase(path: string) {
-	const res = await FetchUtils.changeDatabaseRaw(path);
+	const res = await FetchUtils.changeDatabase(path);
 	expect(res.status).toEqual(400);
 	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 }
