@@ -1,17 +1,11 @@
-import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {Idea} from '../../server/model/ideas/idea';
+import * as ApiUtils from '../utils/api-utils';
+import * as FetchUtils from '../utils/fetch-utils';
 import {SearchContext} from '../../server/model/search/searchContext';
-import {
-	addIdea,
-	addLanguage,
-	changeDatabaseToMemoryAndDeleteEverything,
-	search,
-	searchAndGetResponse,
-	searchRawParamsAndGetResponse,
-} from '../utils/fetch-utils';
+import {ExpressionForAdding} from '../../server/model/ideas/expression';
 
 beforeEach(async () => {
-	await changeDatabaseToMemoryAndDeleteEverything();
+	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
 async function testSearch(
@@ -20,7 +14,7 @@ async function testSearch(
 	expressionsThatShouldMatch2D: string[][],
 	languageId?: number,
 ) {
-	const matchedIdeas = await search(sc);
+	const matchedIdeas = await ApiUtils.search(sc);
 	expect(matchedIdeas.length).toEqual(ideasThatShouldMatch.length);
 	expect(matchedIdeas).toMatchObject(ideasThatShouldMatch);
 	matchedIdeas.forEach((matchedIdea, i) => {
@@ -41,22 +35,22 @@ async function testSearch(
 
 describe('searching expressions', () => {
 	test('searching for expressions in a language', async () => {
-		const fr = await addLanguage('français');
-		const en = await addLanguage('anglais');
-		const es = await addLanguage('español');
+		const fr = await ApiUtils.addLanguage('français');
+		const en = await ApiUtils.addLanguage('anglais');
+		const es = await ApiUtils.addLanguage('español');
 		const fr1: ExpressionForAdding = {text: 'fr lorem ipsum', languageId: fr.id};
 		const en1: ExpressionForAdding = {text: 'en lorem ipsum', languageId: en.id};
 		const es1: ExpressionForAdding = {text: 'es lorem ipsum', languageId: es.id};
 		const fr2: ExpressionForAdding = {text: 'fr ipsum sed', languageId: fr.id};
 		const en2: ExpressionForAdding = {text: 'en ipsum sed', languageId: en.id};
 		const fr3: ExpressionForAdding = {text: 'fr ipsum sed dolor', languageId: fr.id};
-		const i1 = await addIdea({ee: [fr1, en1, es1]});
-		const i2 = await addIdea({ee: [fr2, en2]});
-		const i3 = await addIdea({ee: [fr3]});
+		const i1 = await ApiUtils.addIdea({ee: [fr1, en1, es1]});
+		const i2 = await ApiUtils.addIdea({ee: [fr2, en2]});
+		const i3 = await ApiUtils.addIdea({ee: [fr3]});
 
 		// No duplicates (3 expressions match 'lorem', but idea should show only once)
 		const sc: SearchContext = {pattern: 'lorem'};
-		const matchedIdeas = await search(sc);
+		const matchedIdeas = await ApiUtils.search(sc);
 		expect(matchedIdeas.length).toEqual(1);
 
 		sc.pattern = 'lorem ipsum';
@@ -81,12 +75,12 @@ describe('searching expressions', () => {
 	});
 
 	test('searching for ideas that contain specific languages and does not contain another', async () => {
-		const fr = await addLanguage('français');
-		const en = await addLanguage('anglais');
-		const es = await addLanguage('español');
-		const it = await addLanguage('italiano');
-		const de = await addLanguage('deutsch');
-		const pt = await addLanguage('português');
+		const fr = await ApiUtils.addLanguage('français');
+		const en = await ApiUtils.addLanguage('anglais');
+		const es = await ApiUtils.addLanguage('español');
+		const it = await ApiUtils.addLanguage('italiano');
+		const de = await ApiUtils.addLanguage('deutsch');
+		const pt = await ApiUtils.addLanguage('português');
 
 		// Idea 1: fr, en, es, de, it, pt
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id};
@@ -95,7 +89,7 @@ describe('searching expressions', () => {
 		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id};
 		const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: pt.id};
 		const it1: ExpressionForAdding = {text: 'buongiorno', languageId: it.id};
-		const i1 = await addIdea({ee: [fr1, en1, es1, de1, pt1, it1]});
+		const i1 = await ApiUtils.addIdea({ee: [fr1, en1, es1, de1, pt1, it1]});
 
 		// Idea 2: fr, en, es, de, pt
 		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id};
@@ -103,7 +97,7 @@ describe('searching expressions', () => {
 		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
 		const pt2: ExpressionForAdding = {text: 'boa noite', languageId: pt.id};
 		const de2: ExpressionForAdding = {text: 'gute Natch', languageId: de.id};
-		const i2 = await addIdea({ee: [fr2, en2, es2, pt2, de2]});
+		const i2 = await ApiUtils.addIdea({ee: [fr2, en2, es2, pt2, de2]});
 
 		// Idea 3: fr, en, es
 		const fr3: ExpressionForAdding = {text: 'bonsoir', languageId: fr.id};
@@ -112,7 +106,7 @@ describe('searching expressions', () => {
 		const en4: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
 		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
 		const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
-		const i3 = await addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
+		const i3 = await ApiUtils.addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
 
 		// All ideas containing Spanish and French
 		const sc: SearchContext = {
@@ -189,37 +183,37 @@ describe('searching expressions', () => {
 	});
 
 	test('known expressions', async () => {
-		const fr = await addLanguage('français');
-		const en = await addLanguage('anglais');
-		const es = await addLanguage('español');
-		const de = await addLanguage('deutsch');
-		const pt = await addLanguage('português');
+		const fr = await ApiUtils.addLanguage('français');
+		const en = await ApiUtils.addLanguage('anglais');
+		const es = await ApiUtils.addLanguage('español');
+		const de = await ApiUtils.addLanguage('deutsch');
+		const pt = await ApiUtils.addLanguage('português');
 
 		const fr1: ExpressionForAdding = {text: 'bonjour', languageId: fr.id, known: true};
 		const en1: ExpressionForAdding = {text: 'hello', languageId: en.id, known: true};
 		const es1: ExpressionForAdding = {text: 'buenos días', languageId: es.id, known: true};
 		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id};
 		const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: pt.id};
-		const i1 = await addIdea({ee: [fr1, en1, es1, de1, pt1]});
+		const i1 = await ApiUtils.addIdea({ee: [fr1, en1, es1, de1, pt1]});
 
 		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id, known: true};
 		const en2: ExpressionForAdding = {text: 'good night', languageId: en.id, known: true};
 		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id, known: true};
 		const es22: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
 		const pt2: ExpressionForAdding = {text: 'boa noite', languageId: pt.id};
-		const i2 = await addIdea({ee: [fr2, en2, es2, es22, pt2]});
+		const i2 = await ApiUtils.addIdea({ee: [fr2, en2, es2, es22, pt2]});
 
 		const en3: ExpressionForAdding = {text: 'good evening', languageId: en.id};
 		const en32: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
 		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
 		const es32: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
-		await addIdea({ee: [en3, en32, es3, es32]});
+		await ApiUtils.addIdea({ee: [en3, en32, es3, es32]});
 
 		const en4: ExpressionForAdding = {text: 'good evening', languageId: en.id};
 		const en42: ExpressionForAdding = {text: 'good evening 2', languageId: en.id};
 		const es4: ExpressionForAdding = {text: 'buenas noches', languageId: es.id, known: true};
 		const es42: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id};
-		const i4 = await addIdea({ee: [en4, en42, es4, es42]});
+		const i4 = await ApiUtils.addIdea({ee: [en4, en42, es4, es42]});
 
 		// Not known Portuguese
 		const sc: SearchContext = {
@@ -261,7 +255,7 @@ describe('searching expressions', () => {
 
 	describe('invalid requests', () => {
 		test('no value set', async () => {
-			const r = await searchAndGetResponse({});
+			const r = await FetchUtils.search({});
 			expect(r.status).toEqual(400);
 		});
 
@@ -284,6 +278,6 @@ describe('searching expressions', () => {
 });
 
 async function testInvalidRequests(params: string) {
-	const r = await searchRawParamsAndGetResponse(params);
+	const r = await FetchUtils.searchRaw(params);
 	expect(r.status).toEqual(400);
 }
