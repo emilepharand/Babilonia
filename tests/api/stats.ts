@@ -1,34 +1,29 @@
-import {
-	addIdea,
-	addLanguage,
-	changeDatabaseToMemoryAndDeleteEverything,
-	editLanguagesAndGetResponse,
-	getStats,
-} from '../utils/fetch-utils';
+import * as ApiUtils from '../utils/api-utils';
+
 import {ExpressionForAdding} from '../../server/model/ideas/expression';
 import {LanguageStats} from '../../server/stats/statsCounter';
 
 beforeEach(async () => {
-	await changeDatabaseToMemoryAndDeleteEverything();
+	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
 describe('getting stats', () => {
 	test('getting stats', async () => {
-		let actualStats = await getStats();
+		let actualStats = await ApiUtils.getStats();
 
 		expect(actualStats.allLanguageStats).toHaveLength(0);
 		expect(actualStats.globalStats.totalExpressionsCount).toBe(0);
 		expect(actualStats.globalStats.totalIdeasCount).toBe(0);
 
-		const fr = await addLanguage('français');
-		const en = await addLanguage('english');
-		const es = await addLanguage('español');
-		const it = await addLanguage('italiano');
-		const de = await addLanguage('deutsch');
-		const pt = await addLanguage('português');
-		const kl = await addLanguage('klingon');
+		const fr = await ApiUtils.addLanguage('français');
+		const en = await ApiUtils.addLanguage('english');
+		const es = await ApiUtils.addLanguage('español');
+		const it = await ApiUtils.addLanguage('italiano');
+		const de = await ApiUtils.addLanguage('deutsch');
+		const pt = await ApiUtils.addLanguage('português');
+		const kl = await ApiUtils.addLanguage('klingon');
 
-		actualStats = await getStats();
+		actualStats = await ApiUtils.getStats();
 		expect(actualStats.allLanguageStats).toHaveLength(7);
 		expect(actualStats.globalStats.totalExpressionsCount).toBe(0);
 		expect(actualStats.globalStats.totalIdeasCount).toBe(0);
@@ -40,8 +35,8 @@ describe('getting stats', () => {
 		expect(actualStats.allLanguageStats[6].language.id).toEqual(kl.id);
 		kl.ordering = 0;
 		fr.ordering = 6;
-		await editLanguagesAndGetResponse([kl, en, es, it, de, pt, fr]);
-		actualStats = await getStats();
+		await ApiUtils.editLanguages([kl, en, es, it, de, pt, fr]);
+		actualStats = await ApiUtils.getStats();
 		expect(actualStats.allLanguageStats[0].language.id).toEqual(kl.id);
 		expect(actualStats.allLanguageStats[6].language.id).toEqual(fr.id);
 
@@ -52,11 +47,11 @@ describe('getting stats', () => {
 		const en4: ExpressionForAdding = {text: 'good evening 2', languageId: en.id, known: true};
 		const es3: ExpressionForAdding = {text: 'buenas noches', languageId: es.id, known: true};
 		const es4: ExpressionForAdding = {text: 'buenas noches 2', languageId: es.id, known: true};
-		await addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
+		await ApiUtils.addIdea({ee: [fr3, fr4, en3, en4, es3, es4]});
 
-		await addIdea({ee: [fr3]});
+		await ApiUtils.addIdea({ee: [fr3]});
 
-		actualStats = await getStats();
+		actualStats = await ApiUtils.getStats();
 		expect(actualStats.allLanguageStats).toHaveLength(7);
 		expect(actualStats.globalStats.totalExpressionsCount).toBe(7);
 		expect(actualStats.globalStats.totalIdeasCount).toBe(2);
@@ -103,7 +98,7 @@ describe('getting stats', () => {
 		const de1: ExpressionForAdding = {text: 'guten Tag', languageId: de.id, known: true};
 		const pt1: ExpressionForAdding = {text: 'bom Dia', languageId: pt.id};
 		const it1: ExpressionForAdding = {text: 'buongiorno', languageId: it.id, known: true};
-		await addIdea({ee: [fr1, en1, es1, de1, pt1, it1]});
+		await ApiUtils.addIdea({ee: [fr1, en1, es1, de1, pt1, it1]});
 
 		// Idea 3: fr, en, es, de, pt
 		const fr2: ExpressionForAdding = {text: 'bonne nuit', languageId: fr.id};
@@ -111,9 +106,9 @@ describe('getting stats', () => {
 		const es2: ExpressionForAdding = {text: 'buenas noches', languageId: es.id};
 		const pt2: ExpressionForAdding = {text: 'boa noite', languageId: pt.id, known: true};
 		const de2: ExpressionForAdding = {text: 'gute Natch', languageId: de.id};
-		await addIdea({ee: [fr2, en2, es2, pt2, de2]});
+		await ApiUtils.addIdea({ee: [fr2, en2, es2, pt2, de2]});
 
-		actualStats = await getStats();
+		actualStats = await ApiUtils.getStats();
 		expect(actualStats.allLanguageStats).toHaveLength(7);
 		expect(actualStats.globalStats.totalExpressionsCount).toBe(18);
 		expect(actualStats.globalStats.totalIdeasCount).toBe(4);
