@@ -30,6 +30,10 @@ export async function changeDatabase(path: string) {
 	return fetchUtils.changeDatabase(path);
 }
 
+export async function migrateDatabase(path: string) {
+	return fetchUtils.migrateDatabase(path);
+}
+
 export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {
 	const res = await changeDatabase(memoryDatabasePath);
 	if (res.status !== 200) {

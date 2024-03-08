@@ -1,6 +1,7 @@
-import {currentVersion, memoryDatabasePath, oldVersionDatabaseToMigratePath} from '../../server/const';
+import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
 import * as ApiUtils from '../utils/api-utils';
 import * as FetchUtils from '../utils/fetch-utils';
+import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -59,6 +60,11 @@ describe('invalid cases', () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
+	test('migrate database without an object with path key', async () => {
+		expect((await FetchUtils.migrateDatabaseRaw(JSON.stringify({file: db21}))).status).toEqual(400);
+		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
+	});
+
 	test('change database to a nonexistent path', async () => {
 		await testChangeToInvalidDatabase('/doesnotexist/db.db');
 	});
@@ -69,14 +75,14 @@ describe('invalid cases', () => {
 	});
 
 	test('change database to another version than the current version', async () => {
-		let res = await ApiUtils.changeDatabase('tests/db/unsupported-version.db');
+		let res = await ApiUtils.changeDatabase(oldVersionDatabasePath);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await ApiUtils.changeDatabase(db20);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
