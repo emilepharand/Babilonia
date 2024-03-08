@@ -91,7 +91,7 @@ export async function changeDatabaseRaw(object: any): Promise<Response> {
 	return fetchResource('database/path', undefined, 'PUT', JSON.stringify(object));
 }
 
-export async function migrateDatabase(path: string) {
+export async function migrateDatabase(path: string): Promise<Response> {
 	return migrateDatabaseRaw({path});
 }
 

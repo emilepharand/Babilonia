@@ -65,15 +65,6 @@ describe('invalid cases', () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
-	test('change database to a nonexistent path', async () => {
-		await testChangeToInvalidDatabase('/doesnotexist/db.db');
-	});
-
-	test('change database to an empty path', async () => {
-		await testChangeToInvalidDatabase('');
-		await testChangeToInvalidDatabase(' ');
-	});
-
 	test('change database to another version than the current version', async () => {
 		let res = await ApiUtils.changeDatabase(oldVersionDatabasePath);
 		expect(res.status).toEqual(400);
@@ -86,32 +77,29 @@ describe('invalid cases', () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
-	test('change database to a file that cannot be written to', async () => {
-		await testChangeToInvalidDatabase('tests/db/unwriteable.db');
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
+	const invalidDatabasePaths = [
+		'/doesnotexist/db.db',
+		'',
+		' ',
+		'tests/db/unwriteable.db',
+		'tests/doesnotexist/db.db',
+		'tests/dir.db',
+		'/tmp/invalid.db',
+	];
 
-	test('change database to a file in a directory that doesn\'t exist', async () => {
-		await testChangeToInvalidDatabase('tests/doesnotexist/db.db');
-	});
+	invalidDatabasePaths.forEach(path => {
+		test(`change database to invalid path: ${path}`, async () => {
+			await testInvalidDatabase(path, FetchUtils.changeDatabase);
+		});
 
-	test('change database to a directory', async () => {
-		await testChangeToInvalidDatabase('tests/dir.db');
-	});
-
-	test('migrating database with invalid path', async () => {
-		await testMigrateInvalidDatabase('/tmp/invalid.db');
+		test(`migrate database with invalid path: ${path}`, async () => {
+			await testInvalidDatabase(path, FetchUtils.migrateDatabase);
+		});
 	});
 });
 
-async function testChangeToInvalidDatabase(path: string) {
-	const res = await FetchUtils.changeDatabase(path);
-	expect(res.status).toEqual(400);
-	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-}
-
-async function testMigrateInvalidDatabase(path: string) {
-	const res = await FetchUtils.migrateDatabase(path);
+async function testInvalidDatabase(path:string, testFunction: (_: string) => any) {
+	const res = await testFunction(path);
 	expect(res.status).toEqual(400);
 	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 }
