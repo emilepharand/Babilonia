@@ -68,23 +68,21 @@ describe('invalid cases', () => {
 	});
 
 	const invalidDatabasePaths = [
-		'/doesnotexist/db.db',
 		'',
 		' ',
+		'/doesnotexist/db.db',
 		'tests/db/unwriteable.db',
 		'tests/doesnotexist/db.db',
 		'tests/dir.db',
 		'/tmp/invalid.db',
-		JSON.stringify({file: db21}),
 	];
 
 	invalidDatabasePaths.forEach(path => {
-		test(`change database to invalid path: ${path}`, async () => {
+		test(`wrong path as database path: ${path}`, async () => {
 			await testInvalidDatabase(path, FetchUtils.changeDatabase);
-		});
-
-		test(`migrate database with invalid path: ${path}`, async () => {
 			await testInvalidDatabase(path, FetchUtils.migrateDatabase);
+			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.changeDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.migrateDatabaseRaw);
 		});
 	});
 });
