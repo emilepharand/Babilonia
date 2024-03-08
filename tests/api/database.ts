@@ -55,16 +55,6 @@ describe('valid cases', () => {
 });
 
 describe('invalid cases', () => {
-	test('change database without an object with path key', async () => {
-		expect((await FetchUtils.changeDatabaseRaw(JSON.stringify({file: db21}))).status).toEqual(400);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
-
-	test('migrate database without an object with path key', async () => {
-		expect((await FetchUtils.migrateDatabaseRaw(JSON.stringify({file: db21}))).status).toEqual(400);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
-
 	test('change database to another version than the current version', async () => {
 		let res = await ApiUtils.changeDatabase(oldVersionDatabasePath);
 		expect(res.status).toEqual(400);
@@ -85,6 +75,7 @@ describe('invalid cases', () => {
 		'tests/doesnotexist/db.db',
 		'tests/dir.db',
 		'/tmp/invalid.db',
+		JSON.stringify({file: db21}),
 	];
 
 	invalidDatabasePaths.forEach(path => {
@@ -98,7 +89,7 @@ describe('invalid cases', () => {
 	});
 });
 
-async function testInvalidDatabase(path:string, testFunction: (_: string) => any) {
+async function testInvalidDatabase(path: any, testFunction: (_: string) => any) {
 	const res = await testFunction(path);
 	expect(res.status).toEqual(400);
 	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
