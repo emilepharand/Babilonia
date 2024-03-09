@@ -7,8 +7,9 @@ import type {Settings} from './model/settings/settings';
 import {escape} from 'entities';
 import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {currentVersion, memoryDatabasePath} from './const';
+import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
 import console from 'console';
+import DatabaseMigrator from './model/databaseMigrator';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -20,7 +21,7 @@ if (!dbCoordinator.isValid) {
 	if (dbCoordinator.isValidVersion) {
 		console.error(`Invalid database path provided for --db option ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
 	} else {
-		console.error(`Unsupported database version. Current version is ${currentVersion}.`);
+		console.error(`Old database version. Defaulting to '${memoryDatabasePath}'. You can migrate the database through the API or UI.`);
 	}
 	dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
 	await dbCoordinator.init();
@@ -239,7 +240,7 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
 	await newDbCoordinator.init();
 	if (!newDbCoordinator.isValidVersion) {
-		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
+		res.status(400).send(JSON.stringify({error: databaseVersionErrorCode}));
 		return;
 	}
 	if (!newDbCoordinator.isValid) {
@@ -249,6 +250,33 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 	dataServiceProvider = newDbCoordinator.dataServiceProvider;
 	dbCoordinator = newDbCoordinator;
 	res.end();
+}
+
+export async function migrateDatabase(req: Request, res: Response): Promise<void> {
+	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+		res.status(400).end();
+		return;
+	}
+
+	// Database to migrate
+	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
+	await dbCoordinatorForToMigrate.init();
+
+	if (!dbCoordinatorForToMigrate.isValidPath) {
+		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+		return;
+	}
+
+	// Base database
+	const dbCoordinatorForBaseDb = new DatabaseCoordinator(baseDatabasePath);
+	await dbCoordinatorForBaseDb.init();
+
+	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
+		dbCoordinatorForBaseDb.dataServiceProvider);
+
+	await databaseMigrator.migrate();
+
+	res.status(200).end();
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {
