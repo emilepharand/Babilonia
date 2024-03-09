@@ -1,6 +1,7 @@
-import {currentVersion, memoryDatabasePath} from '../../server/const';
+import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
 import * as ApiUtils from '../utils/api-utils';
 import * as FetchUtils from '../utils/fetch-utils';
+import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -36,51 +37,58 @@ describe('valid cases', () => {
 		await ApiUtils.addAnyLanguage();
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(1);
 	});
+
+	test('migrating 2.0 database to 2.1', async () => {
+		const dbToMigratePath = oldVersionDatabaseToMigratePath;
+		let res = await ApiUtils.changeDatabase(dbToMigratePath);
+		expect(res.status).toEqual(400);
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
+		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
+
+		res = await ApiUtils.migrateDatabase(dbToMigratePath);
+		expect(res.status).toEqual(200);
+
+		res = await ApiUtils.changeDatabase(dbToMigratePath);
+		expect(res.status).toEqual(200);
+		expect(await ApiUtils.getDatabasePath()).toEqual(dbToMigratePath);
+	});
 });
 
 describe('invalid cases', () => {
-	test('change database without an object with path key', async () => {
-		expect((await FetchUtils.changeDatabaseRaw(JSON.stringify({file: db21}))).status).toEqual(400);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
-
-	test('change database to a nonexistent path', async () => {
-		await testChangeToInvalidDatabase('/doesnotexist/db.db');
-	});
-
-	test('change database to an empty path', async () => {
-		await testChangeToInvalidDatabase('');
-		await testChangeToInvalidDatabase(' ');
-	});
-
 	test('change database to another version than the current version', async () => {
-		let res = await ApiUtils.changeDatabase('tests/db/unsupported-version.db');
+		let res = await ApiUtils.changeDatabase(oldVersionDatabasePath);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 
 		res = await ApiUtils.changeDatabase(db20);
 		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual('UNSUPPORTED_DATABASE_VERSION');
+		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 
-	test('change database to a file that cannot be written to', async () => {
-		await testChangeToInvalidDatabase('tests/db/unwriteable.db');
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
+	const invalidDatabasePaths = [
+		'',
+		' ',
+		'/doesnotexist/db.db',
+		'tests/db/unwriteable.db',
+		'tests/doesnotexist/db.db',
+		'tests/dir.db',
+		'/tmp/invalid.db',
+	];
 
-	test('change database to a file in a directory that doesn\'t exist', async () => {
-		await testChangeToInvalidDatabase('tests/doesnotexist/db.db');
-	});
-
-	test('change database to a directory', async () => {
-		await testChangeToInvalidDatabase('tests/dir.db');
+	invalidDatabasePaths.forEach(path => {
+		test(`wrong path as database path: ${path}`, async () => {
+			await testInvalidDatabase(path, FetchUtils.changeDatabase);
+			await testInvalidDatabase(path, FetchUtils.migrateDatabase);
+			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.changeDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.migrateDatabaseRaw);
+		});
 	});
 });
 
-async function testChangeToInvalidDatabase(path: string) {
-	const res = await FetchUtils.changeDatabase(path);
+async function testInvalidDatabase(path: any, testFunction: (_: string) => any) {
+	const res = await testFunction(path);
 	expect(res.status).toEqual(400);
 	expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 }

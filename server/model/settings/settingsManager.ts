@@ -5,7 +5,7 @@ const practiceRandom = 'PRACTICE_RANDOM';
 const strictCharacters = 'STRICT_CHARACTERS';
 const practiceOnlyNotKnown = 'PRACTICE_ONLY_NOT_KNOWN';
 const passiveMode = 'PASSIVE_MODE';
-const version = 'VERSION';
+export const version = 'VERSION';
 
 export default class SettingsManager {
 	constructor(private readonly db: Database) {}
