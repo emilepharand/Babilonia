@@ -1,6 +1,8 @@
 {
   "name": "babilonia",
-  "version": "2.1.0-dev",
+  "version": "2.1.0",
+  "author": "Émile Pharand",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
