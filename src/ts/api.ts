@@ -4,7 +4,15 @@ import type {Language} from '../../server/model/languages/language';
 import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
-import {apiUrl} from './const';
+
+const apiUrl = (() => {
+	if (typeof window === 'undefined') {
+		return `${process.env.VITE_API_URL}`;
+	}
+	const url = new URL(window.location.href);
+	url.port = process.env.VITE_API_PORT!;
+	return url.origin;
+})();
 
 async function doFetch(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE', body?: string) {
 	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
