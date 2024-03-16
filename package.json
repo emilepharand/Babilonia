@@ -47,7 +47,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.12.26",
+    "@cypress/code-coverage": "^3.12.29",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/async-lock": "^1.4.2",
     "@types/bootstrap": "^5.2.10",
@@ -88,7 +88,7 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2",
-    "vite": "^5.1.4",
+    "vite": "^5.1.6",
     "vite-plugin-istanbul": "^5.0.0",
     "vue-eslint-parser": "^9.4.2",
     "vue-tsc": "^2.0.6",
