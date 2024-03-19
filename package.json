@@ -47,7 +47,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "@cypress/code-coverage": "^3.12.29",
+    "@cypress/code-coverage": "^3.12.30",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/async-lock": "^1.4.2",
     "@types/bootstrap": "^5.2.10",
@@ -64,7 +64,7 @@
     "@vue/cli-service": "~5.0.8",
     "@vue/compiler-sfc": "^3.3.7",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "@vue/test-utils": "^2.4.4",
+    "@vue/test-utils": "^2.4.5",
     "cypress": "^13.7.0",
     "cypress-fail-on-console-error": "^5.1.0",
     "dotenv": "^16.4.5",
