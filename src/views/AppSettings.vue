@@ -86,6 +86,27 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <div class="form-check">
+      <input
+        id="enableEditing"
+        v-model="settings.enableEditing"
+        class="form-check-input"
+        type="checkbox"
+      >
+      <label
+        class="form-check-label"
+        for="enableEditing"
+      >
+        Enable editing
+      </label>
+      <i
+        title="Allows you to modify existing ideas, expressions and languages within the application. Note: Enabling this feature will prevent automatic updates to the database from future versions of the application. Once enabled, it should not be disabled to avoid data loss."
+        data-bs-html="true"
+        data-bs-toggle="tooltip"
+        data-bs-placement="right"
+        class="fa-solid fa-triangle-exclamation"
+      />
+    </div>
     <div>
       <label
         class="form-label"
@@ -192,9 +213,9 @@
 <script lang="ts" setup>
 import * as bootstrap from 'bootstrap';
 import {nextTick, ref} from 'vue';
+import {databaseVersionErrorCode} from '../../server/const';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
-import {databaseVersionErrorCode} from '../../server/const';
 
 const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
