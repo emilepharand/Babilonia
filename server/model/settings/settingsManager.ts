@@ -5,10 +5,12 @@ const practiceRandom = 'PRACTICE_RANDOM';
 const strictCharacters = 'STRICT_CHARACTERS';
 const practiceOnlyNotKnown = 'PRACTICE_ONLY_NOT_KNOWN';
 const passiveMode = 'PASSIVE_MODE';
+const enableEditing = 'ENABLE_EDITING';
 export const version = 'VERSION';
 
 export default class SettingsManager {
-	constructor(private readonly db: Database) {}
+	constructor(private readonly db: Database) {
+	}
 
 	async getSetting(name: string) {
 		const setting: {value: string} = (await this.db.get(
@@ -26,6 +28,7 @@ export default class SettingsManager {
 	async setSettings(settings: Settings) {
 		await this.setBooleanSetting(practiceRandom, settings.randomPractice);
 		await this.setBooleanSetting(strictCharacters, settings.strictCharacters);
+		await this.setBooleanSetting(enableEditing, settings.enableEditing);
 		await this.setBooleanSetting(
 			practiceOnlyNotKnown,
 			settings.practiceOnlyNotKnown,
@@ -71,6 +74,10 @@ export default class SettingsManager {
 		return this.getBooleanSetting(strictCharacters);
 	}
 
+	async isEnableEditing() {
+		return this.getBooleanSetting(enableEditing);
+	}
+
 	async getSettings() {
 		return {
 			randomPractice: await this.isRandomPractice(),
@@ -78,6 +85,7 @@ export default class SettingsManager {
 			practiceOnlyNotKnown: await this.isPracticeOnlyNotKnown(),
 			passiveMode: await this.isPassiveMode(),
 			version: await this.getVersion(),
+			enableEditing: await this.isEnableEditing(),
 		};
 	}
 }

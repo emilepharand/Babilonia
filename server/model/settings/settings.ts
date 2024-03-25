@@ -7,6 +7,7 @@ export type Settings = {
 	practiceOnlyNotKnown: boolean;
 	passiveMode: boolean;
 	version: string;
+	enableEditing: boolean;
 };
 
 export function getEmptySettingsNoAsync(): Settings {
@@ -16,6 +17,7 @@ export function getEmptySettingsNoAsync(): Settings {
 		practiceOnlyNotKnown: false,
 		passiveMode: false,
 		version: currentVersion,
+		enableEditing: false,
 	};
 }
 
@@ -29,8 +31,9 @@ export const settingsSchema = {
 		practiceOnlyNotKnown: {type: 'boolean'},
 		passiveMode: {type: 'boolean'},
 		version: {type: 'string'},
+		enableEditing: {type: 'boolean'},
 	},
-	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode', 'version'],
+	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode', 'version', 'enableEditing'],
 	additionalProperties: false,
 };
 
