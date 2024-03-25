@@ -94,7 +94,7 @@
         Path to database
       </label>
       <i
-        title="The path to the database file. It should be a SQLite file located inside the application folder. The database will be created if it does not exist."
+        title="The path to the database file. It should be a SQLite file located inside the application folder. The database will be created if it does not exist. You can use :memory: to create an in-memory database."
         data-bs-html="true"
         data-bs-toggle="tooltip"
         data-bs-placement="right"
