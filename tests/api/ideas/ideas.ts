@@ -151,6 +151,27 @@ describe('valid cases', () => {
 });
 
 describe('invalid cases', () => {
+	test('editing an idea when editing is disabled', async () => {
+		await ApiUtils.setSettings({enableEditing: true});
+		const l = await ApiUtils.addAnyLanguage();
+
+		// Adding
+		await ApiUtils.setSettings({enableEditing: false});
+		const e1 = {languageId: l.id, text: 'expression'};
+		const ideaForAdding: IdeaForAdding = {ee: [e1]};
+		await addInvalidIdeaAndTest(ideaForAdding);
+
+		// Editing
+		await ApiUtils.setSettings({enableEditing: true});
+		const idea = await ApiUtils.addIdea(ideaForAdding);
+		await ApiUtils.setSettings({enableEditing: false});
+		const newIdea = getIdeaForAddingFromIdea(idea);
+		await editInvalidIdeaAndTest(newIdea, idea.id);
+
+		// Deleting
+		expect((await FetchUtils.deleteIdea(idea.id)).status).toEqual(400);
+	});
+
 	test('adding an idea with a non-existent language', async () => {
 		const l1: Language = await ApiUtils.addLanguage('language');
 		const e1 = {languageId: l1.id + 1, text: 'expression'};
@@ -276,13 +297,21 @@ describe('invalid cases', () => {
 
 	test('actions on nonexistent ideas return 404', async () => {
 		expect((await FetchUtils.fetchIdea(FIRST_IDEA_ID)).status).toEqual(404);
-		expect((await FetchUtils.editIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
+		expect((await FetchUtils.editIdea(await makeIdeaForAdding({
+			ee: [{
+				language: 'l',
+				text: 'e',
+			}],
+		}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await FetchUtils.deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
 	});
 
 	test('editing non-numerical id returns 400', async () => {
 		const promises = ['PUT', 'GET', 'DELETE']
-			.map(method => fetch(`${apiUrl}/ideas/123letters`, {method, headers: {'Content-Type': 'application/json'}}));
+			.map(method => fetch(`${apiUrl}/ideas/123letters`, {
+				method,
+				headers: {'Content-Type': 'application/json'},
+			}));
 		(await Promise.all(promises)).forEach(p => expect(p.status).toEqual(400));
 	});
 });

@@ -1,5 +1,9 @@
 import fetch from 'node-fetch';
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Language} from '../../../server/model/languages/language';
+import * as ApiUtils from '../../utils/api-utils';
+import * as FetchUtils from '../../utils/fetch-utils';
+import {apiUrl, FIRST_LANGUAGE_ID, FIRST_ORDERING} from '../../utils/fetch-utils';
 import {
 	addInvalidLanguageAndTest,
 	addNLanguages,
@@ -9,10 +13,6 @@ import {
 	editInvalidLanguagesAndTest,
 	testLanguageOrder,
 } from './utils';
-import * as ApiUtils from '../../utils/api-utils';
-import * as FetchUtils from '../../utils/fetch-utils';
-import {apiUrl, FIRST_LANGUAGE_ID, FIRST_ORDERING} from '../../utils/fetch-utils';
-import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -72,6 +72,17 @@ describe('valid cases', () => {
 });
 
 describe('invalid cases', () => {
+	test('should not allow adding a language when editing is disabled', async () => {
+		await ApiUtils.setSettings({enableEditing: false});
+		await addInvalidLanguageAndTest(JSON.stringify({name: 'a language'}));
+	});
+
+	test('should not allow editing languages when editing is disabled', async () => {
+		const language = await ApiUtils.addLanguage('language');
+		await ApiUtils.setSettings({enableEditing: false});
+		await editInvalidLanguagesAndTest([language], language);
+	});
+
 	test('getting nonexistent language returns 404', async () => {
 		const r = await FetchUtils.fetchLanguage(1);
 		expect(r.status).toEqual(404);

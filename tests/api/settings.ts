@@ -1,5 +1,6 @@
 import * as ApiUtils from '../utils/api-utils';
 import * as FetchUtils from '../utils/fetch-utils';
+import {currentVersion} from '../../server/const';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -9,7 +10,8 @@ beforeEach(async () => {
 describe('settings API', () => {
 	test('right settings returns 200', async () => {
 		const settings = {
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: true, passiveMode: true, version: '2.0',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: true, passiveMode: true,
+			version: currentVersion, enableEditing: true,
 		};
 		const r = await FetchUtils.setSettings(settings);
 		expect(r.status).toEqual(200);

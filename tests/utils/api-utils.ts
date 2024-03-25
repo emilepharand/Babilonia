@@ -1,13 +1,13 @@
-import * as fetchUtils from './fetch-utils';
+import {Response} from 'node-fetch';
+import {memoryDatabasePath} from '../../server/const';
+import {Idea} from '../../server/model/ideas/idea';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {Settings} from '../../server/model/settings/settings';
-import {Idea} from '../../server/model/ideas/idea';
-import {getRandomString, settingsFromPartial} from './utils';
 import {AllStats} from '../../server/stats/statsCounter';
-import {Response} from 'node-fetch';
-import {memoryDatabasePath} from '../../server/const';
+import * as fetchUtils from './fetch-utils';
+import {getRandomString, settingsFromPartial} from './utils';
 
 async function fetchAndConvert<T>(fetchMethod: (..._args: any[]) => Promise<Response>, ..._args: any[]): Promise<T> {
 	const response = await fetchMethod(..._args);
@@ -22,7 +22,7 @@ export async function addAnyLanguage(): Promise<Language> {
 	return addLanguage('language ' + getRandomString());
 }
 
-export async function addIdea(ideaForAdding: IdeaForAdding) : Promise<Idea> {
+export async function addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
 	return fetchAndConvert<Idea>(fetchUtils.addIdea, ideaForAdding);
 }
 
@@ -39,11 +39,12 @@ export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Respo
 	if (res.status !== 200) {
 		throw new Error('Failed to change database to memory.');
 	}
-	return deleteEverything();
+	await deleteEverything();
+	return setSettings({enableEditing: true});
 }
 
-export async function getDatabasePath():Promise<{path:string}> {
-	return fetchAndConvert<{path:string}>(fetchUtils.getDatabasePath);
+export async function getDatabasePath(): Promise<{ path: string }> {
+	return fetchAndConvert<{ path: string }>(fetchUtils.getDatabasePath);
 }
 
 export async function editIdea(object: any, id: number): Promise<Idea> {
@@ -58,7 +59,7 @@ export async function fetchLanguage(id: number): Promise<Language> {
 	return fetchAndConvert<Language>(fetchUtils.fetchLanguage, id);
 }
 
-export async function fetchIdea(id: number):Promise<Idea> {
+export async function fetchIdea(id: number): Promise<Idea> {
 	return fetchAndConvert<Idea>(fetchUtils.fetchIdea, id);
 }
 
