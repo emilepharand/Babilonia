@@ -1,15 +1,15 @@
+import console from 'console';
+import {escape} from 'entities';
 import type {Request, Response} from 'express';
+import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
+import DatabaseCoordinator from './model/databaseCoordinator';
+import DatabaseMigrator from './model/databaseMigrator';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import {escape} from 'entities';
-import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
-import console from 'console';
-import DatabaseMigrator from './model/databaseMigrator';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -76,7 +76,8 @@ export async function addLanguage(req: Request, res: Response): Promise<void> {
 }
 
 export async function editLanguages(req: Request, res: Response): Promise<void> {
-	if (!(await dataServiceProvider.inputValidator.validateLanguagesForEditing(req.body))) {
+	if (!(await dataServiceProvider.inputValidator.validateLanguagesForEditing(req.body))
+        || !(await dataServiceProvider.settingsManager.isEnableEditing())) {
 		res.status(400);
 		res.end();
 		return;
@@ -92,7 +93,8 @@ export async function getLanguages(_: Request, res: Response): Promise<void> {
 }
 
 export async function addIdea(req: Request, res: Response): Promise<void> {
-	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
+	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))
+        || !(await dataServiceProvider.settingsManager.isEnableEditing())) {
 		res.status(400);
 		res.end();
 		return;
@@ -189,6 +191,11 @@ export async function deleteIdea(req: Request, res: Response): Promise<void> {
 	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
+	if (!(await dataServiceProvider.settingsManager.isEnableEditing())) {
+		res.status(400);
+		res.end();
+		return;
+	}
 	await dataServiceProvider.ideaManager.deleteIdea(parseInt(req.params.id, 10));
 	res.end();
 }
@@ -197,7 +204,8 @@ export async function editIdea(req: Request, res: Response): Promise<void> {
 	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
-	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))) {
+	if (!(await dataServiceProvider.inputValidator.validateIdeaForAdding(req.body as IdeaForAdding))
+        || !(await dataServiceProvider.settingsManager.isEnableEditing())) {
 		res.status(400);
 		res.end();
 		return;
