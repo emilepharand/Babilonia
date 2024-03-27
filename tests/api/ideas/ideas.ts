@@ -3,6 +3,7 @@ import {Idea} from '../../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {Language} from '../../../server/model/languages/language';
 import * as ApiUtils from '../../utils/api-utils';
+import {addIdea, editIdea} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {apiUrl, FIRST_IDEA_ID} from '../../utils/fetch-utils';
 import {
@@ -25,13 +26,48 @@ describe('valid cases', () => {
 	test('only one expression', async () => {
 		const i = {ee: [{language: 'l', text: 'e'}]};
 
-		// Adding
-		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+		const idea = await addIdea(await makeIdeaForAdding(i));
 
 		// Editing
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new';
 		await editValidIdeaAndTest(idea, newIdea);
+	});
+
+	test('expression id changes only when expression is modified', async () => {
+		const i = {
+			ee: [{language: 'english', text: '(red) apple'}, {language: 'french', text: 'pomme (rouge)'}],
+		};
+		let ideaForAdding = await makeIdeaForAdding(i);
+		const originalIdea = await addIdea(ideaForAdding);
+
+		async function extracted(text1: string, text2: string, id1ShouldBeModified1: boolean, id2ShouldBeModified: boolean) {
+			ideaForAdding = getIdeaForAddingFromIdea(originalIdea);
+			ideaForAdding.ee[0].text = text1;
+			ideaForAdding.ee[1].text = text2;
+			const editedIdea = await editIdea(ideaForAdding, originalIdea.id);
+			expect(originalIdea.id).toBe(editedIdea.id);
+
+			if (id1ShouldBeModified1) {
+				expect(originalIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
+			} else {
+				expect(originalIdea.ee[0].id).toBe(editedIdea.ee[0].id);
+			}
+			if (id2ShouldBeModified) {
+				expect(originalIdea.ee[1].id).not.toBe(editedIdea.ee[1].id);
+			} else {
+				expect(originalIdea.ee[1].id).toBe(editedIdea.ee[1].id);
+			}
+		}
+
+		await extracted('(green) apple', 'pomme (verte)', false, false);
+		await extracted('apple', 'pomme', false, false);
+		await extracted('(yellow) apple', 'pomme (jaune)', false, false);
+		await extracted('(yellow) potato', 'pomme (jaune)', true, false);
+		await extracted('(yellow) potato', 'patate (jaune)', false, true);
+		await extracted('tomato', 'tomate', true, true);
+		await extracted('(a wonderful) tomato (that is red)', '(une merveilleuse) tomate (rouge)', false, false);
+		await extracted('(a wonderful) tomato', '(une merveilleuse) tomate', false, false);
 	});
 
 	test('only one language', async () => {
@@ -276,13 +312,21 @@ describe('invalid cases', () => {
 
 	test('actions on nonexistent ideas return 404', async () => {
 		expect((await FetchUtils.fetchIdea(FIRST_IDEA_ID)).status).toEqual(404);
-		expect((await FetchUtils.editIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
+		expect((await FetchUtils.editIdea(await makeIdeaForAdding({
+			ee: [{
+				language: 'l',
+				text: 'e',
+			}],
+		}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await FetchUtils.deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
 	});
 
 	test('editing non-numerical id returns 400', async () => {
 		const promises = ['PUT', 'GET', 'DELETE']
-			.map(method => fetch(`${apiUrl}/ideas/123letters`, {method, headers: {'Content-Type': 'application/json'}}));
+			.map(method => fetch(`${apiUrl}/ideas/123letters`, {
+				method,
+				headers: {'Content-Type': 'application/json'},
+			}));
 		(await Promise.all(promises)).forEach(p => expect(p.status).toEqual(400));
 	});
 });
