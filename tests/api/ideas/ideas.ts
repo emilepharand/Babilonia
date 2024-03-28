@@ -3,7 +3,7 @@ import {Idea} from '../../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {Language} from '../../../server/model/languages/language';
 import * as ApiUtils from '../../utils/api-utils';
-import {addIdea, editIdea} from '../../utils/api-utils';
+import {addIdea} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {apiUrl, FIRST_IDEA_ID} from '../../utils/fetch-utils';
 import {
@@ -38,36 +38,71 @@ describe('valid cases', () => {
 		const i = {
 			ee: [{language: 'english', text: '(red) apple'}, {language: 'french', text: 'pomme (rouge)'}],
 		};
+
 		let ideaForAdding = await makeIdeaForAdding(i);
-		const originalIdea = await addIdea(ideaForAdding);
+		let previousIdea = await addIdea(ideaForAdding);
+		let editedIdea = previousIdea;
+		ideaForAdding = getIdeaForAddingFromIdea(previousIdea);
 
-		async function extracted(text1: string, text2: string, id1ShouldBeModified1: boolean, id2ShouldBeModified: boolean) {
-			ideaForAdding = getIdeaForAddingFromIdea(originalIdea);
-			ideaForAdding.ee[0].text = text1;
-			ideaForAdding.ee[1].text = text2;
-			const editedIdea = await editIdea(ideaForAdding, originalIdea.id);
-			expect(originalIdea.id).toBe(editedIdea.id);
-
-			if (id1ShouldBeModified1) {
-				expect(originalIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
+		async function editAndTest(id1ShouldBeModified: boolean, id2ShouldBeModified: boolean) {
+			editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding);
+			if (id1ShouldBeModified) {
+				expect(previousIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
 			} else {
-				expect(originalIdea.ee[0].id).toBe(editedIdea.ee[0].id);
+				expect(previousIdea.ee[0].id).toBe(editedIdea.ee[0].id);
 			}
 			if (id2ShouldBeModified) {
-				expect(originalIdea.ee[1].id).not.toBe(editedIdea.ee[1].id);
+				expect(previousIdea.ee[1].id).not.toBe(editedIdea.ee[1].id);
 			} else {
-				expect(originalIdea.ee[1].id).toBe(editedIdea.ee[1].id);
+				expect(previousIdea.ee[1].id).toBe(editedIdea.ee[1].id);
 			}
+			previousIdea = editedIdea;
 		}
 
-		await extracted('(green) apple', 'pomme (verte)', false, false);
-		await extracted('apple', 'pomme', false, false);
-		await extracted('(yellow) apple', 'pomme (jaune)', false, false);
-		await extracted('(yellow) potato', 'pomme (jaune)', true, false);
-		await extracted('(yellow) potato', 'patate (jaune)', false, true);
-		await extracted('tomato', 'tomate', true, true);
-		await extracted('(a wonderful) tomato (that is red)', '(une merveilleuse) tomate (rouge)', false, false);
-		await extracted('(a wonderful) tomato', '(une merveilleuse) tomate', false, false);
+		function changeTexts(text1: string, text2: string) {
+			ideaForAdding = getIdeaForAddingFromIdea(editedIdea);
+			ideaForAdding.ee[0].text = text1;
+			ideaForAdding.ee[1].text = text2;
+		}
+
+		changeTexts('(green) apple', 'pomme (verte)');
+		await editAndTest(false, false);
+
+		changeTexts('apple', 'pomme');
+		await editAndTest(false, false);
+
+		changeTexts('(yellow) apple', 'pomme (jaune)');
+		await editAndTest(false, false);
+
+		changeTexts('(yellow) potato', 'pomme (jaune)');
+		await editAndTest(true, false);
+
+		changeTexts('(yellow) potato', 'patate (jaune)');
+		await editAndTest(false, true);
+
+		changeTexts('tomato', 'tomate');
+		await editAndTest(true, true);
+
+		changeTexts('(a wonderful) tomato (that is red)', '(une merveilleuse) tomate (rouge)');
+		await editAndTest(false, false);
+
+		changeTexts('(a wonderful) tomato', '(une merveilleuse) tomate');
+		await editAndTest(false, false);
+
+		changeTexts('a wonderful tomato', 'une merveilleuse tomate');
+		await editAndTest(true, true);
+
+		changeTexts('(a) wonderful and delicious (tomato)', 'une (merveilleuse et délicieuse) tomate');
+		await editAndTest(true, true);
+
+		changeTexts('wonderful and delicious', 'une merveilleuse tomate');
+		await editAndTest(false, false);
+
+		changeTexts('wonderful (and) delicious', 'une (merveilleuse) tomate');
+		await editAndTest(true, true);
+
+		editedIdea.ee[0].language = editedIdea.ee[1].language;
+		await editAndTest(true, false);
 	});
 
 	test('only one language', async () => {
