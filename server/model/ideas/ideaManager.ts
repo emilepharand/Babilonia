@@ -9,7 +9,8 @@ import type {IdeaForAdding} from './ideaForAdding';
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager implements Manager {
-	constructor(private readonly db: Database, private readonly lm: LanguageManager) {}
+	constructor(private readonly db: Database, private readonly lm: LanguageManager) {
+	}
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
 		await this.db.run('insert into ideas("id") VALUES (null)');
@@ -19,12 +20,36 @@ export default class IdeaManager implements Manager {
 	}
 
 	async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
-		// Old expressions are deleted and new ones added
-		// because ids of expressions don't need to be preserved
-		// and it is easier to handle editing ideas this way
-		// (this might change in the future)
-		await this.db.run('delete from expressions where ideaId = ?', id);
-		await this.insertExpressions(idea.ee, id);
+		function removeContext(textWithContext: string): string {
+			return textWithContext.replace(/\(.*?\)/g, '').replace(/\s/g, '');
+		}
+
+		const existingExpressions = await this.getExpressions(id);
+		const expressionsWithoutContextMap = new Map<string, Expression>();
+		for (const e of existingExpressions) {
+			expressionsWithoutContextMap.set(removeContext(e.text), e);
+		}
+
+		for (const e of idea.ee) {
+			const expressionWithoutContext = removeContext(e.text);
+			const existingExpression = expressionsWithoutContextMap.get(expressionWithoutContext);
+			if (existingExpression) {
+				// eslint-disable-next-line no-await-in-loop
+				await this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
+					e.languageId,
+					e.text,
+					e.known,
+					existingExpression.id);
+				expressionsWithoutContextMap.delete(expressionWithoutContext);
+			} else {
+				// eslint-disable-next-line no-await-in-loop
+				await this.insertExpression(e, id);
+			}
+		}
+		for (const e of expressionsWithoutContextMap.values()) {
+			// eslint-disable-next-line no-await-in-loop
+			await this.db.run('delete from expressions where id = ?', e.id);
+		}
 	}
 
 	async deleteIdea(ideaId: number): Promise<void> {
@@ -53,6 +78,11 @@ export default class IdeaManager implements Manager {
 			// eslint-disable-next-line no-await-in-loop
 			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
 		}
+	}
+
+	private async insertExpression(e: ExpressionForAdding, ideaId: number): Promise<void> {
+		const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
+		await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {

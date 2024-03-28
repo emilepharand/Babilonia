@@ -3,6 +3,7 @@ import {Idea} from '../../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
 import {Language} from '../../../server/model/languages/language';
 import * as ApiUtils from '../../utils/api-utils';
+import {addIdea} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {apiUrl, FIRST_IDEA_ID} from '../../utils/fetch-utils';
 import {
@@ -25,13 +26,83 @@ describe('valid cases', () => {
 	test('only one expression', async () => {
 		const i = {ee: [{language: 'l', text: 'e'}]};
 
-		// Adding
-		const idea = await addValidIdeaAndTest(await makeIdeaForAdding(i));
+		const idea = await addIdea(await makeIdeaForAdding(i));
 
 		// Editing
 		const newIdea = getIdeaForAddingFromIdea(idea);
 		newIdea.ee[0].text = 'new';
 		await editValidIdeaAndTest(idea, newIdea);
+	});
+
+	test('expression id changes only when expression is modified', async () => {
+		const i = {
+			ee: [{language: 'english', text: '(red) apple'}, {language: 'french', text: 'pomme (rouge)'}],
+		};
+
+		let ideaForAdding = await makeIdeaForAdding(i);
+		let previousIdea = await addIdea(ideaForAdding);
+		let editedIdea = previousIdea;
+		ideaForAdding = getIdeaForAddingFromIdea(previousIdea);
+
+		async function editAndTest(id1ShouldBeModified: boolean, id2ShouldBeModified: boolean) {
+			editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding);
+			if (id1ShouldBeModified) {
+				expect(previousIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
+			} else {
+				expect(previousIdea.ee[0].id).toBe(editedIdea.ee[0].id);
+			}
+			if (id2ShouldBeModified) {
+				expect(previousIdea.ee[1].id).not.toBe(editedIdea.ee[1].id);
+			} else {
+				expect(previousIdea.ee[1].id).toBe(editedIdea.ee[1].id);
+			}
+			previousIdea = editedIdea;
+		}
+
+		function changeTexts(text1: string, text2: string) {
+			ideaForAdding = getIdeaForAddingFromIdea(editedIdea);
+			ideaForAdding.ee[0].text = text1;
+			ideaForAdding.ee[1].text = text2;
+		}
+
+		changeTexts('(green) apple', 'pomme (verte)');
+		await editAndTest(false, false);
+
+		changeTexts('apple', 'pomme');
+		await editAndTest(false, false);
+
+		changeTexts('(yellow) apple', 'pomme (jaune)');
+		await editAndTest(false, false);
+
+		changeTexts('(yellow) potato', 'pomme (jaune)');
+		await editAndTest(true, false);
+
+		changeTexts('(yellow) potato', 'patate (jaune)');
+		await editAndTest(false, true);
+
+		changeTexts('tomato', 'tomate');
+		await editAndTest(true, true);
+
+		changeTexts('(a wonderful) tomato (that is red)', '(une merveilleuse) tomate (rouge)');
+		await editAndTest(false, false);
+
+		changeTexts('(a wonderful) tomato', '(une merveilleuse) tomate');
+		await editAndTest(false, false);
+
+		changeTexts('a wonderful tomato', 'une merveilleuse tomate');
+		await editAndTest(true, true);
+
+		changeTexts('(a) wonderful and delicious (tomato)', 'une (merveilleuse et délicieuse) tomate');
+		await editAndTest(true, true);
+
+		changeTexts('wonderful and delicious', 'une merveilleuse tomate');
+		await editAndTest(false, false);
+
+		changeTexts('wonderful (and) delicious', 'une (merveilleuse) tomate');
+		await editAndTest(true, true);
+
+		editedIdea.ee[0].language = editedIdea.ee[1].language;
+		await editAndTest(true, false);
 	});
 
 	test('only one language', async () => {
@@ -276,13 +347,21 @@ describe('invalid cases', () => {
 
 	test('actions on nonexistent ideas return 404', async () => {
 		expect((await FetchUtils.fetchIdea(FIRST_IDEA_ID)).status).toEqual(404);
-		expect((await FetchUtils.editIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}), FIRST_IDEA_ID)).status).toEqual(404);
+		expect((await FetchUtils.editIdea(await makeIdeaForAdding({
+			ee: [{
+				language: 'l',
+				text: 'e',
+			}],
+		}), FIRST_IDEA_ID)).status).toEqual(404);
 		expect((await FetchUtils.deleteIdea(FIRST_IDEA_ID)).status).toEqual(404);
 	});
 
 	test('editing non-numerical id returns 400', async () => {
 		const promises = ['PUT', 'GET', 'DELETE']
-			.map(method => fetch(`${apiUrl}/ideas/123letters`, {method, headers: {'Content-Type': 'application/json'}}));
+			.map(method => fetch(`${apiUrl}/ideas/123letters`, {
+				method,
+				headers: {'Content-Type': 'application/json'},
+			}));
 		(await Promise.all(promises)).forEach(p => expect(p.status).toEqual(400));
 	});
 });
