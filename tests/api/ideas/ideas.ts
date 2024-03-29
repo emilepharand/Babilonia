@@ -205,8 +205,8 @@ describe('valid cases', () => {
 
 	test('context trimming', async () => {
 		await testTransformExpressions(
-			['to ( play ) sport', 'to (  play) (	sport)', 'to ( 	play   ) ( sport)'],
-			['to (play) sport', 'to (play) (sport)', 'to (play) (sport)'],
+			['to ( play ) a sport', 'to (  play) a (	sport)', 'to ( 	play   ) ( sport)'],
+			['to (play) a sport', 'to (play) a (sport)', 'to (play) (sport)'],
 		);
 	});
 
