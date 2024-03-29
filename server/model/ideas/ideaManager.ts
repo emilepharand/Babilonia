@@ -24,6 +24,7 @@ export default class IdeaManager implements Manager {
 			return textWithContext.replace(/\(.*?\)/g, '').replace(/\s/g, '');
 		}
 
+		const idsInOrder: number[] = [];
 		const existingExpressions = await this.getExpressions(id);
 		const expressionsWithoutContextMap = new Map<string, Expression>();
 		for (const e of existingExpressions) {
@@ -41,14 +42,21 @@ export default class IdeaManager implements Manager {
 					e.known,
 					existingExpression.id);
 				expressionsWithoutContextMap.delete(expressionWithoutContext);
+				idsInOrder.push(existingExpression.id);
 			} else {
 				// eslint-disable-next-line no-await-in-loop
 				await this.insertExpression(e, id);
+				// eslint-disable-next-line no-await-in-loop
+				idsInOrder.push((await this.db.get('select last_insert_rowid() as id')).id as number);
 			}
 		}
 		for (const e of expressionsWithoutContextMap.values()) {
 			// eslint-disable-next-line no-await-in-loop
 			await this.db.run('delete from expressions where id = ?', e.id);
+		}
+		for (let i = 0; i < idsInOrder.length; i++) {
+			// eslint-disable-next-line no-await-in-loop
+			await this.db.run('update expressions set ordering = ? where id = ?', i, idsInOrder[i]);
 		}
 	}
 
@@ -59,7 +67,7 @@ export default class IdeaManager implements Manager {
 
 	public async getIdea(ideaId: number): Promise<Idea> {
 		const ee: Expression[] = await this.getExpressions(ideaId);
-		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
+		ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering || e1.ordering - e2.ordering);
 		return {id: ideaId, ee};
 	}
 
@@ -72,11 +80,11 @@ export default class IdeaManager implements Manager {
 	}
 
 	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
-		for (const e of ee) {
-			const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
-			// Await is needed because order needs to be preserved
+		for (let i = 0; i < ee.length; i++) {
+			const e = ee[i];
+			const query = 'insert into expressions("ideaId", "languageId", "text", "known", "ordering") values (?, ?, ?, ?, ?)';
 			// eslint-disable-next-line no-await-in-loop
-			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
+			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0', i);
 		}
 	}
 
@@ -86,8 +94,8 @@ export default class IdeaManager implements Manager {
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
-		const query = 'select id, languageId, text, known from expressions where ideaId = ?';
-		const rows: [{id: number; languageId: number; text: string; known: string}] = await this.db.all(
+		const query = 'select id, languageId, text, known, ordering from expressions where ideaId = ?';
+		const rows: [{id: number; languageId: number; text: string; known: string; ordering: number}] = await this.db.all(
 			query,
 			ideaId,
 		);
@@ -96,6 +104,7 @@ export default class IdeaManager implements Manager {
 				id: row.id,
 				text: row.text,
 				language: await this.lm.getLanguage(row.languageId),
+				ordering: row.ordering,
 				known: row.known === '1',
 			})),
 		);
