@@ -1,7 +1,7 @@
 import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
 import * as ApiUtils from '../utils/api-utils';
-import * as FetchUtils from '../utils/fetch-utils';
 import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
+import * as FetchUtils from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -51,6 +51,9 @@ describe('valid cases', () => {
 		res = await ApiUtils.changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(200);
 		expect(await ApiUtils.getDatabasePath()).toEqual(dbToMigratePath);
+
+		// eslint-disable-next-line no-warning-comments
+		// TODO more tests
 	});
 });
 
