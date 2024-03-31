@@ -5,8 +5,6 @@ import {version} from './settings/settingsManager';
 export default class DatabaseMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
 		private readonly _baseDataServiceProvider: DataServiceProvider) {
-		console.log('_databaseToMigrate', _databaseToMigrate);
-		console.log('_baseDataServiceProvider', _baseDataServiceProvider);
 	}
 
 	async migrate(): Promise<void> {
