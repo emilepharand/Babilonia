@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p tests/coverage/merged dist/db dist/tests/db dist/tests/dir.db
-cp db/base.db dist/db
+cp db/base.db dist/db.db
 cp tests/db/* dist/tests/db
 cp dist/tests/db/old-version.db dist/tests/db/old-version-to-migrate.db
 
