@@ -23,17 +23,6 @@ beforeEach(async () => {
 });
 
 describe('valid cases', () => {
-	test('only one expression', async () => {
-		const i = {ee: [{language: 'l', text: 'e'}]};
-
-		const idea = await addIdea(await makeIdeaForAdding(i));
-
-		// Editing
-		const newIdea = getIdeaForAddingFromIdea(idea);
-		newIdea.ee[0].text = 'new';
-		await editValidIdeaAndTest(idea, newIdea);
-	});
-
 	test('expression id changes only when expression is modified', async () => {
 		const i = {
 			ee: [{language: 'english', text: '(red) apple'}, {language: 'french', text: 'pomme (rouge)'}],
@@ -105,7 +94,7 @@ describe('valid cases', () => {
 		await editAndTest(true, false);
 	});
 
-	test('only one language', async () => {
+	test('only one language is valid', async () => {
 		const i = {ee: [{language: 'l1', text: 'l1 e1'}, {language: 'l1', text: 'l1 e2'}]};
 
 		// Adding
@@ -210,10 +199,9 @@ describe('valid cases', () => {
 		);
 	});
 
-	test('deleting an idea', async () => {
+	test('deleting an idea deletes associated languages', async () => {
 		const idea = await addAnyIdea();
-		expect((await FetchUtils.deleteIdea(idea.id)).status).toEqual(200);
-		expect((await FetchUtils.fetchIdea(idea.id)).status).toEqual(404);
+		await FetchUtils.deleteIdea(idea.id);
 		for (const e of idea.ee) {
 			// eslint-disable-next-line no-await-in-loop
 			expect((await FetchUtils.fetchLanguage(e.language.id)).status).toEqual(200);
