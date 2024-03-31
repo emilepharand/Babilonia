@@ -20,7 +20,7 @@
     "fix-coverage": "echo 'Temporary hack for iFaxity/vite-plugin-istanbul issue #96' && sed -E -i 's/instrumentSync\\(srcCode, filename/instrumentSync(srcCode, id/g' node_modules/vite-plugin-istanbul/dist/index.mjs",
     "test:prepare": "bash tests/bash/prepare.sh",
     "test": "npm run check && npm run test:build && npm run test:bash && npm run test:api && npm run test:e2e",
-    "test:serve": "cd dist && npm start --db=:memory: 2>/dev/null",
+    "test:serve": "cd dist && npm start --db=:memory: >> log.txt 2>&1",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
     "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_API_PORT test:api:run",
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --silent=false && npm run test:api:coverage",
