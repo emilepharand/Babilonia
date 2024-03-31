@@ -6,8 +6,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "clean": "rimraf -g tests/coverage release .nyc_output_cypress 'dist/!(*.db)'",
-    "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack && cp db/base.db dist/db.db",
+    "clean": "rimraf -g tests/coverage release .nyc_output_cypress dist/tests 'dist/!(*.db)'",
+    "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack",
     "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}, \"scripts\":{\"start\": \"node index.cjs\"}}' > dist/package.json",
     "release": "rm -rf node_modules release && npm i && npm run build && mkdir -p release && export VERSION=$(node -p \"require('./package.json').version\") && cd dist && zip -r \"$VERSION.zip\" * && mv \"$VERSION.zip\" ../release",
     "release:test": "npm run release && rm -rf dist && unzip -o release/*.zip -d dist && tests/bash/tests.sh sqlite3",
