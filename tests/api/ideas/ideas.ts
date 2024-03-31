@@ -85,10 +85,13 @@ describe('valid cases', () => {
 		await editAndTest(true, true);
 
 		changeTexts('wonderful and delicious', 'une merveilleuse tomate');
-		await editAndTest(false, false);
+		await editAndTest(false, true);
 
 		changeTexts('wonderful (and) delicious', 'une (merveilleuse) tomate');
 		await editAndTest(true, true);
+
+		changeTexts('wonderful delicious', 'une tomate');
+		await editAndTest(false, false);
 
 		editedIdea.ee[0].language = editedIdea.ee[1].language;
 		await editAndTest(true, false);
