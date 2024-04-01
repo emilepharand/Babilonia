@@ -1,7 +1,7 @@
-import {Language} from '../../../server/model/languages/language';
 import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Idea, validate} from '../../../server/model/ideas/idea';
-import {getIdeaForAddingFromIdea, IdeaForAdding} from '../../../server/model/ideas/ideaForAdding';
+import {IdeaForAdding, getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
+import {Language} from '../../../server/model/languages/language';
 import * as ApiUtils from '../../utils/api-utils';
 import {addAnyLanguage} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
@@ -59,7 +59,7 @@ export async function editValidIdeaAndTest(idea: Idea,	newIdea: IdeaForAdding,	e
 	return responseIdea;
 }
 
-async function validateIdea(responseIdea: Idea, ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<void> {
+export async function validateIdea(responseIdea: Idea, ideaForAdding: IdeaForAdding, expressionsInOrder?: ExpressionForAdding[]): Promise<void> {
 	expect(validate(responseIdea)).toEqual(true);
 
 	const r = await FetchUtils.fetchIdea(responseIdea.id);

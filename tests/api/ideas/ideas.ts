@@ -16,6 +16,7 @@ import {
 	editValidIdeaAndTest,
 	makeIdeaForAdding,
 	testTransformExpressions,
+	validateIdea,
 } from './utils';
 
 beforeEach(async () => {
@@ -93,6 +94,14 @@ describe('valid cases', () => {
 		changeTexts('wonderful delicious', 'une tomate');
 		await editAndTest(false, false);
 
+		const savedIdea = editedIdea;
+
+		changeTexts('une tomate', 'wonderful delicious');
+		await editAndTest(true, true);
+
+		expect(editedIdea.ee[0].id).toBe(savedIdea.ee[1].id);
+		expect(editedIdea.ee[1].id).toBe(savedIdea.ee[0].id);
+
 		editedIdea.ee[0].language = editedIdea.ee[1].language;
 		await editAndTest(true, false);
 	});
@@ -133,7 +142,6 @@ describe('valid cases', () => {
 	});
 
 	test('ordering of expressions', async () => {
-		// Adding
 		const l1: Language = await ApiUtils.addLanguage('language 1');
 		const l2: Language = await ApiUtils.addLanguage('language 2');
 		const l3: Language = await ApiUtils.addLanguage('language 3');
@@ -145,10 +153,26 @@ describe('valid cases', () => {
 		const e5 = {languageId: l2.id, text: 'l2 e2'};
 		const e6 = {languageId: l3.id, text: 'l3 e1'};
 		const e7 = {languageId: l4.id, text: 'l4 e1'};
-		const idea = await addValidIdeaAndTest({ee: [e4, e5, e1, e2, e3, e7, e6]}, [e1, e2, e3, e4, e5, e6, e7]);
+		let idea = await addValidIdeaAndTest({ee: [e4, e5, e1, e2, e3, e7, e6]}, [e1, e2, e3, e4, e5, e6, e7]);
 
-		// Editing
-		const ideaForAdding = getIdeaForAddingFromIdea(idea);
+		idea = await ApiUtils.fetchIdea(idea.id);
+		let ideaForAdding = getIdeaForAddingFromIdea(idea);
+
+		l1.ordering = 3;
+		l2.ordering = 2;
+		l3.ordering = 1;
+		l4.ordering = 0;
+		await ApiUtils.editLanguages([l1, l2, l3, l4]);
+		await validateIdea(idea, ideaForAdding, [e7, e6, e4, e5, e1, e2, e3]);
+
+		l1.ordering = 0;
+		l2.ordering = 1;
+		l3.ordering = 2;
+		l4.ordering = 3;
+		await ApiUtils.editLanguages([l1, l2, l3, l4]);
+
+		idea = await ApiUtils.fetchIdea(idea.id);
+		ideaForAdding = getIdeaForAddingFromIdea(idea);
 		ideaForAdding.ee[0].languageId = l2.id;
 		ideaForAdding.ee[1].languageId = l1.id;
 		ideaForAdding.ee[2].languageId = l3.id;
@@ -157,7 +181,7 @@ describe('valid cases', () => {
 		ideaForAdding.ee[5].languageId = l1.id;
 		ideaForAdding.ee[6].languageId = l2.id;
 
-		await editValidIdeaAndTest(idea, ideaForAdding, [
+		idea = await editValidIdeaAndTest(idea, ideaForAdding, [
 			ideaForAdding.ee[1],
 			ideaForAdding.ee[3],
 			ideaForAdding.ee[5],
@@ -165,6 +189,19 @@ describe('valid cases', () => {
 			ideaForAdding.ee[6],
 			ideaForAdding.ee[2],
 			ideaForAdding.ee[4],
+		]);
+
+		ideaForAdding = getIdeaForAddingFromIdea(idea);
+		ideaForAdding.ee[3].text = 'new l2 e1';
+		ideaForAdding.ee[1].text = 'l1 (context) e2';
+		await editValidIdeaAndTest(idea, ideaForAdding, [
+			ideaForAdding.ee[0],
+			ideaForAdding.ee[1],
+			ideaForAdding.ee[2],
+			ideaForAdding.ee[3],
+			ideaForAdding.ee[4],
+			ideaForAdding.ee[5],
+			ideaForAdding.ee[6],
 		]);
 	});
 
