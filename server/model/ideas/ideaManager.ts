@@ -1,7 +1,7 @@
 import type {Database} from 'sqlite';
 import type LanguageManager from '../languages/languageManager';
 import {type Manager} from '../manager';
-import type {Expression, ExpressionForAdding} from './expression';
+import {type Expression, type ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
 import type {IdeaForAdding} from './ideaForAdding';
 
@@ -24,16 +24,23 @@ export default class IdeaManager implements Manager {
 			return textWithContext.replace(/\(.*?\)/g, '').replace(/\s/g, '');
 		}
 
+		function getKeyE(e: Expression) {
+			return JSON.stringify({languageId: e.language.id, text: removeContext(e.text)});
+		}
+
+		function getKeyEe(e: ExpressionForAdding) {
+			return JSON.stringify({languageId: e.languageId, text: removeContext(e.text)});
+		}
+
 		const idsInOrder: number[] = [];
 		const existingExpressions = await this.getExpressions(id);
-		const expressionsWithoutContextMap = new Map<string, Expression>();
+		const existingExpressionsMap = new Map<string, Expression>();
 		for (const e of existingExpressions) {
-			expressionsWithoutContextMap.set(removeContext(e.text), e);
+			existingExpressionsMap.set(getKeyE(e), e);
 		}
 
 		for (const e of idea.ee) {
-			const expressionWithoutContext = removeContext(e.text);
-			const existingExpression = expressionsWithoutContextMap.get(expressionWithoutContext);
+			const existingExpression = existingExpressionsMap.get(getKeyEe(e));
 			if (existingExpression) {
 				// eslint-disable-next-line no-await-in-loop
 				await this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
@@ -41,7 +48,7 @@ export default class IdeaManager implements Manager {
 					e.text,
 					e.known,
 					existingExpression.id);
-				expressionsWithoutContextMap.delete(expressionWithoutContext);
+				existingExpressionsMap.delete(getKeyEe(e));
 				idsInOrder.push(existingExpression.id);
 			} else {
 				// eslint-disable-next-line no-await-in-loop
@@ -50,7 +57,7 @@ export default class IdeaManager implements Manager {
 				idsInOrder.push((await this.db.get('select last_insert_rowid() as id')).id as number);
 			}
 		}
-		for (const e of expressionsWithoutContextMap.values()) {
+		for (const e of existingExpressionsMap.values()) {
 			// eslint-disable-next-line no-await-in-loop
 			await this.db.run('delete from expressions where id = ?', e.id);
 		}
