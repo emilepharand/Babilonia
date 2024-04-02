@@ -34,8 +34,12 @@ describe('valid cases', () => {
 		let editedIdea = previousIdea;
 		ideaForAdding = getIdeaForAddingFromIdea(previousIdea);
 
-		async function editAndTest(id1ShouldBeModified: boolean, id2ShouldBeModified: boolean) {
-			editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding);
+		async function editAndTest(id1ShouldBeModified: boolean, id2ShouldBeModified: boolean, swapped?: boolean) {
+			if (swapped) {
+				editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding, [ideaForAdding.ee[1], ideaForAdding.ee[0]]);
+			} else {
+				editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding);
+			}
 			if (id1ShouldBeModified) {
 				expect(previousIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
 			} else {
@@ -94,15 +98,19 @@ describe('valid cases', () => {
 		changeTexts('wonderful delicious', 'une tomate');
 		await editAndTest(false, false);
 
-		const savedIdea = editedIdea;
+		// Swap the expressions
+		changeTexts('une tomate', 'wonderful delicious');
+		const temp = ideaForAdding.ee[0].languageId;
+		ideaForAdding.ee[0].languageId = ideaForAdding.ee[1].languageId;
+		ideaForAdding.ee[1].languageId = temp;
+		await editAndTest(false, false, true);
 
+		// Swap only the expression texts (last edit returned ['wonderful delicious', 'une tomate'])
 		changeTexts('une tomate', 'wonderful delicious');
 		await editAndTest(true, true);
 
-		expect(editedIdea.ee[0].id).toBe(savedIdea.ee[1].id);
-		expect(editedIdea.ee[1].id).toBe(savedIdea.ee[0].id);
-
-		editedIdea.ee[0].language = editedIdea.ee[1].language;
+		// Change the language of the first expression
+		ideaForAdding.ee[0].languageId = ideaForAdding.ee[1].languageId;
 		await editAndTest(true, false);
 	});
 
