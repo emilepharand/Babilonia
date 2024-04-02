@@ -2,12 +2,11 @@ const Sequencer = require('@jest/test-sequencer').default;
 
 class CustomTestSequencer extends Sequencer {
 	sort(tests) {
-		const specificTestName = 'smoke';
-		const specificTest = tests.find(test => test.path.includes(specificTestName));
+		const smokeTests = tests.find(test => test.path.includes('smoke'));
 
-		if (specificTest) {
-			const otherTests = tests.filter(test => test !== specificTest);
-			return [specificTest, ...otherTests];
+		if (smokeTests) {
+			const otherTests = tests.filter(test => test !== smokeTests);
+			return [smokeTests, ...otherTests];
 		}
 
 		return tests;
