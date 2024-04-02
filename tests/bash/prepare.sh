@@ -1,5 +1,6 @@
 #!/bin/bash
 
+rm -rf dist/tests/db
 mkdir -p tests/coverage/merged dist/db dist/tests/db dist/tests/dir.db
 cp db/base.db dist/db.db
 cp tests/db/* dist/tests/db
