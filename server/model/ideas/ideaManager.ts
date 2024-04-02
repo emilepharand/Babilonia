@@ -4,6 +4,7 @@ import {type Manager} from '../manager';
 import {type Expression, type ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
 import type {IdeaForAdding} from './ideaForAdding';
+import {getUniqueExpressionFromExpression, getUniqueExpressionFromExpressionForAdding} from './uniqueExpression';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
@@ -20,27 +21,15 @@ export default class IdeaManager implements Manager {
 	}
 
 	async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
-		function removeContext(textWithContext: string): string {
-			return textWithContext.replace(/\(.*?\)/g, '').replace(/\s/g, '');
-		}
-
-		function getKeyE(e: Expression) {
-			return JSON.stringify({languageId: e.language.id, text: removeContext(e.text)});
-		}
-
-		function getKeyEe(e: ExpressionForAdding) {
-			return JSON.stringify({languageId: e.languageId, text: removeContext(e.text)});
-		}
-
 		const idsInOrder: number[] = [];
 		const existingExpressions = await this.getExpressions(id);
 		const existingExpressionsMap = new Map<string, Expression>();
 		for (const e of existingExpressions) {
-			existingExpressionsMap.set(getKeyE(e), e);
+			existingExpressionsMap.set(JSON.stringify(getUniqueExpressionFromExpression(e)), e);
 		}
 
 		for (const e of idea.ee) {
-			const existingExpression = existingExpressionsMap.get(getKeyEe(e));
+			const existingExpression = existingExpressionsMap.get(JSON.stringify(getUniqueExpressionFromExpressionForAdding(e)));
 			if (existingExpression) {
 				// eslint-disable-next-line no-await-in-loop
 				await this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
@@ -48,7 +37,7 @@ export default class IdeaManager implements Manager {
 					e.text,
 					e.known,
 					existingExpression.id);
-				existingExpressionsMap.delete(getKeyEe(e));
+				existingExpressionsMap.delete(JSON.stringify(getUniqueExpressionFromExpressionForAdding(e)));
 				idsInOrder.push(existingExpression.id);
 			} else {
 				// eslint-disable-next-line no-await-in-loop
