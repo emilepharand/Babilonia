@@ -1,4 +1,6 @@
-class CustomTestSequencer {
+const Sequencer = require('@jest/test-sequencer').default;
+
+class CustomTestSequencer extends Sequencer {
 	sort(tests) {
 		const specificTestName = 'smoke';
 		const specificTest = tests.find(test => test.path.includes(specificTestName));
