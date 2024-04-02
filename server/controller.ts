@@ -1,15 +1,15 @@
+import console from 'console';
+import {escape} from 'entities';
 import type {Request, Response} from 'express';
+import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
+import DatabaseCoordinator from './model/database/databaseCoordinator';
+import DatabaseMigrator from './model/database/databaseMigrator';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import {escape} from 'entities';
-import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
-import console from 'console';
-import DatabaseMigrator from './model/databaseMigrator';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC

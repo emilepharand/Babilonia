@@ -1,6 +1,6 @@
 import type {Database} from 'sqlite';
-import type DataServiceProvider from './dataServiceProvider';
-import {version} from './settings/settingsManager';
+import type DataServiceProvider from '../dataServiceProvider';
+import {version} from '../settings/settingsManager';
 
 export default class DatabaseMigrator {
 	constructor(private readonly _databaseToMigrate: Database,

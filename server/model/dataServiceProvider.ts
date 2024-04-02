@@ -1,13 +1,13 @@
 import {type Database} from 'sqlite';
+import {currentVersion} from '../const';
 import PracticeManager from '../practice/practiceManager';
 import {StatsCounter} from '../stats/statsCounter';
+import {clearDatabaseAndCreateSchema} from './database/databaseInitializer';
 import IdeaManager from './ideas/ideaManager';
 import InputValidator from './inputValidator';
 import LanguageManager from './languages/languageManager';
 import SearchHandler from './search/searchHandler';
 import SettingsManager from './settings/settingsManager';
-import {clearDatabaseAndCreateSchema} from './databaseInitializer';
-import {currentVersion} from '../const';
 
 export default class DataServiceProvider {
 	private readonly _settingsManager: SettingsManager;
