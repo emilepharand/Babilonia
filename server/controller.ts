@@ -10,6 +10,7 @@ import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 import {databasePath} from './options';
+import {normalizeIdea} from './utils/expressionStringUtils';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
@@ -102,33 +103,6 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 	const returnIdea = await dataServiceProvider.ideaManager.addIdea(ideaForAdding);
 	res.status(201);
 	res.send(JSON.stringify(returnIdea));
-}
-
-function normalizeIdea(ideaForAdding: IdeaForAdding) {
-	trimExpressions(ideaForAdding);
-	normalizeWhitespace(ideaForAdding);
-	trimContext(ideaForAdding);
-}
-
-function trimExpressions(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.trim();
-	});
-	return ideaForAdding;
-}
-
-function trimContext(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s(?=\))|(?<=\()\s/g, '');
-	});
-	return ideaForAdding;
-}
-
-function normalizeWhitespace(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s+/g, ' ');
-	});
-	return ideaForAdding;
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
