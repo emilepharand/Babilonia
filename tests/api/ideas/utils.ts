@@ -77,6 +77,8 @@ export async function validateIdea(responseIdea: Idea, ideaForAdding: IdeaForAdd
 		expect(fetchedExpression.language.id).toEqual(e.languageId);
 		if (e.known) {
 			expect(fetchedExpression.known).toEqual(e.known);
+		} else {
+			expect(fetchedExpression.known).toBeFalsy();
 		}
 		languagePromises.push(ApiUtils.fetchLanguage(fetchedExpression.language.id));
 	}
