@@ -178,9 +178,9 @@ describe('valid cases', () => {
 		l4.ordering = 3;
 		await ApiUtils.editLanguages([l1, l2, l3, l4]);
 
-		async function editAndTestOrder(indices: number[]) {
-			const eeIndices = indices.map(index => ideaForAdding.ee[index]);
-			idea = await editValidIdeaAndTest(idea, ideaForAdding, eeIndices);
+		async function editAndTestOrdering(indices: number[]) {
+			const expressionsInOrder = indices.map(index => ideaForAdding.ee[index]);
+			idea = await editValidIdeaAndTest(idea, ideaForAdding, expressionsInOrder);
 			ideaForAdding = getIdeaForAddingFromIdea(idea);
 		}
 
@@ -193,11 +193,11 @@ describe('valid cases', () => {
 		ideaForAdding.ee[4].languageId = l4.id;
 		ideaForAdding.ee[5].languageId = l1.id;
 		ideaForAdding.ee[6].languageId = l2.id;
-		await editAndTestOrder([1, 3, 5, 0, 6, 2, 4]);
+		await editAndTestOrdering([1, 3, 5, 0, 6, 2, 4]);
 
 		ideaForAdding.ee[3].text = 'new l2 e1';
 		ideaForAdding.ee[1].text = 'l1 (context) e2';
-		await editAndTestOrder([0, 1, 2, 3, 4, 5, 6]);
+		await editAndTestOrdering([0, 1, 2, 3, 4, 5, 6]);
 	});
 
 	test('ordering of expressions with same expression texts within idea', async () => {
