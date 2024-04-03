@@ -51,9 +51,6 @@ describe('valid cases', () => {
 		res = await ApiUtils.changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(200);
 		expect(await ApiUtils.getDatabasePath()).toEqual(dbToMigratePath);
-
-		// eslint-disable-next-line no-warning-comments
-		// TODO more tests
 	});
 });
 
