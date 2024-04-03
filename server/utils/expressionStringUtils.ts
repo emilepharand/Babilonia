@@ -28,5 +28,5 @@ export function normalizeWhitespace(ideaForAdding: IdeaForAdding) {
 }
 
 export function removeContext(textWithContext: string): string {
-	return textWithContext.replace(/\(.*?\)/g, '').replace(/\s/g, '');
+	return textWithContext.replace(/\([^)]*\)/g, '').replace(/\s/g, '');
 }
