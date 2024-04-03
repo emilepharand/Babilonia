@@ -14,50 +14,24 @@ export default class IdeaManager implements Manager {
 	}
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
-		await this.db.run('insert into ideas("id") VALUES (null)');
+		await this.db.run('insert into ideas default values');
 		const ideaId = (await this.db.get('select last_insert_rowid() as id')).id as number;
 		await this.insertExpressions(ideaForAdding.ee, ideaId);
 		return this.getIdea(ideaId);
 	}
 
 	async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
-		let promises = [];
-		const existingExpressions = await this.getExpressions(id);
-		const existingExpressionsMap = new Map<string, Expression>();
-		for (const e of existingExpressions) {
-			existingExpressionsMap.set(JSON.stringify(UniqueExpression.fromExpression(e)), e);
-		}
-		for (const e of idea.ee) {
-			const uniqueExpression = UniqueExpression.fromExpressionForAdding(e);
-			const existingExpression = existingExpressionsMap.get(JSON.stringify(uniqueExpression));
-			if (existingExpression) {
-				promises.push(this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
-					e.languageId,
-					e.text,
-					e.known,
-					existingExpression.id));
-				existingExpressionsMap.delete(JSON.stringify(UniqueExpression.fromExpressionForAdding(e)));
-			} else {
-				promises.push(this.insertExpression(e, id));
-			}
-		}
-		for (const e of existingExpressionsMap.values()) {
-			promises.push(this.db.run('delete from expressions where id = ?', e.id));
-		}
+		const currentUniqueExpressionsMap = await this.getUniqueExpressionsMap(id);
 
+		const promises = this.updateAndInsertExpressions(idea, id, currentUniqueExpressionsMap);
+
+		const idsToDelete = Array.from(currentUniqueExpressionsMap.values()).map(e => e.id);
+		promises.push(this.deleteExpressions(idsToDelete));
+
+		// Previous promises must be awaited before updating ordering
 		await Promise.all(promises);
 
-		promises = [];
-		for (let i = 0; i < idea.ee.length; i++) {
-			const e = idea.ee[i];
-			promises.push(this.db.run('update expressions set ordering = ? where ideaId = ? and languageId = ? and text = ?',
-				i,
-				id,
-				e.languageId,
-				e.text));
-		}
-
-		await Promise.all(promises);
+		await Promise.all(this.updateOrdering(idea, id));
 	}
 
 	async deleteIdea(ideaId: number): Promise<void> {
@@ -65,32 +39,64 @@ export default class IdeaManager implements Manager {
 		await this.db.run('delete from ideas where id =  ?', ideaId);
 	}
 
-	public async getIdea(ideaId: number): Promise<Idea> {
+	async getIdea(ideaId: number): Promise<Idea> {
 		const ee: Expression[] = await this.getExpressions(ideaId);
 		ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering || e1.ordering - e2.ordering);
 		return {id: ideaId, ee};
 	}
 
-	public async idExists(id: number): Promise<boolean> {
+	async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
 	}
 
-	public async countIdeas(): Promise<number> {
+	async countIdeas(): Promise<number> {
 		return (await this.db.get('select count(*) as count from ideas'))?.count as number;
 	}
 
-	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
-		for (let i = 0; i < ee.length; i++) {
-			const e = ee[i];
-			const query = 'insert into expressions("ideaId", "languageId", "text", "known", "ordering") values (?, ?, ?, ?, ?)';
-			// eslint-disable-next-line no-await-in-loop
-			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0', i);
+	private async getUniqueExpressionsMap(ideaId: number) {
+		const currentExpressions = await this.getExpressions(ideaId);
+		const currentUniqueExpressionsMap = new Map<string, Expression>();
+		for (const e of currentExpressions) {
+			const uniqueExpressionKey = JSON.stringify(UniqueExpression.fromExpression(e));
+			currentUniqueExpressionsMap.set(uniqueExpressionKey, e);
 		}
+		return currentUniqueExpressionsMap;
+	}
+
+	private updateAndInsertExpressions(idea: IdeaForAdding, id: number, currentUniqueExpressionsMap: Map<string, Expression>) {
+		const promises = [];
+		for (const e of idea.ee) {
+			const uniqueExpressionKey = JSON.stringify(UniqueExpression.fromExpressionForAdding(e));
+			const existingExpression = currentUniqueExpressionsMap.get(uniqueExpressionKey);
+			if (existingExpression) {
+				const query = 'update expressions set languageId = ?, text = ?, known = ? where id = ?';
+				promises.push(this.db.run(query, e.languageId, e.text, e.known, existingExpression.id));
+				currentUniqueExpressionsMap.delete(uniqueExpressionKey);
+			} else {
+				promises.push(this.insertExpression(e, id));
+			}
+		}
+		return promises;
+	}
+
+	private updateOrdering(idea: IdeaForAdding, id: number) {
+		const query = 'update expressions set ordering = ? where ideaId = ? and languageId = ? and text = ?';
+		return idea.ee.map(async (e, i) => this.db.run(query, i, id, e.languageId, e.text));
+	}
+
+	private async deleteExpressions(ids: number[]) {
+		const sql = `delete from expressions where id in (${ids.map(() => '?').join(',')})`;
+		return this.db.run(sql, ids);
+	}
+
+	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
+		const query = 'insert into expressions("ideaId", "languageId", "text", "known", "ordering") values (?, ?, ?, ?, ?)';
+		const promises = ee.map(async (e, i) => this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0', i));
+		await Promise.all(promises);
 	}
 
 	private async insertExpression(e: ExpressionForAdding, ideaId: number): Promise<void> {
-		const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
-		await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
+		await this.insertExpressions([e], ideaId);
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
