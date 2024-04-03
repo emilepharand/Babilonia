@@ -4,7 +4,7 @@ import {type Manager} from '../manager';
 import {type Expression, type ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
 import type {IdeaForAdding} from './ideaForAdding';
-import {getUniqueExpressionFromExpression, getUniqueExpressionFromExpressionForAdding} from './uniqueExpression';
+import * as UniqueExpression from './uniqueExpression';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
@@ -21,39 +21,43 @@ export default class IdeaManager implements Manager {
 	}
 
 	async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
-		const idsInOrder: number[] = [];
+		let promises = [];
 		const existingExpressions = await this.getExpressions(id);
 		const existingExpressionsMap = new Map<string, Expression>();
 		for (const e of existingExpressions) {
-			existingExpressionsMap.set(JSON.stringify(getUniqueExpressionFromExpression(e)), e);
+			existingExpressionsMap.set(JSON.stringify(UniqueExpression.fromExpression(e)), e);
 		}
-
 		for (const e of idea.ee) {
-			const existingExpression = existingExpressionsMap.get(JSON.stringify(getUniqueExpressionFromExpressionForAdding(e)));
+			const uniqueExpression = UniqueExpression.fromExpressionForAdding(e);
+			const existingExpression = existingExpressionsMap.get(JSON.stringify(uniqueExpression));
 			if (existingExpression) {
-				// eslint-disable-next-line no-await-in-loop
-				await this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
+				promises.push(this.db.run('update expressions set languageId = ?, text = ?, known = ? where id = ?',
 					e.languageId,
 					e.text,
 					e.known,
-					existingExpression.id);
-				existingExpressionsMap.delete(JSON.stringify(getUniqueExpressionFromExpressionForAdding(e)));
-				idsInOrder.push(existingExpression.id);
+					existingExpression.id));
+				existingExpressionsMap.delete(JSON.stringify(UniqueExpression.fromExpressionForAdding(e)));
 			} else {
-				// eslint-disable-next-line no-await-in-loop
-				await this.insertExpression(e, id);
-				// eslint-disable-next-line no-await-in-loop
-				idsInOrder.push((await this.db.get('select last_insert_rowid() as id')).id as number);
+				promises.push(this.insertExpression(e, id));
 			}
 		}
 		for (const e of existingExpressionsMap.values()) {
-			// eslint-disable-next-line no-await-in-loop
-			await this.db.run('delete from expressions where id = ?', e.id);
+			promises.push(this.db.run('delete from expressions where id = ?', e.id));
 		}
-		for (let i = 0; i < idsInOrder.length; i++) {
-			// eslint-disable-next-line no-await-in-loop
-			await this.db.run('update expressions set ordering = ? where id = ?', i, idsInOrder[i]);
+
+		await Promise.all(promises);
+
+		promises = [];
+		for (let i = 0; i < idea.ee.length; i++) {
+			const e = idea.ee[i];
+			promises.push(this.db.run('update expressions set ordering = ? where ideaId = ? and languageId = ? and text = ?',
+				i,
+				id,
+				e.languageId,
+				e.text));
 		}
+
+		await Promise.all(promises);
 	}
 
 	async deleteIdea(ideaId: number): Promise<void> {
