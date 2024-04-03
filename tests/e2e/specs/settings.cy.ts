@@ -1,18 +1,18 @@
 import {Settings} from '../../../server/model/settings/settings';
 
-import {apiUrl, setSettings} from '../cy-utils';
-import {memoryDatabasePath} from '../../../server/const';
+import {currentVersion, memoryDatabasePath} from '../../../server/const';
 import {oldVersionDatabasePath} from '../../utils/const';
+import {apiUrl, setSettings} from '../cy-utils';
 
-const db21 = 'tests/db/2.1-simple.db';
+const simpleDatabasePath = 'tests/db/2.2-simple.db';
 
 describe('The settings page', () => {
 	it('Works correctly', () => {
 		setSettings({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.get('#settings-link').click();
 
@@ -23,12 +23,12 @@ describe('The settings page', () => {
 		cy.get('#databasePath').should('be.visible').should('have.value', memoryDatabasePath);
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(db21);
+		cy.get('#databasePath').type(simpleDatabasePath);
 		cy.get('#saveButton').click();
 		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#strictCharacters').uncheck();
@@ -38,14 +38,14 @@ describe('The settings page', () => {
 		cy.get('#successMessage').should('not.exist');
 		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Invalid database path.');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#saveButton').click();
 		cy.get('#successMessage').should('not.exist');
 		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Invalid database path.');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#databasePath').clear();
@@ -55,7 +55,7 @@ describe('The settings page', () => {
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#strictCharacters').uncheck();
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#databasePath').clear();
@@ -64,7 +64,7 @@ describe('The settings page', () => {
 		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#databasePath').clear();
@@ -87,7 +87,7 @@ describe('The settings page', () => {
 			.should('contain', 'Settings saved.')
 			.should('contain', 'Database migrated.');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.reload();
 		cy.get('#databasePath').should('have.value', oldVersionDatabasePath);
