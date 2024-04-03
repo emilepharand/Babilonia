@@ -213,6 +213,67 @@ describe('valid cases', () => {
 		]);
 	});
 
+	test('ordering of expressions with same expression texts within idea', async () => {
+		const l1: Language = await ApiUtils.addLanguage('language 1');
+		const l2: Language = await ApiUtils.addLanguage('language 2');
+		const e1 = {languageId: l1.id, text: 'text 1'};
+		const e2 = {languageId: l1.id, text: 'text 2'};
+		const e3 = {languageId: l2.id, text: 'text 2'};
+		const e4 = {languageId: l2.id, text: 'text 1'};
+		const idea = await addValidIdeaAndTest({ee: [e1, e2, e3, e4]});
+
+		expect(idea.ee[0].ordering).toBe(0);
+		expect(idea.ee[1].ordering).toBe(1);
+		expect(idea.ee[2].ordering).toBe(2);
+		expect(idea.ee[3].ordering).toBe(3);
+
+		const ideaForAdding = getIdeaForAddingFromIdea(idea);
+
+		ideaForAdding.ee[0].text = 'text 2';
+		ideaForAdding.ee[1].text = 'text 1';
+		ideaForAdding.ee[2].text = 'text 1';
+		ideaForAdding.ee[3].text = 'text 2';
+
+		await editValidIdeaAndTest(idea, ideaForAdding);
+
+		expect(idea.ee[0].ordering).toBe(0);
+		expect(idea.ee[1].ordering).toBe(1);
+		expect(idea.ee[2].ordering).toBe(2);
+		expect(idea.ee[3].ordering).toBe(3);
+	});
+
+	test('ordering of expressions with same expression texts across ideas', async () => {
+		const l1: Language = await ApiUtils.addLanguage('language 1');
+		const l2: Language = await ApiUtils.addLanguage('language 2');
+		const e1 = {languageId: l1.id, text: 'text 1'};
+		const e2 = {languageId: l2.id, text: 'text 2'};
+		const e3 = {languageId: l1.id, text: 'text 2'};
+		const e4 = {languageId: l2.id, text: 'text 1'};
+		let idea1 = await addValidIdeaAndTest({ee: [e1, e2]});
+		let idea2 = await addValidIdeaAndTest({ee: [e3, e4]});
+
+		expect(idea1.ee[0].ordering).toBe(0);
+		expect(idea1.ee[1].ordering).toBe(1);
+		expect(idea2.ee[0].ordering).toBe(0);
+		expect(idea2.ee[1].ordering).toBe(1);
+
+		const ideaForAdding1 = getIdeaForAddingFromIdea(idea1);
+		const ideaForAdding2 = getIdeaForAddingFromIdea(idea2);
+
+		ideaForAdding1.ee[0].text = 'text 2';
+		ideaForAdding1.ee[1].text = 'text 1';
+		ideaForAdding2.ee[0].text = 'text 1';
+		ideaForAdding2.ee[1].text = 'text 2';
+
+		idea1 = await editValidIdeaAndTest(idea1, ideaForAdding1);
+		idea2 = await editValidIdeaAndTest(idea2, ideaForAdding2);
+
+		expect(idea1.ee[0].ordering).toBe(0);
+		expect(idea1.ee[1].ordering).toBe(1);
+		expect(idea2.ee[0].ordering).toBe(0);
+		expect(idea2.ee[1].ordering).toBe(1);
+	});
+
 	test('concurrent requests - adding', async () => {
 		const l = await ApiUtils.addLanguage('l');
 		const promises: Array<Promise<Idea>> = [];
