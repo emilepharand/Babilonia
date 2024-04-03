@@ -40,16 +40,15 @@ describe('valid cases', () => {
 			} else {
 				editedIdea = await editValidIdeaAndTest(editedIdea, ideaForAdding);
 			}
-			if (id1ShouldBeModified) {
-				expect(previousIdea.ee[0].id).not.toBe(editedIdea.ee[0].id);
-			} else {
-				expect(previousIdea.ee[0].id).toBe(editedIdea.ee[0].id);
+			function checkIdModification(index: number, shouldBeModified: boolean) {
+				if (shouldBeModified) {
+					expect(previousIdea.ee[index].id).not.toBe(editedIdea.ee[index].id);
+				} else {
+					expect(previousIdea.ee[index].id).toBe(editedIdea.ee[index].id);
+				}
 			}
-			if (id2ShouldBeModified) {
-				expect(previousIdea.ee[1].id).not.toBe(editedIdea.ee[1].id);
-			} else {
-				expect(previousIdea.ee[1].id).toBe(editedIdea.ee[1].id);
-			}
+			checkIdModification(0, id1ShouldBeModified);
+			checkIdModification(1, id2ShouldBeModified);
 			previousIdea = editedIdea;
 		}
 
@@ -179,6 +178,12 @@ describe('valid cases', () => {
 		l4.ordering = 3;
 		await ApiUtils.editLanguages([l1, l2, l3, l4]);
 
+		async function editAndTestOrder(indices: number[]) {
+			const eeIndices = indices.map(index => ideaForAdding.ee[index]);
+			idea = await editValidIdeaAndTest(idea, ideaForAdding, eeIndices);
+			ideaForAdding = getIdeaForAddingFromIdea(idea);
+		}
+
 		idea = await ApiUtils.fetchIdea(idea.id);
 		ideaForAdding = getIdeaForAddingFromIdea(idea);
 		ideaForAdding.ee[0].languageId = l2.id;
@@ -188,29 +193,11 @@ describe('valid cases', () => {
 		ideaForAdding.ee[4].languageId = l4.id;
 		ideaForAdding.ee[5].languageId = l1.id;
 		ideaForAdding.ee[6].languageId = l2.id;
+		await editAndTestOrder([1, 3, 5, 0, 6, 2, 4]);
 
-		idea = await editValidIdeaAndTest(idea, ideaForAdding, [
-			ideaForAdding.ee[1],
-			ideaForAdding.ee[3],
-			ideaForAdding.ee[5],
-			ideaForAdding.ee[0],
-			ideaForAdding.ee[6],
-			ideaForAdding.ee[2],
-			ideaForAdding.ee[4],
-		]);
-
-		ideaForAdding = getIdeaForAddingFromIdea(idea);
 		ideaForAdding.ee[3].text = 'new l2 e1';
 		ideaForAdding.ee[1].text = 'l1 (context) e2';
-		await editValidIdeaAndTest(idea, ideaForAdding, [
-			ideaForAdding.ee[0],
-			ideaForAdding.ee[1],
-			ideaForAdding.ee[2],
-			ideaForAdding.ee[3],
-			ideaForAdding.ee[4],
-			ideaForAdding.ee[5],
-			ideaForAdding.ee[6],
-		]);
+		await editAndTestOrder([0, 1, 2, 3, 4, 5, 6]);
 	});
 
 	test('ordering of expressions with same expression texts within idea', async () => {
