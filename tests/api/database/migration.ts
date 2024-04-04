@@ -2,6 +2,7 @@ import fs from 'fs';
 import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../../server/const';
 import * as ApiUtils from '../../utils/api-utils';
 import {getTestDatabaseVersionPath, previousVersions} from '../../utils/const';
+import {addAnyIdeaAndTest} from '../ideas/utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -28,6 +29,8 @@ describe('migration', () => {
 
 		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
 		await changeDatabaseAndCheck(dbToMigratePath, 200, dbToMigratePath);
+
+		await addAnyIdeaAndTest();
 	});
 });
 

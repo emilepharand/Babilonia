@@ -7,6 +7,23 @@ import {addAnyLanguage} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {FIRST_IDEA_ID} from '../../utils/fetch-utils';
 
+export async function getBasicIdeaForAdding() {
+	return makeIdeaForAdding({
+		ee: [
+			{language: 'l1', text: 'l1 e1', known: true},
+			{language: 'l1', text: 'l1 e2'},
+			{language: 'l2', text: 'l2 e1'},
+			{language: 'l3', text: 'l3 e1', known: false},
+			{language: 'l3', text: 'l3 e2'},
+		],
+	});
+}
+
+export async function addAnyIdeaAndTest() {
+	const idea = await getBasicIdeaForAdding();
+	await addValidIdeaAndTest(idea);
+}
+
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]
 }): Promise<IdeaForAdding> {
