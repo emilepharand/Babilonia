@@ -1,14 +1,12 @@
-import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
-import * as ApiUtils from '../utils/api-utils';
-import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
-import * as FetchUtils from '../utils/fetch-utils';
+import {currentVersion, memoryDatabasePath} from '../../../server/const';
+import * as ApiUtils from '../../utils/api-utils';
+import * as FetchUtils from '../../utils/fetch-utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
-const db20 = 'tests/db/2.0-simple.db';
-const simpleDatabasePath = 'tests/db/2.2-simple.db';
+export const simpleDatabasePath = 'tests/db/2.2-simple.db';
 
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
@@ -37,36 +35,9 @@ describe('valid cases', () => {
 		await ApiUtils.addAnyLanguage();
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(1);
 	});
-
-	test('migrating 2.1 database to 2.2', async () => {
-		const dbToMigratePath = oldVersionDatabaseToMigratePath;
-		let res = await ApiUtils.changeDatabase(dbToMigratePath);
-		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-
-		res = await ApiUtils.migrateDatabase(dbToMigratePath);
-		expect(res.status).toEqual(200);
-
-		res = await ApiUtils.changeDatabase(dbToMigratePath);
-		expect(res.status).toEqual(200);
-		expect(await ApiUtils.getDatabasePath()).toEqual(dbToMigratePath);
-	});
 });
 
 describe('invalid cases', () => {
-	test('change database to another version than the current version', async () => {
-		let res = await ApiUtils.changeDatabase(oldVersionDatabasePath);
-		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-
-		res = await ApiUtils.changeDatabase(db20);
-		expect(res.status).toEqual(400);
-		expect((await (await res.json() as any)).error).toEqual(databaseVersionErrorCode);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-	});
-
 	const invalidDatabasePaths = [
 		'',
 		' ',
