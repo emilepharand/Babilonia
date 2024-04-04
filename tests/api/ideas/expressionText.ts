@@ -1,4 +1,4 @@
-import {getIdeaForAddingFromIdea} from 'server/model/ideas/ideaForAdding';
+import {getIdeaForAddingFromIdea} from '../../../server/model/ideas/ideaForAdding';
 import * as ApiUtils from '../../utils/api-utils';
 import {
 	addAnyIdea,
