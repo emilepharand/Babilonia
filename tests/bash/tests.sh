@@ -174,7 +174,7 @@ sleep 1
 
 write_coverage
 
-if ! grep -Fq "Invalid database path provided" "temp.txt"; then
+if ! grep -Fq "Invalid database path" "temp.txt"; then
   echo "Invalid database path error not found."
   after_failure
 fi
