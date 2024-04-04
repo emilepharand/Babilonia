@@ -27,7 +27,7 @@ export default class DatabaseMigrator {
 		const result = await this._databaseToMigrate.all(sql);
 		const hasOrderingColumn = result.some(column => column.name === 'ordering');
 		if (!hasOrderingColumn) {
-			await this._databaseToMigrate.exec('ALTER TABLE expressions ADD COLUMN ordering INTEGER NOT NULL DEFAULT 0;');
+			await this._databaseToMigrate.exec('ALTER TABLE expressions ADD COLUMN ordering INTEGER DEFAULT 0;');
 		}
 		const query = `
 			UPDATE expressions
