@@ -1,45 +1,39 @@
 import fs from 'fs';
 import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../../server/const';
 import * as ApiUtils from '../../utils/api-utils';
-import {oldVersionDatabaseToMigratePath} from '../../utils/const';
+import {getTestDatabaseVersionPath, previousVersions} from '../../utils/const';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
-const previousVersions = ['2.0', '2.1'];
-
 describe('change database', () => {
-	test('change database to a version to be migrated', async () => {
-		const res = await ApiUtils.changeDatabase(oldVersionDatabaseToMigratePath);
-		expect(res.status).toEqual(400);
+	test.each(previousVersions)('change database to a version %s database', async version => {
+		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version), 400, memoryDatabasePath);
 		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 	});
 });
 
 describe('migration', () => {
 	test.each(previousVersions)('migrating database version %s to current version', async version => {
-		function getSimpleDatabaseVersionPath(version: string) {
-			return `tests/db/${version}-simple.db`;
-		}
-
-		const dbToMigratePath = getSimpleDatabaseVersionPath(version);
+		const dbToMigratePath = getTestDatabaseVersionPath(version);
 		expect(fs.existsSync(dbToMigratePath)).toBe(true);
 
-		const currentVersionPath = getSimpleDatabaseVersionPath(currentVersion);
-		await ApiUtils.changeDatabase(currentVersionPath);
+		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
+		await changeDatabaseAndCheck(currentVersionPath, 200, currentVersionPath);
 
-		let res = await ApiUtils.changeDatabase(dbToMigratePath);
-		expect(res.status).toEqual(400);
-		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
-		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath);
-
-		res = await ApiUtils.migrateDatabase(dbToMigratePath);
-		expect(res.status).toEqual(200);
-
-		res = await ApiUtils.changeDatabase(dbToMigratePath);
+		const res = await ApiUtils.migrateDatabase(dbToMigratePath);
 		expect(res.status).toEqual(200);
 		expect(await ApiUtils.getDatabasePath()).toEqual(dbToMigratePath);
+
+		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
+		await changeDatabaseAndCheck(dbToMigratePath, 200, dbToMigratePath);
 	});
 });
+
+async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, expectedDbPath: string) {
+	const res = await ApiUtils.changeDatabase(dbPath);
+	expect(res.status).toEqual(expectedStatus);
+	expect(await ApiUtils.getDatabasePath()).toEqual(expectedDbPath);
+	return res;
+}

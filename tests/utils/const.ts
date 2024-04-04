@@ -1,2 +1,2 @@
-export const oldVersionDatabasePath = 'tests/db/old-version.db';
-export const oldVersionDatabaseToMigratePath = 'tests/db/old-version-to-migrate.db';
+export const getTestDatabaseVersionPath = (version: string) => `tests/db/${version}-simple.db`;
+export const previousVersions = ['2.0', '2.1'];
