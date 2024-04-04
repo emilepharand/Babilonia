@@ -211,8 +211,7 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).end();
 		return;
 	}
-	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
-	await newDbCoordinator.init();
+	const newDbCoordinator = await changeDatabaseToPath((req.body as {path: string}).path);
 	if (!newDbCoordinator.isValidVersion) {
 		res.status(400).send(JSON.stringify({error: databaseVersionErrorCode}));
 		return;
@@ -221,9 +220,17 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	dataServiceProvider = newDbCoordinator.dataServiceProvider;
-	dbCoordinator = newDbCoordinator;
 	res.end();
+}
+
+async function changeDatabaseToPath(path: string) {
+	const newDbCoordinator = new DatabaseCoordinator(path);
+	await newDbCoordinator.init();
+	if (newDbCoordinator.isValid && newDbCoordinator.isValidVersion) {
+		dataServiceProvider = newDbCoordinator.dataServiceProvider;
+		dbCoordinator = newDbCoordinator;
+	}
+	return newDbCoordinator;
 }
 
 export async function migrateDatabase(req: Request, res: Response): Promise<void> {
@@ -249,6 +256,8 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 		dbCoordinatorForBaseDb.dataServiceProvider);
 
 	await databaseMigrator.migrate();
+
+	await changeDatabaseToPath((req.body as {path: string}).path);
 
 	res.status(200).end();
 }
