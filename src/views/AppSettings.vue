@@ -192,9 +192,9 @@
 <script lang="ts" setup>
 import * as bootstrap from 'bootstrap';
 import {nextTick, ref} from 'vue';
+import {databaseVersionErrorCode} from '../../server/const';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
-import {databaseVersionErrorCode} from '../../server/const';
 
 const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
@@ -223,8 +223,7 @@ async function save() {
 async function migrate() {
 	await Api.migrateDatabase(databasePath.value);
 	errorMessage.value = '';
-	successMessages.value.push('Database migrated.');
-	await Api.changeDatabase(databasePath.value);
+	successMessages.value.push('Migration successful.');
 }
 
 async function changeDatabase() {
