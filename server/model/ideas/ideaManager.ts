@@ -1,30 +1,37 @@
 import type {Database} from 'sqlite';
 import type LanguageManager from '../languages/languageManager';
 import {type Manager} from '../manager';
-import type {Expression, ExpressionForAdding} from './expression';
+import {type Expression, type ExpressionForAdding} from './expression';
 import type {Idea} from './idea';
 import type {IdeaForAdding} from './ideaForAdding';
+import * as UniqueExpression from './uniqueExpression';
 
 // Manages ideas: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
 // Validation is performed at a higher level in the `Controller` class
 export default class IdeaManager implements Manager {
-	constructor(private readonly db: Database, private readonly lm: LanguageManager) {}
+	constructor(private readonly db: Database, private readonly lm: LanguageManager) {
+	}
 
 	async addIdea(ideaForAdding: IdeaForAdding): Promise<Idea> {
-		await this.db.run('insert into ideas("id") VALUES (null)');
+		await this.db.run('insert into ideas default values');
 		const ideaId = (await this.db.get('select last_insert_rowid() as id')).id as number;
 		await this.insertExpressions(ideaForAdding.ee, ideaId);
 		return this.getIdea(ideaId);
 	}
 
 	async editIdea(idea: IdeaForAdding, id: number): Promise<void> {
-		// Old expressions are deleted and new ones added
-		// because ids of expressions don't need to be preserved
-		// and it is easier to handle editing ideas this way
-		// (this might change in the future)
-		await this.db.run('delete from expressions where ideaId = ?', id);
-		await this.insertExpressions(idea.ee, id);
+		const currentUniqueExpressionsMap = await this.getUniqueExpressionsMap(id);
+
+		const promises = this.updateAndInsertExpressions(idea, id, currentUniqueExpressionsMap);
+
+		const idsToDelete = Array.from(currentUniqueExpressionsMap.values()).map(e => e.id);
+		promises.push(this.deleteExpressions(idsToDelete));
+
+		// Previous promises must be awaited before updating ordering
+		await Promise.all(promises);
+
+		await Promise.all(this.updateOrdering(idea, id));
 	}
 
 	async deleteIdea(ideaId: number): Promise<void> {
@@ -32,32 +39,69 @@ export default class IdeaManager implements Manager {
 		await this.db.run('delete from ideas where id =  ?', ideaId);
 	}
 
-	public async getIdea(ideaId: number): Promise<Idea> {
+	async getIdea(ideaId: number): Promise<Idea> {
 		const ee: Expression[] = await this.getExpressions(ideaId);
-		ee.sort((e1: Expression, e2: Expression) => e1.language.ordering - e2.language.ordering);
+		ee.sort((e1, e2) => e1.language.ordering - e2.language.ordering || e1.ordering - e2.ordering);
 		return {id: ideaId, ee};
 	}
 
-	public async idExists(id: number): Promise<boolean> {
+	async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
 	}
 
-	public async countIdeas(): Promise<number> {
+	async countIdeas(): Promise<number> {
 		return (await this.db.get('select count(*) as count from ideas'))?.count as number;
 	}
 
-	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
-		for (const e of ee) {
-			const query = 'insert into expressions("ideaId", "languageId", "text", "known") values (?, ?, ?, ?)';
-			// Await is needed because order needs to be preserved
-			// eslint-disable-next-line no-await-in-loop
-			await this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0');
+	private async getUniqueExpressionsMap(ideaId: number) {
+		const currentExpressions = await this.getExpressions(ideaId);
+		const currentUniqueExpressionsMap = new Map<string, Expression>();
+		for (const e of currentExpressions) {
+			const uniqueExpressionKey = JSON.stringify(UniqueExpression.fromExpression(e));
+			currentUniqueExpressionsMap.set(uniqueExpressionKey, e);
 		}
+		return currentUniqueExpressionsMap;
+	}
+
+	private updateAndInsertExpressions(idea: IdeaForAdding, id: number, currentUniqueExpressionsMap: Map<string, Expression>) {
+		const promises = [];
+		for (const e of idea.ee) {
+			const uniqueExpressionKey = JSON.stringify(UniqueExpression.fromExpressionForAdding(e));
+			const existingExpression = currentUniqueExpressionsMap.get(uniqueExpressionKey);
+			if (existingExpression) {
+				const query = 'update expressions set languageId = ?, text = ?, known = ? where id = ?';
+				promises.push(this.db.run(query, e.languageId, e.text, e.known, existingExpression.id));
+				currentUniqueExpressionsMap.delete(uniqueExpressionKey);
+			} else {
+				promises.push(this.insertExpression(e, id));
+			}
+		}
+		return promises;
+	}
+
+	private updateOrdering(idea: IdeaForAdding, id: number) {
+		const query = 'update expressions set ordering = ? where ideaId = ? and languageId = ? and text = ?';
+		return idea.ee.map(async (e, i) => this.db.run(query, i, id, e.languageId, e.text));
+	}
+
+	private async deleteExpressions(ids: number[]) {
+		const sql = `delete from expressions where id in (${ids.map(() => '?').join(',')})`;
+		return this.db.run(sql, ids);
+	}
+
+	private async insertExpressions(ee: ExpressionForAdding[], ideaId: number): Promise<void> {
+		const query = 'insert into expressions("ideaId", "languageId", "text", "known", "ordering") values (?, ?, ?, ?, ?)';
+		const promises = ee.map(async (e, i) => this.db.run(query, ideaId, e.languageId, e.text, e.known ? '1' : '0', i));
+		await Promise.all(promises);
+	}
+
+	private async insertExpression(e: ExpressionForAdding, ideaId: number): Promise<void> {
+		await this.insertExpressions([e], ideaId);
 	}
 
 	private async getExpressions(ideaId: number): Promise<Expression[]> {
-		const query = 'select id, languageId, text, known from expressions where ideaId = ?';
-		const rows: [{id: number; languageId: number; text: string; known: string}] = await this.db.all(
+		const query = 'select id, languageId, text, known, ordering from expressions where ideaId = ?';
+		const rows: [{id: number; languageId: number; text: string; known: string; ordering: number}] = await this.db.all(
 			query,
 			ideaId,
 		);
@@ -66,6 +110,7 @@ export default class IdeaManager implements Manager {
 				id: row.id,
 				text: row.text,
 				language: await this.lm.getLanguage(row.languageId),
+				ordering: row.ordering,
 				known: row.known === '1',
 			})),
 		);

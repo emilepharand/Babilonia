@@ -26,6 +26,7 @@ export async function clearDatabaseAndCreateSchema(db: Database) {
             "languageId" INTEGER NOT NULL,
             "text" TEXT NOT NULL,
             "known" TEXT DEFAULT 0,
+            "ordering" INTEGER DEFAULT 0,
             FOREIGN KEY("languageId") REFERENCES "languages"("id"),
             FOREIGN KEY("ideaId") REFERENCES "ideas"("id")
         )

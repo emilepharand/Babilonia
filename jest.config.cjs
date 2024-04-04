@@ -23,4 +23,6 @@ module.exports = {
       },
     ],
   },
+    testSequencer: './tests/api/testSequencer.cjs',
+    bail: true,
 };

@@ -1,22 +1,22 @@
 import {currentVersion, databaseVersionErrorCode, memoryDatabasePath} from '../../server/const';
 import * as ApiUtils from '../utils/api-utils';
-import * as FetchUtils from '../utils/fetch-utils';
 import {oldVersionDatabasePath, oldVersionDatabaseToMigratePath} from '../utils/const';
+import * as FetchUtils from '../utils/fetch-utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
 const db20 = 'tests/db/2.0-simple.db';
-const db21 = 'tests/db/2.1-simple.db';
+const simpleDatabasePath = 'tests/db/2.2-simple.db';
 
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
 
-		await ApiUtils.changeDatabase(db21);
-		expect(await ApiUtils.getDatabasePath()).toEqual(db21);
+		await ApiUtils.changeDatabase(simpleDatabasePath);
+		expect(await ApiUtils.getDatabasePath()).toEqual(simpleDatabasePath);
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 		const ll = await ApiUtils.fetchLanguages();
 		expect(ll).toHaveLength(1);
@@ -38,7 +38,7 @@ describe('valid cases', () => {
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(1);
 	});
 
-	test('migrating 2.0 database to 2.1', async () => {
+	test('migrating 2.1 database to 2.2', async () => {
 		const dbToMigratePath = oldVersionDatabaseToMigratePath;
 		let res = await ApiUtils.changeDatabase(dbToMigratePath);
 		expect(res.status).toEqual(400);

@@ -1,5 +1,9 @@
 import fetch from 'node-fetch';
+import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 import {Language} from '../../../server/model/languages/language';
+import * as ApiUtils from '../../utils/api-utils';
+import * as FetchUtils from '../../utils/fetch-utils';
+import {FIRST_LANGUAGE_ID, FIRST_ORDERING, apiUrl} from '../../utils/fetch-utils';
 import {
 	addInvalidLanguageAndTest,
 	addNLanguages,
@@ -9,10 +13,6 @@ import {
 	editInvalidLanguagesAndTest,
 	testLanguageOrder,
 } from './utils';
-import * as ApiUtils from '../../utils/api-utils';
-import * as FetchUtils from '../../utils/fetch-utils';
-import {apiUrl, FIRST_LANGUAGE_ID, FIRST_ORDERING} from '../../utils/fetch-utils';
-import {ExpressionForAdding} from '../../../server/model/ideas/expression';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();

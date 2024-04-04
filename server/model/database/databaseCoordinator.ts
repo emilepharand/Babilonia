@@ -1,10 +1,10 @@
-import DatabaseOpener from './databaseOpener';
-import DataServiceProvider from './dataServiceProvider';
-import fs from 'fs';
-import SettingsManager from './settings/settingsManager';
-import {currentVersion, memoryDatabasePath} from '../const';
-import {resolveAndNormalizePathUnderWorkingDirectory} from './inputValidator';
 import console from 'console';
+import fs from 'fs';
+import {currentVersion, memoryDatabasePath} from '../../const';
+import DataServiceProvider from '../dataServiceProvider';
+import {resolveAndNormalizePathUnderWorkingDirectory} from '../inputValidator';
+import SettingsManager from '../settings/settingsManager';
+import DatabaseOpener from './databaseOpener';
 
 export default class DatabaseCoordinator {
 	private _dataServiceProvider!: DataServiceProvider;

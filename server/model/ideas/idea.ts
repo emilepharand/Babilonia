@@ -44,6 +44,7 @@ const schema = {
 					id: {type: 'integer'},
 					text: {type: 'string'},
 					known: {type: 'boolean'},
+					ordering: {type: 'integer'},
 					language: {
 						type: 'object',
 						properties: {

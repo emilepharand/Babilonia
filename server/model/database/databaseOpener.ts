@@ -1,9 +1,9 @@
+import * as console from 'console';
 import fs from 'fs';
 import type {Database} from 'sqlite';
 import {open} from 'sqlite';
 import sqlite3 from 'sqlite3';
-import * as console from 'console';
-import {memoryDatabasePath} from '../const';
+import {memoryDatabasePath} from '../../const';
 
 export default class DatabaseOpener {
 	private _db!: Database;
