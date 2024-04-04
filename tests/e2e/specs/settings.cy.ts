@@ -1,7 +1,7 @@
 import {Settings} from '../../../server/model/settings/settings';
 
 import {currentVersion, memoryDatabasePath} from '../../../server/const';
-import {getTestDatabaseVersionPath, previousVersions} from '../../utils/const';
+import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/const';
 import {apiUrl, setSettings} from '../cy-utils';
 
 const simpleDatabasePath = 'tests/db/2.2-simple.db';
@@ -68,7 +68,7 @@ describe('The settings page', () => {
 		});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(getTestDatabaseVersionPath(previousVersions[previousVersions.length - 1]));
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion));
 		cy.get('#saveButton').click();
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#confirm-migrate-modal').should('be.visible');
@@ -90,7 +90,7 @@ describe('The settings page', () => {
 			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.reload();
-		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(previousVersions[previousVersions.length - 1]));
+		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion));
 	});
 });
 
