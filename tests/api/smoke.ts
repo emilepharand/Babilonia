@@ -1,4 +1,3 @@
-import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import * as ApiUtils from '../utils/api-utils';
 import * as FetchUtils from '../utils/fetch-utils';
 import {
@@ -10,24 +9,40 @@ beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
-describe('smoke', () => {
+describe('smoke tests', () => {
+	async function getBasicIdeaForAdding() {
+		return makeIdeaForAdding({
+			ee: [
+				{language: 'l1', text: 'l1 e1', known: true},
+				{language: 'l1', text: 'l1 e2'},
+				{language: 'l2', text: 'l2 e1'},
+				{language: 'l3', text: 'l3 e1', known: false},
+				{language: 'l3', text: 'l3 e2'},
+			],
+		});
+	}
+
 	test('add idea', async () => {
-		const i = {ee: [{language: 'l', text: 'e'}, {language: 'l2', text: 'e2'}]};
-		await addValidIdeaAndTest(await makeIdeaForAdding(i));
+		const idea = await getBasicIdeaForAdding();
+		await addValidIdeaAndTest(idea);
 	});
 
 	test('get idea', async () => {
-		const idea = await ApiUtils.addIdea(await makeIdeaForAdding({ee: [{language: 'l', text: 'e'}]}));
+		const idea = await ApiUtils.addIdea(await getBasicIdeaForAdding());
 		expect((await FetchUtils.fetchIdea(idea.id)).status).toEqual(200);
 		const fetchedIdea = await ApiUtils.fetchIdea(idea.id);
 		expect(fetchedIdea).toEqual(idea);
 	});
 
 	test('edit idea', async () => {
-		const i = {ee: [{language: 'l', text: 'e'}]};
-		const idea = await ApiUtils.addIdea(await makeIdeaForAdding(i));
-		idea.ee[0].text = 'e2';
-		await editValidIdeaAndTest(idea, getIdeaForAddingFromIdea(idea));
+		const ideaForAdding = await getBasicIdeaForAdding();
+		const idea = await ApiUtils.addIdea(ideaForAdding);
+		const editedIdea = ideaForAdding;
+		editedIdea.ee[0].text = 'a new expression 1';
+		editedIdea.ee[1].text = 'a new expression 2';
+		editedIdea.ee[2] = {languageId: editedIdea.ee[0].languageId, text: 'a new expression 3', known: true};
+		editedIdea.ee[3] = {languageId: editedIdea.ee[2].languageId, text: 'a new expression 4', known: false};
+		await editValidIdeaAndTest(idea, editedIdea);
 	});
 
 	test('delete idea', async () => {
