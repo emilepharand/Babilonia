@@ -2,9 +2,10 @@ import * as ApiUtils from '../utils/api-utils';
 import * as FetchUtils from '../utils/fetch-utils';
 import {
 	addAnyIdea, addAnyIdeaAndTest,
-	editValidIdeaAndTest, getBasicIdeaForAdding,
+	editAnyIdeaAndTest,
+	getBasicIdeaForAdding,
 } from './ideas/utils';
-import {addValidLanguageAndTest} from './languages/utils';
+import {addAnyLanguageAndTest, editAnyLanguageAndtest as editAnyLanguageAndTest} from './languages/utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -23,14 +24,7 @@ describe('smoke tests', () => {
 	});
 
 	test('edit idea', async () => {
-		const ideaForAdding = await getBasicIdeaForAdding();
-		const idea = await ApiUtils.addIdea(ideaForAdding);
-		const editedIdea = ideaForAdding;
-		editedIdea.ee[0].text = 'a new expression 1';
-		editedIdea.ee[1].text = 'a new expression 2';
-		editedIdea.ee[2] = {languageId: editedIdea.ee[0].languageId, text: 'a new expression 3', known: true};
-		editedIdea.ee[3] = {languageId: editedIdea.ee[2].languageId, text: 'a new expression 4', known: false};
-		await editValidIdeaAndTest(idea, editedIdea);
+		await editAnyIdeaAndTest();
 	});
 
 	test('delete idea', async () => {
@@ -40,7 +34,7 @@ describe('smoke tests', () => {
 	});
 
 	test('add language', async () => {
-		await addValidLanguageAndTest('l1', FetchUtils.FIRST_LANGUAGE_ID, FetchUtils.FIRST_ORDERING);
+		await addAnyLanguageAndTest();
 	});
 
 	test('get language', async () => {
@@ -51,11 +45,7 @@ describe('smoke tests', () => {
 	});
 
 	test('edit language', async () => {
-		const language = await ApiUtils.addLanguage('l');
-		language.name = 'l2';
-		await ApiUtils.editLanguages([language]);
-		const fetchedLanguage = await ApiUtils.fetchLanguage(language.id);
-		expect(fetchedLanguage).toEqual(language);
+		await editAnyLanguageAndTest();
 	});
 
 	test('delete language', async () => {
