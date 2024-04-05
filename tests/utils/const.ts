@@ -1,6 +1,11 @@
 import {currentVersion} from '../../server/const';
 
-export const getTestDatabaseVersionPath = (version: string) => `tests/db/${version}-simple.db`;
+export function getTestDatabaseVersionPath(version: string): string {
+	if (version === currentVersion) {
+		version = 'current';
+	}
+	return `tests/db/${version}.db`;
+}
 
 export const generatePreviousVersions = (startVersion: string, endVersion: string): string[] => {
 	const versions: string[] = [];

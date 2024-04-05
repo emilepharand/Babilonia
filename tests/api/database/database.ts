@@ -1,26 +1,30 @@
-import {currentVersion, memoryDatabasePath} from '../../../server/const';
+import {
+	currentVersion, memoryDatabasePath, minimumExpectedExpressions, minimumExpectedIdeas, minimumExpectedLanguages,
+} from '../../../server/const';
 import * as ApiUtils from '../../utils/api-utils';
+import {getTestDatabaseVersionPath} from '../../utils/const';
 import * as FetchUtils from '../../utils/fetch-utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
 });
 
-export const simpleDatabasePath = 'tests/db/2.2-simple.db';
-
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
 
-		await ApiUtils.changeDatabase(simpleDatabasePath);
-		expect(await ApiUtils.getDatabasePath()).toEqual(simpleDatabasePath);
+		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
+		await ApiUtils.changeDatabase(currentVersionPath);
+		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath);
+
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 		const ll = await ApiUtils.fetchLanguages();
-		expect(ll).toHaveLength(1);
-		expect(ll[0]).toEqual({
-			id: 1, name: '2.1-l1', ordering: 0, isPractice: true,
-		});
+		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
+
+		const stats = await ApiUtils.getStats();
+		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
+		expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
 
 		await ApiUtils.changeDatabase(memoryDatabasePath);
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
