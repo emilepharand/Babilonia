@@ -196,7 +196,7 @@ echo "-------------------------------------------------------"
 cleanup
 go_to_dist
 
-node index.cjs --db="tests/db/old-version.db" >temp.txt 2>&1 &
+node index.cjs --db="tests/db/2.0.db" >temp.txt 2>&1 &
 
 sleep 1
 
