@@ -4,6 +4,7 @@ import {
 import * as ApiUtils from '../../utils/api-utils';
 import {getTestDatabaseVersionPath} from '../../utils/const';
 import * as FetchUtils from '../../utils/fetch-utils';
+import {basicTests} from '../../utils/utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -21,6 +22,8 @@ describe('valid cases', () => {
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 		const ll = await ApiUtils.fetchLanguages();
 		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
+
+		await basicTests();
 
 		const stats = await ApiUtils.getStats();
 		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
