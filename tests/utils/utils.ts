@@ -1,4 +1,6 @@
 import {Settings} from '../../server/model/settings/settings';
+import {addAnyIdeaAndTest, editAnyIdeaAndTest} from '../api/ideas/utils';
+import {addAnyLanguageAndTest, editAnyLanguageAndtest} from '../api/languages/utils';
 
 export function settingsFromPartial(partialSettings: Partial<Settings>) {
 	return {
@@ -20,4 +22,11 @@ export async function executeNTimes(n: number, fn: () => void) {
 
 export function getRandomString(): string {
 	return Math.random().toString(36).substring(10);
+}
+
+export async function basicTests() {
+	await addAnyIdeaAndTest();
+	await editAnyIdeaAndTest();
+	await addAnyLanguageAndTest();
+	await editAnyLanguageAndtest();
 }
