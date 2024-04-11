@@ -1,9 +1,6 @@
 import {currentVersion} from '../../server/const';
 
 export function getTestDatabaseVersionPath(version: string): string {
-	if (version === currentVersion) {
-		version = 'current';
-	}
 	return `tests/db/${version}.db`;
 }
 
