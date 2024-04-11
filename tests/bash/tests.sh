@@ -77,6 +77,26 @@ write_coverage() {
 }
 
 echo "------------------------------------------------------"
+echo " package.json version and version.txt match           "                      "
+echo "------------------------------------------------------"
+
+cleanup
+go_to_root
+
+PACKAGE_VERSION=$(node -p "require('./package.json').version")
+CURRENT_VERSION=$(cat version.txt)
+EXPECTED_VERSION="$CURRENT_VERSION".0
+
+if [ "$PACKAGE_VERSION" != "$EXPECTED_VERSION" ]; then
+  echo "Version mismatch."
+  echo "package.json: $PACKAGE_VERSION"
+  echo "version.txt: $CURRENT_VERSION"
+  after_failure
+fi
+
+after_success
+
+echo "------------------------------------------------------"
 echo " sqlite3 is not included in production build          "
 echo " and package.json in dist includes sqlite3            "
 echo "------------------------------------------------------"
