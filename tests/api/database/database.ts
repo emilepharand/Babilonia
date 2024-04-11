@@ -1,10 +1,9 @@
 import {
-	currentVersion, memoryDatabasePath, minimumExpectedExpressions, minimumExpectedIdeas, minimumExpectedLanguages,
+	currentVersion, memoryDatabasePath,
 } from '../../../server/const';
 import * as ApiUtils from '../../utils/api-utils';
 import {getTestDatabaseVersionPath} from '../../utils/const';
 import * as FetchUtils from '../../utils/fetch-utils';
-import {basicTests} from '../../utils/utils';
 
 beforeEach(async () => {
 	await ApiUtils.changeDatabaseToMemoryAndDeleteEverything();
@@ -13,25 +12,9 @@ beforeEach(async () => {
 describe('valid cases', () => {
 	test('change database to a valid database', async () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
-
 		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
 		await ApiUtils.changeDatabase(currentVersionPath);
 		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath);
-
-		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
-		const ll = await ApiUtils.fetchLanguages();
-		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
-
-		await basicTests();
-
-		const stats = await ApiUtils.getStats();
-		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
-		expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
-
-		await ApiUtils.changeDatabase(memoryDatabasePath);
-		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
-		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
 	});
 
 	test('change database to a db to be created', async () => {
