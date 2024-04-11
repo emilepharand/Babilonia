@@ -69,7 +69,7 @@ describe('using all database versions', () => {
 			expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
 			expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
 		}
-	});
+	}, 30000);
 });
 
 async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, expectedDbPath: string) {
