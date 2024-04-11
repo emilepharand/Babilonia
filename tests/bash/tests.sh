@@ -77,7 +77,7 @@ write_coverage() {
 }
 
 echo "------------------------------------------------------"
-echo " package.json version and version.txt match           "                      "
+echo " package.json version and version.txt match           "
 echo "------------------------------------------------------"
 
 cleanup
