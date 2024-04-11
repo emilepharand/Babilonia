@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_VERSION="2.2"
+CURRENT_VERSION=$(cat version.txt)
 
 rm -rf dist/tests/db
 mkdir -p tests/coverage/merged dist/db dist/tests/db dist/tests/dir.db

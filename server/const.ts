@@ -1,4 +1,5 @@
-export const currentVersion = '2.2';
+import fs from 'fs';
+export const currentVersion = fs.readFileSync('../version.txt', 'utf8');
 export const memoryDatabasePath = ':memory:';
 export const databaseVersionErrorCode = 'DATABASE_VERSION';
 export const baseDatabasePath = 'db/base.db';
