@@ -47,7 +47,7 @@ describe('change database', () => {
 	});
 });
 
-describe.only('using all database versions', () => {
+describe('using all database versions', () => {
 	test.each(allVersions)('using database version %s (migrating if required)', async version => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 
@@ -86,38 +86,36 @@ describe.only('using all database versions', () => {
 });
 
 async function testDatabaseSchema(databasePath: string) {
-    let db;
-    try {
-        db = await open({
-            filename: databasePath,
-            driver: sqlite3.Database,
-        });
+	let db;
+	try {
+		db = await open({
+			filename: databasePath,
+			driver: sqlite3.Database,
+		});
 
-        let schema = (await db.all('SELECT * FROM sqlite_master'))
-				.filter((s: any) => s.type === 'table' && !s.name.startsWith('sqlite'))
-                .map((s: any) => s.sql);
-				
-        let expectedSchema = getSchemaQueries();
+		let schema = (await db.all('SELECT * FROM sqlite_master'))
+			.filter((s: any) => s.type === 'table' && !s.name.startsWith('sqlite'))
+			.map((s: any) => s.sql);
 
-        const cleanAndSortSchema = (schema: any[]) => {
-            return schema
-                .map((s: string) => s.replace(/\s+/g, ' ').replace(/"/g, ''))
-                .sort();
-        };
+		let expectedSchema = getSchemaQueries();
 
-        schema = cleanAndSortSchema(schema);
-        expectedSchema = cleanAndSortSchema(expectedSchema);
+		const cleanAndSortSchema = (schema: any[]) => schema
+			.map((s: string) => s.replace(/\s+/g, ' ').replace(/"/g, ''))
+			.sort();
 
-        expect(schema.length).toEqual(expectedSchema.length);
+		schema = cleanAndSortSchema(schema);
+		expectedSchema = cleanAndSortSchema(expectedSchema);
 
-        for (let i = 0; i < schema.length; i++) {
+		expect(schema.length).toEqual(expectedSchema.length);
+
+		for (let i = 0; i < schema.length; i++) {
 			expect(schema[i]).toEqual(expectedSchema[i]);
 		}
-    } finally {
-        if (db) {
-            await db.close();
-        }
-    }
+	} finally {
+		if (db) {
+			await db.close();
+		}
+	}
 }
 async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, expectedDbPath: string) {
 	const res = await ApiUtils.changeDatabase(dbPath);
