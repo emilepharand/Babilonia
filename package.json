@@ -21,7 +21,7 @@
     "test:prepare": "bash tests/bash/prepare.sh",
     "test": "npm run check && npm run test:build && npm run test:bash && npm run test:api && npm run test:e2e",
     "test:quick": "export $(xargs < .env.test) && npm run clean && webpack && npm run postbuild && npm run test:prepare && npm run test:api",
-    "test:serve": "cd dist && npm start --db=:memory: >> log.txt 2>&1",
+    "test:serve": "cd dist && npm start >> log.txt 2>&1",
     "test:bash": "export $(xargs < .env.test) && tests/bash/tests.sh",
     "test:api": "export $(xargs < .env.test) && start-server-and-test test:serve :$VITE_API_PORT test:api:run",
     "test:api:run": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --silent=false && npm run test:api:coverage",
@@ -33,7 +33,7 @@
     "test:report": "nyc report -t tests/coverage/merged --report-dir tests/coverage/merged -r=html -r=cobertura && rm -rf .nyc_output*",
     "test:dev:vue": "export $(xargs < .env.test) && start-server-and-test test:dev:serve :$VITE_BASE_PORT test:e2e:run",
     "test:dev:serve": "export $(xargs < .env.test) && run-p test:dev:serve:api dev:serve:vue",
-    "test:dev:serve:api": "export $(xargs < .env.test) && nodemon server/index.ts --dev-mode --db=:memory:"
+    "test:dev:serve:api": "export $(xargs < .env.test) && nodemon server/index.ts --dev-mode"
   },
   "dependencies": {
     "ajv": "^8.12.0",
