@@ -6,21 +6,22 @@ export async function clearDatabaseAndCreateSchema(db: Database) {
 	await db.run('DROP TABLE IF EXISTS ideas');
 	await db.run('DROP TABLE IF EXISTS languages');
 	await db.run('DROP TABLE IF EXISTS settings');
-	await db.run(`
-        CREATE TABLE "languages" (
+
+	await Promise.all(getSchemaQueries().map(async query => db.run(query)));
+}
+
+export function getSchemaQueries() {
+	const queries = [];
+	queries.push(`CREATE TABLE "languages" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
             "name" TEXT NOT NULL,
             "ordering" INTEGER NOT NULL,
             "isPractice" TEXT NOT NULL
-        )
-    `);
-	await db.run(`
-        CREATE TABLE "ideas" (
+        )`);
+	queries.push(`CREATE TABLE "ideas" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE
-        )
-    `);
-	await db.run(`
-        CREATE TABLE "expressions" (
+        )`);
+	queries.push(`CREATE TABLE "expressions" (
             "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
             "ideaId" INTEGER NOT NULL,
             "languageId" INTEGER NOT NULL,
@@ -29,12 +30,10 @@ export async function clearDatabaseAndCreateSchema(db: Database) {
             "ordering" INTEGER DEFAULT 0,
             FOREIGN KEY("languageId") REFERENCES "languages"("id"),
             FOREIGN KEY("ideaId") REFERENCES "ideas"("id")
-        )
-    `);
-	await db.run(`
-        CREATE TABLE "settings" (
+        )`);
+	queries.push(`CREATE TABLE "settings" (
             "name" TEXT NOT NULL UNIQUE,
             "value" TEXT
-        )
-    `);
+        )`);
+	return queries;
 }
