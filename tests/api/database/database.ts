@@ -32,6 +32,11 @@ describe('change database', () => {
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(1);
 	});
 
+	test('version.txt', async () => {
+		const currentVersionInVersionTxt = fs.readFileSync('version.txt', 'utf8').trim();
+		expect(currentVersionInVersionTxt).toEqual(currentVersion);
+	});
+
 	test.each(previousVersions)('change database to old database version %s', async version => {
 		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version), 400, memoryDatabasePath);
 		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
