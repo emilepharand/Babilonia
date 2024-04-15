@@ -6,9 +6,6 @@ import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
 
 const apiUrl = (() => {
-	if (typeof window === 'undefined') {
-		return `${process.env.VITE_API_URL}`;
-	}
 	const url = new URL(window.location.href);
 	url.port = process.env.VITE_API_PORT!;
 	return url.origin;
