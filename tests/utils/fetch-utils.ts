@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import fetch, {Response} from 'node-fetch';
-import {paramsFromSearchContext} from '../../src/ts/api';
 import {SearchContext} from '../../server/model/search/searchContext';
+import {paramsFromSearchContext} from '../../server/utils/searchParams';
 
 export const FIRST_LANGUAGE_ID = 1;
 export const FIRST_IDEA_ID = 1;
