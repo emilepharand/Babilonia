@@ -4,11 +4,9 @@ import type {Language} from '../../server/model/languages/language';
 import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
+import {paramsFromSearchContext} from '../../server/utils/searchParams';
 
 const apiUrl = (() => {
-	if (typeof window === 'undefined') {
-		return `${process.env.VITE_API_URL}`;
-	}
 	const url = new URL(window.location.href);
 	url.port = process.env.VITE_API_PORT!;
 	return url.origin;
@@ -124,15 +122,4 @@ export async function searchIdeas(sc: SearchContext): Promise<Idea[]> {
 	const params = paramsFromSearchContext(sc);
 	const response = await doGet(`/ideas?${params}`);
 	return (await response.json()) as Idea[];
-}
-
-export function paramsFromSearchContext(sc: SearchContext): string {
-	return [
-		sc.pattern && `pattern=${sc.pattern}`,
-		sc.strict && 'strict=true',
-		sc.language && `language=${sc.language}`,
-		sc.ideaHas && `ideaHas=${sc.ideaHas.join(',')}`,
-		sc.ideaDoesNotHave && `ideaDoesNotHave=${sc.ideaDoesNotHave}`,
-		sc.knownExpressions !== undefined && `knownExpressions=${sc.knownExpressions ? 'true' : 'false'}`,
-	].filter(Boolean).join('&');
 }
