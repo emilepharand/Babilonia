@@ -84,6 +84,12 @@ cleanup
 go_to_root
 
 PACKAGE_VERSION=$(node -p "require('./package.json').version")
+if [[ "$PACKAGE_VERSION" != *-dev ]]; then
+  echo -e "\n\e[1;33mWARNING: The version in package.json does not end with -dev."
+  echo -e "If this is not a release version, append -dev to the version number.\e[0m"
+fi
+PACKAGE_VERSION=${PACKAGE_VERSION%-dev}
+
 CURRENT_VERSION=$(cat version.txt)
 EXPECTED_VERSION="$CURRENT_VERSION".0
 
@@ -105,7 +111,10 @@ cleanup
 go_to_root
 
 # Make sure project's node_modules is not used
-mv node_modules node_modules.bak
+mv node_modules node_modules.bak || {
+  echo "mv node_modules node_modules.bak failed"
+  after_failure
+}
 
 go_to_dist
 
