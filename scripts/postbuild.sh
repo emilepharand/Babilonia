@@ -1,4 +1,5 @@
 cp db/base.db dist/db.db
+cp README.md dist/README.md
 
 VERSION=$(node -p "require('./package.json').version")
 SQLITE3_VERSION=$(node -p "require('./package.json').dependencies.sqlite3" | sed 's/\\^//g')
