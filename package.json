@@ -8,7 +8,7 @@
   "scripts": {
     "clean": "rimraf -g tests/coverage release .nyc_output_cypress dist/tests 'dist/!(*.db)'",
     "build": "export $(xargs < .env${NODE_ENV:+.${NODE_ENV}}) && npm run clean && vite build && webpack",
-    "postbuild": "echo '{\"dependencies\": {\"sqlite3\": \"'$(node -p \"require('./package.json').dependencies.sqlite3\" | sed 's/\\^//g')'\"}, \"scripts\":{\"start\": \"node index.cjs\"}}' > dist/package.json",
+    "postbuild": "scripts/postbuild.sh",
     "release": "scripts/release.sh",
     "release:test": "npm run release && rm -rf dist && unzip -o release/*.zip -d dist && tests/bash/tests.sh sqlite3",
     "dev": "export $(xargs < .env) && run-p dev:serve:api dev:serve:vue",
