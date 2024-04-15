@@ -85,7 +85,6 @@ go_to_root
 
 PACKAGE_VERSION=$(node -p "require('./package.json').version")
 if [[ "$PACKAGE_VERSION" != *-dev ]]; then
-  echo "::warning::The version in package.json does not end with -dev."
   echo -e "\n\e[1;33mWARNING: The version in package.json does not end with -dev."
   echo -e "If this is not a release version, append -dev to the version number.\e[0m"
 fi
