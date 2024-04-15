@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cp db/base.db dist/db.db
 cp README.md dist/README.md
 
