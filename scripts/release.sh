@@ -10,6 +10,6 @@ rm -rf node_modules release
 npm i
 npm run build
 mkdir -p release
-cd dist
+cd dist || exit 1
 zip -r "$VERSION.zip" *
 mv "$VERSION.zip" ../release
