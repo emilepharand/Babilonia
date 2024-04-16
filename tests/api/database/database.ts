@@ -11,8 +11,8 @@ import {
 } from '../../../server/const';
 import {getSchemaQueries} from '../../../server/model/database/databaseInitializer';
 import * as ApiUtils from '../../utils/api-utils';
-import {allVersions, getTestDatabaseVersionPath, previousVersions} from '../../utils/const';
 import * as FetchUtils from '../../utils/fetch-utils';
+import {allVersions, getTestDatabaseVersionPath, previousVersions} from '../../utils/versions';
 import {basicTests} from '../utils/utils';
 
 beforeEach(async () => {

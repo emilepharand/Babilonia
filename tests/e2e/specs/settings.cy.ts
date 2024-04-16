@@ -1,7 +1,7 @@
 import {Settings} from '../../../server/model/settings/settings';
 
 import {currentVersion, memoryDatabasePath} from '../../../server/const';
-import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/const';
+import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/versions';
 import {apiUrl, setSettings} from '../cy-utils';
 
 describe('The settings page', () => {
