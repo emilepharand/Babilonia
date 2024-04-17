@@ -11,5 +11,5 @@ npm i
 npm run build
 mkdir -p release
 cd dist || exit 1
-zip -r "$VERSION.zip" *
+zip -r "$VERSION.zip" "*"
 mv "$VERSION.zip" ../release
