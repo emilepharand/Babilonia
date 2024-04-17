@@ -15,17 +15,34 @@ export default class DatabaseMigrator {
 		const sql = 'INSERT OR REPLACE INTO settings (name, value) VALUES (?, ?);';
 		await this._databaseToMigrate.run(sql, [version, currentVersion]);
 
-		// Added in version 2.2
-		await this.addOrderingToExpressionTable();
+		await this.migrateVersion22();
 
 		await this._databaseToMigrate.exec('COMMIT;');
 		console.log('Migration complete.');
 	}
 
+	async migrateVersion22(): Promise<void> {
+		await this.addOrderingToExpressionTable();
+		await this.addGuids();
+	}
+
+	async addGuids(): Promise<void> {
+		if (!(await this.columnExists('ideas', 'guid'))) {
+			await this._databaseToMigrate.run('ALTER TABLE ideas ADD COLUMN guid TEXT');
+			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "ideas_guid" ON "ideas" ("guid")');
+		}
+		if (!(await this.columnExists('expressions', 'guid'))) {
+			await this._databaseToMigrate.run('ALTER TABLE expressions ADD COLUMN guid TEXT');
+			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "expressions_guid" ON "expressions" ("guid")');
+		}
+		if (!(await this.columnExists('languages', 'guid'))) {
+			await this._databaseToMigrate.run('ALTER TABLE languages ADD COLUMN guid TEXT');
+			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "languages_guid" ON "languages" ("guid")');
+		}
+	}
+
 	async addOrderingToExpressionTable(): Promise<void> {
-		const sql = 'PRAGMA table_info(expressions);';
-		const result = await this._databaseToMigrate.all(sql);
-		const hasOrderingColumn = result.some(column => column.name === 'ordering');
+		const hasOrderingColumn = await this.columnExists('expressions', 'ordering');
 		if (!hasOrderingColumn) {
 			await this._databaseToMigrate.exec('ALTER TABLE expressions ADD COLUMN ordering INTEGER DEFAULT 0;');
 		}
@@ -36,5 +53,13 @@ export default class DatabaseMigrator {
 							WHERE  e.ideaid = expressions.ideaid
 									AND e.id <= expressions.id);`;
 		await this._databaseToMigrate.exec(query);
+	}
+
+	async columnExists(tableName: string, columnName: string): Promise<boolean> {
+		const query = `
+			SELECT 1
+			FROM   pragma_table_info('${tableName}')
+			WHERE  name = '${columnName}';`;
+		return await this._databaseToMigrate.get(query) !== undefined;
 	}
 }
