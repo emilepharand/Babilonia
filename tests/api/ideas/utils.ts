@@ -6,6 +6,38 @@ import * as ApiUtils from '../../utils/api-utils';
 import {addAnyLanguage} from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {FIRST_IDEA_ID} from '../../utils/fetch-utils';
+import {getRandomString} from '../../utils/utils';
+
+export async function getBasicIdeaForAdding() {
+	const language1 = 'l1' + getRandomString();
+	const language2 = 'l2' + getRandomString();
+	const language3 = 'l3' + getRandomString();
+	return makeIdeaForAdding({
+		ee: [
+			{language: language1, text: 'l1 e1', known: true},
+			{language: language1, text: 'l1 e2'},
+			{language: language2, text: 'l2 e1'},
+			{language: language3, text: 'l3 e1', known: false},
+			{language: language3, text: 'l3 e2'},
+		],
+	});
+}
+
+export async function addAnyIdeaAndTest() {
+	const idea = await getBasicIdeaForAdding();
+	await addValidIdeaAndTest(idea);
+}
+
+export async function editAnyIdeaAndTest() {
+	const ideaForAdding = await getBasicIdeaForAdding();
+	const idea = await ApiUtils.addIdea(ideaForAdding);
+	const editedIdea = ideaForAdding;
+	editedIdea.ee[0].text = 'a new expression 1';
+	editedIdea.ee[1].text = 'a new expression 2';
+	editedIdea.ee[2] = {languageId: editedIdea.ee[0].languageId, text: 'a new expression 3', known: true};
+	editedIdea.ee[3] = {languageId: editedIdea.ee[2].languageId, text: 'a new expression 4', known: false};
+	await editValidIdeaAndTest(idea, editedIdea);
+}
 
 export async function makeIdeaForAdding(i: {
 	ee:(Omit<ExpressionForAdding, 'languageId'> & {language: string;})[]

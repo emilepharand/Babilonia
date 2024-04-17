@@ -16,17 +16,22 @@ import {normalizeIdea} from './utils/expressionStringUtils';
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-let dbCoordinator = new DatabaseCoordinator(databasePath);
-await dbCoordinator.init();
-if (!dbCoordinator.isValid) {
-	if (dbCoordinator.isValidVersion) {
-		console.error(`Invalid database path provided for --db option ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
-	} else {
-		console.error(`Old database version. Defaulting to '${memoryDatabasePath}'. You can migrate the database through the API or UI.`);
-	}
-	dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
+async function initDatabase(databasePath: string) {
+	let dbCoordinator = new DatabaseCoordinator(databasePath);
 	await dbCoordinator.init();
+	if (!dbCoordinator.isValid) {
+		if (dbCoordinator.isValidVersion) {
+			console.error(`Invalid database path ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
+		} else {
+			console.error(`Old database version. Defaulting to '${memoryDatabasePath}'. You can migrate the database through the API or UI.`);
+		}
+		dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
+		await dbCoordinator.init();
+	}
+	return dbCoordinator;
 }
+
+let dbCoordinator = await initDatabase(databasePath);
 let {dataServiceProvider} = dbCoordinator;
 
 export async function getStats(_: Request, res: Response): Promise<void> {
@@ -211,8 +216,7 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).end();
 		return;
 	}
-	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
-	await newDbCoordinator.init();
+	const newDbCoordinator = await changeDatabaseToPath((req.body as {path: string}).path);
 	if (!newDbCoordinator.isValidVersion) {
 		res.status(400).send(JSON.stringify({error: databaseVersionErrorCode}));
 		return;
@@ -221,9 +225,17 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	dataServiceProvider = newDbCoordinator.dataServiceProvider;
-	dbCoordinator = newDbCoordinator;
 	res.end();
+}
+
+async function changeDatabaseToPath(path: string) {
+	const newDbCoordinator = new DatabaseCoordinator(path);
+	await newDbCoordinator.init();
+	if (newDbCoordinator.isValid && newDbCoordinator.isValidVersion) {
+		dataServiceProvider = newDbCoordinator.dataServiceProvider;
+		dbCoordinator = newDbCoordinator;
+	}
+	return newDbCoordinator;
 }
 
 export async function migrateDatabase(req: Request, res: Response): Promise<void> {
@@ -249,6 +261,9 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 		dbCoordinatorForBaseDb.dataServiceProvider);
 
 	await databaseMigrator.migrate();
+
+	dbCoordinator = await initDatabase((req.body as {path: string}).path);
+	({dataServiceProvider} = dbCoordinator);
 
 	res.status(200).end();
 }

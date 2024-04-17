@@ -1,10 +1,8 @@
 import {Settings} from '../../../server/model/settings/settings';
 
 import {currentVersion, memoryDatabasePath} from '../../../server/const';
-import {oldVersionDatabasePath} from '../../utils/const';
+import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/versions';
 import {apiUrl, setSettings} from '../cy-utils';
-
-const simpleDatabasePath = 'tests/db/2.2-simple.db';
 
 describe('The settings page', () => {
 	it('Works correctly', () => {
@@ -23,7 +21,7 @@ describe('The settings page', () => {
 		cy.get('#databasePath').should('be.visible').should('have.value', memoryDatabasePath);
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(simpleDatabasePath);
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(currentVersion));
 		cy.get('#saveButton').click();
 		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
@@ -68,7 +66,7 @@ describe('The settings page', () => {
 		});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(oldVersionDatabasePath);
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion));
 		cy.get('#saveButton').click();
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#confirm-migrate-modal').should('be.visible');
@@ -85,12 +83,12 @@ describe('The settings page', () => {
 		cy.get('#modal-migrate-button').wait(500).click();
 		cy.get('#successMessage').should('be.visible')
 			.should('contain', 'Settings saved.')
-			.should('contain', 'Database migrated.');
+			.should('contain', 'Migration successful.');
 		assertSettingsEquals({
 			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.reload();
-		cy.get('#databasePath').should('have.value', oldVersionDatabasePath);
+		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion));
 	});
 });
 
