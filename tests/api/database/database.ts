@@ -45,6 +45,12 @@ describe('change database', () => {
 		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version), 400, memoryDatabasePath);
 		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
 	});
+
+	test('migrate bad database', async () => {
+		const res = await ApiUtils.migrateDatabase('tests/db/bad.db');
+		expect(res.status).toEqual(400);
+		expect((await res.json() as { error:string }).error).toEqual('MIGRATION_ERROR');
+	});
 });
 
 describe('using all database versions', () => {
@@ -117,6 +123,7 @@ async function testDatabaseSchema(databasePath: string) {
 		}
 	}
 }
+
 async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, expectedDbPath: string) {
 	const res = await ApiUtils.changeDatabase(dbPath);
 	expect(res.status).toEqual(expectedStatus);
