@@ -257,15 +257,19 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 	const dbCoordinatorForBaseDb = new DatabaseCoordinator(baseDatabasePath);
 	await dbCoordinatorForBaseDb.init();
 
-	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
-		dbCoordinatorForBaseDb.dataServiceProvider);
+	try {
+		const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
+			dbCoordinatorForBaseDb.dataServiceProvider);
 
-	await databaseMigrator.migrate();
+		await databaseMigrator.migrate();
 
-	dbCoordinator = await initDatabase((req.body as {path: string}).path);
-	({dataServiceProvider} = dbCoordinator);
+		dbCoordinator = await initDatabase((req.body as {path: string}).path);
+		({dataServiceProvider} = dbCoordinator);
 
-	res.status(200).end();
+		res.status(200).end();
+	} catch (error) {
+		res.status(500).send(JSON.stringify({error: 'INTERNAL_ERROR'}));
+	}
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {

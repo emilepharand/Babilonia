@@ -8,6 +8,7 @@ export default class DatabaseMigrator {
 	}
 
 	async migrate(): Promise<void> {
+		try {
 		const currentVersion = await this._baseDataServiceProvider.settingsManager.getVersion();
 		console.log(`Migrating database to version ${currentVersion}...`);
 		await this._databaseToMigrate.exec('BEGIN TRANSACTION;');
@@ -19,6 +20,11 @@ export default class DatabaseMigrator {
 
 		await this._databaseToMigrate.exec('COMMIT;');
 		console.log('Migration complete.');
+		} catch (error) {
+			console.error('Error migrating database:', error);
+			await this._databaseToMigrate.exec('ROLLBACK;');
+			throw error;
+		}
 	}
 
 	async migrateVersion22(): Promise<void> {

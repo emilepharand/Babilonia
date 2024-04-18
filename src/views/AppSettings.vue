@@ -221,9 +221,13 @@ async function save() {
 }
 
 async function migrate() {
-	await Api.migrateDatabase(databasePath.value);
-	errorMessage.value = '';
-	successMessages.value.push('Migration successful.');
+	const migrateResponse = await Api.migrateDatabase(databasePath.value);
+	if (migrateResponse.status === 200) {
+		errorMessage.value = '';
+		successMessages.value.push('Migration successful.');
+	} else {
+		errorMessage.value = 'An error occurred during migration. Please check the server logs for more information.';
+	}
 }
 
 async function changeDatabase() {
