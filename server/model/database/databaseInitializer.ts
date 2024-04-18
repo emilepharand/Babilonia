@@ -12,28 +12,46 @@ export async function clearDatabaseAndCreateSchema(db: Database) {
 
 export function getSchemaQueries() {
 	const queries = [];
-	queries.push(`CREATE TABLE "languages" (
-            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-            "name" TEXT NOT NULL,
-            "ordering" INTEGER NOT NULL,
-            "isPractice" TEXT NOT NULL
-        )`);
-	queries.push(`CREATE TABLE "ideas" (
-            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE
-        )`);
-	queries.push(`CREATE TABLE "expressions" (
-            "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-            "ideaId" INTEGER NOT NULL,
-            "languageId" INTEGER NOT NULL,
-            "text" TEXT NOT NULL,
-            "known" TEXT DEFAULT 0,
-            "ordering" INTEGER DEFAULT 0,
-            FOREIGN KEY("languageId") REFERENCES "languages"("id"),
-            FOREIGN KEY("ideaId") REFERENCES "ideas"("id")
-        )`);
-	queries.push(`CREATE TABLE "settings" (
-            "name" TEXT NOT NULL UNIQUE,
-            "value" TEXT
-        )`);
+	queries.push(getLanguagesTableQuery());
+	queries.push(getIdeasTableQuery());
+	queries.push(getExpressionsTableQuery());
+	queries.push(getSettingsTableQuery());
 	return queries;
+}
+
+export function getIdeasTableQuery() {
+	return `CREATE TABLE "ideas" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        "guid" TEXT UNIQUE)`;
+}
+
+export function getLanguagesTableQuery() {
+	return `CREATE TABLE "languages" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        "name" TEXT NOT NULL,
+        "ordering" INTEGER NOT NULL,
+        "isPractice" TEXT NOT NULL,
+        "guid" TEXT
+    )`;
+}
+
+export function getExpressionsTableQuery() {
+	return `CREATE TABLE "expressions" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        "ideaId" INTEGER NOT NULL,
+        "languageId" INTEGER NOT NULL,
+        "text" TEXT NOT NULL,
+        "known" TEXT DEFAULT 0,
+        "ordering" INTEGER DEFAULT 0,
+        "guid" TEXT,
+        FOREIGN KEY("languageId") REFERENCES "languages"("id"),
+        FOREIGN KEY("ideaId") REFERENCES "ideas"("id")
+    )`;
+}
+
+function getSettingsTableQuery() {
+	return `CREATE TABLE "settings" (
+        "name" TEXT NOT NULL UNIQUE,
+        "value" TEXT
+    )`;
 }
