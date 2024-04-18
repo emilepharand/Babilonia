@@ -160,7 +160,7 @@
           <div class="modal-body">
             The database version does not match the application version.<br><br>
             Do you want to migrate the database?<br><br>
-            <span class="alert-danger">WARNING: This may cause data loss. It is recommended to make a backup of the database before proceeding.</span>
+            <span class="alert-danger">WARNING: This may cause data loss. It is <b>highly</b> recommended to make a backup of the database before proceeding.</span>
           </div>
           <div class="modal-footer">
             <button
