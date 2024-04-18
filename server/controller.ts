@@ -268,7 +268,7 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 
 		res.status(200).end();
 	} catch (error) {
-		res.status(500).send(JSON.stringify({error: 'INTERNAL_ERROR'}));
+		res.status(400).send(JSON.stringify({error: 'MIGRATION_ERROR'}));
 	}
 }
 
