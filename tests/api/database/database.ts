@@ -131,7 +131,7 @@ describe('invalid cases', () => {
 		'/doesnotexist/db.db',
 		'tests/db/unwriteable.db',
 		'tests/doesnotexist/db.db',
-		'tests/dir.db',
+		'tests/db/dir.db',
 		'/tmp/invalid.db',
 	];
 

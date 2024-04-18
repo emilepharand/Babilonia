@@ -3,7 +3,7 @@
 CURRENT_VERSION=$(cat version.txt)
 
 rm -rf dist/tests/db
-mkdir -p tests/coverage/merged dist/db dist/tests/db dist/tests/dir.db
+mkdir -p tests/coverage/merged dist/db dist/tests/db dist/tests/db/dir.db
 cp db/base.db dist/db.db
 cp db/base.db "dist/tests/db/$CURRENT_VERSION.db"
 cp tests/db/* dist/tests/db
