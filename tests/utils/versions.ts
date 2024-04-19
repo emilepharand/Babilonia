@@ -1,7 +1,30 @@
 import {currentVersion} from '../../server/const';
 
-export function getTestDatabaseVersionPath(version: string): string {
-	return `tests/db/${version}.db`;
+export class TestDatabasePath {
+	fromDist: string;
+
+	constructor(filename: string) {
+		this.fromDist = 'tests/db/' + filename;
+	}
+
+	getActualPath() {
+		return `dist/${this.fromDist}`;
+	}
+
+	getPathToProvide() {
+		if (process.env.TEST_DEV) {
+			return this.getActualPath();
+		}
+		return this.fromDist;
+	}
+}
+
+export function getTestDatabaseVersionPath(version: string): TestDatabasePath {
+	return new TestDatabasePath(`${version}.db`);
+}
+
+export function getBadDatabasePath(): TestDatabasePath {
+	return new TestDatabasePath('bad.db');
 }
 
 export function generateVersionRange(start: string, end: string): string[] {

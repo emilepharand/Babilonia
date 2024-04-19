@@ -12,7 +12,10 @@ import {
 import {getSchemaQueries} from '../../../server/model/database/databaseInitializer';
 import * as ApiUtils from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
-import {allVersions, getTestDatabaseVersionPath, previousVersions} from '../../utils/versions';
+import {
+	TestDatabasePath,
+	allVersions, getBadDatabasePath, getTestDatabaseVersionPath, previousVersions,
+} from '../../utils/versions';
 import {basicTests} from '../utils/utils';
 
 beforeEach(async () => {
@@ -23,12 +26,12 @@ describe('change database', () => {
 	test('change database to a valid database', async () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
-		await ApiUtils.changeDatabase(currentVersionPath);
-		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath);
+		await ApiUtils.changeDatabase(currentVersionPath.getPathToProvide());
+		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath.getPathToProvide());
 	});
 
 	test('change database to a db to be created', async () => {
-		const newDbPath = 'tests/db/new.db';
+		const newDbPath = new TestDatabasePath('new.db').getPathToProvide();
 		await ApiUtils.changeDatabase(newDbPath);
 		expect(await ApiUtils.getDatabasePath()).toEqual(newDbPath);
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
@@ -42,12 +45,12 @@ describe('change database', () => {
 	});
 
 	test.each(previousVersions)('change database to old database version %s', async version => {
-		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version), 400, memoryDatabasePath);
+		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version).getPathToProvide(), 400, memoryDatabasePath);
 		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
 	});
 
 	test('migrate bad database', async () => {
-		const res = await ApiUtils.migrateDatabase('tests/db/bad.db');
+		const res = await ApiUtils.migrateDatabase(getBadDatabasePath().getPathToProvide());
 		expect(res.status).toEqual(400);
 		expect((await res.json() as { error:string }).error).toEqual('MIGRATION_ERROR');
 	});
@@ -58,24 +61,23 @@ describe('using all database versions', () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 
 		const databasePath = getTestDatabaseVersionPath(version);
-		const distDatabasePath = `dist/${databasePath}`;
 
-		expect(fs.existsSync(`${distDatabasePath}`)).toBe(true);
+		expect(fs.existsSync(databasePath.getActualPath())).toBe(true);
 
-		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
+		const currentVersionPath = getTestDatabaseVersionPath(currentVersion).getPathToProvide();
 		await changeDatabaseAndCheck(currentVersionPath, 200, currentVersionPath);
 
 		if (version !== currentVersion) {
-			const res = await ApiUtils.migrateDatabase(databasePath);
+			const res = await ApiUtils.migrateDatabase(databasePath.getPathToProvide());
 			expect(res.status).toEqual(200);
 		}
 
-		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath);
+		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
 
-		testDatabaseSchema(`${distDatabasePath}`);
+		testDatabaseSchema(databasePath.getActualPath());
 
 		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
-		await changeDatabaseAndCheck(databasePath, 200, databasePath);
+		await changeDatabaseAndCheck(databasePath.getPathToProvide(), 200, databasePath.getPathToProvide());
 
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 
@@ -133,12 +135,13 @@ async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, ex
 
 describe('invalid cases', () => {
 	const invalidDatabasePaths = [
+		null,
 		'',
 		' ',
 		'/doesnotexist/db.db',
-		'tests/db/unwriteable.db',
-		'tests/doesnotexist/db.db',
-		'tests/db/dir.db',
+		new TestDatabasePath('unwriteable.db').getPathToProvide(),
+		new TestDatabasePath('doesnotexist/db.db').getPathToProvide(),
+		new TestDatabasePath('dir.db').getPathToProvide(),
 		'/tmp/invalid.db',
 	];
 
