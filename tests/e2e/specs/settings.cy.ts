@@ -106,7 +106,7 @@ describe('The settings page', () => {
 			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.reload();
-		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion));
+		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion).getPathToProvide());
 	});
 });
 
