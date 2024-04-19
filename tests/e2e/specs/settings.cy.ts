@@ -1,10 +1,28 @@
 import {Settings} from '../../../server/model/settings/settings';
 
 import {currentVersion, memoryDatabasePath} from '../../../server/const';
-import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/versions';
+import {getBadDatabasePath, getTestDatabaseVersionPath, penultimateVersion} from '../../utils/versions';
 import {apiUrl, setSettings} from '../cy-utils';
 
 describe('The settings page', () => {
+	it('Displays an error when migration fails', () => {
+		cy.get('#settings-link').click();
+		cy.get('#databasePath').clear();
+		cy.get('#databasePath').type(getBadDatabasePath().getPathToProvide());
+		cy.get('#saveButton').click();
+		cy.get('#confirm-migrate-modal').should('be.visible');
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.get('#modal-migrate-button').wait(500).click();
+		cy.get('#settingsErrorText')
+			.should('be.visible')
+			.should('contain', 'Error migrating database.');
+		cy.get('#successMessage').should('not.exist');
+
+		cy.reload();
+
+		cy.get('#databasePath').should('have.value', memoryDatabasePath);
+	});
+
 	it('Works correctly', () => {
 		setSettings({
 			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
@@ -21,7 +39,7 @@ describe('The settings page', () => {
 		cy.get('#databasePath').should('be.visible').should('have.value', memoryDatabasePath);
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(getTestDatabaseVersionPath(currentVersion));
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(currentVersion).getPathToProvide());
 		cy.get('#saveButton').click();
 		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
@@ -66,7 +84,7 @@ describe('The settings page', () => {
 		});
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion));
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion).getPathToProvide());
 		cy.get('#saveButton').click();
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#confirm-migrate-modal').should('be.visible');
