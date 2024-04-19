@@ -226,7 +226,7 @@ async function migrate() {
 		errorMessage.value = '';
 		successMessages.value.push('Migration successful.');
 	} else {
-		errorMessage.value = 'An error occurred during migration. Please check the server logs for more information.';
+		errorMessage.value = 'Error migrating database. Please check server logs.';
 	}
 }
 
