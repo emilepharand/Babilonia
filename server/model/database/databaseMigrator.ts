@@ -54,21 +54,7 @@ export default class DatabaseMigrator {
 		}
 		await this._databaseToMigrate.exec(sql);
 
-		await this.renameTable('languages', 'languages_old');
-		await this.renameTable('ideas', 'ideas_old');
-		await this.renameTable('expressions', 'expressions_old');
-
-		await this._databaseToMigrate.run(getLanguagesTableQuery());
-		await this._databaseToMigrate.run(getIdeasTableQuery());
-		await this._databaseToMigrate.run(getExpressionsTableQuery());
-
-		await this.copyTable('languages_old', 'languages');
-		await this.copyTable('ideas_old', 'ideas');
-		await this.copyTable('expressions_old', 'expressions');
-
-		await this.dropTable('languages_old');
-		await this.dropTable('ideas_old');
-		await this.dropTable('expressions_old');
+		await this.recreateAndCopyTables();
 	}
 
 	async addOrderingToExpressionTable(): Promise<void> {
@@ -91,6 +77,34 @@ export default class DatabaseMigrator {
 			FROM   pragma_table_info('${tableName}')
 			WHERE  name = '${columnName}';`;
 		return await this._databaseToMigrate.get(query) !== undefined;
+	}
+
+	private async recreateAndCopyTables() {
+		function getTempTableName(tableTable: string) {
+			return `${tableTable}_temp`;
+		}
+		const languages = 'languages';
+		const ideas = 'ideas';
+		const expressions = 'expressions';
+		const tempLanguages = getTempTableName(languages);
+		const tempIdeas = getTempTableName(ideas);
+		const tempExpressions = getTempTableName(expressions);
+
+		await this.renameTable(languages, tempLanguages);
+		await this.renameTable(ideas, tempIdeas);
+		await this.renameTable(expressions, tempExpressions);
+
+		await this._databaseToMigrate.run(getLanguagesTableQuery());
+		await this._databaseToMigrate.run(getIdeasTableQuery());
+		await this._databaseToMigrate.run(getExpressionsTableQuery());
+
+		await this.copyTable(tempLanguages, languages);
+		await this.copyTable(tempIdeas, ideas);
+		await this.copyTable(tempExpressions, expressions);
+
+		await this.dropTable(tempLanguages);
+		await this.dropTable(tempIdeas);
+		await this.dropTable(tempExpressions);
 	}
 
 	private async renameTable(tableName: string, newTableName: string) {
