@@ -1,7 +1,9 @@
 import type {Database} from 'sqlite';
 import type DataServiceProvider from '../dataServiceProvider';
 import {version} from '../settings/settingsManager';
+import DatabaseGUIDMigrator from './databaseGuidMigrator';
 import {getExpressionsTableQuery, getIdeasTableQuery, getLanguagesTableQuery} from './databaseInitializer';
+import {columnExists} from './databaseUtils';
 
 export default class DatabaseMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
@@ -19,6 +21,8 @@ export default class DatabaseMigrator {
 
 			await this.migrateVersion22();
 
+			await this.recreateAndCopyTables();
+
 			await this._databaseToMigrate.exec('COMMIT;');
 			console.log('Migration complete.');
 		} catch (error) {
@@ -34,43 +38,12 @@ export default class DatabaseMigrator {
 	}
 
 	async addGuids(): Promise<void> {
-		if (!(await this.columnExists('ideas', 'guid'))) {
-			await this._databaseToMigrate.run('ALTER TABLE ideas ADD COLUMN guid TEXT');
-			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "ideas_guid" ON "ideas" ("guid")');
-		}
-		if (!(await this.columnExists('expressions', 'guid'))) {
-			await this._databaseToMigrate.run('ALTER TABLE expressions ADD COLUMN guid TEXT');
-			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "expressions_guid" ON "expressions" ("guid")');
-		}
-		if (!(await this.columnExists('languages', 'guid'))) {
-			await this._databaseToMigrate.run('ALTER TABLE languages ADD COLUMN guid TEXT');
-			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "languages_guid" ON "languages" ("guid")');
-		}
-
-		await this.updateGuids();
-
-		await this.recreateAndCopyTables();
-	}
-
-	private async updateGuids(): Promise<void> {
-		let sql = '';
-		const languages = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM languages');
-		for (const language of languages) {
-			sql += `UPDATE languages SET guid = '${language.guid}' WHERE id = ${language.id};\n`;
-		}
-		const ideas = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM ideas');
-		for (const idea of ideas) {
-			sql += `UPDATE ideas SET guid = '${idea.guid}' WHERE id = ${idea.id};\n`;
-		}
-		const expressions = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM expressions');
-		for (const expression of expressions) {
-			sql += `UPDATE expressions SET guid = '${expression.guid}' WHERE id = ${expression.id};\n`;
-		}
-		await this._databaseToMigrate.exec(sql);
+		const guidMigrator = new DatabaseGUIDMigrator(this._databaseToMigrate, this._baseDataServiceProvider.db);
+		await guidMigrator.migrateGuids();
 	}
 
 	private async addOrderingToExpressionTable(): Promise<void> {
-		const hasOrderingColumn = await this.columnExists('expressions', 'ordering');
+		const hasOrderingColumn = await columnExists(this._databaseToMigrate, 'expressions', 'ordering');
 		if (!hasOrderingColumn) {
 			await this._databaseToMigrate.exec('ALTER TABLE expressions ADD COLUMN ordering INTEGER DEFAULT 0;');
 		}
@@ -81,14 +54,6 @@ export default class DatabaseMigrator {
 							WHERE  e.ideaid = expressions.ideaid
 									AND e.id <= expressions.id);`;
 		await this._databaseToMigrate.exec(query);
-	}
-
-	private async columnExists(tableName: string, columnName: string): Promise<boolean> {
-		const query = `
-			SELECT 1
-			FROM   pragma_table_info('${tableName}')
-			WHERE  name = '${columnName}';`;
-		return await this._databaseToMigrate.get(query) !== undefined;
 	}
 
 	private async recreateAndCopyTables() {
