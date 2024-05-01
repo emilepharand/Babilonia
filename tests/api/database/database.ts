@@ -81,17 +81,37 @@ describe('using all database versions', () => {
 
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 
+		await testNoNullGuids(databasePath.getActualPath());
+
 		await basicTests();
 
-		if (version === currentVersion) {
-			const stats = await ApiUtils.getStats();
-			const ll = await ApiUtils.fetchLanguages();
-			expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
-			expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
-			expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
-		}
+		const stats = await ApiUtils.getStats();
+		const ll = await ApiUtils.fetchLanguages();
+		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
+		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
+		expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
 	}, 30000);
 });
+
+async function testNoNullGuids(databasePath: string) {
+	let db;
+	try {
+		db = await open({
+			filename: databasePath,
+			driver: sqlite3.Database,
+		});
+		const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
+		const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
+		const languagesWithNoGuid = await db.all('SELECT * FROM languages where guid is null');
+		expect(ideasWithNoGuid).toHaveLength(0);
+		expect(expressionsWithNoGuid).toHaveLength(0);
+		expect(languagesWithNoGuid).toHaveLength(0);
+	} finally {
+		if (db) {
+			await db.close();
+		}
+	}
+}
 
 async function testDatabaseSchema(databasePath: string) {
 	let db;
