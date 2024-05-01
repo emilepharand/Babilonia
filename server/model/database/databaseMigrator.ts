@@ -47,17 +47,29 @@ export default class DatabaseMigrator {
 			await this._databaseToMigrate.run('CREATE UNIQUE INDEX "languages_guid" ON "languages" ("guid")');
 		}
 
-		let sql = '';
-		const ideas = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM ideas');
-		for (const idea of ideas) {
-			sql += `UPDATE ideas SET guid = '${idea.guid}' WHERE id = ${idea.id};\n`;
-		}
-		await this._databaseToMigrate.exec(sql);
+		await this.updateGuids();
 
 		await this.recreateAndCopyTables();
 	}
 
-	async addOrderingToExpressionTable(): Promise<void> {
+	private async updateGuids(): Promise<void> {
+		let sql = '';
+		const languages = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM languages');
+		for (const language of languages) {
+			sql += `UPDATE languages SET guid = '${language.guid}' WHERE id = ${language.id};\n`;
+		}
+		const ideas = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM ideas');
+		for (const idea of ideas) {
+			sql += `UPDATE ideas SET guid = '${idea.guid}' WHERE id = ${idea.id};\n`;
+		}
+		const expressions = await this._baseDataServiceProvider.db.all('SELECT id, guid FROM expressions');
+		for (const expression of expressions) {
+			sql += `UPDATE expressions SET guid = '${expression.guid}' WHERE id = ${expression.id};\n`;
+		}
+		await this._databaseToMigrate.exec(sql);
+	}
+
+	private async addOrderingToExpressionTable(): Promise<void> {
 		const hasOrderingColumn = await this.columnExists('expressions', 'ordering');
 		if (!hasOrderingColumn) {
 			await this._databaseToMigrate.exec('ALTER TABLE expressions ADD COLUMN ordering INTEGER DEFAULT 0;');
@@ -71,7 +83,7 @@ export default class DatabaseMigrator {
 		await this._databaseToMigrate.exec(query);
 	}
 
-	async columnExists(tableName: string, columnName: string): Promise<boolean> {
+	private async columnExists(tableName: string, columnName: string): Promise<boolean> {
 		const query = `
 			SELECT 1
 			FROM   pragma_table_info('${tableName}')
