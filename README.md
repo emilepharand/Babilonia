@@ -87,9 +87,9 @@ only supports languages using the Latin alphabet, but future releases will inclu
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
 
-You can also easily **add your own** expressions, ideas and languages.
+You can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **learn a specific set of words** or **practice a language that is not included** in the default vocabulary. You can also **remove** expressions, ideas and languages that you don't want to practice. This way, you can **customize** your learning experience to your liking.
 
-Keep in mind that while ideas and expressions in Babilonia may change in future updates, your database will remain unchanged. This means any additions, deletions, or modifications you make to the database will be preserved. However, to access new ideas and expressions, you'll need to use the new version of the database.
+Keep in mind that while modifying the included vocabulary is possible, it comes with implications for future updates. Included vocabulary may change with each release, potentially affecting your modifications. However, any content you add outside of included data will remain unaffected. Otherwise, a best-effort approach is used.
 
 ## An important caveat
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
