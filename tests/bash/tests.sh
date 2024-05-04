@@ -77,6 +77,32 @@ write_coverage() {
 }
 
 echo "------------------------------------------------------"
+echo " package.json version and version.txt match           "
+echo "------------------------------------------------------"
+
+cleanup
+go_to_root
+
+PACKAGE_VERSION=$(node -p "require('./package.json').version")
+if [[ "$PACKAGE_VERSION" != *-dev ]]; then
+  echo -e "\n\e[1;33mWARNING: The version in package.json does not end with -dev."
+  echo -e "If this is not a release version, append -dev to the version number.\e[0m"
+fi
+PACKAGE_VERSION=${PACKAGE_VERSION%-dev}
+
+CURRENT_VERSION=$(cat version.txt)
+EXPECTED_VERSION="$CURRENT_VERSION".0
+
+if [ "$PACKAGE_VERSION" != "$EXPECTED_VERSION" ]; then
+  echo "Version mismatch."
+  echo "package.json: $PACKAGE_VERSION"
+  echo "version.txt: $CURRENT_VERSION"
+  after_failure
+fi
+
+after_success
+
+echo "------------------------------------------------------"
 echo " sqlite3 is not included in production build          "
 echo " and package.json in dist includes sqlite3            "
 echo "------------------------------------------------------"
@@ -85,7 +111,10 @@ cleanup
 go_to_root
 
 # Make sure project's node_modules is not used
-mv node_modules node_modules.bak
+mv node_modules node_modules.bak || {
+  echo "mv node_modules node_modules.bak failed"
+  after_failure
+}
 
 go_to_dist
 
@@ -174,7 +203,7 @@ sleep 1
 
 write_coverage
 
-if ! grep -Fq "Invalid database path provided" "temp.txt"; then
+if ! grep -Fq "Invalid database path" "temp.txt"; then
   echo "Invalid database path error not found."
   after_failure
 fi
@@ -190,20 +219,20 @@ fi
 after_success
 
 echo "-------------------------------------------------------"
-echo " --db=db, unsupported version                          "
+echo " --db=db, old version                          "
 echo "-------------------------------------------------------"
 
 cleanup
 go_to_dist
 
-node index.cjs --db="tests/db/unsupported-version.db" >temp.txt 2>&1 &
+node index.cjs --db="tests/db/2.0.db" >temp.txt 2>&1 &
 
 sleep 1
 
 write_coverage
 
-if ! grep -Fq "Unsupported database version" "temp.txt"; then
-  echo "Unsupported database version error not found."
+if ! grep -Fq "Old database version" "temp.txt"; then
+  echo "Old database version error not found."
   after_failure
 fi
 

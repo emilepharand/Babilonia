@@ -1,30 +1,37 @@
+import console from 'console';
+import {escape} from 'entities';
 import type {Request, Response} from 'express';
+import {baseDatabasePath, databaseVersionErrorCode, memoryDatabasePath} from './const';
+import DatabaseCoordinator from './model/database/databaseCoordinator';
+import DatabaseMigrator from './model/database/databaseMigrator';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
 import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
-import {escape} from 'entities';
-import DatabaseCoordinator from './model/databaseCoordinator';
 import {databasePath} from './options';
-import {currentVersion, memoryDatabasePath} from './const';
-import console from 'console';
+import {normalizeIdea} from './utils/expressionStringUtils';
 
 // This is the contact point for the front-end and the back-end
 // Controller as in C in MVC
 // It must validate arguments before calling methods of the managers
 
-let dbCoordinator = new DatabaseCoordinator(databasePath);
-await dbCoordinator.init();
-if (!dbCoordinator.isValid) {
-	if (dbCoordinator.isValidVersion) {
-		console.error(`Invalid database path provided for --db option ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
-	} else {
-		console.error(`Unsupported database version. Current version is ${currentVersion}.`);
-	}
-	dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
+async function initDatabase(databasePath: string) {
+	let dbCoordinator = new DatabaseCoordinator(databasePath);
 	await dbCoordinator.init();
+	if (!dbCoordinator.isValid) {
+		if (dbCoordinator.isValidVersion) {
+			console.error(`Invalid database path ('${databasePath}'). Defaulting to '${memoryDatabasePath}'.`);
+		} else {
+			console.error(`Old database version. Defaulting to '${memoryDatabasePath}'. You can migrate the database through the API or UI.`);
+		}
+		dbCoordinator = new DatabaseCoordinator(memoryDatabasePath);
+		await dbCoordinator.init();
+	}
+	return dbCoordinator;
 }
+
+let dbCoordinator = await initDatabase(databasePath);
 let {dataServiceProvider} = dbCoordinator;
 
 export async function getStats(_: Request, res: Response): Promise<void> {
@@ -101,33 +108,6 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 	const returnIdea = await dataServiceProvider.ideaManager.addIdea(ideaForAdding);
 	res.status(201);
 	res.send(JSON.stringify(returnIdea));
-}
-
-function normalizeIdea(ideaForAdding: IdeaForAdding) {
-	trimExpressions(ideaForAdding);
-	normalizeWhitespace(ideaForAdding);
-	trimContext(ideaForAdding);
-}
-
-function trimExpressions(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.trim();
-	});
-	return ideaForAdding;
-}
-
-function trimContext(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s(?=\))|(?<=\()\s/g, '');
-	});
-	return ideaForAdding;
-}
-
-function normalizeWhitespace(ideaForAdding: IdeaForAdding) {
-	ideaForAdding.ee.forEach(e => {
-		e.text = e.text.replaceAll(/\s+/g, ' ');
-	});
-	return ideaForAdding;
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
@@ -236,19 +216,56 @@ export async function changeDatabase(req: Request, res: Response): Promise<void>
 		res.status(400).end();
 		return;
 	}
-	const newDbCoordinator = new DatabaseCoordinator((req.body as {path: string}).path);
-	await newDbCoordinator.init();
+	const newDbCoordinator = await changeDatabaseToPath((req.body as {path: string}).path);
 	if (!newDbCoordinator.isValidVersion) {
-		res.status(400).send(JSON.stringify({error: 'UNSUPPORTED_DATABASE_VERSION'}));
+		res.status(400).send(JSON.stringify({error: databaseVersionErrorCode}));
 		return;
 	}
 	if (!newDbCoordinator.isValid) {
 		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
 		return;
 	}
-	dataServiceProvider = newDbCoordinator.dataServiceProvider;
-	dbCoordinator = newDbCoordinator;
 	res.end();
+}
+
+async function changeDatabaseToPath(path: string) {
+	const newDbCoordinator = new DatabaseCoordinator(path);
+	await newDbCoordinator.init();
+	if (newDbCoordinator.isValid && newDbCoordinator.isValidVersion) {
+		dataServiceProvider = newDbCoordinator.dataServiceProvider;
+		dbCoordinator = newDbCoordinator;
+	}
+	return newDbCoordinator;
+}
+
+export async function migrateDatabase(req: Request, res: Response): Promise<void> {
+	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+		res.status(400).end();
+		return;
+	}
+
+	// Database to migrate
+	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
+	await dbCoordinatorForToMigrate.init();
+
+	if (!dbCoordinatorForToMigrate.isValidPath) {
+		res.status(400).send(JSON.stringify({error: 'INVALID_REQUEST'}));
+		return;
+	}
+
+	// Base database
+	const dbCoordinatorForBaseDb = new DatabaseCoordinator(baseDatabasePath);
+	await dbCoordinatorForBaseDb.init();
+
+	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
+		dbCoordinatorForBaseDb.dataServiceProvider);
+
+	await databaseMigrator.migrate();
+
+	dbCoordinator = await initDatabase((req.body as {path: string}).path);
+	({dataServiceProvider} = dbCoordinator);
+
+	res.status(200).end();
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {

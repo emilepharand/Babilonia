@@ -94,7 +94,7 @@
         Path to database
       </label>
       <i
-        title="The path to the database file. It should be a SQLite file located inside the application folder. The version must match the current application version. The database will be created if it does not exist."
+        title="The path to the database file. It should be a SQLite file located inside the application folder. The database will be created if it does not exist. You can specify `:memory:` to use an in-memory database."
         data-bs-html="true"
         data-bs-toggle="tooltip"
         data-bs-placement="right"
@@ -114,13 +114,18 @@
     >
       Save
     </button>
-    <p
-      v-if="submitted && !errorMessage"
-      id="settingsSavedText"
-      class="text-success"
+    <div
+      v-if="successMessages.length > 0 && !errorMessage"
+      id="successMessage"
     >
-      Settings saved.
-    </p>
+      <p
+        v-for="successMessage in successMessages"
+        :key="successMessage"
+        class="text-success"
+      >
+        {{ successMessage }}
+      </p>
+    </div>
     <p
       v-if="errorMessage"
       id="settingsErrorText"
@@ -128,19 +133,74 @@
     >
       {{ errorMessage }}
     </p>
+    <div
+      id="confirm-migrate-modal"
+      ref="confirmMigrateModal"
+      class="modal fade"
+      tabindex="-1"
+      aria-labelledby="confirm-migrate-modal-label"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5
+              id="confirm-migrate-modal-label"
+              class="modal-title"
+            >
+              Confirm
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            />
+          </div>
+          <div class="modal-body">
+            The database version does not match the application version.<br><br>
+            Do you want to migrate the database?<br><br>
+            <span class="alert-danger">WARNING: This may cause data loss. It is recommended to make a backup of the database before proceeding.</span>
+          </div>
+          <div class="modal-footer">
+            <button
+              id="modal-cancel-button"
+              ref="modalCancelButton"
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              id="modal-migrate-button"
+              ref="modalMigrateButton"
+              type="button"
+              class="btn btn-danger"
+              data-bs-dismiss="modal"
+              @click="migrate()"
+            >
+              Migrate
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import * as bootstrap from 'bootstrap';
 import {nextTick, ref} from 'vue';
+import {databaseVersionErrorCode} from '../../server/const';
 import {getEmptySettingsNoAsync} from '../../server/model/settings/settings';
 import * as Api from '../ts/api';
 
+const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
-const submitted = ref(false);
+const successMessages = ref(['']);
 let previousDatabasePath = '';
 
 (async () => {
@@ -152,23 +212,34 @@ let previousDatabasePath = '';
 })();
 
 async function save() {
+	successMessages.value = [];
 	const success = await changeDatabase();
 	if (success) {
 		await Api.setSettings(settings.value);
+		successMessages.value.push('Settings saved.');
 	}
-	submitted.value = true;
+}
+
+async function migrate() {
+	await Api.migrateDatabase(databasePath.value);
+	errorMessage.value = '';
+	successMessages.value.push('Migration successful.');
 }
 
 async function changeDatabase() {
 	if (databasePath.value !== previousDatabasePath || errorMessage.value) {
-		previousDatabasePath = databasePath.value;
 		const res = await Api.changeDatabase(databasePath.value);
 		if (res.status === 200) {
 			errorMessage.value = '';
-		} else if (((await res.json()).error) === 'UNSUPPORTED_DATABASE_VERSION') {
-			errorMessage.value = 'The version of the database is not supported.';
+			previousDatabasePath = databasePath.value;
+		} else if (((await res.json()).error) === databaseVersionErrorCode) {
+			successMessages.value = [];
+			new bootstrap.Modal(confirmMigrateModal.value).show();
+			await new Promise(resolve => {
+				confirmMigrateModal.value.addEventListener('hidden.bs.modal', resolve);
+			});
 		} else {
-			errorMessage.value = 'Database path could not be changed. Please check the path and try again.';
+			errorMessage.value = 'Invalid database path.';
 		}
 	}
 	return errorMessage.value === '';

@@ -1,16 +1,17 @@
-import DatabaseOpener from './databaseOpener';
-import DataServiceProvider from './dataServiceProvider';
-import fs from 'fs';
-import SettingsManager from './settings/settingsManager';
-import {currentVersion, memoryDatabasePath} from '../const';
-import {resolveAndNormalizePathUnderWorkingDirectory} from './inputValidator';
 import console from 'console';
+import fs from 'fs';
+import {currentVersion, memoryDatabasePath} from '../../const';
+import DataServiceProvider from '../dataServiceProvider';
+import {resolveAndNormalizePathUnderWorkingDirectory} from '../inputValidator';
+import SettingsManager from '../settings/settingsManager';
+import DatabaseOpener from './databaseOpener';
 
 export default class DatabaseCoordinator {
 	private _dataServiceProvider!: DataServiceProvider;
 	private _databaseOpener!: DatabaseOpener;
 	private _needsToBeInitialized!: boolean;
 	private _isValid = false;
+	private _isValidPath = false;
 	private _isValidVersion = true;
 	private _realAbsolutePath!: string | false;
 
@@ -59,6 +60,7 @@ export default class DatabaseCoordinator {
 	}
 
 	private async setValidFlags() {
+		this._isValidPath = true;
 		this._isValidVersion = await this.computeIsValidVersion();
 		this._isValid = this._isValidVersion;
 		return this._isValid;
@@ -84,7 +86,15 @@ export default class DatabaseCoordinator {
 		return this._dataServiceProvider;
 	}
 
+	get databaseOpener(): DatabaseOpener {
+		return this._databaseOpener;
+	}
+
 	get inputPath(): string {
 		return this._inputPath;
+	}
+
+	get isValidPath(): boolean {
+		return this._isValidPath;
 	}
 }

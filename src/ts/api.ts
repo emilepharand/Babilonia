@@ -4,15 +4,36 @@ import type {Language} from '../../server/model/languages/language';
 import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
-import {apiUrl} from './const';
+import {paramsFromSearchContext} from '../../server/utils/searchParams';
+
+const apiUrl = (() => {
+	const url = new URL(window.location.href);
+	url.port = process.env.VITE_API_PORT!;
+	return url.origin;
+})();
 
 async function doFetch(url: string, method: 'GET' | 'PUT' | 'POST' | 'DELETE', body?: string) {
 	return fetch(url, {method, headers: {'Content-Type': 'application/json'}, body});
 }
 
+async function doPut(url: string, body: unknown): Promise<Response> {
+	return doFetch(`${apiUrl}${url}`, 'PUT', JSON.stringify(body));
+}
+
+async function doGet(url: string): Promise<Response> {
+	return doFetch(`${apiUrl}${url}`, 'GET');
+}
+
+async function doPost(url: string, body: unknown): Promise<Response> {
+	return doFetch(`${apiUrl}${url}`, 'POST', JSON.stringify(body));
+}
+
+async function doDelete(url: string): Promise<void> {
+	await doFetch(`${apiUrl}${url}`, 'DELETE');
+}
+
 export async function getIdea(ideaId: number): Promise<Idea> {
-	const url = `${apiUrl}/ideas/${ideaId}`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet(`/ideas/${ideaId}`);
 	if (response.status === 404) {
 		return Promise.reject(new Error('Idea not found'));
 	}
@@ -23,30 +44,25 @@ export async function editIdea(
 	ideaForAdding: IdeaForAdding,
 	id: number,
 ): Promise<Idea> {
-	const url = `${apiUrl}/ideas/${id}`;
-	const response = await doFetch(url, 'PUT', JSON.stringify(ideaForAdding));
+	const response = await doPut(`/ideas/${id}`, ideaForAdding);
 	return (await response.json()) as Idea;
 }
 
 export async function deleteIdea(ideaId: number): Promise<void> {
-	const url = `${apiUrl}/ideas/${ideaId}`;
-	await doFetch(url, 'DELETE');
+	await doDelete(`/ideas/${ideaId}`);
 }
 
 export async function deleteLanguage(languageId: number): Promise<void> {
-	const url = `${apiUrl}/languages/${languageId}`;
-	await doFetch(url, 'DELETE');
+	await doDelete(`/languages/${languageId}`);
 }
 
 export async function addIdea(ifa: IdeaForAdding): Promise<Idea> {
-	const url = `${apiUrl}/ideas`;
-	const response = await doFetch(url, 'POST', JSON.stringify(ifa));
+	const response = await doPost('/ideas', ifa);
 	return (await response.json()) as Idea;
 }
 
 export async function getNextIdea(): Promise<Idea | undefined> {
-	const url = `${apiUrl}/practice-ideas/next`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet('/practice-ideas/next');
 	if (response.status === 404) {
 		return undefined;
 	}
@@ -54,73 +70,56 @@ export async function getNextIdea(): Promise<Idea | undefined> {
 }
 
 export async function addLanguage(name: string): Promise<Language> {
-	const url = `${apiUrl}/languages`;
-	const response = await doFetch(url, 'POST', JSON.stringify({name}));
+	const response = await doPost('/languages', {name});
 	return (await response.json()) as Language;
 }
 
 export async function editLanguages(
 	languages: Language[],
 ): Promise<Language[]> {
-	const url = `${apiUrl}/languages`;
-	const response = await doFetch(url, 'PUT', JSON.stringify(languages));
+	const response = await doPut('/languages', languages);
 	return (await response.json()) as Language[];
 }
 
 export async function getLanguage(id: number): Promise<Language> {
-	const url = `${apiUrl}/languages/${id}`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet(`/languages/${id}`);
 	return (await response.json()) as Language;
 }
 
 export async function getStats(): Promise<AllStats> {
-	const url = `${apiUrl}/stats`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet('/stats');
 	return (await response.json()) as AllStats;
 }
 
 export async function getLanguages(): Promise<Language[]> {
-	const url = `${apiUrl}/languages`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet('/languages');
 	return (await response.json()) as Language[];
 }
 
 export async function getSettings(): Promise<Settings> {
-	const url = `${apiUrl}/settings`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet('/settings');
 	return (await response.json()) as Settings;
 }
 
 export async function getDatabasePath(): Promise<string> {
-	const url = `${apiUrl}/database/path`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet('/database/path');
 	return (await response.json()) as string;
 }
 
 export async function changeDatabase(path: string): Promise<Response> {
-	const url = `${apiUrl}/database/path`;
-	return doFetch(url, 'PUT', JSON.stringify({path}));
+	return doPut('/database/path', {path});
+}
+
+export async function migrateDatabase(path: string): Promise<Response> {
+	return doPut('/database/migrate', {path});
 }
 
 export async function setSettings(settings: Settings): Promise<void> {
-	const url = `${apiUrl}/settings`;
-	await doFetch(url, 'PUT', JSON.stringify(settings));
+	await doPut('/settings', settings);
 }
 
 export async function searchIdeas(sc: SearchContext): Promise<Idea[]> {
 	const params = paramsFromSearchContext(sc);
-	const url = `${apiUrl}/ideas?${params}`;
-	const response = await doFetch(url, 'GET');
+	const response = await doGet(`/ideas?${params}`);
 	return (await response.json()) as Idea[];
-}
-
-export function paramsFromSearchContext(sc: SearchContext): string {
-	return [
-		sc.pattern && `pattern=${sc.pattern}`,
-		sc.strict && 'strict=true',
-		sc.language && `language=${sc.language}`,
-		sc.ideaHas && `ideaHas=${sc.ideaHas.join(',')}`,
-		sc.ideaDoesNotHave && `ideaDoesNotHave=${sc.ideaDoesNotHave}`,
-		sc.knownExpressions !== undefined && `knownExpressions=${sc.knownExpressions ? 'true' : 'false'}`,
-	].filter(Boolean).join('&');
 }

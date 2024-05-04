@@ -1,17 +1,16 @@
 import {Settings} from '../../../server/model/settings/settings';
 
+import {currentVersion, memoryDatabasePath} from '../../../server/const';
+import {getTestDatabaseVersionPath, penultimateVersion} from '../../utils/versions';
 import {apiUrl, setSettings} from '../cy-utils';
-import {memoryDatabasePath} from '../../../server/const';
-
-const db21 = 'tests/db/2.1-simple.db';
 
 describe('The settings page', () => {
 	it('Works correctly', () => {
 		setSettings({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.get('#settings-link').click();
 
@@ -22,66 +21,74 @@ describe('The settings page', () => {
 		cy.get('#databasePath').should('be.visible').should('have.value', memoryDatabasePath);
 
 		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type(db21);
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(currentVersion));
 		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('be.visible');
+		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#strictCharacters').uncheck();
-
-		cy.get('#databasePath').clear();
-		cy.get('#databasePath').type('tests/db/unsupported-version.db');
-		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('not.exist');
-		cy.get('#settingsErrorText').should('be.visible').should('contain', 'The version of the database is not supported.');
-		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
-		});
-
-		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('not.exist');
-		cy.get('#settingsErrorText').should('be.visible').should('contain', 'The version of the database is not supported.');
-		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
-		});
-
 		cy.get('#databasePath').clear();
 		cy.get('#databasePath').type('');
 		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('not.exist');
-		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Database path could not be changed. Please check the path and try again.');
+		cy.get('#successMessage').should('not.exist');
+		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Invalid database path.');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('not.exist');
-		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Database path could not be changed. Please check the path and try again.');
+		cy.get('#successMessage').should('not.exist');
+		cy.get('#settingsErrorText').should('be.visible').should('contain', 'Invalid database path.');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: true, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#databasePath').clear();
 		cy.get('#databasePath').type(memoryDatabasePath);
 		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('be.visible');
+		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#strictCharacters').uncheck();
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 
 		cy.get('#databasePath').clear();
 		cy.get('#databasePath').type(memoryDatabasePath);
 		cy.get('#saveButton').click();
-		cy.get('#settingsSavedText').should('be.visible');
+		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		assertSettingsEquals({
-			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: '2.1',
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
+
+		cy.get('#databasePath').clear();
+		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion));
+		cy.get('#saveButton').click();
+		cy.get('#settingsErrorText').should('not.exist');
+		cy.get('#confirm-migrate-modal').should('be.visible');
+		cy.get('#modal-cancel-button').should('be.visible');
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.get('#modal-cancel-button').wait(500).click();
+		cy.get('#settingsErrorText').should('not.exist');
+		cy.get('#successMessage').should('be.visible');
+		cy.get('#saveButton').click();
+		cy.get('#successMessage').should('not.exist');
+		cy.get('#settingsErrorText').should('not.exist');
+		cy.get('#confirm-migrate-modal').should('be.visible');
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.get('#modal-migrate-button').wait(500).click();
+		cy.get('#successMessage').should('be.visible')
+			.should('contain', 'Settings saved.')
+			.should('contain', 'Migration successful.');
+		assertSettingsEquals({
+			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
+		});
+		cy.reload();
+		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion));
 	});
 });
 

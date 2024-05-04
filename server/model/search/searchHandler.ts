@@ -46,6 +46,7 @@ export default class SearchHandler {
 		if (whereCondition.length > 0) {
 			query += ` where ${whereCondition.join(' and ')}`;
 		}
+		query += ' order by ideaId, e.ordering';
 		// Setting an arbitrary limit for now to prevent too large result to be returned
 		// eslint-disable-next-line no-warning-comments
 		// TODO #47
