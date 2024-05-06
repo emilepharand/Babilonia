@@ -157,7 +157,7 @@ describe('migration', () => {
 			);
 
 			UPDATE expressions
-			SET text = text || ' (App Edited)'
+			SET text = text || ' (App Context Edited)'
 			WHERE text LIKE '%App Context Edited%';
 
 			UPDATE expressions
