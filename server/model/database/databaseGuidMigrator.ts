@@ -47,6 +47,23 @@ export default class DatabaseGuidMigrator {
 		const sql = [];
 		const params = [];
 
+		const baseLanguages: Array<{guid: string; name: string}> = await this._baseDatabase.all('SELECT guid, name FROM languages');
+		const languagesToMigrate = await this._databaseToMigrate.all('SELECT id, guid FROM languages');
+		for (const languageToMigrate of languagesToMigrate) {
+			if (languageToMigrate.guid) {
+				const baseLanguage = baseLanguages.find(baseLanguage => baseLanguage.guid === languageToMigrate.guid);
+				if (baseLanguage) {
+					sql.push('UPDATE languages SET name = ? WHERE guid = ?');
+					params.push([baseLanguage.name, languageToMigrate.guid]);
+				} else {
+					sql.push('DELETE FROM expressions WHERE languageId = ?');
+					params.push([languageToMigrate.id]);
+					sql.push('DELETE FROM languages WHERE id = ?');
+					params.push([languageToMigrate.id]);
+				}
+			}
+		}
+
 		const baseExpressions: Array<{guid: string; text: string}> = await this._baseDatabase.all('SELECT guid, text FROM expressions');
 		const expressionsToMigrate = await this._databaseToMigrate.all('SELECT id, guid FROM expressions');
 		for (const expressionToMigrate of expressionsToMigrate) {
@@ -67,27 +84,16 @@ export default class DatabaseGuidMigrator {
 		for (const ideaToMigrate of ideasToMigrate) {
 			if (ideaToMigrate.guid) {
 				if (!baseIdeas.find(baseIdea => baseIdea.guid === ideaToMigrate.guid)) {
+					sql.push('DELETE FROM expressions WHERE ideaId = ?');
+					params.push([ideaToMigrate.id]);
 					sql.push('DELETE FROM ideas WHERE id = ?');
 					params.push([ideaToMigrate.id]);
 				}
 			}
 		}
 
-		const baseLanguages: Array<{guid: string; name: string}> = await this._baseDatabase.all('SELECT guid, name FROM languages');
-		const languagesToMigrate = await this._databaseToMigrate.all('SELECT id, guid FROM languages');
-		for (const languageToMigrate of languagesToMigrate) {
-			if (languageToMigrate.guid) {
-				const baseLanguage = baseLanguages.find(baseLanguage => baseLanguage.guid === languageToMigrate.guid);
-				if (baseLanguage) {
-					sql.push('UPDATE languages SET name = ? WHERE guid = ?');
-					params.push([baseLanguage.name, languageToMigrate.guid]);
-				} else {
-					sql.push('DELETE FROM languages WHERE id = ?');
-					params.push([languageToMigrate.id]);
-				}
-			}
-		}
 		for (let i = 0; i < sql.length; i++) {
+			console.log('About to run this sql: ', sql[i], params[i]);
 			// eslint-disable-next-line no-await-in-loop
 			await this._databaseToMigrate.run(sql[i], params[i]);
 		}
