@@ -87,9 +87,9 @@ only supports languages using the Latin alphabet, but future releases will inclu
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
 
-You can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **learn a specific set of words** or **practice a language that is not included** in the default vocabulary. You can also **remove** expressions, ideas and languages that you don't want to practice. This way, you can **customize** your learning experience to your liking.
+You can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **practice a language that is not included** in the default vocabulary or if you want to **add your own words** to practice.
 
-Keep in mind that while modifying the included vocabulary is possible, it comes with implications for future updates. Included vocabulary may change with each release, potentially affecting your modifications. However, any content you add outside of included data will remain unaffected. Otherwise, a best-effort approach is used.
+Also, while modifying and deleting included words is possible, it comes with implications for future updates. Included vocabulary may change with each release, potentially overwriting your modifications. However, any new content you add will remain unaffected. In any case, make sure to always back up your data before updating the application.
 
 ## An important caveat
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
