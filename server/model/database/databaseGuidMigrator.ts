@@ -93,7 +93,6 @@ export default class DatabaseGuidMigrator {
 		}
 
 		for (let i = 0; i < sql.length; i++) {
-			console.log('About to run this sql: ', sql[i], params[i]);
 			// eslint-disable-next-line no-await-in-loop
 			await this._databaseToMigrate.run(sql[i], params[i]);
 		}
