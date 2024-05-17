@@ -29,7 +29,51 @@ describe('migration', () => {
 			const languages = await languageManager.getLanguages();
 			expect(languages).toHaveLength(7);
 
-			expect(languages.map(l => l.name)).toEqual(['No Change', 'App Edited - App Edited', 'User Edited', 'App And User Edited - App Edited', 'User Deleted', 'User Added', 'App Added']);
+			const expectedLanguageNames = [
+				'No Change',
+				'App Edited - App Edited',
+				'User Edited',
+				'App And User Edited - App Edited',
+				'User Deleted',
+				'User Added',
+				'App Added',
+			];
+			expect(languages.map(l => l.name)).toEqual(expectedLanguageNames);
+
+			const ideas = await ideaManager.getIdeas();
+			expect(ideas).toHaveLength(6);
+
+			const prefix = 'App';
+			const languageNoChange = languages[0];
+			const languageAppEdited = languages[1];
+			const languageUserEdited = languages[2];
+			const languageAppAndUserEdited = languages[3];
+			const languageUserDeleted = languages[4];
+			const languageUserAdded = languages[5];
+			const languageAppAdded = languages[6];
+
+			expect(getIdeaForAddingFromIdea(ideas[0]).ee.map(e => ({text: e.text, languageId: e.languageId}))).toEqual([
+				{text: 'App And User No Change', languageId: languageNoChange.id},
+				{text: 'App Context Edited Expression (App Context Edited)', languageId: languageNoChange.id},
+				{text: 'User Context Edited Expression', languageId: languageNoChange.id},
+				{text: 'App And User Context Edited Expression (App Context Edited)', languageId: languageNoChange.id},
+				{text: 'App Edited Expression - App Edited', languageId: languageNoChange.id},
+				{text: 'User Edited Expression - User Edited', languageId: languageNoChange.id},
+				{text: 'User Edited Expression', languageId: languageNoChange.id},
+				{text: 'App And User Edited Expression - User Edited', languageId: languageNoChange.id},
+				{text: 'App And User Edited Expression - App Edited', languageId: languageNoChange.id},
+				{text: 'User Deleted Expression', languageId: languageNoChange.id},
+				{text: 'User Added Expression Language No Change', languageId: languageNoChange.id},
+				{text: 'App Added Expression Language No Change', languageId: languageNoChange.id},
+				{text: 'Language App Edited', languageId: languageAppEdited.id},
+				{text: 'Language User Edited', languageId: languageUserEdited.id},
+				{text: 'Language App And User Edited', languageId: languageAppAndUserEdited.id},
+				{text: 'User Deleted Language', languageId: languageUserDeleted.id},
+				{text: 'User Added Expression User Added Language', languageId: languageUserAdded.id},
+				{text: 'App Added Expression App Added Language', languageId: languageAppAdded.id},
+			]);
+
+			expect(getIdeaForAddingFromIdea(ideas[1]).ee.map(e => ({text: e.text, languageId: e.languageId}))).toEqual([]);
 		} finally {
 			if (userDb) {
 				await userDb.close();
@@ -73,19 +117,20 @@ async function setUp(previousDbPath: string, userDbPath: string, currentDbPath: 
 		const editedIdea = getIdeaForAddingFromIdea(ideaFirst!);
 		editedIdea.ee[3].text = `App And User Context Edited Expression (${prefix} Context Edited)`;
 		editedIdea.ee[6].text = `App And User Edited Expression - ${prefix} Edited`;
-		editedIdea.ee.splice(10, 1);
+		let indexToDelete = editedIdea.ee.indexOf(editedIdea.ee.find(e => e.text === 'App And User Deleted Expression')!);
+		editedIdea.ee.splice(indexToDelete, 1);
+		indexToDelete = editedIdea.ee.indexOf(editedIdea.ee.find(e => e.text === `${prefix} Deleted Expression`)!);
+		editedIdea.ee.splice(indexToDelete, 1);
 		if (prefix === 'App') {
-			editedIdea.ee.push({languageId: languageNoChange!.id, text: 'App Added Expession Language No Change'});
-			editedIdea.ee.push({languageId: languageAppAdded!.id, text: 'App Added Expession App Added Language'});
+			editedIdea.ee.push({languageId: languageNoChange!.id, text: 'App Added Expression Language No Change'});
+			editedIdea.ee.push({languageId: languageAppAdded!.id, text: 'App Added Expression App Added Language'});
 			editedIdea.ee[1].text = 'App Context Edited Expression (App Context Edited)';
 			editedIdea.ee[4].text = 'App Edited Expression - App Edited';
-			editedIdea.ee.splice(8, 1);
 		} else {
-			editedIdea.ee.push({languageId: languageNoChange!.id, text: 'Added Expession Language No Change'});
-			editedIdea.ee.push({languageId: languageUserAdded!.id, text: 'Added Expession User Added Language'});
+			editedIdea.ee.push({languageId: languageNoChange!.id, text: 'User Added Expression Language No Change'});
+			editedIdea.ee.push({languageId: languageUserAdded!.id, text: 'User Added Expression User Added Language'});
 			editedIdea.ee[2].text = 'User Context Edited Expression (User Context Edited)';
 			editedIdea.ee[5].text = 'User Edited Expression - User Edited';
-			editedIdea.ee.splice(9, 1);
 		}
 		await ideaManager.editIdea(editedIdea, ideaFirst!.id);
 	}
@@ -134,8 +179,8 @@ async function setUp(previousDbPath: string, userDbPath: string, currentDbPath: 
 				{text: 'User Deleted Language', languageId: languageUserDeleted.id},
 				{text: 'App And User Deleted Language', languageId: languageAppAndUserDeleted.id}],
 		});
-		await ideaManager.addIdea({ee: [{text: 'App Deleted Language', languageId: 3}]});
-		await ideaManager.addIdea({ee: [{text: 'User Deleted Language', languageId: 3}]});
+		await ideaManager.addIdea({ee: [{text: 'App Deleted Language', languageId: languageAppDeleted.id}]});
+		await ideaManager.addIdea({ee: [{text: 'User Deleted Language', languageId: languageUserDeleted.id}]});
 		ideaAppDeleted = await ideaManager.addIdea({ee: [{text: 'App Deleted Idea', languageId: 1}]});
 		ideaUserDeleted = await ideaManager.addIdea({ee: [{text: 'User Deleted Idea', languageId: 1}]});
 
@@ -150,9 +195,9 @@ async function setUp(previousDbPath: string, userDbPath: string, currentDbPath: 
 		await commonAddIdea(ideaManager, prefix);
 		await commonEditIdea(ideaManager, prefix);
 		await ideaManager.deleteIdea(ideaAppDeleted!.id);
-		const languages = await commonEditLanguages(languageManager, prefix);
 		await languageManager.deleteLanguage(languageAppDeleted!.id);
 		await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
+		const languages = await commonEditLanguages(languageManager, prefix);
 		await addGuids(currentDb);
 	}
 
