@@ -60,6 +60,8 @@ export default class DatabaseGuidMigrator {
 					params.push([languageToMigrate.id]);
 					sql.push('DELETE FROM languages WHERE id = ?');
 					params.push([languageToMigrate.id]);
+					sql.push('DELETE FROM ideas WHERE id NOT IN (SELECT DISTINCT ideaId FROM expressions)');
+					params.push([]);
 				}
 			}
 		}
