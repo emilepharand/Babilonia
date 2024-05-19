@@ -5,6 +5,7 @@ import {Database} from 'sqlite';
 import DatabaseGuidMigrator from '../../server/model/database/databaseGuidMigrator';
 import {clearDatabaseAndCreateSchema} from '../../server/model/database/databaseInitializer';
 import {openDatabase} from '../../server/model/database/databaseUtils';
+import {Idea} from '../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import IdeaManager from '../../server/model/ideas/ideaManager';
 import LanguageManager from '../../server/model/languages/languageManager';
@@ -41,9 +42,8 @@ describe('migration', () => {
 			expect(languages.map(l => l.name)).toEqual(expectedLanguageNames);
 
 			const ideas = await ideaManager.getIdeas();
-			expect(ideas).toHaveLength(6);
+			expect(ideas).toHaveLength(5);
 
-			const prefix = 'App';
 			const languageNoChange = languages[0];
 			const languageAppEdited = languages[1];
 			const languageUserEdited = languages[2];
@@ -52,7 +52,9 @@ describe('migration', () => {
 			const languageUserAdded = languages[5];
 			const languageAppAdded = languages[6];
 
-			expect(getIdeaForAddingFromIdea(ideas[0]).ee.map(e => ({text: e.text, languageId: e.languageId}))).toEqual([
+			const getSimpleIdeaForTesting = (idea: Idea) => getIdeaForAddingFromIdea(idea).ee.map(e => ({text: e.text, languageId: e.languageId}));
+
+			expect(getSimpleIdeaForTesting(ideas[0])).toEqual([
 				{text: 'App And User No Change', languageId: languageNoChange.id},
 				{text: 'App Context Edited Expression (App Context Edited)', languageId: languageNoChange.id},
 				{text: 'User Context Edited Expression', languageId: languageNoChange.id},
@@ -73,7 +75,32 @@ describe('migration', () => {
 				{text: 'App Added Expression App Added Language', languageId: languageAppAdded.id},
 			]);
 
-			expect(getIdeaForAddingFromIdea(ideas[1]).ee.map(e => ({text: e.text, languageId: e.languageId}))).toEqual([]);
+			expect(getSimpleIdeaForTesting(ideas[1])).toEqual([
+				{text: 'User Deleted Language', languageId: languageUserDeleted!.id},
+			]);
+
+			let prefix = 'User';
+			expect(getSimpleIdeaForTesting(ideas[2])).toEqual([
+				{text: `${prefix} Added Idea Language No Change`, languageId: languageNoChange!.id},
+				{text: `${prefix} Added Idea Language App Edited`, languageId: languageAppEdited!.id},
+				{text: `${prefix} Added Idea Language User Edited`, languageId: languageUserEdited!.id},
+				{text: `${prefix} Added Idea Language App And User Edited`, languageId: languageAppAndUserEdited!.id},
+				{text: `${prefix} Added Idea ${prefix} Added Language`, languageId: languageUserAdded!.id},
+			]);
+
+			expect(getSimpleIdeaForTesting(ideas[3])).toEqual([
+				{text: 'User Deleted Idea', languageId: languageNoChange!.id},
+			]);
+
+			prefix = 'App';
+			expect(getSimpleIdeaForTesting(ideas[4])).toEqual([
+				{text: `${prefix} Added Idea Language No Change`, languageId: languageNoChange!.id},
+				{text: `${prefix} Added Idea Language App Edited`, languageId: languageAppEdited!.id},
+				{text: `${prefix} Added Idea Language User Edited`, languageId: languageUserEdited!.id},
+				{text: `${prefix} Added Idea Language App And User Edited`, languageId: languageAppAndUserEdited!.id},
+				{text: `${prefix} Added Idea User Deleted Language`, languageId: languageUserDeleted!.id},
+				{text: `${prefix} Added Idea ${prefix} Added Language`, languageId: languageAppAdded!.id},
+			]);
 		} finally {
 			if (userDb) {
 				await userDb.close();
@@ -110,7 +137,7 @@ async function setUp(previousDbPath: string, userDbPath: string, currentDbPath: 
 				{text: `${prefix} Added Idea App Deleted Language`, languageId: languageAppDeleted!.id},
 				{text: `${prefix} Added Idea User Deleted Language`, languageId: languageUserDeleted!.id},
 				{text: `${prefix} Added Idea App And User Deleted Language`, languageId: languageAppAndUserDeleted!.id},
-				{text: `${prefix} Added Idea App Added Language`, languageId: languageAppAdded!.id}],
+				{text: `${prefix} Added Idea ${prefix} Added Language`, languageId: prefix === 'App' ? languageAppAdded!.id : languageUserAdded!.id}],
 		});
 	}
 	async function commonEditIdea(ideaManager: IdeaManager, prefix: string) {
