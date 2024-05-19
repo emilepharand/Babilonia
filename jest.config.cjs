@@ -2,7 +2,7 @@
 module.exports = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  "testMatch": ["<rootDir>/tests/api/**/*.ts"],
+  "testMatch": ["<rootDir>/tests/(migration|api)/**/*.ts"],
   "testPathIgnorePatterns": ["utils.ts"],
   "extensionsToTreatAsEsm": [".ts"],
   moduleNameMapper: {
@@ -23,6 +23,6 @@ module.exports = {
       },
     ],
   },
-    testSequencer: './tests/api/testSequencer.cjs',
-    bail: true,
+  testSequencer: './tests/api/testSequencer.cjs',
+  bail: true,
 };
