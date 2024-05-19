@@ -89,7 +89,7 @@ As of version 2.1, the application comes with a set of **2751 expressions** and 
 
 You can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **practice a language that is not included** in the default vocabulary or if you want to **add your own words** to practice.
 
-Also, while modifying and deleting included words is possible, it comes with implications for future updates. Included vocabulary may change with each release, potentially overwriting your modifications. However, any new content you add will remain unaffected. In any case, make sure to always back up your data before updating the application.
+Keep in mind that while modifying included content is possible, it comes with an important caveat. As the application's content grows and evolves, the included vocabulary changes over time. That means that any modifications you make to the included vocabulary may be overwritten by future releases when updating your database. When you choose to modify the application's content, migrating to a newer version of the application is done using a best-effort approach. As a general rule, any new ideas and languages you add will not be affected. In any case, it is always highly recommended to **back up your data** before updating the application.
 
 ## An important caveat
 **Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
