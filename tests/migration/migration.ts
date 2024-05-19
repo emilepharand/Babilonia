@@ -278,7 +278,7 @@ async function migrateDatabase(userDbPath: string, currentDbPath: string) {
 	try {
 		userDb = await openDatabase(userDbPath);
 		currentDb = await openDatabase(currentDbPath);
-		const dbGuidMigrator = new DatabaseGuidMigrator(userDb, currentDb);
+		const dbGuidMigrator = new DatabaseGuidMigrator(userDb, currentDb, {language: 0, idea: 0, expression: 0});
 		await dbGuidMigrator.migrateGuids();
 	} finally {
 		if (userDb) {

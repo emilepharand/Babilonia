@@ -4,7 +4,7 @@ import {columnExists} from './databaseUtils';
 export default class DatabaseGuidMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
 		private readonly _baseDatabase: Database,
-		private readonly _maximumsIdForSimpleGuidUpdate: {language: number; idea: number; expression: number} = {language: 0, idea: 0, expression: 0}) {
+		private readonly _maximumsIdForSimpleGuidUpdate: {language: number; idea: number; expression: number} = {expression: 3146, idea: 523, language: 5}) {
 	}
 
 	async migrateGuids(): Promise<void> {
