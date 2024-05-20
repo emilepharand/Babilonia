@@ -1,6 +1,6 @@
 import type {Database} from 'sqlite';
-import type {Language} from './language';
 import {type Manager} from '../manager';
+import type {Language} from './language';
 
 // Manages languages: getting, adding, editing, deleting and the logic around those actions
 // Arguments are assumed to be valid
@@ -21,15 +21,14 @@ export default class LanguageManager implements Manager {
 	}
 
 	async deleteLanguage(languageId: number): Promise<void> {
-		// eslint-disable-next-line no-warning-comments
-		// TODO ordering when unique is enforced: (Issue #76)
 		const l = await this.getLanguage(languageId);
 		await this.db.run(
 			'update languages set ordering = case when ordering > ? then ordering - 1 else ordering END',
 			l.ordering,
 		);
-		await this.db.run('delete from languages where id = ?', languageId);
 		await this.db.run('delete from expressions where languageId = ?', languageId);
+		await this.db.run('delete from languages where id = ?', languageId);
+		await this.db.run('delete from ideas where not exists (select 1 from expressions where ideas.id = expressions.ideaId)');
 	}
 
 	public async addLanguage(name: string): Promise<Language> {
