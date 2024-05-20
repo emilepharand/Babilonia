@@ -40,14 +40,14 @@ describe('migration', () => {
 });
 
 async function setUpData(previousDbPath: string, userDbPath: string, currentDbPath: string) {
-	await openAndFillDatabase(previousDbPath, fillPreviousDb);
+	await openAndFillDatabase(previousDbPath, fillDatabasePreviousVersion);
 	fs.copyFileSync(previousDbPath, userDbPath);
 	fs.copyFileSync(previousDbPath, currentDbPath);
-	await openAndFillDatabase(currentDbPath, fillCurrentDb);
-	await openAndFillDatabase(userDbPath, fillUserDb);
+	await openAndFillDatabase(currentDbPath, fillCurrentVersionDatabase);
+	await openAndFillDatabase(userDbPath, fillUserDatabase);
 }
 
-async function openAndFillDatabase(path: string, fillFunction: Function) {
+async function openAndFillDatabase(path: string, fillFunction: (db: Database) => Promise<void>) {
 	let db;
 	try {
 		db = await openDatabase(path);
@@ -80,14 +80,14 @@ async function commonEditIdea(ideaManager: IdeaManager, prefix: string) {
 	const editExpressionByText = (text: string, newText: string) => {
 		editedIdea.ee.find(e => e.text === text)!.text = newText;
 	};
-	editedIdea.ee[3].text = `App And User Context Edited Expression (${prefix} Context Edited)`;
-	editedIdea.ee[6].text = `App And User Edited Expression - ${prefix} Edited`;
-	removeExpressionByText('App And User Deleted Expression');
-	removeExpressionByText(`${prefix} Deleted Expression`);
-	editedIdea.ee.push({languageId: languageNoChange!.id, text: `${prefix} Added Expression Language No Change`});
-	editedIdea.ee.push({languageId: languageAppAdded!.id, text: `${prefix} Added Expression ${prefix} Added Language`});
+	editExpressionByText('App And User Context Edited Expression', `App And User Context Edited Expression (${prefix} Context Edited)`);
+	editExpressionByText('App And User Edited Expression', `App And User Edited Expression - ${prefix} Edited`);
 	editExpressionByText(`${prefix} Context Edited Expression`, `${prefix} Context Edited Expression (${prefix} Context Edited)`);
 	editExpressionByText(`${prefix} Edited Expression`, `${prefix} Edited Expression - ${prefix} Edited`);
+	removeExpressionByText('App And User Deleted Expression');
+	removeExpressionByText(`${prefix} Deleted Expression`);
+	editedIdea.ee.push({text: `${prefix} Added Expression Language No Change`, languageId: languageNoChange!.id});
+	editedIdea.ee.push({text: `${prefix} Added Expression ${prefix} Added Language`, languageId: prefix === 'App' ? languageAppAdded!.id : languageUserAdded!.id});
 	await ideaManager.editIdea(editedIdea, ideaFirst!.id);
 }
 
@@ -103,7 +103,7 @@ async function commonEditLanguages(languageManager: LanguageManager, prefix: str
 	await languageManager.editLanguages(languages);
 }
 
-async function fillPreviousDb(previousDb: Database) {
+async function fillDatabasePreviousVersion(previousDb: Database) {
 	await clearDatabaseAndCreateSchema(previousDb);
 
 	const languageManager = new LanguageManager(previousDb);
@@ -137,37 +137,41 @@ async function fillPreviousDb(previousDb: Database) {
 	});
 	await ideaManager.addIdea({ee: [{text: 'App Deleted Language', languageId: languageAppDeleted.id}]});
 	await ideaManager.addIdea({ee: [{text: 'User Deleted Language', languageId: languageUserDeleted.id}]});
-	ideaAppDeleted = await ideaManager.addIdea({ee: [{text: 'App Deleted Idea', languageId: 1}]});
-	ideaUserDeleted = await ideaManager.addIdea({ee: [{text: 'User Deleted Idea', languageId: 1}]});
+	ideaAppDeleted = await ideaManager.addIdea({ee: [{text: 'App Deleted Idea', languageId: languageNoChange.id}]});
+	ideaUserDeleted = await ideaManager.addIdea({ee: [{text: 'User Deleted Idea', languageId: languageNoChange.id}]});
 
 	await addGuids(previousDb);
 }
 
-async function fillCurrentDb(currentDb: Database) {
-	const languageManager = new LanguageManager(currentDb);
-	const ideaManager = new IdeaManager(currentDb, languageManager);
-	const prefix = 'App';
-	languageAppAdded = await languageManager.addLanguage(`${prefix} Added`);
-	await commonAddIdea(ideaManager, prefix);
-	await commonEditIdea(ideaManager, prefix);
-	await ideaManager.deleteIdea(ideaAppDeleted!.id);
-	await languageManager.deleteLanguage(languageAppDeleted!.id);
-	await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
-	const languages = await commonEditLanguages(languageManager, prefix);
+async function fillCurrentVersionDatabase(currentDb: Database) {
+	await commonUpdateCurrentAndUserDatabase(currentDb, 'App');
 	await addGuids(currentDb);
 }
 
-async function fillUserDb(userDb: Database) {
-	const languageManager = new LanguageManager(userDb);
-	const ideaManager = new IdeaManager(userDb, languageManager);
-	const prefix = 'User';
-	languageUserAdded = await languageManager.addLanguage(`${prefix} Added`);
+async function fillUserDatabase(userDb: Database) {
+	await commonUpdateCurrentAndUserDatabase(userDb, 'User');
+}
+
+async function commonUpdateCurrentAndUserDatabase(db: Database, prefix: string) {
+	const languageManager = new LanguageManager(db);
+	const ideaManager = new IdeaManager(db, languageManager);
+	if (prefix === 'App') {
+		languageAppAdded = await languageManager.addLanguage(`${prefix} Added`);
+	} else {
+		languageUserAdded = await languageManager.addLanguage(`${prefix} Added`);
+	}
 	await commonAddIdea(ideaManager, prefix);
 	await commonEditIdea(ideaManager, prefix);
-	await ideaManager.deleteIdea(ideaUserDeleted!.id);
 	await commonEditLanguages(languageManager, prefix);
-	await languageManager.deleteLanguage(languageUserDeleted!.id);
-	await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
+	if (prefix === 'App') {
+		await ideaManager.deleteIdea(ideaAppDeleted!.id);
+		await languageManager.deleteLanguage(languageAppDeleted!.id);
+		await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
+	} else {
+		await ideaManager.deleteIdea(ideaUserDeleted!.id);
+		await languageManager.deleteLanguage(languageUserDeleted!.id);
+		await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
+	}
 }
 
 async function addGuids(db: Database) {
