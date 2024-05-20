@@ -27,8 +27,8 @@ export default class LanguageManager implements Manager {
 			l.ordering,
 		);
 		await this.db.run('delete from expressions where languageId = ?', languageId);
-		await this.db.run('delete from languages where id = ?', languageId);
 		await this.db.run('delete from ideas where not exists (select 1 from expressions where ideas.id = expressions.ideaId)');
+		await this.db.run('delete from languages where id = ?', languageId);
 	}
 
 	public async addLanguage(name: string): Promise<Language> {
