@@ -26,10 +26,10 @@ jobs:
           files: tests/coverage/merged/cobertura-coverage.xml
           verbose: true
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: server log
           path: dist/log.txt
-          if: always()
   test-release:
     runs-on: ubuntu-latest
     steps:
