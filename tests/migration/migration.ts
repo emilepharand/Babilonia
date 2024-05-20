@@ -254,17 +254,17 @@ async function performAssertions(userDbPath: string) {
 			{text: 'App Added Expression App Added Language', languageId: languageAppAdded.id},
 		]);
 
-		expect(getSimpleIdeaForTesting(ideas[1])).toEqual([
-			{text: 'User Deleted Language', languageId: languageUserDeleted!.id},
-		]);
-
 		let prefix = 'User';
-		expect(getSimpleIdeaForTesting(ideas[2])).toEqual([
+		expect(getSimpleIdeaForTesting(ideas[1])).toEqual([
 			{text: `${prefix} Added Idea Language No Change`, languageId: languageNoChange!.id},
 			{text: `${prefix} Added Idea Language App Edited`, languageId: languageAppEdited!.id},
 			{text: `${prefix} Added Idea Language User Edited`, languageId: languageUserEdited!.id},
 			{text: `${prefix} Added Idea Language App And User Edited`, languageId: languageAppAndUserEdited!.id},
 			{text: `${prefix} Added Idea ${prefix} Added Language`, languageId: languageUserAdded!.id},
+		]);
+
+		expect(getSimpleIdeaForTesting(ideas[2])).toEqual([
+			{text: 'User Deleted Language', languageId: languageUserDeleted!.id},
 		]);
 
 		expect(getSimpleIdeaForTesting(ideas[3])).toEqual([
