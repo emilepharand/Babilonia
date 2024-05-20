@@ -276,36 +276,6 @@ describe('deleting languages', () => {
 		expect(idea2.ee[2].text).toEqual(e7.text);
 	});
 
-	test('deleting should delete all expressions of that language', async () => {
-		const l1: Language = await ApiUtils.addLanguage('language 1');
-		const l2: Language = await ApiUtils.addLanguage('language 2');
-		const l3: Language = await ApiUtils.addLanguage('language 3');
-
-		const e1: ExpressionForAdding = {text: 'e1', languageId: l1.id};
-		const e2: ExpressionForAdding = {text: 'e2', languageId: l2.id};
-		const e3: ExpressionForAdding = {text: 'e3', languageId: l3.id};
-		const e4: ExpressionForAdding = {text: 'e4', languageId: l3.id};
-		await ApiUtils.addIdea({ee: [e1, e2, e3, e4]});
-
-		const e5: ExpressionForAdding = {text: 'e5', languageId: l1.id};
-		const e6: ExpressionForAdding = {text: 'e6', languageId: l2.id};
-		const e7: ExpressionForAdding = {text: 'e7', languageId: l2.id};
-		const e8: ExpressionForAdding = {text: 'e8', languageId: l3.id};
-		await ApiUtils.addIdea({ee: [e5, e6, e7, e8]});
-
-		await ApiUtils.deleteLanguage(l3.id);
-
-		const idea1 = await ApiUtils.fetchIdea(1);
-		expect(idea1.ee.length).toEqual(2);
-		expect(idea1.ee[0].text).toEqual(e1.text);
-		expect(idea1.ee[1].text).toEqual(e2.text);
-		const idea2 = await ApiUtils.fetchIdea(2);
-		expect(idea2.ee.length).toEqual(3);
-		expect(idea2.ee[0].text).toEqual(e5.text);
-		expect(idea2.ee[1].text).toEqual(e6.text);
-		expect(idea2.ee[2].text).toEqual(e7.text);
-	});
-
 	test('deleting should delete empty ideas', async () => {
 		const l: Language = await ApiUtils.addLanguage('language 1');
 		const e: ExpressionForAdding = {text: 'e1', languageId: l.id};
