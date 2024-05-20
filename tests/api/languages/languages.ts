@@ -275,6 +275,14 @@ describe('deleting languages', () => {
 		expect(idea2.ee[1].text).toEqual(e6.text);
 		expect(idea2.ee[2].text).toEqual(e7.text);
 	});
+
+	test('deleting should delete empty ideas', async () => {
+		const l: Language = await ApiUtils.addLanguage('language 1');
+		const e: ExpressionForAdding = {text: 'e1', languageId: l.id};
+		const idea = await ApiUtils.addIdea({ee: [e]});
+		await ApiUtils.deleteLanguage(l.id);
+		expect((await FetchUtils.fetchIdea(idea.id)).status).toEqual(404);
+	});
 });
 
 describe('deleting invalid languages', () => {
