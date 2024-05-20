@@ -31,6 +31,7 @@ export default class LanguageManager implements Manager {
 		await this.db.run('delete from expressions where languageId = ?', languageId);
 		await this.db.run('delete from languages where id = ?', languageId);
 
+		// eslint-disable-next-line no-warning-comments
 		// TODO empty ideas should be deleted
 	}
 
