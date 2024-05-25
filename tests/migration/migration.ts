@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-
 import fs from 'fs';
 import {Database} from 'sqlite';
 import DatabaseGuidMigrator from '../../server/model/database/databaseGuidMigrator';
@@ -47,7 +45,7 @@ async function setUpData(previousDbPath: string, userDbPath: string, currentDbPa
 	await openAndFillDatabase(userDbPath, fillUserDatabase);
 }
 
-async function openAndFillDatabase(path: string, fillFunction: (db: Database) => Promise<void>) {
+async function openAndFillDatabase(path: string, fillFunction: (_: Database) => Promise<void>) {
 	let db;
 	try {
 		db = await openDatabase(path);
@@ -153,9 +151,10 @@ async function fillUserDatabase(userDb: Database) {
 }
 
 async function commonUpdateCurrentAndUserDatabase(db: Database, prefix: string) {
+	const isApp = prefix === 'App';
 	const languageManager = new LanguageManager(db);
 	const ideaManager = new IdeaManager(db, languageManager);
-	if (prefix === 'App') {
+	if (isApp) {
 		languageAppAdded = await languageManager.addLanguage(`${prefix} Added`);
 	} else {
 		languageUserAdded = await languageManager.addLanguage(`${prefix} Added`);
@@ -163,15 +162,9 @@ async function commonUpdateCurrentAndUserDatabase(db: Database, prefix: string) 
 	await commonAddIdea(ideaManager, prefix);
 	await commonEditIdea(ideaManager, prefix);
 	await commonEditLanguages(languageManager, prefix);
-	if (prefix === 'App') {
-		await ideaManager.deleteIdea(ideaAppDeleted!.id);
-		await languageManager.deleteLanguage(languageAppDeleted!.id);
-		await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
-	} else {
-		await ideaManager.deleteIdea(ideaUserDeleted!.id);
-		await languageManager.deleteLanguage(languageUserDeleted!.id);
-		await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
-	}
+	await ideaManager.deleteIdea(isApp ? ideaAppDeleted!.id : ideaUserDeleted!.id);
+	await languageManager.deleteLanguage(isApp ? languageAppDeleted!.id : languageUserDeleted!.id);
+	await languageManager.deleteLanguage(languageAppAndUserDeleted!.id);
 }
 
 async function addGuids(db: Database) {
@@ -206,19 +199,7 @@ async function performAssertions(userDbPath: string) {
 		const languageManager = new LanguageManager(userDb);
 		const ideaManager = new IdeaManager(userDb, languageManager);
 
-		const languages = await languageManager.getLanguages();
-		expect(languages).toHaveLength(7);
-
-		const expectedLanguageNames = [
-			'No Change',
-			'App Edited - App Edited',
-			'User Edited',
-			'App And User Edited - App Edited',
-			'User Deleted',
-			'User Added',
-			'App Added',
-		];
-		expect(languages.map(l => l.name)).toEqual(expectedLanguageNames);
+		const languages = await assertLanguages(languageManager);
 
 		const ideas = await ideaManager.getIdeas();
 		expect(ideas).toHaveLength(5);
@@ -285,4 +266,17 @@ async function performAssertions(userDbPath: string) {
 			await userDb.close();
 		}
 	}
+}
+async function assertLanguages(languageManager: LanguageManager) {
+	const languages = await languageManager.getLanguages();
+	expect(languages).toHaveLength(7);
+	const expectedLanguageNames = ['No Change',
+		'App Edited - App Edited',
+		'User Edited',
+		'App And User Edited - App Edited',
+		'User Deleted',
+		'User Added',
+		'App Added'];
+	expect(languages.map(l => l.name)).toEqual(expectedLanguageNames);
+	return languages;
 }
