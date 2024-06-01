@@ -21,9 +21,12 @@ export default class DatabaseMigrator {
 
 			await this.migrateVersion22();
 
+			await this.addGuids();
+
 			await this.recreateAndCopyTables();
 
 			await this._databaseToMigrate.exec('COMMIT;');
+
 			console.log('Migration complete.');
 		} catch (error) {
 			console.error('Error migrating database:', error);
@@ -32,14 +35,9 @@ export default class DatabaseMigrator {
 		}
 	}
 
-	async migrateVersion22(): Promise<void> {
+	private async migrateVersion22(): Promise<void> {
 		await this.addOrderingToExpressionTable();
-		await this.addGuids();
-	}
-
-	async addGuids(): Promise<void> {
-		const guidMigrator = new DatabaseGUIDMigrator(this._databaseToMigrate, this._baseDataServiceProvider.db);
-		await guidMigrator.migrateGuids();
+		await this.createGuidColumns();
 	}
 
 	private async addOrderingToExpressionTable(): Promise<void> {
@@ -54,6 +52,25 @@ export default class DatabaseMigrator {
 							WHERE  e.ideaid = expressions.ideaid
 									AND e.id <= expressions.id);`;
 		await this._databaseToMigrate.exec(query);
+	}
+
+	private async addGuids(): Promise<void> {
+		const guidMigrator = new DatabaseGUIDMigrator(this._databaseToMigrate, this._baseDataServiceProvider.db);
+		await guidMigrator.migrateGuids();
+	}
+
+	private async createGuidColumns() {
+		const promises = [];
+		for (const table of ['ideas', 'expressions', 'languages']) {
+			// eslint-disable-next-line no-await-in-loop
+			if (!(await columnExists(this._databaseToMigrate, table, 'guid'))) {
+				promises.push(this._databaseToMigrate.run(`
+					ALTER TABLE ${table} ADD COLUMN guid TEXT;
+					CREATE UNIQUE INDEX "${table}_guid" ON "${table}" ("guid");
+				`));
+			}
+		}
+		await Promise.all(promises);
 	}
 
 	private async recreateAndCopyTables() {

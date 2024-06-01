@@ -1,5 +1,4 @@
 import type {Database} from 'sqlite';
-import {columnExists} from './databaseUtils';
 
 export default class DatabaseGuidMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
@@ -8,24 +7,9 @@ export default class DatabaseGuidMigrator {
 	}
 
 	async migrateGuids(): Promise<void> {
-		await this.createColumns();
 		await this.updateGuidsForOldIds();
 		await this.updateContent();
 		await this.insertContent();
-	}
-
-	private async createColumns() {
-		const promises = [];
-		for (const table of ['ideas', 'expressions', 'languages']) {
-			// eslint-disable-next-line no-await-in-loop
-			if (!(await columnExists(this._databaseToMigrate, table, 'guid'))) {
-				promises.push(this._databaseToMigrate.run(`
-					ALTER TABLE ${table} ADD COLUMN guid TEXT;
-					CREATE UNIQUE INDEX "${table}_guid" ON "${table}" ("guid");
-				`));
-			}
-		}
-		await Promise.all(promises);
 	}
 
 	private async updateGuidsForOldIds(): Promise<void> {
