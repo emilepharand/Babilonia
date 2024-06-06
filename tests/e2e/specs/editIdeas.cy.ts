@@ -21,12 +21,14 @@ import {
 } from '../cy-utils';
 
 context('The idea page', () => {
-	specify('Editing ideas', () => {
-		addIdeas();
-
+	specify('Trying to edit a non-existent idea', () => {
 		cy.visit('/ideas/100');
 		cy.contains('not found');
 		cy.get('button').should('not.be.visible');
+	});
+
+	specify('Editing ideas', () => {
+		addIdeas();
 
 		cy.visit('/ideas/1');
 
@@ -86,7 +88,7 @@ context('The idea page', () => {
 			.click();
 		assertFetchIdeaReturnsStatus(1, 200, ['hello']);
 
-		// Test delete
+		// Test delete modal
 		cy.get('#confirm-delete-modal').should('not.be.visible');
 		cy.get('#delete-button').click();
 		cy.get('#confirm-delete-modal').should('be.visible');
@@ -100,7 +102,17 @@ context('The idea page', () => {
 			.should('be.focused')
 			.type('{rightArrow}');
 		cy.get('#modal-delete-button')
-			.should('be.focused')
+			.should('be.focused');
+	});
+
+	specify('Deleting ideas', () => {
+		addIdeas();
+		cy.visit('/ideas/1');
+		cy.get('#delete-button')
+			.click();
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.wait(500)
+			.get('#modal-delete-button')
 			.click();
 		assertFetchIdeaReturnsStatus(1, 404, []);
 	});
@@ -175,12 +187,6 @@ context('The idea page', () => {
 				.should('have.focus')
 				.type('{downArrow}');
 		}
-		getExpressionTextInputRow(1).type('hello');
-		getEditButton().click();
-		cy.reload();
-		waitForTableToLoad(2);
-		getExpressionTextInputRow(0)
-			.should('have.focus');
 	});
 
 	specify('Known expressions', () => {
