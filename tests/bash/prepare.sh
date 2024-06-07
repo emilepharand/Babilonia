@@ -9,4 +9,5 @@ cp db/base.db "dist/tests/db/$CURRENT_VERSION.db"
 cp tests/db/* dist/tests/db
 
 cp "dist/tests/db/$CURRENT_VERSION.db" dist/tests/db/unwriteable.db
+cp "dist/tests/db/2.0.db" dist/tests/db/spare-2.0.db
 chmod 000 dist/tests/db/unwriteable.db

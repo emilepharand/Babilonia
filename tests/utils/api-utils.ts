@@ -1,13 +1,13 @@
-import * as fetchUtils from './fetch-utils';
+import {Response} from 'node-fetch';
+import {memoryDatabasePath} from '../../server/const';
+import {Idea} from '../../server/model/ideas/idea';
 import {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import {Language} from '../../server/model/languages/language';
 import {SearchContext} from '../../server/model/search/searchContext';
 import {Settings} from '../../server/model/settings/settings';
-import {Idea} from '../../server/model/ideas/idea';
-import {getRandomString, settingsFromPartial} from './utils';
 import {AllStats} from '../../server/stats/statsCounter';
-import {Response} from 'node-fetch';
-import {memoryDatabasePath} from '../../server/const';
+import * as fetchUtils from './fetch-utils';
+import {getRandomString, settingsFromPartial} from './utils';
 
 async function fetchAndConvert<T>(fetchMethod: (..._args: any[]) => Promise<Response>, ..._args: any[]): Promise<T> {
 	const response = await fetchMethod(..._args);
@@ -30,8 +30,8 @@ export async function changeDatabase(path: string) {
 	return fetchUtils.changeDatabase(path);
 }
 
-export async function migrateDatabase(path: string) {
-	return fetchUtils.migrateDatabase(path);
+export async function migrateDatabase(path: string, noContentUpdate: boolean = false) {
+	return fetchUtils.migrateDatabase(path, noContentUpdate);
 }
 
 export async function changeDatabaseToMemoryAndDeleteEverything(): Promise<Response> {

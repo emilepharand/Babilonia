@@ -76,12 +76,9 @@ describe('using all database versions', () => {
 
 		testDatabaseSchema(databasePath.getActualPath());
 
-		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
-		await changeDatabaseAndCheck(databasePath.getPathToProvide(), 200, databasePath.getPathToProvide());
-
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 
-		await testNoNullGuids(databasePath.getActualPath());
+		await testAllGuidsDefined(databasePath.getActualPath());
 
 		await basicTests();
 
@@ -90,22 +87,54 @@ describe('using all database versions', () => {
 		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
 		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
 		expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
+
+		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
+		await changeDatabaseAndCheck(databasePath.getPathToProvide(), 200, databasePath.getPathToProvide());
 	}, 30000);
 });
 
-async function testNoNullGuids(databasePath: string) {
+describe('updating without content update', () => {
+	test('async', async () => {
+		const databasePath = getTestDatabaseVersionPath('spare-2.0');
+		await ApiUtils.migrateDatabase(databasePath.getPathToProvide(), true);
+		await testNoGuidsDefined(databasePath.getActualPath());
+		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
+		testDatabaseSchema(databasePath.getActualPath());
+		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
+		await basicTests();
+	});
+});
+
+async function testAllGuidsDefined(databasePath: string) {
+	await testAllGuidsDefinedOrNot(databasePath, true);
+}
+
+async function testNoGuidsDefined(databasePath: string) {
+	await testAllGuidsDefinedOrNot(databasePath, false);
+}
+
+async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) {
 	let db;
 	try {
 		db = await open({
 			filename: databasePath,
 			driver: sqlite3.Database,
 		});
-		const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
-		const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
-		const languagesWithNoGuid = await db.all('SELECT * FROM languages where guid is null');
-		expect(ideasWithNoGuid).toHaveLength(0);
-		expect(expressionsWithNoGuid).toHaveLength(0);
-		expect(languagesWithNoGuid).toHaveLength(0);
+		if (defined) {
+			const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
+			const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
+			const languagesWithNoGuid = await db.all('SELECT * FROM languages where guid is null');
+			expect(ideasWithNoGuid).toHaveLength(0);
+			expect(expressionsWithNoGuid).toHaveLength(0);
+			expect(languagesWithNoGuid).toHaveLength(0);
+		} else {
+			const ideasWithGuid = await db.all('SELECT * FROM ideas where guid is not null');
+			const expressionsWithGuid = await db.all('SELECT * FROM expressions where guid is not null');
+			const languagesWithGuid = await db.all('SELECT * FROM languages where guid is not null');
+			expect(ideasWithGuid).toHaveLength(0);
+			expect(expressionsWithGuid).toHaveLength(0);
+			expect(languagesWithGuid).toHaveLength(0);
+		}
 	} finally {
 		if (db) {
 			await db.close();
