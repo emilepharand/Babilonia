@@ -148,7 +148,7 @@
               id="confirm-migrate-modal-label"
               class="modal-title"
             >
-              Confirm
+              Update Required
             </h5>
             <button
               type="button"
@@ -158,9 +158,30 @@
             />
           </div>
           <div class="modal-body">
-            The database version does not match the application version.<br><br>
-            Do you want to migrate the database?<br><br>
+            The database version does not match the current version of the application. The database needs to be updated to be compatible with the current version.<br><br>
+            Do you want to update the database?<br><br>
             <span class="alert-danger">WARNING: This may cause data loss. It is <b>highly</b> recommended to make a backup of the database before proceeding.</span>
+            <br><br>
+            <h5>What will happen to your data</h5>
+            If you did not add or modify any languages, ideas, or expressions, the migration process will be seamless, and everything will be updated as expected.
+            <br><br>
+            If you did, the migration process will attempt to merge your changes with the updated vocabulary in the newer version. In most cases, conflicts are resolved gracefully, and your content is preserved. However, due to the complexity of the migration process, not all conflicts may be resolved, which may lead to data loss or inconsistencies. That's why it is important to make a backup of the database before proceeding.
+            <br><br>
+            If you wish, you can also choose the option "Do not import or update content". If you select this option, the database will only be updated for compatibility with the current version, while keeping all of the existing content unchanged. However, you will not benefit from the updated vocabulary.
+            <br><br>
+            <div class="form-check">
+              <input
+                id="noContentUpdate"
+                v-model="noContentUpdate"
+                class="form-check-input"
+                type="checkbox"
+              >
+              <label
+                class="form-check-label"
+                for="noContentUpdate"
+              />
+              Do not import or update content
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -180,7 +201,7 @@
               data-bs-dismiss="modal"
               @click="migrate()"
             >
-              Migrate
+              Update database
             </button>
           </div>
         </div>
@@ -201,6 +222,7 @@ const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
 const successMessages = ref(['']);
+const noContentUpdate = ref(false);
 let previousDatabasePath = '';
 
 (async () => {
@@ -221,7 +243,7 @@ async function save() {
 }
 
 async function migrate() {
-	const migrateResponse = await Api.migrateDatabase(databasePath.value);
+	const migrateResponse = await Api.migrateDatabase(databasePath.value, noContentUpdate.value);
 	if (migrateResponse.status === 200) {
 		errorMessage.value = '';
 		successMessages.value.push('Migration successful.');
