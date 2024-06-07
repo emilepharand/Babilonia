@@ -1,13 +1,13 @@
 import Ajv from 'ajv';
+import fs from 'fs';
+import path from 'path';
 import type {ExpressionForAdding} from './ideas/expression';
 import type {IdeaForAdding} from './ideas/ideaForAdding';
 import {validateSchema as validateIdeaForAddingSchema} from './ideas/ideaForAdding';
 import type {Language} from './languages/language';
-import {validate as validateLanguage, validateForAdding} from './languages/language';
+import {validateForAdding, validate as validateLanguage} from './languages/language';
 import type LanguageManager from './languages/languageManager';
 import {validateSchema as validateSettingsSchema} from './settings/settings';
-import path from 'path';
-import fs from 'fs';
 
 // Validates input received by the controller
 export default class InputValidator {
@@ -104,16 +104,34 @@ export default class InputValidator {
 	}
 
 	public validateChangeDatabase(pathObject: unknown) {
-		return validateDatabaseSchema(pathObject);
+		return validateChangeDatabaseSchema(pathObject);
+	}
+
+	public validateMigrateDatabase(migrateObject: unknown) {
+		return validateMigrateDatabaseSchema(migrateObject);
 	}
 }
 
-export function validateDatabaseSchema(pathObject: unknown) {
+export function validateChangeDatabaseSchema(pathObject: unknown) {
 	const ajv = new Ajv();
 	const schema = {
 		type: 'object',
 		properties: {
 			path: {type: 'string'},
+		},
+		required: ['path'],
+		additionalProperties: false,
+	};
+	return ajv.compile(schema)(pathObject);
+}
+
+export function validateMigrateDatabaseSchema(pathObject: unknown) {
+	const ajv = new Ajv();
+	const schema = {
+		type: 'object',
+		properties: {
+			path: {type: 'string'},
+			noContentUpdate: {type: 'boolean'},
 		},
 		required: ['path'],
 		additionalProperties: false,

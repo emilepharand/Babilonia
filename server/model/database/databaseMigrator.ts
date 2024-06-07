@@ -10,7 +10,7 @@ export default class DatabaseMigrator {
 		private readonly _baseDataServiceProvider: DataServiceProvider) {
 	}
 
-	async migrate(): Promise<void> {
+	async migrate(noContentUpdate = false): Promise<void> {
 		try {
 			const currentVersion = await this._baseDataServiceProvider.settingsManager.getVersion();
 			console.log(`Migrating database to version ${currentVersion}...`);
@@ -21,7 +21,9 @@ export default class DatabaseMigrator {
 
 			await this.migrateVersion22();
 
-			await this.addGuids();
+			if (!noContentUpdate) {
+				await this.migrateGuids();
+			}
 
 			await this.recreateAndCopyTables();
 
@@ -54,7 +56,7 @@ export default class DatabaseMigrator {
 		await this._databaseToMigrate.exec(query);
 	}
 
-	private async addGuids(): Promise<void> {
+	private async migrateGuids(): Promise<void> {
 		const guidMigrator = new DatabaseGUIDMigrator(this._databaseToMigrate, this._baseDataServiceProvider.db);
 		await guidMigrator.migrateGuids();
 	}

@@ -239,13 +239,16 @@ async function changeDatabaseToPath(path: string) {
 }
 
 export async function migrateDatabase(req: Request, res: Response): Promise<void> {
-	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+	if (!dataServiceProvider.inputValidator.validateMigrateDatabase(req.body)) {
 		res.status(400).end();
 		return;
 	}
 
+	const {path} = (req.body as {path: string});
+	const {noContentUpdate} = (req.body as {noContentUpdate: boolean});
+
 	// Database to migrate
-	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
+	const dbCoordinatorForToMigrate = new DatabaseCoordinator(path);
 	await dbCoordinatorForToMigrate.init();
 
 	if (!dbCoordinatorForToMigrate.isValidPath) {
@@ -261,7 +264,7 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 		const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
 			dbCoordinatorForBaseDb.dataServiceProvider);
 
-		await databaseMigrator.migrate();
+		await databaseMigrator.migrate(noContentUpdate);
 
 		dbCoordinator = await initDatabase((req.body as {path: string}).path);
 		({dataServiceProvider} = dbCoordinator);
