@@ -16,13 +16,16 @@ export default class DatabaseGuidMigrator {
 		let sql = '';
 		const tables = ['languages', 'ideas', 'expressions'];
 		const maximums = [this._maximumsIdForSimpleGuidUpdate.language, this._maximumsIdForSimpleGuidUpdate.idea, this._maximumsIdForSimpleGuidUpdate.expression];
-		for (const [index, table] of tables.entries()) {
-			// eslint-disable-next-line no-await-in-loop
-			const rows = await this._baseDatabase.all(`SELECT id, guid FROM ${table} WHERE id <= ${maximums[index]}`);
-			for (const row of rows) {
-				sql += `UPDATE ${table} SET guid = '${row.guid}' WHERE id = ${row.id};\n`;
-			}
-		}
+
+		const promises = tables.map(async (table, index) =>
+			this._baseDatabase.all(`SELECT id, guid FROM ${table} WHERE id <= ${maximums[index]}`)
+				.then(rows => {
+					for (const row of rows) {
+						sql += `UPDATE ${table} SET guid = '${row.guid}' WHERE id = ${row.id};\n`;
+					}
+				}),
+		);
+		await Promise.all(promises);
 		await this._databaseToMigrate.exec(sql);
 	}
 
