@@ -57,6 +57,8 @@ Two interesting and helpful concepts that Babilonia uses are `ideas` and `expres
 ### Ideas are universal
 The concept of ideas is that words in one language are **grouped** with words in other languages **that express the same idea**.
 
+To put it another way, an idea is a **group of words** in different languages that convey the **same meaning**.
+
 While dictionaries organize vocabulary **by words**, Babilonia organizes vocabulary **by ideas**. There are as many ideas as there are **meanings** for a word.
 
 For example, in English, you `play` music like you `play` a sport. Spanish conveys those two meanings with two different words: `tocar` and `jugar`. While an English-Spanish dictionary would list those two words under `to play`, Babilonia views them as **two separate ideas**. Learners practice them separately as they *are* two distinct entities.
@@ -87,14 +89,14 @@ only supports languages using the Latin alphabet, but future releases will inclu
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
 
-You can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **practice a language that is not included** in the default vocabulary or if you want to **add your own words** to practice.
+In addition to that, you can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **practice a language that is not included** in the default vocabulary or if you want to **add your own words** to practice.
 
-Keep in mind that while modifying included content is possible, it comes with an important caveat. As the application's content grows and evolves, the included vocabulary changes over time. That means that any modifications you make to the included vocabulary may be overwritten by future releases when updating your database.
-When you choose to modify the application's content, migrating to a newer version of the application is done using a best-effort approach. As a general rule, any new ideas and languages you add will not be affected. In any case, it is always highly recommended to **back up your data** before updating the application.
+Simply keep in mind that while modifying included content is possible, it does come with an important caveat. As the application's content **grows and evolves** over time, the included vocabulary gets updated. That means that any modifications you make to the included vocabulary **may be overwritten** by future releases when updating your database.
 
-## An important caveat
-**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
-is the single most important aspect of learning languages, which unlocks a world of possibilities.
+When you choose to modify the application's content, migrating to a newer version of the application is done using a best-effort approach. As a general rule, **any new ideas and languages you add will not be affected**. You also have the option to not update your vocabulary when updating the application. In any case, it is always highly recommended to **back up your data** before updating the application.
+
+## Why Babilonia?
+We created Babilonia because we believe that acquiring vocabulary is the **single most important** aspect of learning languages. Without words, you can't express your thoughts, understand others, or even learn grammar. That being said, obviously, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
 
 ## How to use
 
