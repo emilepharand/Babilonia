@@ -12,7 +12,9 @@ export class TestDatabasePath {
 	}
 
 	getPathToProvide() {
-		if (process.env.TEST_DEV) {
+		// eslint-disable-next-line no-undef
+		if ((process.env.JEST_WORKER_ID === undefined && Cypress && Cypress.config('isInteractive'))
+				|| process.env.TEST_DEV) {
 			return this.getActualPath();
 		}
 		return this.fromDist;
