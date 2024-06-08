@@ -1,6 +1,4 @@
 import fs from 'fs';
-import {open} from 'sqlite';
-import sqlite3 from 'sqlite3';
 import {
 	currentVersion,
 	databaseVersionErrorCode,
@@ -10,6 +8,7 @@ import {
 	minimumExpectedLanguages,
 } from '../../../server/const';
 import {getSchemaQueries} from '../../../server/model/database/databaseInitializer';
+import {openDatabase} from '../../../server/model/database/databaseUtils';
 import * as ApiUtils from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {
@@ -119,10 +118,7 @@ export async function testNoGuidsDefined(databasePath: string) {
 async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) {
 	let db;
 	try {
-		db = await open({
-			filename: databasePath,
-			driver: sqlite3.Database,
-		});
+		db = await openDatabase(databasePath);
 		if (defined) {
 			const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
 			const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
@@ -148,10 +144,7 @@ async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) 
 async function testDatabaseSchema(databasePath: string) {
 	let db;
 	try {
-		db = await open({
-			filename: databasePath,
-			driver: sqlite3.Database,
-		});
+		db = await openDatabase(databasePath);
 
 		let schema = (await db.all('SELECT * FROM sqlite_master'))
 			.filter((s: any) => s.type === 'table' && !s.name.startsWith('sqlite'))

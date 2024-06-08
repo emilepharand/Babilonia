@@ -1,9 +1,9 @@
-import type { Database } from 'sqlite';
+import type {Database} from 'sqlite';
 import type DataServiceProvider from '../dataServiceProvider';
-import { version } from '../settings/settingsManager';
+import {version} from '../settings/settingsManager';
 import DatabaseGUIDMigrator from './databaseGuidMigrator';
-import { getCreateExpressionsTableQuery, getCreateIdeasTableQuery, getCreateLanguagesTableQuery } from './databaseInitializer';
-import { columnExists } from './databaseUtils';
+import {getCreateExpressionsTableQuery, getCreateIdeasTableQuery, getCreateLanguagesTableQuery} from './databaseInitializer';
+import {columnExists} from './databaseUtils';
 
 export default class DatabaseMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
