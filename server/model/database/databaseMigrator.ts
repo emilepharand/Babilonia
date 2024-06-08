@@ -1,9 +1,9 @@
-import type {Database} from 'sqlite';
+import type { Database } from 'sqlite';
 import type DataServiceProvider from '../dataServiceProvider';
-import {version} from '../settings/settingsManager';
+import { version } from '../settings/settingsManager';
 import DatabaseGUIDMigrator from './databaseGuidMigrator';
-import {getExpressionsTableQuery, getIdeasTableQuery, getLanguagesTableQuery} from './databaseInitializer';
-import {columnExists} from './databaseUtils';
+import { getCreateExpressionsTableQuery, getCreateIdeasTableQuery, getCreateLanguagesTableQuery } from './databaseInitializer';
+import { columnExists } from './databaseUtils';
 
 export default class DatabaseMigrator {
 	constructor(private readonly _databaseToMigrate: Database,
@@ -90,9 +90,9 @@ export default class DatabaseMigrator {
 		await this.renameTable(ideas, tempIdeas);
 		await this.renameTable(expressions, tempExpressions);
 
-		await this._databaseToMigrate.run(getLanguagesTableQuery());
-		await this._databaseToMigrate.run(getIdeasTableQuery());
-		await this._databaseToMigrate.run(getExpressionsTableQuery());
+		await this._databaseToMigrate.run(getCreateLanguagesTableQuery());
+		await this._databaseToMigrate.run(getCreateIdeasTableQuery());
+		await this._databaseToMigrate.run(getCreateExpressionsTableQuery());
 
 		await this.copyTable(tempLanguages, languages);
 		await this.copyTable(tempIdeas, ideas);

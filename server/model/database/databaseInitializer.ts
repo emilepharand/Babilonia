@@ -12,20 +12,14 @@ export async function clearDatabaseAndCreateSchema(db: Database) {
 
 export function getSchemaQueries() {
 	const queries = [];
-	queries.push(getLanguagesTableQuery());
-	queries.push(getIdeasTableQuery());
-	queries.push(getExpressionsTableQuery());
-	queries.push(getSettingsTableQuery());
+	queries.push(getCreateLanguagesTableQuery());
+	queries.push(getCreateIdeasTableQuery());
+	queries.push(getCreateExpressionsTableQuery());
+	queries.push(getCreateSettingsTableQuery());
 	return queries;
 }
 
-export function getIdeasTableQuery() {
-	return `CREATE TABLE "ideas" (
-        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
-        "guid" TEXT UNIQUE)`;
-}
-
-export function getLanguagesTableQuery() {
+export function getCreateLanguagesTableQuery() {
 	return `CREATE TABLE "languages" (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
         "name" TEXT NOT NULL,
@@ -35,7 +29,13 @@ export function getLanguagesTableQuery() {
     )`;
 }
 
-export function getExpressionsTableQuery() {
+export function getCreateIdeasTableQuery() {
+	return `CREATE TABLE "ideas" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+        "guid" TEXT UNIQUE)`;
+}
+
+export function getCreateExpressionsTableQuery() {
 	return `CREATE TABLE "expressions" (
         "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
         "ideaId" INTEGER NOT NULL,
@@ -49,7 +49,7 @@ export function getExpressionsTableQuery() {
     )`;
 }
 
-function getSettingsTableQuery() {
+function getCreateSettingsTableQuery() {
 	return `CREATE TABLE "settings" (
         "name" TEXT NOT NULL UNIQUE,
         "value" TEXT
