@@ -7,7 +7,7 @@ import {Idea} from '../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import IdeaManager from '../../server/model/ideas/ideaManager';
 import LanguageManager from '../../server/model/languages/languageManager';
-import {TestDatabasePath} from '../../tests/utils/versions';
+import {TestDatabasePath} from '../utils/versions';
 
 let languageNoChange;
 let languageAppEdited;
