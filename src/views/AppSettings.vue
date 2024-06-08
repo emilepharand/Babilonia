@@ -142,7 +142,7 @@
       aria-labelledby="confirm-migrate-modal-label"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5
@@ -166,7 +166,7 @@
             <h5>What will happen to your data</h5>
             If you did not add or modify any languages, ideas, or expressions, the migration process will be seamless, and everything will be updated as expected.
             <br><br>
-            If you did, the migration process will attempt to merge your changes with the updated vocabulary in the newer version. In most cases, conflicts are resolved gracefully, and your content is preserved. However, not all conflicts can be resolved, which may lead to data loss or inconsistencies. That's why it is important to make a backup of the database before proceeding.
+            If you did, the migration process will attempt to merge your changes with the updated vocabulary in the newer version. In many cases, conflicts are resolved gracefully, and your content is preserved. However, not all conflicts can be resolved, which may lead to data loss or inconsistencies. That's why it is important to make a backup of the database before proceeding.
             <br><br>
             If you wish, you can also choose the option "Do not import or update content". If you select this option, the database will only be updated for compatibility with the current version, while keeping all of the existing content unchanged. However, you will not benefit from the updated vocabulary.
             <br><br>
