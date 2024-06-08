@@ -87,8 +87,6 @@ describe('The settings page', () => {
 		cy.get('#databasePath').type(getTestDatabaseVersionPath(penultimateVersion).getPathToProvide());
 		cy.get('#saveButton').click();
 		cy.get('#settingsErrorText').should('not.exist');
-		cy.get('#confirm-migrate-modal').should('be.visible');
-		cy.get('#modal-cancel-button').should('be.visible');
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
 		cy.get('#modal-cancel-button').wait(500).click();
 		cy.get('#settingsErrorText').should('not.exist');
@@ -97,16 +95,38 @@ describe('The settings page', () => {
 		cy.get('#successMessage').should('not.exist');
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#confirm-migrate-modal').should('be.visible');
+
+		cy.intercept('database/migrate').as('migrate');
+
 		// eslint-disable-next-line cypress/no-unnecessary-waiting
 		cy.get('#modal-migrate-button').wait(500).click();
 		cy.get('#successMessage').should('be.visible')
 			.should('contain', 'Settings saved.')
 			.should('contain', 'Migration successful.');
+
+		cy.wait('@migrate').its('request.body').should('include', {noContentUpdate: false});
+
 		assertSettingsEquals({
 			randomPractice: true, strictCharacters: false, practiceOnlyNotKnown: false, passiveMode: false, version: currentVersion,
 		});
 		cy.reload();
 		cy.get('#databasePath').should('have.value', getTestDatabaseVersionPath(penultimateVersion).getPathToProvide());
+	});
+
+	it('Migration with no content update', () => {
+		cy.get('#settings-link').click();
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.get('#databasePath').wait(1000).clear();
+		cy.get('#databasePath').type(getTestDatabaseVersionPath('another-2.0').getPathToProvide());
+		cy.get('#saveButton').click();
+
+		cy.intercept('database/migrate').as('migrate');
+
+		// eslint-disable-next-line cypress/no-unnecessary-waiting
+		cy.get('#noContentUpdate').wait(500).click();
+		cy.get('#modal-migrate-button').click();
+
+		cy.wait('@migrate').its('request.body').should('include', {noContentUpdate: true});
 	});
 });
 
