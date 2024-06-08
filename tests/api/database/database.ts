@@ -94,22 +94,25 @@ describe('using all database versions', () => {
 });
 
 describe('updating without content update', () => {
-	test('async', async () => {
-		const databasePath = getTestDatabaseVersionPath('spare-2.0');
+	test('updating without content update', async () => {
+		const databasePath = getTestDatabaseVersionPath('another-2.0');
 		await ApiUtils.migrateDatabase(databasePath.getPathToProvide(), true);
 		await testNoGuidsDefined(databasePath.getActualPath());
 		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
 		testDatabaseSchema(databasePath.getActualPath());
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
+		const stats = await ApiUtils.getStats();
+		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThan(0);
+		expect(stats.globalStats.totalIdeasCount).toBeGreaterThan(0);
 		await basicTests();
 	});
 });
 
-async function testAllGuidsDefined(databasePath: string) {
+export async function testAllGuidsDefined(databasePath: string) {
 	await testAllGuidsDefinedOrNot(databasePath, true);
 }
 
-async function testNoGuidsDefined(databasePath: string) {
+export async function testNoGuidsDefined(databasePath: string) {
 	await testAllGuidsDefinedOrNot(databasePath, false);
 }
 
