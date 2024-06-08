@@ -105,6 +105,7 @@
         v-model="databasePath"
         class="form-control"
         type="text"
+        @keyup.enter="save()"
       >
     </div>
     <button
