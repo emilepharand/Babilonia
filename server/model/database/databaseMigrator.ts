@@ -10,7 +10,7 @@ export default class DatabaseMigrator {
 		private readonly _baseDataServiceProvider: DataServiceProvider) {
 	}
 
-	async migrate(noContentUpdate = false): Promise<void> {
+	async migrate(noContentUpdate: boolean) {
 		try {
 			const currentVersion = await this._baseDataServiceProvider.settingsManager.getVersion();
 			console.log(`Migrating database to version ${currentVersion}...`);
