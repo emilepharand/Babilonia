@@ -66,7 +66,7 @@ describe('The settings page', () => {
 
 		cy.get('#databasePath').clear();
 		cy.get('#databasePath').type(memoryDatabasePath);
-		cy.get('#saveButton').click();
+		cy.get('#databasePath').type('{enter}');
 		cy.get('#successMessage').should('be.visible');
 		cy.get('#settingsErrorText').should('not.exist');
 		cy.get('#strictCharacters').uncheck();
