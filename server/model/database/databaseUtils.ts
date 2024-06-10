@@ -10,10 +10,12 @@ export async function columnExists(db: Database, tableName: string, columnName: 
 }
 
 export async function openDatabase(path: string) {
+	console.log('Opening database at ', path);
 	const db = await open({
 		filename: path,
 		driver: sqlite3.Database,
 	});
 	await db.exec('PRAGMA foreign_keys = ON');
+	console.log('Database successfully opened.');
 	return db;
 }
