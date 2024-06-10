@@ -111,7 +111,7 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
-	if (!await validateIdeaIdInRequest(req, res)) {
+	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
 	const idea = await dataServiceProvider.ideaManager.getIdea(parseInt(req.params.id, 10));
@@ -194,7 +194,7 @@ export async function setSettings(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const settings = req.body as Settings;
-	if (await dataServiceProvider.settingsManager.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
+	if ((await dataServiceProvider.settingsManager.isPracticeOnlyNotKnown()) !== settings.practiceOnlyNotKnown) {
 		// Reset practice manager because practiceable ideas may change after changing this setting
 		dataServiceProvider.practiceManager.clear();
 	}
@@ -271,6 +271,7 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 
 		res.status(200).end();
 	} catch (error) {
+		console.error('Migration error:', error);
 		res.status(400).send(JSON.stringify({error: 'MIGRATION_ERROR'}));
 	}
 }
