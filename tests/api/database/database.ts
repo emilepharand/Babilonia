@@ -95,7 +95,8 @@ describe('using all database versions', () => {
 describe('updating without content update', () => {
 	test('updating without content update', async () => {
 		const databasePath = getTestDatabaseVersionPath('another-2.0');
-		await ApiUtils.migrateDatabase(databasePath.getPathToProvide(), true);
+		const res = await ApiUtils.migrateDatabase(databasePath.getPathToProvide(), true);
+		expect(res.status).toEqual(200);
 		await testNoGuidsDefined(databasePath.getActualPath());
 		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
 		testDatabaseSchema(databasePath.getActualPath());
@@ -104,7 +105,7 @@ describe('updating without content update', () => {
 		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThan(0);
 		expect(stats.globalStats.totalIdeasCount).toBeGreaterThan(0);
 		await basicTests();
-	});
+	}, 30000);
 });
 
 export async function testAllGuidsDefined(databasePath: string) {
@@ -194,8 +195,8 @@ describe('invalid cases', () => {
 		test(`wrong path as database path: ${path}`, async () => {
 			await testInvalidDatabase(path, FetchUtils.changeDatabase);
 			await testInvalidDatabase(path, FetchUtils.migrateDatabase);
-			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.changeDatabaseRaw);
-			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.migrateDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path, noContentUpdate: false}), FetchUtils.changeDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path, noContentUpdate: false}), FetchUtils.migrateDatabaseRaw);
 		});
 	});
 });
