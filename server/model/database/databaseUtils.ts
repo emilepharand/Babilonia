@@ -1,5 +1,4 @@
-import {open, type Database} from 'sqlite';
-import sqlite3 from 'sqlite3';
+import {type Database} from 'sqlite';
 
 export async function columnExists(db: Database, tableName: string, columnName: string): Promise<boolean> {
 	const query = `
@@ -7,15 +6,4 @@ export async function columnExists(db: Database, tableName: string, columnName: 
         FROM   pragma_table_info('${tableName}')
         WHERE  name = '${columnName}';`;
 	return await db.get(query) !== undefined;
-}
-
-export async function openDatabase(path: string) {
-	console.log('Opening database at ', path);
-	const db = await open({
-		filename: path,
-		driver: sqlite3.Database,
-	});
-	await db.exec('PRAGMA foreign_keys = ON');
-	console.log('Database successfully opened.');
-	return db;
 }

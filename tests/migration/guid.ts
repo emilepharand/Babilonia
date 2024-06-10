@@ -1,8 +1,8 @@
 import fs from 'fs';
 import {Database} from 'sqlite';
 import DatabaseGuidMigrator from '../../server/model/database/databaseGuidMigrator';
+import DatabaseHandler from '../../server/model/database/databaseHandler';
 import {clearDatabaseAndCreateSchema} from '../../server/model/database/databaseInitializer';
-import {openDatabase} from '../../server/model/database/databaseUtils';
 import {Idea} from '../../server/model/ideas/idea';
 import {getIdeaForAddingFromIdea} from '../../server/model/ideas/ideaForAdding';
 import IdeaManager from '../../server/model/ideas/ideaManager';
@@ -46,14 +46,12 @@ async function setUpData(previousDbPath: string, userDbPath: string, currentDbPa
 }
 
 async function openAndFillDatabase(path: string, fillFunction: (_: Database) => Promise<void>) {
-	let db;
+	const dbHandler = new DatabaseHandler(path);
 	try {
-		db = await openDatabase(path);
+		const db = await dbHandler.open();
 		await fillFunction(db);
 	} finally {
-		if (db) {
-			await db.close();
-		}
+		await dbHandler.close();
 	}
 }
 
@@ -175,27 +173,23 @@ async function addGuids(db: Database) {
 }
 
 async function migrate(userDbPath: string, currentDbPath: string) {
-	let userDb;
-	let currentDb;
+	const currentDbHandler = new DatabaseHandler(currentDbPath);
+	const userDbHandler = new DatabaseHandler(userDbPath);
 	try {
-		userDb = await openDatabase(userDbPath);
-		currentDb = await openDatabase(currentDbPath);
+		const userDb = await userDbHandler.open();
+		const currentDb = await currentDbHandler.open();
 		const dbGuidMigrator = new DatabaseGuidMigrator(userDb, currentDb, {language: 0, idea: 0, expression: 0});
 		await dbGuidMigrator.migrateGuids();
 	} finally {
-		if (userDb) {
-			await userDb.close();
-		}
-		if (currentDb) {
-			await currentDb.close();
-		}
+		currentDbHandler.close();
+		userDbHandler.close();
 	}
 }
 
 async function performAssertions(userDbPath: string) {
-	let userDb;
+	const userDbHandler = new DatabaseHandler(userDbPath);
 	try {
-		userDb = await openDatabase(userDbPath);
+		const userDb = await userDbHandler.open();
 		const languageManager = new LanguageManager(userDb);
 		const ideaManager = new IdeaManager(userDb, languageManager);
 
@@ -262,9 +256,7 @@ async function performAssertions(userDbPath: string) {
 			{text: `${prefix} Added Idea ${prefix} Added Language`, languageId: languageAppAdded!.id},
 		]);
 	} finally {
-		if (userDb) {
-			await userDb.close();
-		}
+		await userDbHandler.close();
 	}
 }
 async function assertLanguages(languageManager: LanguageManager) {

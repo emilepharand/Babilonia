@@ -7,8 +7,8 @@ import {
 	minimumExpectedIdeas,
 	minimumExpectedLanguages,
 } from '../../../server/const';
+import DatabaseHandler from '../../../server/model/database/databaseHandler';
 import {getSchemaQueries} from '../../../server/model/database/databaseInitializer';
-import {openDatabase} from '../../../server/model/database/databaseUtils';
 import * as ApiUtils from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
 import {
@@ -117,9 +117,9 @@ export async function testNoGuidsDefined(databasePath: string) {
 }
 
 async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) {
-	let db;
+	const dbHandler = new DatabaseHandler(databasePath);
 	try {
-		db = await openDatabase(databasePath);
+		const db = await dbHandler.open();
 		if (defined) {
 			const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
 			const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
@@ -136,16 +136,14 @@ async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) 
 			expect(languagesWithGuid).toHaveLength(0);
 		}
 	} finally {
-		if (db) {
-			await db.close();
-		}
+		dbHandler.close();
 	}
 }
 
 async function testDatabaseSchema(databasePath: string) {
-	let db;
+	const dbHandler = new DatabaseHandler(databasePath);
 	try {
-		db = await openDatabase(databasePath);
+		const db = await dbHandler.open();
 
 		let schema = (await db.all('SELECT * FROM sqlite_master'))
 			.filter((s: any) => s.type === 'table' && !s.name.startsWith('sqlite'))
@@ -166,9 +164,7 @@ async function testDatabaseSchema(databasePath: string) {
 			expect(schema[i]).toEqual(expectedSchema[i]);
 		}
 	} finally {
-		if (db) {
-			await db.close();
-		}
+		dbHandler.close();
 	}
 }
 

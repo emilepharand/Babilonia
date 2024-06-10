@@ -261,7 +261,7 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 	await dbCoordinatorForBaseDb.init();
 
 	try {
-		const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
+		const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseHandler.db,
 			dbCoordinatorForBaseDb.dataServiceProvider);
 
 		await databaseMigrator.migrate(noContentUpdate);
