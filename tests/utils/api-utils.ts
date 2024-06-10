@@ -30,7 +30,7 @@ export async function changeDatabase(path: string) {
 	return fetchUtils.changeDatabase(path);
 }
 
-export async function migrateDatabase(path: string, noContentUpdate: boolean = false) {
+export async function migrateDatabase(path: string, noContentUpdate = false) {
 	return fetchUtils.migrateDatabase(path, noContentUpdate);
 }
 
