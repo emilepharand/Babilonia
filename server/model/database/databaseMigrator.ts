@@ -97,9 +97,9 @@ export default class DatabaseMigrator {
 		await this.copyTable(tempIdeas, ideas);
 		await this.copyTable(tempExpressions, expressions);
 
+		await this.dropTable(tempExpressions);
 		await this.dropTable(tempLanguages);
 		await this.dropTable(tempIdeas);
-		await this.dropTable(tempExpressions);
 	}
 
 	private async renameTable(tableName: string, newTableName: string) {
