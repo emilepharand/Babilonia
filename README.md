@@ -96,7 +96,9 @@ Simply keep in mind that while modifying included content is possible, it does c
 When you choose to modify the application's content, migrating to a newer version of the application is done using a best-effort approach. As a general rule, **any new ideas and languages you add will not be affected**. You also have the option to not update your vocabulary when updating the application. In any case, it is always highly recommended to **back up your data** before updating the application.
 
 ## Why Babilonia?
-We created Babilonia because we believe that acquiring vocabulary is the **single most important** aspect of learning languages. Without words, you can't express your thoughts, understand others, or even learn grammar. That being said, obviously, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
+We created Babilonia because we believe that acquiring vocabulary is the **single most important** aspect of learning languages.
+Without words, you can't express your thoughts, understand others, or even learn grammar.
+That being said, obviously, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
 
 ## How to use
 
