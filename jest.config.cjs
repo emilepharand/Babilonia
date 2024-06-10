@@ -2,7 +2,7 @@
 module.exports = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  "testMatch": ["<rootDir>/tests/(migration|api)/**/*.ts"],
+  "testMatch": ["<rootDir>/tests/(integration|api)/**/*.ts"],
   "testPathIgnorePatterns": ["utils.ts"],
   "extensionsToTreatAsEsm": [".ts"],
   moduleNameMapper: {
