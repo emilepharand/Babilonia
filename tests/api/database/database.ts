@@ -120,21 +120,12 @@ async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) 
 	const dbHandler = new DatabaseHandler(databasePath);
 	try {
 		const db = await dbHandler.open();
-		if (defined) {
-			const ideasWithNoGuid = await db.all('SELECT * FROM ideas where guid is null');
-			const expressionsWithNoGuid = await db.all('SELECT * FROM expressions where guid is null');
-			const languagesWithNoGuid = await db.all('SELECT * FROM languages where guid is null');
-			expect(ideasWithNoGuid).toHaveLength(0);
-			expect(expressionsWithNoGuid).toHaveLength(0);
-			expect(languagesWithNoGuid).toHaveLength(0);
-		} else {
-			const ideasWithGuid = await db.all('SELECT * FROM ideas where guid is not null');
-			const expressionsWithGuid = await db.all('SELECT * FROM expressions where guid is not null');
-			const languagesWithGuid = await db.all('SELECT * FROM languages where guid is not null');
-			expect(ideasWithGuid).toHaveLength(0);
-			expect(expressionsWithGuid).toHaveLength(0);
-			expect(languagesWithGuid).toHaveLength(0);
-		}
+		const ideasQuery = async () => db.all(`SELECT * FROM ideas where guid is ${defined ? '' : 'not'} null`);
+		const expressionsQuery = async () => db.all(`SELECT * FROM expressions where guid is ${defined ? '' : 'not'} null`);
+		const languagesQuery = async () => db.all(`SELECT * FROM languages where guid is ${defined ? '' : 'not'} null`);
+		expect(await ideasQuery()).toHaveLength(0);
+		expect(await expressionsQuery()).toHaveLength(0);
+		expect(await languagesQuery()).toHaveLength(0);
 	} finally {
 		dbHandler.close();
 	}
