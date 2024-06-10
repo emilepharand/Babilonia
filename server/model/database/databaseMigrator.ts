@@ -31,7 +31,6 @@ export default class DatabaseMigrator {
 
 			console.log('Migration complete.');
 		} catch (error) {
-			console.error('Error migrating database:', error);
 			await this._databaseToMigrate.exec('ROLLBACK;');
 			throw error;
 		}
