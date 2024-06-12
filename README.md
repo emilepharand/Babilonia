@@ -78,13 +78,11 @@ But it could also be **a phrase**, **an expression**, **an idiom**, **a saying**
 Expressions are the **actual language elements** that you type and practice in Babilonia.
 
 ## Simplified keyboard input
-When simultaneously practicing multiple languages that use **different alphabets**, typing the **right letter** with the **correct accent**
-in **every word** of **every language** can be impractical and add friction to your learning. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
+Sometimes, typing accents can get in the way of practicing vocabulary. For example, typing `ç` in Portuguese, `é` in French, `ñ` in Spanish, and `ö` in German all require specific key combinations that must be remembered, which can be tedious and not necessarily what you want to focus on. You might even have to change your keyboard settings to type them.
 
-That can add a lot of friction to your learning. Sure, mastering spelling *is* important, but if your goal is to practice as many words as possible, getting each accent right might not be your priority. Furthermore, many people find it valuable to first learn a new language without the **added difficulty of accents**.
+That's especially the case when you're practicing multiple languages at the same time, or when you want to practice as many words as possible. In those cases, you might not want to worry about accents. Also, when you're just starting out, accents can get in the way of learning new words.
 
-To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently
-only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
+To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form, for example, typing `c` instead of `ç` or `e` instead of `é`. This feature can save you **time and effort** so you can focus on what you really want to learn. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
@@ -98,7 +96,7 @@ When you choose to modify the application's content, migrating to a newer versio
 ## Why Babilonia?
 We created Babilonia because we believe that acquiring vocabulary is the **single most important** aspect of learning languages.
 Without words, you can't express your thoughts, understand others, or even learn grammar.
-That being said, obviously, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
+That being said, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
 
 ## How to use
 
