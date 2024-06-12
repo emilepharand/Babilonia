@@ -15,8 +15,8 @@ jobs:
         run: npm run test:build
       - name: bash
         run: npm run test:bash
-      - name: api
-        run: npm run test:api
+      - name: integration
+        run: npm run test:integration
       - name: e2e
         run: npm run test:e2e
       - name: coverage
