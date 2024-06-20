@@ -63,5 +63,6 @@ export default class DataServiceProvider {
 		await clearDatabaseAndCreateSchema(this._db);
 		this._practiceManager.clear();
 		await this._settingsManager.setVersion(currentVersion);
+		await this._settingsManager.setRandomPractice(true);
 	}
 }

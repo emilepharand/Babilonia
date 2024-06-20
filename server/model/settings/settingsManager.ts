@@ -34,6 +34,10 @@ export default class SettingsManager {
 		await this.setSetting(version, settings.version);
 	}
 
+	async setRandomPractice(value: boolean) {
+		await this.setBooleanSetting(practiceRandom, value);
+	}
+
 	async setSetting(name: string, value: string) {
 		await this.db.run(
 			'insert or ignore into settings (name, value) values (?,?)',
