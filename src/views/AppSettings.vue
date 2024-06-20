@@ -86,6 +86,7 @@
         class="fa-solid fa-circle-question"
       />
     </div>
+    <h2>Database</h2>
     <div>
       <label
         class="form-label"
@@ -100,23 +101,35 @@
         data-bs-placement="right"
         class="fa-solid fa-circle-question"
       />
-      <input
-        id="databasePath"
-        v-model="databasePath"
-        class="form-control"
-        type="text"
-        @keyup.enter="save()"
-      >
+      <div class="input-group mb-3">
+        <input
+          id="databasePath"
+          v-model="databasePath"
+          type="text"
+          class="form-control"
+          @keyup.enter="changeDatabase()"
+        >
+        <div class="input-group-append">
+          <button
+            id="changeDatabaseButton"
+            class="btn btn-secondary"
+            type="button"
+            @click="changeDatabase()"
+          >
+            Change
+          </button>
+        </div>
+      </div>
     </div>
     <button
       id="saveButton"
-      class="btn btn-primary w-100 mt-2"
+      class="btn btn-primary w-100"
       @click="save()"
     >
       Save
     </button>
     <div
-      v-if="successMessages.length > 0 && !errorMessage"
+      v-if="successMessages.length > 0"
       id="successMessage"
     >
       <p
@@ -129,7 +142,7 @@
     </div>
     <p
       v-if="errorMessage"
-      id="settingsErrorText"
+      id="errorMessage"
       class="text-danger"
     >
       {{ errorMessage }}
@@ -222,25 +235,26 @@ const confirmMigrateModal = ref(document.createElement('div'));
 const settings = ref(getEmptySettingsNoAsync());
 const databasePath = ref('');
 const errorMessage = ref('');
-const successMessages = ref(['']);
+const successMessages = ref([] as string[]);
 const noContentUpdate = ref(false);
 let previousDatabasePath = '';
 
 (async () => {
+	await load();
+})();
+
+async function load() {
 	const fetchedSettings = await Api.getSettings();
 	const fetchedDatabasePath = await Api.getDatabasePath();
 	settings.value = fetchedSettings;
 	databasePath.value = fetchedDatabasePath;
 	previousDatabasePath = databasePath.value;
-})();
+}
 
 async function save() {
 	successMessages.value = [];
-	const success = await changeDatabase();
-	if (success) {
-		await Api.setSettings(settings.value);
-		successMessages.value.push('Settings saved.');
-	}
+	await Api.setSettings(settings.value);
+	successMessages.value.push('Settings saved.');
 }
 
 async function migrate() {
@@ -259,11 +273,17 @@ async function changeDatabase() {
 		if (res.status === 200) {
 			errorMessage.value = '';
 			previousDatabasePath = databasePath.value;
+			successMessages.value = ['Database path changed.'];
+			await load();
 		} else if (((await res.json()).error) === databaseVersionErrorCode) {
 			successMessages.value = [];
 			new bootstrap.Modal(confirmMigrateModal.value).show();
+			confirmMigrateModal.value.addEventListener('shown.bs.modal', async () => {
+				confirmMigrateModal.value.setAttribute('loaded', 'true');
+			});
 			await new Promise(resolve => {
 				confirmMigrateModal.value.addEventListener('hidden.bs.modal', resolve);
+				confirmMigrateModal.value.removeAttribute('loaded');
 			});
 		} else {
 			errorMessage.value = 'Invalid database path.';
