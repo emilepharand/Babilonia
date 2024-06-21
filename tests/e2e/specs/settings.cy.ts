@@ -69,7 +69,7 @@ describe('The settings page', () => {
 		changeDatabaseAndAssert(memoryDatabasePath);
 	});
 
-	it.only('Allows migrating the database', () => {
+	it('Allows migrating the database', () => {
 		goToSettingsPage();
 
 		const databaseToMigratePath = getTestDatabaseVersionPath(penultimateVersion).getPathToProvide();
