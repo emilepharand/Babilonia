@@ -82,7 +82,8 @@ Sometimes, typing accents can get in the way of practicing vocabulary. For examp
 
 That's especially the case when you're practicing multiple languages at the same time, or when you want to practice as many words as possible. In those cases, you might not want to worry about accents. Also, when you're just starting out, accents can get in the way of learning new words.
 
-To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form, for example, typing `c` instead of `ç` or `e` instead of `é`. This feature can save you **time and effort** so you can focus on what you really want to learn. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
+To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form, for example, typing `c` instead of `ç` or `e` instead of `é`.
+This feature can save you **time and effort** so you can focus on what you really want to learn. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
