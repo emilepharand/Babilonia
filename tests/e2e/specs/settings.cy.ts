@@ -69,10 +69,23 @@ describe('The settings page', () => {
 		changeDatabaseAndAssert(memoryDatabasePath);
 	});
 
-	it('Allows migrating the database', () => {
+	it.only('Allows migrating the database', () => {
 		goToSettingsPage();
 
 		const databaseToMigratePath = getTestDatabaseVersionPath(penultimateVersion).getPathToProvide();
+
+		// Test the interaction of saving settings then changing database
+		cy.get('#randomPractice').uncheck();
+		cy.get('#strictCharacters').check();
+		cy.get('#passiveMode').check();
+
+		saveSettingsAndAssert();
+
+		// Define a new intercept because the previous one was used
+		cy.intercept('PUT', 'settings').as('putSettings2');
+
+		// This should be overriden when the database is changed
+		cy.get('#practiceOnlyNotKnown').check();
 
 		changeDatabase(databaseToMigratePath);
 
@@ -90,10 +103,17 @@ describe('The settings page', () => {
 		cy.get('#modal-migrate-button').click();
 		assertSuccessMessage('Migration successful.');
 
-		cy.get('@putSettings').should('not.exist');
-		assertMigrated(false);
+		assertDatabasePath(databaseToMigratePath);
 
+		// Settings are updated to the values from the database
+		assertSettingsAreDefault();
 		cy.reload(true);
+		assertSettingsAreDefault();
+
+		assertDatabasePath(databaseToMigratePath);
+
+		cy.get('@putSettings2').should('not.exist');
+		assertMigrated(false);
 
 		assertDatabasePath(databaseToMigratePath);
 	});
@@ -180,7 +200,7 @@ describe('The settings page', () => {
 
 	function assertNotMigrated() {
 		cy.get('@migrate').should('not.exist');
-		cy.get('@putSettings').should('not.exist');
+		cy.get('@putSettings2').should('not.exist');
 		assertNoMessage();
 	}
 

@@ -262,6 +262,7 @@ async function migrate() {
 	if (migrateResponse.status === 200) {
 		errorMessage.value = '';
 		successMessages.value.push('Migration successful.');
+    await load();
 	} else {
 		errorMessage.value = 'Error migrating database. Please check server logs.';
 	}
