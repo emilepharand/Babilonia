@@ -6,7 +6,6 @@ export function settingsFromPartial(partialSettings: Partial<Settings>) {
 		practiceOnlyNotKnown: partialSettings.practiceOnlyNotKnown ? partialSettings.practiceOnlyNotKnown : false,
 		randomPractice: partialSettings.randomPractice ? partialSettings.randomPractice : false,
 		strictCharacters: partialSettings.strictCharacters ? partialSettings.strictCharacters : false,
-		version: partialSettings.version ? partialSettings.version : '2.0',
 	};
 }
 
