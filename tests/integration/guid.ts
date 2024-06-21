@@ -166,10 +166,11 @@ async function commonUpdateCurrentAndUserDatabase(db: Database, prefix: string) 
 }
 
 async function addGuids(db: Database) {
-	for (const tableName of ['languages', 'ideas', 'expressions']) {
-		// eslint-disable-next-line no-await-in-loop
-		await db.run(`UPDATE ${tableName} SET guid = (printf(lower(hex(randomblob(4) || randomblob(2) || '4' || randomblob(1) || 'a' || randomblob(5))))) WHERE guid IS NULL`);
-	}
+	const tableNames = ['languages', 'ideas', 'expressions'];
+	const promises = tableNames.map(tableName =>
+		db.run(`UPDATE ${tableName} SET guid = (printf(lower(hex(randomblob(4) || randomblob(2) || '4' || randomblob(1) || 'a' || randomblob(5))))) WHERE guid IS NULL`),
+	);
+	await Promise.all(promises);
 }
 
 async function migrate(userDbPath: string, currentDbPath: string) {

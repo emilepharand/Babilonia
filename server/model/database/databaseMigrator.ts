@@ -61,16 +61,16 @@ export default class DatabaseMigrator {
 	}
 
 	private async createGuidColumns() {
-		const promises = [];
-		for (const table of ['ideas', 'expressions', 'languages']) {
-			// eslint-disable-next-line no-await-in-loop
-			if (!(await columnExists(this._databaseToMigrate, table, 'guid'))) {
-				promises.push(this._databaseToMigrate.run(`
-					ALTER TABLE ${table} ADD COLUMN guid TEXT;
-					CREATE UNIQUE INDEX "${table}_guid" ON "${table}" ("guid");
-				`));
+		const tables = ['ideas', 'expressions', 'languages'];
+		const promises = tables.map(async table => {
+			const columnExistsResult = await columnExists(this._databaseToMigrate, table, 'guid');
+			if (!columnExistsResult) {
+				return this._databaseToMigrate.run(`
+                ALTER TABLE ${table} ADD COLUMN guid TEXT;
+                CREATE UNIQUE INDEX "${table}_guid" ON "${table}" ("guid");
+            `);
 			}
-		}
+		});
 		await Promise.all(promises);
 	}
 
