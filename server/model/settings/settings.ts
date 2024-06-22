@@ -30,7 +30,7 @@ export const settingsSchema = {
 		passiveMode: {type: 'boolean'},
 		version: {type: 'string'},
 	},
-	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode', 'version'],
+	required: ['randomPractice', 'strictCharacters', 'practiceOnlyNotKnown', 'passiveMode'],
 	additionalProperties: false,
 };
 

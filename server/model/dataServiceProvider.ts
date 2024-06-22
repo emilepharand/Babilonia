@@ -55,9 +55,14 @@ export default class DataServiceProvider {
 		return this._statsCounter;
 	}
 
+	get db(): Database {
+		return this._db;
+	}
+
 	async reset() {
 		await clearDatabaseAndCreateSchema(this._db);
 		this._practiceManager.clear();
 		await this._settingsManager.setVersion(currentVersion);
+		await this._settingsManager.setRandomPractice(true);
 	}
 }

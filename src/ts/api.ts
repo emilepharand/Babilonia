@@ -110,8 +110,8 @@ export async function changeDatabase(path: string): Promise<Response> {
 	return doPut('/database/path', {path});
 }
 
-export async function migrateDatabase(path: string): Promise<Response> {
-	return doPut('/database/migrate', {path});
+export async function migrateDatabase(path: string, noContentUpdate: boolean): Promise<Response> {
+	return doPut('/database/migrate', {path, noContentUpdate});
 }
 
 export async function setSettings(settings: Settings): Promise<void> {

@@ -45,6 +45,11 @@ export default class IdeaManager implements Manager {
 		return {id: ideaId, ee};
 	}
 
+	async getIdeas(): Promise<Idea[]> {
+		const ideas: Array<{id: number}> = await this.db.all('select id from ideas');
+		return Promise.all(ideas.map(async idea => this.getIdea(idea.id)));
+	}
+
 	async idExists(id: number): Promise<boolean> {
 		return (await this.db.get('select * from ideas where id = ?', id)) !== undefined;
 	}

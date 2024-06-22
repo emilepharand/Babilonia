@@ -31,7 +31,10 @@ export default class SettingsManager {
 			settings.practiceOnlyNotKnown,
 		);
 		await this.setBooleanSetting(passiveMode, settings.passiveMode);
-		await this.setSetting(version, settings.version);
+	}
+
+	async setRandomPractice(value: boolean) {
+		await this.setBooleanSetting(practiceRandom, value);
 	}
 
 	async setSetting(name: string, value: string) {

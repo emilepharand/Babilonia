@@ -23,8 +23,10 @@ import {
 
 context('Interation on the practice page', () => {
 	specify('Typing, hinting, showing, and navigating', () => {
-	// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
-	// Idea 2: salut, allô, hi, hey, HOLA éàíôüáéíóú, ciao, salve
+		setSettings({randomPractice: false});
+
+		// Idea 1: bonjour, hello, buenos días, buongiorno, guten Tag
+		// Idea 2: salut, allô, hi, hey, HOLA éàíôüáéíóú, ciao, salve
 		addIdeas();
 
 		cy.get('#practice-link').click();
@@ -232,7 +234,7 @@ context('Interation on the practice page', () => {
 		getResetButton().click();
 
 		// Character mapping (strict disabled)
-		setSettings({randomPractice: false, strictCharacters: true, practiceOnlyNotKnown: false});
+		setSettings({strictCharacters: true});
 		cy.then(() => {
 			cy.reload();
 		});

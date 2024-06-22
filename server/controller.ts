@@ -111,7 +111,7 @@ export async function addIdea(req: Request, res: Response): Promise<void> {
 }
 
 export async function getIdeaById(req: Request, res: Response): Promise<void> {
-	if (!await validateIdeaIdInRequest(req, res)) {
+	if (!(await validateIdeaIdInRequest(req, res))) {
 		return;
 	}
 	const idea = await dataServiceProvider.ideaManager.getIdea(parseInt(req.params.id, 10));
@@ -194,7 +194,7 @@ export async function setSettings(req: Request, res: Response): Promise<void> {
 		return;
 	}
 	const settings = req.body as Settings;
-	if (await dataServiceProvider.settingsManager.isPracticeOnlyNotKnown() !== settings.practiceOnlyNotKnown) {
+	if ((await dataServiceProvider.settingsManager.isPracticeOnlyNotKnown()) !== settings.practiceOnlyNotKnown) {
 		// Reset practice manager because practiceable ideas may change after changing this setting
 		dataServiceProvider.practiceManager.clear();
 	}
@@ -239,13 +239,16 @@ async function changeDatabaseToPath(path: string) {
 }
 
 export async function migrateDatabase(req: Request, res: Response): Promise<void> {
-	if (!dataServiceProvider.inputValidator.validateChangeDatabase(req.body)) {
+	if (!dataServiceProvider.inputValidator.validateMigrateDatabase(req.body)) {
 		res.status(400).end();
 		return;
 	}
 
+	const {path} = (req.body as {path: string});
+	const {noContentUpdate} = (req.body as {noContentUpdate: boolean});
+
 	// Database to migrate
-	const dbCoordinatorForToMigrate = new DatabaseCoordinator((req.body as {path: string}).path);
+	const dbCoordinatorForToMigrate = new DatabaseCoordinator(path);
 	await dbCoordinatorForToMigrate.init();
 
 	if (!dbCoordinatorForToMigrate.isValidPath) {
@@ -257,15 +260,20 @@ export async function migrateDatabase(req: Request, res: Response): Promise<void
 	const dbCoordinatorForBaseDb = new DatabaseCoordinator(baseDatabasePath);
 	await dbCoordinatorForBaseDb.init();
 
-	const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseOpener.db,
-		dbCoordinatorForBaseDb.dataServiceProvider);
+	try {
+		const databaseMigrator = new DatabaseMigrator(dbCoordinatorForToMigrate.databaseHandler.db,
+			dbCoordinatorForBaseDb.dataServiceProvider);
 
-	await databaseMigrator.migrate();
+		await databaseMigrator.migrate(noContentUpdate);
 
-	dbCoordinator = await initDatabase((req.body as {path: string}).path);
-	({dataServiceProvider} = dbCoordinator);
+		dbCoordinator = await initDatabase((req.body as {path: string}).path);
+		({dataServiceProvider} = dbCoordinator);
 
-	res.status(200).end();
+		res.status(200).end();
+	} catch (error) {
+		console.error('Migration error:', error);
+		res.status(400).send(JSON.stringify({error: 'MIGRATION_ERROR'}));
+	}
 }
 
 export async function deleteAllData(_: Request, res: Response): Promise<void> {

@@ -15,8 +15,8 @@ jobs:
         run: npm run test:build
       - name: bash
         run: npm run test:bash
-      - name: api
-        run: npm run test:api
+      - name: integration
+        run: npm run test:integration
       - name: e2e
         run: npm run test:e2e
       - name: coverage
@@ -25,6 +25,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: tests/coverage/merged/cobertura-coverage.xml
           verbose: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: server log
+          path: dist/log.txt
   test-release:
     runs-on: ubuntu-latest
     steps:

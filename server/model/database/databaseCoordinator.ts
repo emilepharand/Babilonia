@@ -4,11 +4,11 @@ import {currentVersion, memoryDatabasePath} from '../../const';
 import DataServiceProvider from '../dataServiceProvider';
 import {resolveAndNormalizePathUnderWorkingDirectory} from '../inputValidator';
 import SettingsManager from '../settings/settingsManager';
-import DatabaseOpener from './databaseOpener';
+import DatabaseHandler from './databaseHandler';
 
 export default class DatabaseCoordinator {
 	private _dataServiceProvider!: DataServiceProvider;
-	private _databaseOpener!: DatabaseOpener;
+	private _databaseHandler!: DatabaseHandler;
 	private _needsToBeInitialized!: boolean;
 	private _isValid = false;
 	private _isValidPath = false;
@@ -24,16 +24,16 @@ export default class DatabaseCoordinator {
 
 		this._needsToBeInitialized = this.computeNeedsInitialization();
 
-		this._databaseOpener = new DatabaseOpener(this._realAbsolutePath as string);
+		this._databaseHandler = new DatabaseHandler(this._realAbsolutePath as string);
 		try {
-			await this._databaseOpener.tryOpenElseThrow();
+			await this._databaseHandler.open();
 		} catch (e) {
 			console.error(e);
 			return;
 		}
 
 		if (await this.setValidFlags()) {
-			this._dataServiceProvider = new DataServiceProvider(this._databaseOpener.db);
+			this._dataServiceProvider = new DataServiceProvider(this._databaseHandler.db);
 			if (this._needsToBeInitialized) {
 				await this.dataServiceProvider.reset();
 			}
@@ -70,7 +70,7 @@ export default class DatabaseCoordinator {
 		if (this._needsToBeInitialized) {
 			return true;
 		}
-		const sm = new SettingsManager(this._databaseOpener.db);
+		const sm = new SettingsManager(this._databaseHandler.db);
 		return await sm.getVersion() === currentVersion;
 	}
 
@@ -86,8 +86,8 @@ export default class DatabaseCoordinator {
 		return this._dataServiceProvider;
 	}
 
-	get databaseOpener(): DatabaseOpener {
-		return this._databaseOpener;
+	get databaseHandler(): DatabaseHandler {
+		return this._databaseHandler;
 	}
 
 	get inputPath(): string {

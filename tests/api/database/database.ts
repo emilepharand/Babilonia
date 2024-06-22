@@ -1,6 +1,4 @@
 import fs from 'fs';
-import {open} from 'sqlite';
-import sqlite3 from 'sqlite3';
 import {
 	currentVersion,
 	databaseVersionErrorCode,
@@ -9,10 +7,14 @@ import {
 	minimumExpectedIdeas,
 	minimumExpectedLanguages,
 } from '../../../server/const';
+import DatabaseHandler from '../../../server/model/database/databaseHandler';
 import {getSchemaQueries} from '../../../server/model/database/databaseInitializer';
 import * as ApiUtils from '../../utils/api-utils';
 import * as FetchUtils from '../../utils/fetch-utils';
-import {allVersions, getTestDatabaseVersionPath, previousVersions} from '../../utils/versions';
+import {
+	TestDatabasePath,
+	allVersions, getBadDatabasePath, getTestDatabaseVersionPath, previousVersions,
+} from '../../utils/versions';
 import {basicTests} from '../utils/utils';
 
 beforeEach(async () => {
@@ -23,12 +25,12 @@ describe('change database', () => {
 	test('change database to a valid database', async () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
-		await ApiUtils.changeDatabase(currentVersionPath);
-		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath);
+		await ApiUtils.changeDatabase(currentVersionPath.getPathToProvide());
+		expect(await ApiUtils.getDatabasePath()).toEqual(currentVersionPath.getPathToProvide());
 	});
 
 	test('change database to a db to be created', async () => {
-		const newDbPath = 'tests/db/new.db';
+		const newDbPath = new TestDatabasePath('new.db').getPathToProvide();
 		await ApiUtils.changeDatabase(newDbPath);
 		expect(await ApiUtils.getDatabasePath()).toEqual(newDbPath);
 		expect(await ApiUtils.fetchLanguages()).toHaveLength(0);
@@ -42,8 +44,14 @@ describe('change database', () => {
 	});
 
 	test.each(previousVersions)('change database to old database version %s', async version => {
-		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version), 400, memoryDatabasePath);
+		const res = await changeDatabaseAndCheck(getTestDatabaseVersionPath(version).getPathToProvide(), 400, memoryDatabasePath);
 		expect((await res.json() as { error:string }).error).toEqual(databaseVersionErrorCode);
+	});
+
+	test('migrate bad database', async () => {
+		const res = await ApiUtils.migrateDatabase(getBadDatabasePath().getPathToProvide());
+		expect(res.status).toEqual(400);
+		expect((await res.json() as { error:string }).error).toEqual('MIGRATION_ERROR');
 	});
 });
 
@@ -52,46 +60,81 @@ describe('using all database versions', () => {
 		expect(await ApiUtils.getDatabasePath()).toEqual(memoryDatabasePath);
 
 		const databasePath = getTestDatabaseVersionPath(version);
-		const distDatabasePath = `dist/${databasePath}`;
 
-		expect(fs.existsSync(`${distDatabasePath}`)).toBe(true);
+		expect(fs.existsSync(databasePath.getActualPath())).toBe(true);
 
-		const currentVersionPath = getTestDatabaseVersionPath(currentVersion);
+		const currentVersionPath = getTestDatabaseVersionPath(currentVersion).getPathToProvide();
 		await changeDatabaseAndCheck(currentVersionPath, 200, currentVersionPath);
 
 		if (version !== currentVersion) {
-			const res = await ApiUtils.migrateDatabase(databasePath);
+			const res = await ApiUtils.migrateDatabase(databasePath.getPathToProvide());
 			expect(res.status).toEqual(200);
 		}
 
-		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath);
+		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
 
-		testDatabaseSchema(`${distDatabasePath}`);
-
-		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
-		await changeDatabaseAndCheck(databasePath, 200, databasePath);
+		testDatabaseSchema(databasePath.getActualPath());
 
 		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
 
+		await testAllGuidsDefined(databasePath.getActualPath());
+
 		await basicTests();
 
-		if (version === currentVersion) {
-			const stats = await ApiUtils.getStats();
-			const ll = await ApiUtils.fetchLanguages();
-			expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
-			expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
-			expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
-		}
+		const stats = await ApiUtils.getStats();
+		const ll = await ApiUtils.fetchLanguages();
+		expect(ll.length).toBeGreaterThanOrEqual(minimumExpectedLanguages);
+		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThanOrEqual(minimumExpectedExpressions);
+		expect(stats.globalStats.totalIdeasCount).toBeGreaterThanOrEqual(minimumExpectedIdeas);
+
+		await changeDatabaseAndCheck(memoryDatabasePath, 200, memoryDatabasePath);
+		await changeDatabaseAndCheck(databasePath.getPathToProvide(), 200, databasePath.getPathToProvide());
 	}, 30000);
 });
 
-async function testDatabaseSchema(databasePath: string) {
-	let db;
+describe('updating without content update', () => {
+	test('updating without content update', async () => {
+		const databasePath = getTestDatabaseVersionPath('another-2.0');
+		const res = await ApiUtils.migrateDatabase(databasePath.getPathToProvide(), true);
+		expect(res.status).toEqual(200);
+		await testNoGuidsDefined(databasePath.getActualPath());
+		expect(await ApiUtils.getDatabasePath()).toEqual(databasePath.getPathToProvide());
+		testDatabaseSchema(databasePath.getActualPath());
+		expect((await ApiUtils.fetchSettings()).version).toEqual(currentVersion);
+		const stats = await ApiUtils.getStats();
+		expect(stats.globalStats.totalExpressionsCount).toBeGreaterThan(0);
+		expect(stats.globalStats.totalIdeasCount).toBeGreaterThan(0);
+		await basicTests();
+	}, 30000);
+});
+
+export async function testAllGuidsDefined(databasePath: string) {
+	await testAllGuidsDefinedOrNot(databasePath, true);
+}
+
+export async function testNoGuidsDefined(databasePath: string) {
+	await testAllGuidsDefinedOrNot(databasePath, false);
+}
+
+async function testAllGuidsDefinedOrNot(databasePath: string, defined: boolean) {
+	const dbHandler = new DatabaseHandler(databasePath);
 	try {
-		db = await open({
-			filename: databasePath,
-			driver: sqlite3.Database,
-		});
+		const db = await dbHandler.open();
+		const ideasQuery = async () => db.all(`SELECT * FROM ideas where guid is ${defined ? '' : 'not'} null`);
+		const expressionsQuery = async () => db.all(`SELECT * FROM expressions where guid is ${defined ? '' : 'not'} null`);
+		const languagesQuery = async () => db.all(`SELECT * FROM languages where guid is ${defined ? '' : 'not'} null`);
+		expect(await ideasQuery()).toHaveLength(0);
+		expect(await expressionsQuery()).toHaveLength(0);
+		expect(await languagesQuery()).toHaveLength(0);
+	} finally {
+		dbHandler.close();
+	}
+}
+
+async function testDatabaseSchema(databasePath: string) {
+	const dbHandler = new DatabaseHandler(databasePath);
+	try {
+		const db = await dbHandler.open();
 
 		let schema = (await db.all('SELECT * FROM sqlite_master'))
 			.filter((s: any) => s.type === 'table' && !s.name.startsWith('sqlite'))
@@ -112,11 +155,10 @@ async function testDatabaseSchema(databasePath: string) {
 			expect(schema[i]).toEqual(expectedSchema[i]);
 		}
 	} finally {
-		if (db) {
-			await db.close();
-		}
+		dbHandler.close();
 	}
 }
+
 async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, expectedDbPath: string) {
 	const res = await ApiUtils.changeDatabase(dbPath);
 	expect(res.status).toEqual(expectedStatus);
@@ -126,12 +168,13 @@ async function changeDatabaseAndCheck(dbPath: string, expectedStatus: number, ex
 
 describe('invalid cases', () => {
 	const invalidDatabasePaths = [
+		null,
 		'',
 		' ',
 		'/doesnotexist/db.db',
-		'tests/db/unwriteable.db',
-		'tests/doesnotexist/db.db',
-		'tests/dir.db',
+		new TestDatabasePath('unwriteable.db').getPathToProvide(),
+		new TestDatabasePath('doesnotexist/db.db').getPathToProvide(),
+		new TestDatabasePath('dir.db').getPathToProvide(),
 		'/tmp/invalid.db',
 	];
 
@@ -139,8 +182,8 @@ describe('invalid cases', () => {
 		test(`wrong path as database path: ${path}`, async () => {
 			await testInvalidDatabase(path, FetchUtils.changeDatabase);
 			await testInvalidDatabase(path, FetchUtils.migrateDatabase);
-			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.changeDatabaseRaw);
-			await testInvalidDatabase(JSON.stringify({file: path}), FetchUtils.migrateDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path, noContentUpdate: false}), FetchUtils.changeDatabaseRaw);
+			await testInvalidDatabase(JSON.stringify({file: path, noContentUpdate: false}), FetchUtils.migrateDatabaseRaw);
 		});
 	});
 });

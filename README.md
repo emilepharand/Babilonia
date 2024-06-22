@@ -57,6 +57,8 @@ Two interesting and helpful concepts that Babilonia uses are `ideas` and `expres
 ### Ideas are universal
 The concept of ideas is that words in one language are **grouped** with words in other languages **that express the same idea**.
 
+To put it another way, an idea is a **group of words** in different languages that convey the **same meaning**.
+
 While dictionaries organize vocabulary **by words**, Babilonia organizes vocabulary **by ideas**. There are as many ideas as there are **meanings** for a word.
 
 For example, in English, you `play` music like you `play` a sport. Spanish conveys those two meanings with two different words: `tocar` and `jugar`. While an English-Spanish dictionary would list those two words under `to play`, Babilonia views them as **two separate ideas**. Learners practice them separately as they *are* two distinct entities.
@@ -76,24 +78,26 @@ But it could also be **a phrase**, **an expression**, **an idiom**, **a saying**
 Expressions are the **actual language elements** that you type and practice in Babilonia.
 
 ## Simplified keyboard input
-When simultaneously practicing multiple languages that use **different alphabets**, typing the **right letter** with the **correct accent**
-in **every word** of **every language** can be impractical and add friction to your learning. Not only does that require you to change your keyboard settings a lot, but also to learn what specific combination of keys on your keyboard allows you to type each letter and accent.
+Sometimes, typing accents can get in the way of practicing vocabulary. For example, typing `ç` in Portuguese, `é` in French, `ñ` in Spanish, and `ö` in German all require specific key combinations that must be remembered, which can be tedious and not necessarily what you want to focus on. You might even have to change your keyboard settings to type them.
 
-That can add a lot of friction to your learning. Sure, mastering spelling *is* important, but if your goal is to practice as many words as possible, getting each accent right might not be your priority. Furthermore, many people find it valuable to first learn a new language without the **added difficulty of accents**.
+That's especially the case when you're practicing multiple languages at the same time, or when you want to practice as many words as possible. In those cases, you might not want to worry about accents. Also, when you're just starting out, accents can get in the way of learning new words.
 
-To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form. This feature can save you **time and effort**, especially if your goal is to practice **as many words as possible**. Please note that this feature currently
-only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
+To help with this, Babilonia allows you to disable "strict mode," which allows you to type the **unaccented form** of a letter instead of its accented form, for example, typing `c` instead of `ç` or `e` instead of `é`.
+This feature can save you **time and effort** so you can focus on what you really want to learn. Please note that this feature currently only supports languages using the Latin alphabet, but future releases will include ways to enable it for more scripts.
 
 ## Use included vocabulary or add your own
 As of version 2.1, the application comes with a set of **2751 expressions** and **518 ideas** in **5 languages**: English, French, German, Spanish and Italian. **More get added** over time.
 
-You can also easily **add your own** expressions, ideas and languages.
+In addition to that, you can also easily **add your own** expressions, ideas and languages. You can then **practice them** just like the included vocabulary. This feature is especially useful if you want to **practice a language that is not included** in the default vocabulary or if you want to **add your own words** to practice.
 
-Keep in mind that while ideas and expressions in Babilonia may change in future updates, your database will remain unchanged. This means any additions, deletions, or modifications you make to the database will be preserved. However, to access new ideas and expressions, you'll need to use the new version of the database.
+Simply keep in mind that while modifying included content is possible, it does come with an important caveat. As the application's content **grows and evolves** over time, the included vocabulary gets updated. That means that any modifications you make to the included vocabulary **may be overwritten** by future releases when updating your database.
 
-## An important caveat
-**Vocabulary** is only **one part** of language learning. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. *Nothing is*. Learning languages requires a **variety of sources**. However, we believe that acquiring vocabulary
-is the single most important aspect of learning languages, which unlocks a world of possibilities.
+When you choose to modify the application's content, migrating to a newer version of the application is done using a best-effort approach. As a general rule, **any new ideas and languages you add will not be affected**. You also have the option to not update your vocabulary when updating the application. In any case, it is always highly recommended to **back up your data** before updating the application.
+
+## Why Babilonia?
+We created Babilonia because we believe that acquiring vocabulary is the **single most important** aspect of learning languages.
+Without words, you can't express your thoughts, understand others, or even learn grammar.
+That being said, vocabulary is only **one part** of language learning, albeit a key one. That's why Babilonia does not seek to be the be-all and end-all of language learning tools. Nothing is. Instead, it aims to be the **best tool** for learning vocabulary.
 
 ## How to use
 
