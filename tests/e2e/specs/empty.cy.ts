@@ -15,7 +15,7 @@ describe('When database is empty', () => {
 		cy.get('button').should('not.exist');
 	});
 	it('Displays search ideas page correctly', () => {
-		cy.get('#search-ideas-link').click();
+		cy.get('#search-link').click();
 	});
 	it('Displays languages page correctly', () => {
 		cy.get('#languages-link').click();

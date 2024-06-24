@@ -32,9 +32,9 @@ const routes: RouteRecordRaw[] = [
 	},
 	{
 		path: '/ideas/search',
-		name: 'SearchIdeas',
+		name: 'SearchExpressions',
 		component: async () =>
-			import(/* webpackChunkName: "SearchIdeas" */ '../views/SearchIdeas.vue'),
+			import(/* webpackChunkName: "SearchExpressions" */ '../views/SearchExpressions.vue'),
 	},
 	{
 		path: '/languages',

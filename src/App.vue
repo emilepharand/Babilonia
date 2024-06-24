@@ -43,7 +43,7 @@
             </li>
             <li class="nav-item">
               <router-link
-                id="search-ideas-link"
+                id="search-link"
                 to="/ideas/search"
                 class="nav-link"
               >

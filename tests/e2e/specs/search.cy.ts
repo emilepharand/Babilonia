@@ -1,7 +1,7 @@
-import {ExpressionForAdding} from 'server/model/ideas/expression';
-import {IdeaForAdding} from 'server/model/ideas/ideaForAdding';
+import { ExpressionForAdding } from 'server/model/ideas/expression';
+import { IdeaForAdding } from 'server/model/ideas/ideaForAdding';
 import {
-	addIdeasDifferentSet, addLanguages, apiUrl, cyRequestPost,
+    addIdeasDifferentSet, addLanguages, apiUrl, cyRequestPost,
 } from '../cy-utils';
 
 // This test should focus on whether the buttons and filters are correctly taken into account
@@ -12,7 +12,7 @@ context('Search', () => {
 	specify('Searching works', () => {
 		addIdeasDifferentSet();
 
-		cy.get('#search-ideas-link').click();
+		cy.get('#search-link').click();
 
 		// Reset button
 		typePattern('pattern');
@@ -98,7 +98,7 @@ context('Search', () => {
 			cyRequestPost(`${apiUrl}/ideas`, i1);
 		}
 
-		cy.get('#search-ideas-link').click();
+		cy.get('#search-link').click();
 
 		getKnownExpressionsCheckbox().check();
 		clickSearch();
