@@ -40,6 +40,7 @@
     "async-lock": "^1.4.1",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
+    "datatables.net-bs5": "^2.0.8",
     "express": "^4.19.2",
     "rimraf": "^5.0.7",
     "sqlite": "^5.1.1",
