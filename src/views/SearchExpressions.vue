@@ -1,12 +1,17 @@
 <template>
   <div>
     <h1>Search Ideas</h1>
-    <table id="table" />
+    <table
+      id="table"
+      class="responsive"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import DataTable from 'datatables.net-bs5';
+import 'datatables.net-buttons-bs5';
+import 'jquery';
 import * as Api from '../ts/api';
 
 (async () => {
@@ -18,7 +23,7 @@ import * as Api from '../ts/api';
 
 		data: searchResults,
 		columns: [
-			{data: 'ideaId', title: 'Idea ID'},
+			{data: 'ideaId', title: 'Idea&nbsp;ID'},
 			{data: 'languageName', title: 'Language'},
 			{data: 'text', title: 'Text'},
 			{data: 'known', title: 'Known'},
@@ -26,3 +31,9 @@ import * as Api from '../ts/api';
 	});
 })();
 </script>
+
+<style>
+table.dataTable td.dt-type-numeric {
+	text-align: left;
+}
+</style>
