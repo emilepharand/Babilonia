@@ -44,7 +44,7 @@
     "rimraf": "^5.0.7",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "vue": "^3.4.30",
+    "vue": "^3.4.31",
     "vue-router": "^4.4.0"
   },
   "devDependencies": {
@@ -89,10 +89,10 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2",
-    "vite": "^5.3.1",
+    "vite": "^5.3.2",
     "vite-plugin-istanbul": "^6.0.2",
     "vue-eslint-parser": "^9.4.3",
-    "vue-tsc": "^2.0.22",
+    "vue-tsc": "^2.0.24",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4",
     "webpack-node-externals": "^3.0.0"
