@@ -72,7 +72,7 @@
     "eslint": "^8.57.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-config-xo": "^0.45.0",
-    "eslint-config-xo-typescript": "^4.0.0",
+    "eslint-config-xo-typescript": "^5.0.0",
     "eslint-plugin": "^1.0.1",
     "eslint-plugin-cypress": "^3.4.0",
     "eslint-plugin-import": "^2.29.1",
