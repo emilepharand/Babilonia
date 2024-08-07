@@ -7,7 +7,6 @@ import DatabaseMigrator from './model/database/databaseMigrator';
 import type {IdeaForAdding} from './model/ideas/ideaForAdding';
 import type {Language} from './model/languages/language';
 import {type Manager} from './model/manager';
-import type {SearchContext} from './model/search/searchContext';
 import type {Settings} from './model/settings/settings';
 import {databasePath} from './options';
 import {normalizeIdea} from './utils/expressionStringUtils';
@@ -118,50 +117,9 @@ export async function getIdeaById(req: Request, res: Response): Promise<void> {
 	res.send(idea);
 }
 
-export async function search(req: Request, res: Response): Promise<void> {
-	const sc: SearchContext = {};
-	sc.pattern = (req.query.pattern as string) ?? undefined;
-	sc.strict = (req.query as SearchContext).strict as true | undefined;
-	if (req.query.language) {
-		if (!validateNumberInRequest(req.query.language as string, res)) {
-			return;
-		}
-		sc.language = parseInt(req.query.language as string, 10);
-	}
-	if (req.query.ideaHas) {
-		const ideaHasArray = (req.query.ideaHas as string).split(',');
-		for (const ideaHas of ideaHasArray) {
-			if (!(validateNumberInRequest(ideaHas, res))) {
-				return;
-			}
-		}
-		sc.ideaHas = (req.query.ideaHas as string).split(',').map(i => parseInt(i, 10));
-	}
-	if (req.query.ideaDoesNotHave) {
-		if (!validateNumberInRequest(req.query.ideaDoesNotHave as string, res)) {
-			return;
-		}
-		sc.ideaDoesNotHave = parseInt(req.query.ideaDoesNotHave as string, 10);
-	}
-	if (req.query.knownExpressions) {
-		if (req.query.knownExpressions === 'true') {
-			sc.knownExpressions = true;
-		} else if (req.query.knownExpressions === 'false') {
-			sc.knownExpressions = false;
-		} else {
-			res.status(400);
-			res.end();
-			return;
-		}
-	}
-	// Nothing to search
-	if (Object.values(sc).every(el => el === undefined)) {
-		res.status(400);
-		res.end();
-		return;
-	}
-	const ideas = await dataServiceProvider.searchHandler.executeSearch(sc);
-	res.send(ideas);
+export async function getExpressions(_: Request, res: Response): Promise<void> {
+	const expressions = await dataServiceProvider.ideaManager.getExpressionsForSearch();
+	res.send(expressions);
 }
 
 export async function deleteIdea(req: Request, res: Response): Promise<void> {

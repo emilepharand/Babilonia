@@ -38,10 +38,11 @@ export default class Routes {
 		this.route('delete', '/languages/:id', Controller.deleteLanguage);
 		// Ideas
 		this.route('get', '/ideas/:id', Controller.getIdeaById);
-		this.route('get', '/ideas?:search', Controller.search);
 		this.route('post', '/ideas', Controller.addIdea);
 		this.route('put', '/ideas/:id', Controller.editIdea);
 		this.route('delete', '/ideas/:id', Controller.deleteIdea);
+		// Expressions
+		this.route('get', '/expressions', Controller.getExpressions);
 		// Practice
 		this.route('delete', '/everything', Controller.deleteAllData);
 		this.route('get', '/practice-ideas/next', Controller.getNextPracticeIdea);

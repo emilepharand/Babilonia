@@ -1,10 +1,8 @@
 import type {Idea} from '../../server/model/ideas/idea';
 import type {IdeaForAdding} from '../../server/model/ideas/ideaForAdding';
 import type {Language} from '../../server/model/languages/language';
-import type {SearchContext} from '../../server/model/search/searchContext';
 import type {Settings} from '../../server/model/settings/settings';
 import type {AllStats} from '../../server/stats/statsCounter';
-import {paramsFromSearchContext} from '../../server/utils/searchParams';
 
 const apiUrl = (() => {
 	const url = new URL(window.location.href);
@@ -118,8 +116,7 @@ export async function setSettings(settings: Settings): Promise<void> {
 	await doPut('/settings', settings);
 }
 
-export async function searchIdeas(sc: SearchContext): Promise<Idea[]> {
-	const params = paramsFromSearchContext(sc);
-	const response = await doGet(`/ideas?${params}`);
-	return (await response.json()) as Idea[];
+export async function getExpressions(): Promise<Array<{ideaId: number; languageName: string; text: string; known: string}>> {
+	const response = await doGet('/expressions');
+	return (await response.json()) as Array<{ideaId: number; languageName: string; text: string; known: string}>;
 }

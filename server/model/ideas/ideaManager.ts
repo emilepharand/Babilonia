@@ -58,6 +58,15 @@ export default class IdeaManager implements Manager {
 		return (await this.db.get('select count(*) as count from ideas'))?.count as number;
 	}
 
+	async getExpressionsForSearch(): Promise<Array<{ideaId: number; languageName: string; text: string; known: string}>> {
+		const query = `
+		select ideaId, languages.name as languageName, text, known from expressions
+		inner join languages on expressions.languageId = languages.id
+		`;
+		const rows: [{ideaId: number; languageName: string; text: string; known: string}] = await this.db.all(query);
+		return rows;
+	}
+
 	private async getUniqueExpressionsMap(ideaId: number) {
 		const currentExpressions = await this.getExpressions(ideaId);
 		const currentUniqueExpressionsMap = new Map<string, Expression>();
